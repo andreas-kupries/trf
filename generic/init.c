@@ -84,6 +84,12 @@ Tcl_Interp* interp;
 {
   Tcl_HashTable* hTablePtr;
 
+#if GT81
+  if (Tcl_InitStubs(interp, "8.1", 0) == NULL) {
+    return TCL_ERROR;
+  }
+#endif
+
   if (Trf_IsInitialized (interp)) {
       /*
        * catch multiple initialization of an interpreter

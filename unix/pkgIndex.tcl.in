@@ -12,7 +12,7 @@
 
 foreach {__maj__ __min__} [info tclversion] {break}
 
-if {@MC_USING_STUBS@} {
+if {@TRF_USING_STUBS@} {
     # Compiled with stubs, allow 8.1 and beyond.
     if {$__maj__ > 8 || ($__maj__ == 8 && $__min__ > 0)} {
 	package ifneeded Trf @TRF_VERSION@ \
