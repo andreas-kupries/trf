@@ -69,15 +69,25 @@ url zlib      [lib zlib] trf_zip.html#zlib
 link cmd_ref  {command reference}   trf_cmds.html
 link inst_man {installation manual} trf_install.html
 
-link memchan    Memchan            http://www.westend.com/~kupries/tcltk.html
 link patch      {separate chapter} trf_patch.html
 link patch_next {next section}     trf_compile.html
-
-link trfcrypt   TrfCrypt \
-	http://www.westend.com/~kupries/doc/trfcrypt/index.html
 
 link zipT       zip       trf_misc.html#zip
 link transformT transform trf_misc.html#transform
 link rsEccT     rs_ecc    trf_misc.html#rsecc
 link binioT     binio     trf_misc.html#binio
 link unstackT   unstack   trf_misc.html#unstack
+
+
+if {[info exists ::westend]} {
+
+    link trfcrypt   TrfCrypt ../trfcrypt/index.html
+    link memchan    Memchan  ../../tcltk.html
+
+} else {
+    link trfcrypt   TrfCrypt \
+	    http://www.westend.com/~kupries/doc/trfcrypt/index.html
+
+    link memchan    Memchan \
+            http://www.westend.com/~kupries/tcltk.html
+}

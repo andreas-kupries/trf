@@ -10,7 +10,7 @@ node trf_home {
     # environment dependent action:
     # link to my site, or produce stand alone docs
 
-    if {[info exists ::_cgi_link_url(tcltk)]} {
+    if {[info exists ::westend]} {
 	parent tcltk
     }
 
