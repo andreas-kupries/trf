@@ -1,3 +1,25 @@
+Wed Sep 30 15:49:24 1998  Andreas Kupries  <a.kupries@westend.com>
+
+	* unix/Makefile.in: Added [ZLIB|SSL]_[LIB|INCLUDE]_DIR, analogous
+	  to TCL_[LIB|INCLUDE]_DIR. Extended runtime library search path
+	  and compiler include options.
+
+	* unix/configure.in (TCL_LIB/INCLUDE_DIR): Added some additional
+	  intelligence: Setting one of the variables, but not the other
+	  causes automatic definition of the missing part with a value
+	  derived from the defined directory. Suggested by Larry Virden.
+	  Added 8.0.3 to the paths to search. Added $exec_prefix/lib to
+	  the paths to search for the tcl-library.
+	  Added searches for zlib.h / sha1.h / md2.h, and appropriate
+	  configure options (--with-zlib, --with-ssl, handling analogous
+	  to --with-tcl).
+
+Tue Sep 29 23:20:11 1998  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/digest.c: Added fixes for nits discovered by Larry
+	  Virden on his Sun: added explicit comparison to NULL, added
+	  casts for 'char*' to 'unsigned char*'.
+
 Mon Jul 27 22:11:59 1998  Andreas Kupries  <a.kupries@westend.com>
 
 	* win/: Got a windows dll from Jan Nijtmans (Jan.Nijtmans@wxs.nl)

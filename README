@@ -53,9 +53,8 @@ describing commands (-> latex) and c-level interfaces (-> man-pages).
 
 COMPILING/USING Tcl-Trf
 
-To compile Tcl-Trf please follow the instructions in the file
-'install.tex' in the 'doc' subdirectory. This contains a reference
-manual too (man.tex).
+To compile Tcl-Trf please follow the instructions in the HTML
+documentation (file: doc/html/trf_compile.html).
 
 To report bugs, bug fixes, descriptions of interesting Tcl-Trf
 applications, and suggested improvements:

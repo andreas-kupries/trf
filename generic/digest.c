@@ -384,7 +384,7 @@ ClientData       clientData;
   EncoderControl*                c = (EncoderControl*) ctrlBlock;
   Trf_MessageDigestDescription* md = (Trf_MessageDigestDescription*) clientData;
 
-  if (*md->updateBufProc) {
+  if (*md->updateBufProc != (Trf_MDUpdateBuf*) NULL) {
     (*md->updateBufProc) (c->context, buffer, bufLen);
   } else {
     unsigned int character, i;
@@ -451,7 +451,11 @@ ClientData       clientData;
     /*
      * Immediate execution or attached channel absorbing the checksum.
      */
-    res = c->write (c->writeClientData, digest, md->digest_size, interp);
+
+    /* -W- check wether digest can be declared 'uchar*', or if this has
+     * -W- other sideeffects, see lines 636, 653, 82 too.
+     */
+    res = c->write (c->writeClientData, (unsigned char*) digest, md->digest_size, interp);
   }
 
   Tcl_Free (digest);
@@ -629,7 +633,7 @@ ClientData       clientData;
     buf = character;
     (*md->updateProc) (c->context, character);
 
-    return c->write (c->writeClientData, &buf, 1, interp);
+    return c->write (c->writeClientData, (unsigned char*) &buf, 1, interp);
   } else {
     if (c->charCount == md->digest_size) {
       /*
@@ -646,7 +650,7 @@ ClientData       clientData;
       character = buf;
       (*md->updateProc) (c->context, character);
 
-      return c->write (c->writeClientData, &buf, 1, interp);
+      return c->write (c->writeClientData, (unsigned char*) &buf, 1, interp);
     } else {
       /*
        * Fill ringbuffer.
@@ -693,7 +697,7 @@ ClientData       clientData;
   Trf_MessageDigestDescription* md = (Trf_MessageDigestDescription*) clientData;
 
   if (c->operation_mode == ATTACH_WRITE) {
-    if (*md->updateBufProc) {
+    if (*md->updateBufProc != (Trf_MDUpdateBuf*) NULL) {
       (*md->updateBufProc) (c->context, buffer, bufLen);
     } else {
       int character, i;
@@ -705,7 +709,7 @@ ClientData       clientData;
     }
 
   } else if (c->operation_mode == ATTACH_TRANS) {
-    if (*md->updateBufProc) {
+    if (*md->updateBufProc != (Trf_MDUpdateBuf*) NULL) {
       (*md->updateBufProc) (c->context, buffer, bufLen);
     } else {
       int character, i;
@@ -822,7 +826,7 @@ ClientData       clientData;
 	  character = buf;
 	  (*md->updateProc) (c->context, character);
 
-	  res = c->write (c->writeClientData, &buf, 1, interp);
+	  res = c->write (c->writeClientData, (unsigned char*) &buf, 1, interp);
 	  if (res != TCL_OK)
 	    return res;
 	} else {
