@@ -1,5 +1,13 @@
 2003-03-27  Andreas Kupries  <andreask@activestate.com>
 
+	* tea.tests/base64_bb.test:
+	* tests/base64.test:
+	* generic/b64code.c (Decode): Added code to ignore any illegal
+	  character found in the input. This makes the [base64] command
+	  conform to RFC 2045. Changed the test-case base64-2.0 to reflect
+	  this. This fixes bug #696325 reported by Keith Vetter
+	  <keithv@users.sourceforge.net>.
+
 	* md5-crypt/md5.c (md5_process_bytes): Accepted patch #667168 by
 	  Olly Stephens <ollystephens@users.sourceforge.net>. Without the
 	  the patch new md5 test-case (see yesterday) causes a crash on

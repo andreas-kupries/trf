@@ -564,6 +564,11 @@ ClientData clientData;
   if ((character == '\r') || (character == '\n'))
       return TCL_OK;
 
+  /* ignore any ! illegal character - RFC 2045 */
+
+  if (((char) baseMapReverse [character]) & 0x80)
+    return TCL_OK;
+
   if (c->expectFlush) {
     /*
      * We had a quadruple with pad characters at the last call,
