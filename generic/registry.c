@@ -1275,7 +1275,9 @@ Tcl_Interp* interp;
      *
      * Suggested by Mikhail Teterin <mi@aldan.algebra.com> 25.11.1999.
      */
-    return;
+
+    DONE (TrfClose);
+    return TCL_OK;
   }
 
   parent = trans->parent;
@@ -2936,7 +2938,7 @@ Tcl_Interp*    interp;
   /*PRTSTR ("Data = {%d, \"%s\"}\n", outLen, outString);*/
   PRINT ("Data = %d {\n", outLen);
   DUMP  (outLen, outString);
-  PRINT ("}\n", outLen);
+  PRINT ("}\n");
 
   ResultAdd (r, outString, outLen);
 

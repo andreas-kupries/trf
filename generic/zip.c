@@ -771,7 +771,7 @@ ClientData clientData;
 
     /* 29.11.1999, AK * /
     if (res == Z_STREAM_END) {
-      /* Don't process the remainining characters, they are not part of the
+      / * Don't process the remainining characters, they are not part of the
        * compressed stream. Push them back into the channel downward and then
        * fake our upstream user into EOF.
        * /
@@ -870,7 +870,7 @@ ClientData clientData;
 
     /* 29.11.1999, AK * /
     if (res == Z_STREAM_END) {
-      /* Don't process the remainining characters, they are not part of the
+      / * Don't process the remainining characters, they are not part of the
        * compressed stream. Push them back into the channel downward and then
        * fake our upstream user into EOF.
        * /
