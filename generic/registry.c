@@ -210,7 +210,22 @@ typedef struct _TrfTransformationInstance_ {
 
   SeekState seekState;
 
+#ifdef TRF_STREAM_DEBUG
+  char*         name;       /* Name of transformation command */
+  unsigned long inCounter;  /* Number of bytes read from below */
+  unsigned long outCounter; /* Number of bytes stored in 'result' */
+#endif
+
 } TrfTransformationInstance;
+
+#ifdef TRF_STREAM_DEBUG
+#define STREAM_IN(trans,blen,buf) {int i; for (i=0;i<(blen);i++,(trans)->inCounter++) {printf ("%p:%s:in_\t%d\t%02x\n", (trans), (trans)->name, (trans)->inCounter, 0xff & ((buf) [i]));}}
+#define STREAM_OUT(trans,blen,buf) {int i; for (i=0;i<(blen);i++,(trans)->outCounter++) {printf ("%p:%s:out\t%d\t%02x\n", (trans), (trans)->name, (trans)->outCounter, 0xff & ((buf) [i]));}}
+#else
+#define STREAM_IN(t,bl,b)
+#define STREAM_OUT(t,bl,b)
+#endif
+
 
 #define INCREMENT (512)
 #define READ_CHUNK_SIZE 4096
@@ -1253,6 +1268,16 @@ Tcl_Interp* interp;
 	    trans->self            : /* 'self' already refers to our parent */
 	    trans->parent);
 #else
+  if ((instanceData == NULL) ||
+      (interp == NULL)) {
+    /* Hack, prevent 8.0 from crashing upon exit if channels
+     * with transformations were left open during exit
+     *
+     * Suggested by Mikhail Teterin <mi@aldan.algebra.com> 25.11.1999.
+     */
+    return;
+  }
+
   parent = trans->parent;
 #endif
 
@@ -1450,7 +1475,12 @@ int*       errorCodePtr;
 
     OT; OT;
     PRINT  ("................\n");
-    PRTSTR ("Retrieved = {%d, \"%s\"}\n", read, buf);
+    /*PRTSTR ("Retrieved = {%d, \"%s\"}\n", read, buf);*/
+
+    PRINT ("Retrieved = %d {\n", read);
+    DUMP  (read, buf);
+    PRINT ("}\n");
+    STREAM_IN (trans, read, buf);
 
     if (read < 0) {
       /* Report errors to caller.
@@ -2532,6 +2562,12 @@ Tcl_Interp*        interp;
 
   START (AttachTransform);
 
+#ifdef TRF_STREAM_DEBUG
+  trans->inCounter  = 0;
+  trans->outCounter = 0;
+  trans->name       = entry->trfType->name;
+#endif
+
   trans->patchIntegrated = entry->registry->patchIntegrated;
 
 
@@ -2739,7 +2775,10 @@ Tcl_Interp*    interp;
   Tcl_Channel parent;
 
   START  (PutDestination);
-  PRTSTR ("Data = {%d, \"%s\"}\n", outLen, outString);
+  /*PRTSTR ("Data = {%d, \"%s\"}\n", outLen, outString);*/
+  PRINT ("Data = %d {\n", outLen);
+  DUMP  (outLen, outString);
+  PRINT ("}\n");
 
 #ifdef USE_TCL_STUBS
   parent = (trans->patchIntegrated ?
@@ -2798,7 +2837,10 @@ Tcl_Interp*    interp;
   Tcl_Channel destination = (Tcl_Channel) clientData;
 
   START  (PutDestinationImm);
-  PRTSTR ("Data = {%d, \"%s\"}\n", outLen, outString);
+  /*PRTSTR ("Data = {%d, \"%s\"}\n", outLen, outString);*/
+  PRINT ("Data = %d {\n", outLen);
+  DUMP  (outLen, outString);
+  PRINT ("}\n");
 
   res = Tcl_Write (destination, (char*) outString, outLen);
 
@@ -2847,7 +2889,11 @@ Tcl_Interp*    interp;
   TrfTransformationInstance* trans = (TrfTransformationInstance*) clientData;
 
   START  (PutTrans);
-  PRTSTR ("Data = {%d, \"%s\"}\n", outLen, outString);
+  /*PRTSTR ("Data = {%d, \"%s\"}\n", outLen, outString);*/
+  PRINT ("Data = %d {\n", outLen);
+  DUMP  (outLen, outString);
+  PRINT ("}\n");
+  STREAM_OUT (trans, read, buf);
 
   trans->lastStored += outLen;
 
@@ -2887,7 +2933,10 @@ Tcl_Interp*    interp;
   ResultBuffer* r = (ResultBuffer*) clientData;
 
   START  (PutInterpResult);
-  PRTSTR ("Data = {%d, \"%s\"}\n", outLen, outString);
+  /*PRTSTR ("Data = {%d, \"%s\"}\n", outLen, outString);*/
+  PRINT ("Data = %d {\n", outLen);
+  DUMP  (outLen, outString);
+  PRINT ("}\n", outLen);
 
   ResultAdd (r, outString, outLen);
 
@@ -3917,6 +3966,49 @@ PrintString (fmt,len,bytes)
 /*
  *------------------------------------------------------*
  *
+ *	DumpString --
+ *
+ *	Defined only in debug mode, dumps information
+ *	in hex blocks
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+void
+DumpString (n,len,bytes)
+     int   n;
+     int   len;
+     char* bytes;
+{
+  int i, c;
+
+  for (i=0, c=0; i < len; i++, c++) {
+    if (c == 0) {
+      BLNKS;
+    }
+
+    printf (" %02x", (0xff & bytes [i]));
+
+    if (c == 16) {
+      c = -1;
+      printf ("\n");
+    }
+  }
+
+  if (c != 0) {
+    printf ("\n");
+  }
+}
+
+/*
+ *------------------------------------------------------*
+ *
  *	SeekDump --
  *
  *	Defined only in debug mode, dumps the complete
@@ -3937,6 +4029,7 @@ SeekDump (trans, place)
      CONST char*                place;
 {
   Tcl_Channel parent;
+  int         loc;
 
 #ifdef USE_TCL_STUBS
   parent = (trans->patchIntegrated ?
@@ -3945,6 +4038,8 @@ SeekDump (trans, place)
 #else
   parent = trans->parent;
 #endif
+
+  loc = TRF_TELL (parent);
 
 #if 0
   PRINT ("SeekDump (%s) {\n", place); FL; IN;
@@ -3961,7 +4056,7 @@ SeekDump (trans, place)
   PRINT ("down             %d [%d] | %d\n",
 	 trans->seekState.downLoc,
 	 trans->seekState.aheadOffset,
-	 TRF_TELL (parent)); FL;
+	 loc); FL;
   PRINT ("base             %d\n",
 	 trans->seekState.downZero); FL;
   PRINT ("identity force   %d\n",
@@ -3993,7 +4088,7 @@ SeekDump (trans, place)
 	  trans->seekState.upBufEndLoc,
 	  trans->seekState.downLoc,
 	  trans->seekState.aheadOffset,
-	  TRF_TELL (parent),
+	  loc,
 	  trans->seekState.downZero,
 	  trans->seekCfg.identity,
 	  trans->seekState.changed

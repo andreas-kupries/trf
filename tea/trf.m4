@@ -44,6 +44,14 @@ AC_ARG_ENABLE(static-bzlib,
 	[  --enable-static-bzlib         link 'bzlib' statically],
 	[STATIC_BZLIB=$enableval], [STATIC_BZLIB=no])
 
+AC_ARG_ENABLE(trf_debug,
+	[  --enable-debug              enable debugging output],
+	[trf_debug=$enableval], [trf_debug=no])
+
+AC_ARG_ENABLE(stream_debug,
+	[  --enable-stream-debug              enable debugging of IO streams],
+	[stream_debug=$enableval], [stream_debug=no])
+
 
 dnl ----------------------------------------------------------------
 dnl
@@ -338,6 +346,16 @@ fi
 if test "x$BZLIB_STATIC" = "xyes"
 then
 	eval AC_DEFINE_UNQUOTED(BZLIB_STATIC_BUILD, 1)
+fi
+
+if test "x$trf_debug" = "xyes"
+then
+	eval AC_DEFINE_UNQUOTED(TRF_DEBUG, 1)
+fi
+
+if test "x$stream_debug" = "xyes"
+then
+	eval AC_DEFINE_UNQUOTED(TRF_STREAM_DEBUG, 1)
 fi
 
 

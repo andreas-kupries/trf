@@ -1,3 +1,15 @@
+Thu Nov 25 22:14:28 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/registry.c (TrfClose): Added patch suggested by Mikhail
+ 	  Teterin <mi@aldan.algebra.com> to avoid a crash of the
+ 	  interpreter upon exit. Restricted to usage without stubss / 8.0
+ 	  series. Some platforms seem to call TrfClose with bogus
+ 	  instanceData and interpreter references (NULL) during exit with
+ 	  transformation channels left open.
+
+	* unix/Makefile.in (install-lib): Added '-' to avoid stop on error
+	  if compiled against 8.0, i.e. without stubs.
+
 Fri Nov 12 18:02:17 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* tea/configure.in: Added forgotten check for endianess to the TEA

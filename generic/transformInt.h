@@ -97,7 +97,10 @@ extern int n;
 #define PRINTLN(a) BLNKS; printf ("%s\n", (a))
 #define NPRINT     printf
 #define PRTSTR(fmt,len,bytes) PrintString (fmt,len,bytes)
+#define DUMP(len,bytes) DumpString (n, len, bytes)
+
 extern void PrintString _ANSI_ARGS_ ((char* fmt, int len, char* bytes));
+extern void DumpString  _ANSI_ARGS_ ((int level, int len, char* bytes));
 #else
 #define BLNKS
 #define IN
@@ -109,6 +112,7 @@ extern void PrintString _ANSI_ARGS_ ((char* fmt, int len, char* bytes));
 #define NPRINT if (0) printf
 #define PRINTLN(a)
 #define PRTSTR(fmt,len,bytes)
+#define DUMP(len,bytes)
 #endif
 
 
