@@ -712,8 +712,11 @@ int             preserve; /* Preserve result of transformation interp ? y/n */
      * Take it, then write it out to the channel system.
      */
     resObj = Tcl_GetObjResult (c->interp);
+#if GT81
+    resBuf = (unsigned char*) Tcl_GetByteArrayFromObj (resObj, &resLen);
+#else
     resBuf = (unsigned char*) Tcl_GetStringFromObj (resObj, &resLen);
-
+#endif
     res = c->write (c->writeClientData, resBuf, resLen, interp);
     break;
 

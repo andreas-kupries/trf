@@ -28,7 +28,7 @@
 #include <tcl.h>
 
 /* Encrypt at most 8 characters from KEY using salt to perturb DES.  */
-extern char *crypt _ANSI_ARGS_ ((__const char *__key, __const char *__salt));
+extern char *crypt _ANSI_ARGS_ ((CONST char *__key, CONST char *__salt));
 
 
 /* Reentrant versions of the functions above.  The additional argument
@@ -49,7 +49,7 @@ struct crypt_data {
 
 #ifdef __USE_GNU
 
-extern char *crypt_r _ANSI_ARGS_ ((__const char *__key, __const char *__salt,
+extern char *crypt_r _ANSI_ARGS_ ((CONST char *__key, CONST char *__salt,
 				   struct crypt_data * __data));
 #endif
 

@@ -1,4 +1,13 @@
 
+>> byte counter (message digest) - see gIOT test suite for
+>> implementation using 'transform'.
+	suggested by Oliver.Stephens@arm.com
+
+>> Remove dependency from Memchan in the tests.
+	sug. by Robert Karen <robert@namsb.namsi.com>
+
+
+
 > #if (TCL_MAJOR_VERSION < 8)
 > #define Tcl_GetStringResult(interp) (interp->result)
 > #endif
