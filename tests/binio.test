@@ -18,7 +18,7 @@ if {[string compare test [info procs test]] == 1} then {source defs}
 # determine endianess of machine running these tests
 
 proc endianess {} {
-    set fh [open /dev/null w]
+    set fh [open binio.test r]
     set e  [fconfigure $fh -byteorder]
     close $fh
     return $e
@@ -78,7 +78,7 @@ test binio-1.7 {binio copy, errors} {
 
 test binio-1.8 {binio copy} {
     set input  [open test.binio r]
-    set output [open /dev/null w]
+    set output [memchan]
     set n [binio copy $input $output]
     close $output
     close $input
