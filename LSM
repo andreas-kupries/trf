@@ -16,7 +16,7 @@ Primary-URL:	ftp.westend.com/pub/aku/trf@mFullVersion@.tar.gz (~500 K)
 Secondary-URL:	ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz (~500 K)
 		ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip (~500 K)
 		ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme (~2 K)
-Platforms:	Linux 2.0.29	(gcc 2.7.2.1)	Development sytem
+Platforms:	Linux 2.0.29	(gcc 2.7.2.1)	Development system
 		IRIX 6.2	(cc only)
 		ULTRIX 4.1	(both cc and gcc)
 		ULTRIX 4.4	(cc 3.0)

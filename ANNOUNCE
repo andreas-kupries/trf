@@ -15,7 +15,7 @@ Changes from b2 to b3:
 
 *	Added Windows port.
 
-*	Some bugfixes.
+*	Some bug fixes.
 
 *	More algorithms: RC2, MD2, SHA-1	(SSLeay required)
 			 RIPEMD-160
@@ -62,7 +62,7 @@ IMPORTANT:
 
 PLATFORMS:
 	tested:
-		Linux 2.0.29	(gcc 2.7.2.1)	Development sytem (yes, I made an upgrade)
+		Linux 2.0.29	(gcc 2.7.2.1)	Development system (yes, I made an upgrade)
 		IRIX 6.2	(cc only)
 		ULTRIX 4.1	(both cc and gcc)
 		ULTRIX 4.4	(cc 3.0)

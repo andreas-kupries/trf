@@ -1,3 +1,24 @@
+Mon May 19 22:35:19 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* doc/man.tex, install.tex: checked with 'ispell', added new
+	  message digests.
+
+	* generic/ripemd/rmd128.c: see below.
+
+	* generic/ripemd/rmd128.h: Made usable for AXP (64bit long's),
+	  added unique prefix to function names. Added tcl.h, _ANSI_ARGS_
+	  to let it compile for K&R too.
+
+	* tests/rmd128.test: see below.
+
+	* win/makefile.vc (TRFOBJS): see below.
+
+	* unix/Makefile.in (rmd128.o): see below.
+
+	* generic/init.c: see below.
+
+	* generic/rmd128.c: Added message digest RIPEMD-128.
+
 Thu May 15 20:32:49 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* generic/ripemd/rmd160.c: see below.

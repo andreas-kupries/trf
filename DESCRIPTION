@@ -31,7 +31,7 @@ extension trf {
 
     development-platform {Linux 2.0.29, gcc 2.7.2.1}
     platforms {
-	Linux 2.0.29	(gcc 2.7.2.1)	Development sytem
+	Linux 2.0.29	(gcc 2.7.2.1)	Development system
 	IRIX 6.2	(cc only)
 	ULTRIX 4.1	(both cc and gcc)
 	ULTRIX 4.4	(cc 3.0)

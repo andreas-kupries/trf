@@ -21,7 +21,7 @@ procedures includes:
 *	Conversion from and to various data encodings:
 
 	dual, octal, hexadecimal representation	
-	uuencoding, base64-encoding, ascii85-encoding
+	uuencoding, base64-encoding, ASCII85-encoding
 
 *	A reed-solomon error correcting coder.
 *	(De)Compression based on zlib 1.0.4	(if available as shared library)
@@ -57,7 +57,7 @@ Secondary ftp-site is
 	<ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip>
 	<ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme>
 
-And for convencience:
+And for convenience:
 
         <ftp://ftp.kisters.de/pub/lang/tcl/ext/zlib-1.0.4.tar.gz>
         <ftp://ftp.kisters.de/pub/lang/tcl/ext/libdes-3.23.tar.gz>
@@ -85,7 +85,7 @@ or
 
 PLATFORMS
 	tested:
-		Linux 2.0.29	(gcc 2.7.2.1)	Development sytem
+		Linux 2.0.29	(gcc 2.7.2.1)	Development system
 		IRIX 6.2	(cc only)
 		ULTRIX 4.1	(both cc and gcc)
 		ULTRIX 4.4	(cc 3.0)
