@@ -23,6 +23,12 @@ proc identity {operation buffer} {
 }
 
 
+proc pfx {prefix operation buffer} {
+    return $prefix$buffer
+}
+
+
+
 test transform-1.0 {transform behaviour, immediate write} {
     set     tracevar ""
     lappend tracevar [transform -mode write -command identity foobarflabbergast]
@@ -59,6 +65,25 @@ test transform-2.1 {transform behaviour, attached read} {
 
     set tracevar
 } {create/write-0 create/read-0 query/ratio-0 query/maxRead-0 read-17 query/maxRead-0 flush/read-0 flush/write-0 delete/write-0 delete/read-0}
+
+
+test transform-3.0 {More than one transform should work too} {
+    set tracevar ""
+    set                out [memchan]
+
+    transform -attach $out -command [list pfx a]
+    transform -attach $out -command [list pfx b]
+    puts -nonewline   $out foo
+
+    unstack $out
+    unstack $out
+
+    seek $out 0
+    set data [read $out]
+    close             $out
+
+    set data
+} {abfooaba}
 
 
 ::tcltest::cleanupTests

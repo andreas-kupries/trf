@@ -1,3 +1,20 @@
+2001-08-18  Tcl Project  <andreask@activestate.com>
+
+	* generic/transformInt.h: Added definitions for
+	  "Tcl_GetTopChannel" for use by cores older than 8.3.2. See bug
+	  below.
+
+	* generic/registry.c (AttachTransform, Lines 2665f): Forgot to
+	  compensate for stacking when remembering the parent channel for
+	  a 8.3.2+ core. Tcl_StackChannel does, but the Tcl_*Raw
+	  don't. Thanks to Adrian Koren <adrian@synchronicity.com> for
+	  reporting the problem and providing a script exercising the
+	  bug.
+
+	* generic/digest.c (WriteDigest): See Tue Jun 20 20:49:05 2000
+	  (reflect.c) for a similar fix. This one is thanks to Adrian
+	  Koren <adrian@synchronicity.com>.
+
 2001-03-27  Tcl Project  <a.kupries@westend.com>
 
 	* PREPARE: Moves contents of subdirectory 'tea' into main

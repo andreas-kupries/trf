@@ -15,6 +15,9 @@ typedef unsigned char BYTE;
 typedef unsigned int  UINT32;
 #else
 #ifndef UINT32
+#ifdef _WIN32
+#	pragma warning ( disable : 4142 )
+#endif
 typedef unsigned long UINT32;
 #endif
 #endif

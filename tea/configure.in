@@ -120,8 +120,17 @@ AC_SUBST(CYGPATH)
 # This MUST be called before SC_PATH_TCLCONFIG/SC_LOAD_TCLCONFIG
 #--------------------------------------------------------------------
 
-SC_PUBLIC_TCL_HEADERS
-#SC_PRIVATE_TCL_HEADERS
+case "`uname -s`" in
+    *win32* | *WIN32* | *CYGWIN_NT* | *CYGWIN_98* | *CYGWIN_95*)
+	# On windows tclLoadWin.c depends on internal headers. Darn.
+	SC_PRIVATE_TCL_HEADERS
+    ;;
+    *)
+	# Everywhere else we can stick with the public ones.
+	SC_PUBLIC_TCL_HEADERS
+    ;;
+esac
+
 
 #--------------------------------------------------------------------
 # Load the tclConfig.sh file
@@ -318,6 +327,14 @@ elif test "$SHLIB_SUFFIX" = "..o" -o "$SHLIB_SUFFIX" = ".a"; then
 else
     DL_OBJS=""
 fi
+
+case "`uname -s`" in
+    *win32* | *WIN32* | *CYGWIN_NT* | *CYGWIN_98* | *CYGWIN_95*)
+	DL_OBJS="tclLoadWin.o"
+    ;;
+    *)
+    ;;
+esac
 
 AC_SUBST(DL_OBJS)
 

@@ -1027,7 +1027,12 @@ char*                         digest;
 Trf_MessageDigestDescription* md;
 {
   if (destHandle != (char*) NULL) {
-    Tcl_Obj* digestObj = Tcl_NewStringObj (digest, md->digest_size);
+
+#if GT81
+    Tcl_Obj* digestObj = Tcl_NewByteArrayObj (digest, md->digest_size);
+#else
+    Tcl_Obj* digestObj = Tcl_NewStringObj    (digest, md->digest_size);
+#endif
     Tcl_Obj* result;
 
     /*#if GT81

@@ -528,6 +528,10 @@ typedef int (trf_ReadRaw)  _ANSI_ARGS_((Tcl_Channel chan,
 typedef int (trf_WriteRaw) _ANSI_ARGS_((Tcl_Channel chan,
 					char*       src,
 					int         srcLen));
+
+/* 396 */
+typedef int (trf_GetTopChannel) _ANSI_ARGS_((Tcl_Channel chan));
+
 /* 397 */
 typedef int (trf_ChannelBuffered) _ANSI_ARGS_((Tcl_Channel chan));
 
@@ -547,11 +551,13 @@ typedef int (trf_ChannelBuffered) _ANSI_ARGS_((Tcl_Channel chan));
 
 #define Tcl_ReadRaw         (*((trf_ReadRaw**)         (SLOT (394))))
 #define Tcl_WriteRaw        (*((trf_WriteRaw**)        (SLOT (395))))
+#define Tcl_GetTopChannel   (*((trf_GetTopChannel**)   (SLOT (396))))
 #define Tcl_ChannelBuffered (*((trf_ChannelBuffered**) (SLOT (397))))
 
 /*
 #define Tcl_ReadRaw         ((trf_ReadRaw*)         tclStubsPtr->reserved394)
 #define Tcl_WriteRaw        ((trf_WriteRaw*)        tclStubsPtr->reserved395)
+#define Tcl_GetTopChannel   ((trf_GetTopChannel*)   tclStubsPtr->reserved396)
 #define Tcl_ChannelBuffered ((trf_ChannelBuffered*) tclStubsPtr->reserved397)
 */
 

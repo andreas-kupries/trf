@@ -2661,7 +2661,13 @@ Tcl_Interp*        interp;
 
   /* trans->standard.typePtr = entry->transType; */
   trans->clientData       = entry->trfType->clientData;
-  trans->parent           = baseOpt->attach;
+
+  if (trans->patchVariant == PATCH_832) {
+    trans->parent = Tcl_GetTopChannel (baseOpt->attach);
+  } else {
+    trans->parent = baseOpt->attach;
+  }
+
   trans->readIsFlushed    = 0;
 
   /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
