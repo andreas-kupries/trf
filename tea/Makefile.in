@@ -184,7 +184,7 @@ Trf_INCLUDES		=	-I$(ZLIB_INCLUDE_DIR) -I$(SSL_INCLUDE_DIR)
 # This is a list of header files to be installed
 #========================================================================
 
-GENERIC_HDRS	=
+GENERIC_HDRS	=	$(TRF_GENSRCDIR)/transform.h
 
 #========================================================================
 # Define a list of files containing the stub declarations.
