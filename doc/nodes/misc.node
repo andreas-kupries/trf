@@ -16,10 +16,22 @@ node trf_misc {
 
     contents {
 	p "
-	5 more commands are available, not fitting into the categories
+	7 more commands are available, not fitting into the categories
 	of message digests or conversion:"
 
 	table {
+	    defrow [anchor_name crypt][cmd crypt] {
+		p "
+		implements the crypt function used by unix to hash the
+		user passwords.
+		"
+	    }
+	    defrow [anchor_name md5crypt][cmd md5crypt] {
+		p "
+		is an alternative to [cmd crypt] using MD5 as its
+		hashing algorithm.
+		"
+	    }
 	    defrow [anchor_name transform][cmd [link trf_transform]] {
 		p "
 		implements a general transformation. The underlying

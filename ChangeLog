@@ -1,3 +1,11 @@
+Sun May 28 19:25:52 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* win/makefile.vc5 (TRF_DEFINES): Added missing -DTRF_VERSION.
+
+	* generic/otpcode.c (insert): Added casts to prevent some warnings
+	  about unsigned long to unsigned char assignement. The operations
+	  causing them are ok.
+
 Sat Apr 29 00:14:23 2000  Andreas Kupries  <a.kupries@westend.com>
 
 	* -- Release 2.0p7 --
@@ -481,7 +489,7 @@ Sun Sep 19 01:29:23 1999  Andreas Kupries  <a.kupries@westend.com>
 	* generic/bz2.c (FlushEncoder): Killed the bug that plagued the
 	  'bzip' transformation. It was an error in the compressor,
 	  although the test of the decompressor failed. BZ_FLUSH ->
-	  BZ_FINISH solved that problem (incomplete output form the
+	  BZ_FINISH solved that problem (incomplete output from the
 	  compressor!).
 	  (FlushDecoder, Decode(Buffer)): Remembered result from last call
 	  too 'bzDecompress' to skip flushing if the stream is already in

@@ -2904,9 +2904,9 @@ int  start, length;
 
   shift = ((8  -(( start + length) % 8))%8);
   y = (long) (x << shift);
-  cl = (y >> 16) & 0xff;
-  cc = (y >> 8) & 0xff;
-  cr = y & 0xff;
+  cl = (unsigned char) ((y >> 16) & 0xff);
+  cc = (unsigned char) ((y >> 8) & 0xff);
+  cr = (unsigned char) (y & 0xff);
   if(shift + length > 16) {
     s[start /8] |= cl;
     s[start/8 +1] |= cc;
