@@ -101,17 +101,22 @@ exec ./capibase > nodes/capi.node
 
 exec nodeCompile westend html nodes 
 
-mDocTGZArchive html
+mDocTGZArchive doc/html
 eval file delete -force [glob html/*.html]
 
 
-file delete -force node/up.def
+file delete -force nodes/up.def
 exec nodeCompile     plain html          nodes
 exec nodeMakeSitemap plain html trf_home nodes
+
+
+mExclude nodes
 
 cd ..
 # pwd = root of distribution
 
+# remove crypto directories
+mExclude generic/blowfish generic/idea generic/rc4 generic/safer
 
 
 # II. security measures
