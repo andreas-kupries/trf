@@ -141,10 +141,10 @@ typedef struct _TrfMDOptionBlock {
 
   char*       readDestination;	/* Name of channel (or global variable)
 				 * to write the hash of read data to
-				 * (mode = TRF_WRITE_HASH) */
+				 * (mode = TRF_WRITE_HASH / ..TRANSPARENT) */
   char*       writeDestination;	/* Name of channel (or global variable)
 				 * to write the hash of written data to
-				 * (mode = TRF_WRITE_HASH) */
+				 * (mode = TRF_WRITE_HASH / ..TRANSPARENT) */
 
   int        rdIsChannel; /* typeflag for 'readDestination',  true for a channel */
   int        wdIsChannel; /* typeflag for 'writeDestination', true for a channel */
@@ -166,6 +166,7 @@ typedef struct _TrfMDOptionBlock {
 
 #define TRF_ABSORB_HASH (1)
 #define TRF_WRITE_HASH  (2)
+#define TRF_TRANSPARENT (3)
 
 EXTERN Trf_OptionVectors*
 TrfMDOptions _ANSI_ARGS_ ((void));

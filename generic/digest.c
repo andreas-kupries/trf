@@ -122,6 +122,8 @@ typedef struct _EncoderControl_ {
    * destHandle != NULL, vInterp != NULL, dest == NULL  /ATTACH_WRITE, to variable
    * destHandle == NULL, vInterp == NULL, dest != NULL  /ATTACH_WRITE, to channel
    * destHandle == NULL, vInterp == NULL, dest == NULL  /ATTACH_ABSORB, or IMMEDIATE
+   *
+   * TRF_TRANSPARENT <=> TRF_WRITE_HASH
    */
 
   VOID*          context;
@@ -132,7 +134,7 @@ typedef struct _EncoderControl_ {
 #define IMMEDIATE     (0)
 #define ATTACH_ABSORB (1)
 #define ATTACH_WRITE  (2)
-
+#define ATTACH_TRANS  (3)
 
 typedef struct _DecoderControl_ {
   Trf_WriteProc* write;
@@ -149,6 +151,8 @@ typedef struct _DecoderControl_ {
    * destHandle == NULL, dest != NULL	/ATTACH_WRITE, to channel
    * destHandle == NULL, dest == NULL	/ATTACH_ABSORB, or IMMEDIATE
    * vInterp always set, because of 'matchFlag'.
+   *
+   * TRF_TRANSPARENT <=> TRF_WRITE_HASH
    */
 
   VOID*          context;
@@ -247,7 +251,10 @@ ClientData    clientData;
     c->destHandle     = (char*)       NULL;
     c->dest           = (Tcl_Channel) NULL;
   } else {
-    c->operation_mode = ATTACH_WRITE;
+    if (o->mode == TRF_WRITE_HASH)
+      c->operation_mode = ATTACH_WRITE;
+    else
+      c->operation_mode = ATTACH_TRANS;
 
     if (o->wdIsChannel) {
       c->vInterp        = (Tcl_Interp*) NULL;
@@ -334,9 +341,11 @@ ClientData       clientData;
   buf = character;
   (*md->updateProc) (c->context, character);
 
-  if (c->operation_mode == ATTACH_ABSORB) {
+  if ((c->operation_mode == ATTACH_ABSORB) ||
+      (c->operation_mode == ATTACH_TRANS)) {
     /*
-     * absorption mode: incoming characters flow unchanged through transformation.
+     * absorption/transparent mode: incoming characters flow
+     * unchanged through transformation.
      */
 
     return c->write (c->writeClientData, &buf, 1, interp);
@@ -386,9 +395,11 @@ ClientData       clientData;
     }
   }
 
-  if (c->operation_mode == ATTACH_ABSORB) {
+  if ((c->operation_mode == ATTACH_ABSORB) ||
+      (c->operation_mode == ATTACH_TRANS)) {
     /*
-     * absorption mode: incoming characters flow unchanged through transformation.
+     * absorption/transparent mode: incoming characters flow
+     * unchanged through transformation.
      */
 
     return c->write (c->writeClientData, buffer, bufLen, interp);
@@ -433,7 +444,8 @@ ClientData       clientData;
   digest = (char*) Tcl_Alloc (2 + md->digest_size);
   (*md->finalProc) (c->context, digest);
 
-  if (c->operation_mode == ATTACH_WRITE) {
+  if ((c->operation_mode == ATTACH_WRITE) ||
+      (c->operation_mode == ATTACH_TRANS)) {
     res = WriteDigest (c->vInterp, c->destHandle, c->dest, digest, md);
   } else {
     /*
@@ -521,7 +533,10 @@ ClientData    clientData;
     c->destHandle     = (char*)       NULL;
     c->dest           = (Tcl_Channel) NULL;
   } else {
-    c->operation_mode = ATTACH_WRITE;
+    if (o->mode == TRF_WRITE_HASH)
+      c->operation_mode = ATTACH_WRITE;
+    else
+      c->operation_mode = ATTACH_TRANS;
 
     if (o->rdIsChannel) {
       c->destHandle     = (char*)       NULL;
@@ -609,6 +624,12 @@ ClientData       clientData;
   if (c->operation_mode == ATTACH_WRITE) {
     buf = character;
     (*md->updateProc) (c->context, character);
+
+  } else if (c->operation_mode == ATTACH_TRANS) {
+    buf = character;
+    (*md->updateProc) (c->context, character);
+
+    return c->write (c->writeClientData, &buf, 1, interp);
   } else {
     if (c->charCount == md->digest_size) {
       /*
@@ -672,7 +693,6 @@ ClientData       clientData;
   Trf_MessageDigestDescription* md = (Trf_MessageDigestDescription*) clientData;
 
   if (c->operation_mode == ATTACH_WRITE) {
-
     if (*md->updateBufProc) {
       (*md->updateBufProc) (c->context, buffer, bufLen);
     } else {
@@ -683,6 +703,20 @@ ClientData       clientData;
 	(*md->updateProc) (c->context, character);
       }
     }
+
+  } else if (c->operation_mode == ATTACH_TRANS) {
+    if (*md->updateBufProc) {
+      (*md->updateBufProc) (c->context, buffer, bufLen);
+    } else {
+      int character, i;
+
+      for (i=0; i < bufLen; i++) {
+	character = buffer [i];
+	(*md->updateProc) (c->context, character);
+      }
+    }
+
+    return c->write (c->writeClientData, buffer, bufLen, interp);
 
   } else {
     /* try to use more than character at a time. */
@@ -844,7 +878,8 @@ ClientData       clientData;
   digest = (char*) Tcl_Alloc (2 + md->digest_size);
   (*md->finalProc) (c->context, digest);
 
-  if (c->operation_mode == ATTACH_WRITE) {
+  if ((c->operation_mode == ATTACH_WRITE) ||
+      (c->operation_mode == ATTACH_TRANS)) {
     res = WriteDigest (c->vInterp, c->destHandle, c->dest, digest, md);
   } else if (c->charCount < md->digest_size) {
     /*

@@ -225,6 +225,7 @@ ClientData             clientData;
    *                TRF_WRITE_HASH:  -write/read-destination required according to
    *				      access mode of attached channel. If a channel
    *                                  is used as target, then it has to be writable.
+   *                TRF_TRANSPARENT: see TRF_WRITE_HASH.
    */
 
   if (baseOptions->attach == (Tcl_Channel) NULL) {
@@ -249,7 +250,7 @@ ClientData             clientData;
 	return TCL_ERROR;
       }
 
-    } else if (o->mode == TRF_WRITE_HASH) {
+    } else if ((o->mode == TRF_WRITE_HASH) || (o->mode == TRF_TRANSPARENT)) {
       if (o->matchFlag != (char*) NULL) {
 	Tcl_AppendResult (interp, "attach: -matchflag not allowed", (char*) NULL);
 	return TCL_ERROR;
@@ -341,7 +342,7 @@ ClientData  clientData;
 {
   /* Possible options:
    *
-   *	-mode			absorb|write
+   *	-mode			absorb|write|transparent
    *	-matchflag		<varname>
    *	-write-destination	<channel> | <variable>
    *	-read-destination	<channel> | <variable>
@@ -549,6 +550,13 @@ int*        mode;
   case 'w':
     if (0 == strncmp (modeString, "write", len)) {
       *mode = TRF_WRITE_HASH;
+    } else
+      goto unknown_mode;
+    break;
+
+  case 't':
+    if (0 == strncmp (modeString, "transparent", len)) {
+      *mode = TRF_TRANSPARENT;
     } else
       goto unknown_mode;
     break;
