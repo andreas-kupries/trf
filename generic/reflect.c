@@ -232,7 +232,7 @@ ClientData clientData;
     c->command = strcpy (Tcl_Alloc (1+strlen (o->command)), o->command);
 #endif
 
-    res = Execute (c, interp, "create/write", NULL, 0, 0);
+    res = Execute (c, interp, (unsigned char*) "create/write", NULL, 0, 0);
 
     if (res != TCL_OK) {
 #if (TCL_MAJOR_VERSION >= 8)
@@ -273,7 +273,7 @@ ClientData clientData;
 {
   EncoderControl* c = (EncoderControl*) ctrlBlock;
 
-  Execute (c, NULL, "delete/write", NULL, 0, 0);
+  Execute (c, NULL, (unsigned char*) "delete/write", NULL, 0, 0);
 
 #if (TCL_MAJOR_VERSION >= 8)
   Tcl_DecrRefCount (c->command);
@@ -313,7 +313,7 @@ ClientData clientData;
 {
   EncoderControl* c = (EncoderControl*) ctrlBlock;
 
-  return Execute (c, interp, "write", buffer, bufLen, 1);
+  return Execute (c, interp, (unsigned char*) "write", buffer, bufLen, 1);
 }
 
 /*
@@ -343,7 +343,7 @@ ClientData clientData;
 {
   EncoderControl* c = (EncoderControl*) ctrlBlock;
 
-  return Execute (c, interp, "flush/write", NULL, 0, 1);
+  return Execute (c, interp, (unsigned char*) "flush/write", NULL, 0, 1);
 }
 
 /*
@@ -371,7 +371,7 @@ ClientData clientData;
 {
   EncoderControl* c = (EncoderControl*) ctrlBlock;
 
-  Execute (c, (Tcl_Interp*) NULL, "clear_write", NULL, 0, 0);
+  Execute (c, (Tcl_Interp*) NULL, (unsigned char*) "clear_write", NULL, 0, 0);
 }
 
 /*
@@ -418,7 +418,7 @@ ClientData clientData;
     c->command = strcpy (Tcl_Alloc (1+strlen (o->command)), o->command);
 #endif
 
-    if (TCL_OK != Execute (c, interp, "create/read", NULL, 0, 0)) {
+    if (TCL_OK != Execute (c, interp, (unsigned char*) "create/read", NULL, 0, 0)) {
 #if (TCL_MAJOR_VERSION >= 8)
       Tcl_DecrRefCount (c->command);
 #else
@@ -457,7 +457,7 @@ ClientData clientData;
 {
   DecoderControl* c = (DecoderControl*) ctrlBlock;
 
-  Execute (c, NULL, "delete/read", NULL, 0, 0);
+  Execute (c, NULL, (unsigned char*) "delete/read", NULL, 0, 0);
 
 #if (TCL_MAJOR_VERSION >= 8)
   Tcl_DecrRefCount (c->command);
@@ -497,7 +497,7 @@ ClientData clientData;
 {
   DecoderControl* c = (DecoderControl*) ctrlBlock;
 
-  return Execute (c, interp, "read", buffer, bufLen, 1);
+  return Execute (c, interp, (unsigned char*) "read", buffer, bufLen, 1);
 }
 
 /*
@@ -527,7 +527,7 @@ ClientData clientData;
 {
   DecoderControl* c = (DecoderControl*) ctrlBlock;
 
-  return Execute (c, interp, "flush/read", NULL, 0, 1);
+  return Execute (c, interp, (unsigned char*) "flush/read", NULL, 0, 1);
 }
 
 /*
@@ -555,7 +555,7 @@ ClientData clientData;
 {
   DecoderControl* c = (DecoderControl*) ctrlBlock;
 
-  Execute (c, (Tcl_Interp*) NULL, "clear_read", NULL, 0, 0);
+  Execute (c, (Tcl_Interp*) NULL, (unsigned char*) "clear_read", NULL, 0, 0);
 }
 
 /*
@@ -606,12 +606,12 @@ int             transmit;
   }
 
   res = Tcl_ListObjAppendElement (interp, command,
-				  Tcl_NewStringObj (op, strlen (op)));
+				  Tcl_NewStringObj ((char*) op, strlen (op)));
   if (res != TCL_OK)
     goto cleanup;
 
   res = Tcl_ListObjAppendElement (interp, command,
-				  Tcl_NewStringObj (buf, bufLen));
+				  Tcl_NewStringObj ((char*) buf, bufLen));
   if (res != TCL_OK)
     goto cleanup;
 

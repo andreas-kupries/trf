@@ -310,7 +310,7 @@ ClientData clientData;
     c->charCount = 0;
     memset (c->buf, '\0', 4);
 
-    return c->write (c->writeClientData, result, len, interp);
+    return c->write (c->writeClientData, (unsigned char*) result, len, interp);
   }
 
   return TCL_OK;
@@ -370,7 +370,7 @@ ClientData clientData;
     c->charCount = 0;
     memset (c->buf, '\0', 4);
 
-    return c->write (c->writeClientData, result, len, interp);
+    return c->write (c->writeClientData, (unsigned char*) result, len, interp);
   }
 
   return TCL_OK;
@@ -528,7 +528,7 @@ ClientData clientData;
       unsigned long num = 0;
       int           k;
 
-      if (TCL_OK != CheckQuintuple (interp, c->buf, ALL))
+      if (TCL_OK != CheckQuintuple (interp, (unsigned char*) c->buf, ALL))
 	return TCL_ERROR;
 
       for (k=0; k < 5; k++) {
@@ -635,7 +635,7 @@ ClientData clientData;
       unsigned char result [4];
 
 
-      if (TCL_OK != CheckQuintuple (interp, c->buf, partial))
+      if (TCL_OK != CheckQuintuple (interp, (unsigned char*) c->buf, partial))
 	return TCL_ERROR;
 
       for (k=0; k < partial; k++) {
