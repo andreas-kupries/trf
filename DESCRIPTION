@@ -9,7 +9,7 @@ extension trf {
 	channel-based manipulation of binary data.
 
 	Trf extends the language at the C-level with so-called
-	``transformer''-procedures. With the help of some patches to the
+	``transformer''-procedures. With the help of some patches (*) to the
 	core the package is able to intercept all read/write operations
 	on designated channels, thus giving it the ability to transform
 	the buffer contents as desired. This allows things like
@@ -20,6 +20,9 @@ extension trf {
 
 	A separate package containing encryption transformation is available
 	at the same site carrying this package.
+
+	(*) The patches are only necessary for Tcl 8.0.x and 8.1.x. Since
+	Tcl 8.2 the Trf patch is an official part of the core.
     }
 
     keywords {
