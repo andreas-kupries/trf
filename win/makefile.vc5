@@ -39,7 +39,7 @@ TMPDIR	=	.
 # Name and placement of an important system DLL, the M$ Visual C RunTime
 
 MSVCRT		= msvcrt.dll
-MSVCRT_SYS	= c:\windows\system\msvcrt.dll
+MSVCRT_SYS	= c:\winnt\system32\msvcrt.dll
 
 # =======================================================================
 # Paths to the binaries and libraries of the Visual C++ environment. Since
@@ -80,8 +80,8 @@ TCL_SHORTVERS	= 80
 # Path to the installed include files (or the part of the source
 # distribution containing them.
 
-TCL_INCLUDES	= c:\programme\tcl\include
-#TCL_INCLUDES	= c:\programs\tcl\include
+TCL_INCLUDES	= c:\programs\tcl\include
+#TCL_INCLUDES	= c:\programme\tcl\include
 
 
 # =======================================================================
