@@ -1,0 +1,6 @@
+#!/bin/sh
+# generate configInfo
+rm -f configInfo
+echo	'# Definitions and libraries required to build tcl-applications with BLOB extension'					>> configInfo
+echo	'BLOB_CC_SWITCHES	= '		>> configInfo
+echo	'BLOB_LIBS		= -lblob'	>> configInfo

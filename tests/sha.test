@@ -1,0 +1,95 @@
+# -*- tcl -*-
+# Commands covered:	sha one-way hash function
+#
+# This file contains a collection of tests for one or more of the commands
+# the BLOB-X extension. Sourcing this file into Tcl runs the
+# tests and generates output for errors.  No output means no errors were
+# found.
+#
+# Copyright (c) 1996 Andreas Kupries (a.kupries@westend.com)
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# $Id$
+
+if {[string compare test [info procs test]] == 1} then {source defs}
+
+
+test sha-1.0 {argument errors} {
+    catch {sha} msg
+    set msg
+} {sha: source, destination missing}
+
+
+test sha-1.1 {argument errors} {
+    catch {sha x} msg
+    set msg
+} {sha: wrong # args}
+
+
+
+test sha-2.0 {sha} {
+    set m [memchan]
+    fconfigure  $m -translation binary
+    hex -attach $m -mode encode
+
+    sha [set mb [hex2chan [text2hex abc]]] $m
+    unstack $m
+    seek             $m 0
+    set text [string tolower [read $m]]
+
+    close $m
+    close $mb
+
+    set text
+} {0164b8a914cd2a5e74c4f7ff082c4d97f1edf880}
+
+
+test sha-2.1 {sha} {
+    set m [memchan]
+    fconfigure  $m -translation binary
+    hex -attach $m -mode encode
+
+    sha [set mb [hex2chan [text2hex abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq]]] $m
+    unstack $m
+    seek             $m 0
+    set text [string tolower [read $m]]
+
+    close $m
+    close $mb
+
+    set text
+} {d2516ee1acfa5baf33dfc1c471e438449ef134c8}
+
+
+test sha-2.2 {sha} {
+    if {[file size sha.test.vec] == 1000} {
+	set _ [pid]
+	exec cat sha.test.vec sha.test.vec sha.test.vec sha.test.vec sha.test.vec > $_
+	exec cat $_   $_   $_   $_   $_   $_   $_   $_   $_   $_   > $_.1
+	exec cat $_.1 $_.1 $_.1 $_.1 $_.1 $_.1 $_.1 $_.1 $_.1 $_.1 > $_
+	exec cat $_   $_ > sha.test.vec
+	file delete $_ $_.1
+	unset _
+    }
+
+    set          ma [open sha.test.vec r]
+    fconfigure  $ma -translation binary
+
+    set          mb [memchan]
+    fconfigure  $mb -translation binary
+    hex -attach $mb -mode encode
+
+    sha $ma $mb
+
+    unstack $mb
+    seek             $mb 0
+    set text [string tolower [read $mb]]
+
+    close $ma
+    close $mb
+
+    set text
+} {3232affa48628a26653b5aaa44541fd90d690603}
+

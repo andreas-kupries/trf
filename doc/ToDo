@@ -1,0 +1,17 @@
+<>	tools/md5sum
+	=>	make independent of TCL_POOL code!	/done/
+
+<>	documentation!
+	prepare for C2MAN	/done/
+
+<>	rewrite manual		/done/
+
+<>	add tests for uu/base64/ascii85
+
+<>	change rs-ecc to restrict length information to the legal range!
+	(errors may destroy the length byte too !!!)
+	/done/
+
+<>	add	md5/haval/sha file-digests, sign with pgp
+	=>	place in separate files on ftp-server!
+	/partly done/

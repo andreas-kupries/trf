@@ -1,0 +1,93 @@
+
+		Tcl Data transformations (Tcl-Trf)
+		(Version @VERSION@ / @DATE@)
+
+		Andreas Kupries	(a.kupries@westend.com)
+
+This directory contains a freely distributable extension to Tcl/Tk called Tcl
+Data transformations (Tcl-Trf). The collection of provided transformation
+procedures includes:
+
+*	Data encryption:
+
+	IDEA, Blowfish, RC4
+	DES		(if 'libdes' is available as shared library)
+
+*	Generation of message digests (hash values, checksums)
+
+	MD5, SHA/SHS, HAVAL
+	CRC (polynomial used by PGP)
+	ADLER (based upon zlib)
+
+*	Conversion from and to various data encodings:
+
+	dual, octal, hexadecimal representation	
+	uuencoding, base64-encoding, ascii85-encoding
+
+*	A reed-solomon error correcting coder.
+*	(De)Compression based on zlib 1.0.4	(if available as shared library)
+
+Example applications distributed with the package are:
+
+*	'tools/md', a message digest generator. Upwardly compatible to 'md5sum'.
+
+Tcl-Trf is developed for Tcl 7.6 or higher.  It is a pure Tcl extension, Tk is
+not required.  The extension requires a patched core. Patch files for 7.6 and
+8.0a1 are part of the distribution.  The plus-patches maintained by Jan
+Nijtmans (nijtmans@nici.kun.nl) contain this patch too .  Supporting (optional)
+packages are:
+
+*	memchan 1.0 or higher
+*	zlib-1.0.4  or higher
+*	libdes 3.21 or higher
+
+
+This distribution contains the source code for Tcl-Trf + documentation
+describing commands (-> latex) and c-level interfaces (-> man-pages).
+
+Primary ftp-site is
+
+	<ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.tar.gz>
+	<ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.readme>
+	<ftp://ftp.kisters.de/pub/lang/tcl/ext/memchan1.1.tar.gz>
+
+And for convencience:
+
+        <ftp://ftp.kisters.de/pub/lang/tcl/ext/zlib-1.0.4.tar.gz>
+        <ftp://ftp.kisters.de/pub/lang/tcl/ext/libdes-3.23.tar.gz>
+
+There will be NO upload to the official ftp-archive at ftp.neosoft.com
+to avoid problems with US export regulations (ITAR, cryptography
+is ammunition).
+
+
+
+COMPILING/USING Tcl-Trf
+
+To compile Tcl-Trf follow the instructions in the file INSTALL (and
+INSTALL.optional) in the 'doc' subdirectory.
+
+To report bugs, bug fixes, descriptions of interesting Tcl-Trf
+applications, and suggested improvements:
+
++) Send email to a.kupries@westend.com
+
+or
+
++) Post an article to the newsgroup	comp.lang.tcl
+
+
+PLATFORMS
+	tested:
+		Linux 1.2.13	(gcc 2.7.0)	Development sytem
+		IRIX 6.2	(cc only)
+		ULTRIX 4.1	(both cc and gcc)
+		ULTRIX 4.4	(cc 3.0)
+		HP-UX-9		(both cc and gcc)
+		HP-UX-10.2
+		Solaris 2.5	(gcc only)
+
+	Other machines and OS's should work too. 
+
+Feedback about other OS's and compilers is appreciated. Please
+help me in making this package better.

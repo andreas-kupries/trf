@@ -1,0 +1,457 @@
+% -*- latex -*-
+\documentstyle {report}
+\def\strong#1{{\bf #1}}
+\def\lang#1{{\tt #1}}
+\def\file#1{{\tt #1}}
+\def\arg#1{{\tt $<$#1$>$}}
+\def\trf{\strong {trf}}
+\def\blob{\strong {blob}}
+\def\blobx{\strong {blobX}}
+\def\tcl{\lang {tcl}}
+\def\cmd#1{{\tt #1}}
+\def\opt#1{{\tt #1}}
+\def\man#1{{\tt #1}}
+\def\lib#1{{\tt #1}}
+
+\def\version{1.0}
+\begin {document}
+\tableofcontents
+
+\chapter {Introduction}
+After torturing the world with 2 extensions releated to binary support
+in tcl (\blob{} and \blobx{}) I could not resist and wrote another
+one :-). It can be seen as a merger of features from these 2, but in
+contrast to them it is build on top of the binary data support coming
+in tcl8.0, aka
+
+\begin{itemize}
+\item	the \cmd{binio} command,
+\item	memory channels,
+\item	and transformation procedures.
+\end{itemize}
+
+\strong {This is not true in the current implementation}. We need
+
+\begin{itemize}
+\item	plain tcl 7.6 or higher and the appropriate patch-file from
+	subdirectory \file {patches} or
+
+\item	a tcl patched with Jan Nijtmans (nijtmans@nici.kun.nl)
+	plus-patches as of 12/05/1996 or later.
+
+\item	libz (compression library, optional, some functionality depends on it)
+\item	libdes (DES encryption library, optional, some functionality depends on it)
+\item	memchan 1.0 (optional)
+\end{itemize}
+
+
+\chapter {Acknowledgements}
+
+\begin {itemize}\Large
+\item	Guess who ? John Ousterhout (JohnOusterhout@sun.eng.com) for
+	\tcl {} itself. 
+\item	Jacob Levy (jyl@sun.eng.com)
+\item	Bastiaan Harmsen for general friendship.
+\item	Graham Stoney (greyham@research.canon.oz.au) for \cmd {c2man}.
+\item	Jan Nijtmans (nijtmans@nici.kun.nl) for support, encouragement
+	(transformation procedures as part of his plus-patches) and
+	several patches enhancing the usability (load-on-demand of
+	libz, \dots{}) of this package.
+\end   {itemize}
+
+Neither the encryption algorithms nor the message digests were
+implemented by myself, they are all from other persons. See chapter
+\ref {copyright} for more information.
+
+
+\chapter {Installation}
+See files \file {INSTALL}, \file {INSTALL.optional} (in directory \file {doc}).
+
+
+\chapter {Danger ahead}
+
+First some remarks regarding the work with binary data (and this
+package) in general:
+
+\begin {enumerate}
+\item	Whatever you do, don't forget to switch the used channels into
+	binary mode, i.e. execute ``fconfigure <channel> -translation
+	binary''. Not doing this will produce all kind of strange
+	errors, even on unix machines, as the default translation mode
+	(``auto'') will not only convert CR LF into LF, but a single
+	CR as well!
+
+\item	Using transformation procedures (as in this package)
+	introduces an additional level of buffering, because they are
+	permitted to buffer all characters they are unable to process
+	immediately. This may mess up especially
+	interprocess communication, a notoriously problematic field. A
+	not so improbable scenario would be the addition of encryption
+	to enhance security. Using a blockcipher here may lead to the
+	following problem (a line-oriented protocol is assumed):
+
+	\begin {itemize}
+	\item	The sender produces a line and writes it into the channel,
+		waiting for a response from the receiver afterward.
+	\item	The channel system invokes the blockcipher to encrypt
+		the line, but not all characters are encrypted due to
+		the length of the line not being a multiple of the
+		blocksize. Especially the EOL-character is neither
+		encrypted, nor transmitted.
+	\item	The receiver decrypts the blocks it got, then waits
+		for the EOL character.
+	\item	DEADLOCK.
+	\end   {itemize}
+
+	The solution here would be the usage of a blockcipher in CFB
+	mode and shift $=$ 1 or that of a stream cipher, as both of these
+	would encrypt single characters without buffering.
+
+	Data compression is another good candidate for such a situation.
+
+	Because of this I decided to include the number of characters
+	buffered by a certain transformation in its description.
+
+\end   {enumerate}
+
+
+\chapter {The available commands}
+
+All commands are available in 2 modes of operation, ``immediate'' and
+``attached''. The generic syntactical forms of these modes are:
+
+\begin {itemize}
+\item[immediate:]	\cmd {command} -option arg {value} \dots{} \arg {source} \arg {destination}
+
+			In this mode the command reads data from the
+			channel \arg {source}, transforms it according
+			to its specification (and the configuration as
+			defined by the options) and then writes the
+			result into the \arg {destination} channel.
+
+\item[attached:]	\cmd {command} -attach \arg {channel} -option \arg {value} \dots{}
+
+			Here a transformation procedure is created,
+			configured as defined by the options and then
+			attached to the \arg {channel}. All data read
+			from or written into the \arg {channel} will
+			be transformed accordingly from now on.
+\end   {itemize}
+
+
+\section {Encryption}
+
+The ciphers implemented here are
+
+\begin {enumerate}
+\item	DES 	(the dinosaur)
+\item	IDEA	(used by PGP)
+\item	Blowfish
+\item	RC4
+\end   {enumerate}
+
+The commands to invoke them are identical to the names, converted to
+all lowercase. Options common to them all:
+
+\begin {itemize}
+\item [-direction]	Allowed values are ``encrypt'', ``decrypt'' and all
+			unique abbreviations. Specifies the operation
+			to be executed in immediate mode or the
+			operation executed upon write! if attached to
+			a channel.
+\item [-key]		Argument to this option has to be a readable
+			channel. The user key for encryption and/or
+			decryption is defined by the contents of this
+			channel. The minimum and maximum number of
+			bytes to be read are cipher dependent and will
+			be described later.
+\end   {itemize}
+
+The first 3 ciphers are blockciphers, i.e. they do not encrypt single
+characters, but blocks of 2 or more. Such ciphers can be operated in 4
+different modes and therefore have additional options defined:
+
+\begin {itemize}
+\item[-mode]	The 4 possible argument values (and modes) are:
+	\begin {itemize}
+	\item[ecb]	$=$ \strong {e}lectronic \strong {c}ode\strong {b}ook.
+	\item[cbc]	$=$ \strong {c}ipher \strong{b}lock \strong{c}haining.
+	\item[cfb]	$=$ \strong {c}ipher \strong {f}eed\strong {b}ack.
+	\item[ofb]	$=$ \strong {o}utput \strong {f}eed\strong {b}ack.
+	\end   {itemize}
+
+	Only ``ecb'' neither requires a shiftvalue nor an initialization
+	vector (see options below). All other (``stream'') modes require
+	the initialization vector, the feedback modes additionally
+	need a shiftvalue.
+
+	The number of characters buffered internally depends both on
+	cipher and operation mode.
+	In 'ebc'- and 'cbc'-modes blocksize-1 characters are buffered.
+	The feedback modes buffer shift-1 characters.
+
+
+\item[-iv]	Argument to this option has to be a readable
+		channel. The initialization vector required by the
+		stream modes is defined by the contents of this
+		channel. A complete block must be stored.
+
+\item[-shift]	Only integer numbers are allowed as values to this
+		option. It defines the number of bytes the feedback
+		register is shifted to the left after every
+		encryption. Only positive values not larger than the
+		blocksize are allowed. They must be a divisor of the
+		blocksize too!
+\end   {itemize}
+
+
+Cipher characteristics:
+
+\begin {center}
+	\begin {tabular}{|l|l|l|}\hline
+	Name		& Blocksize (in byte)	& Keysize (in byte) \\ \hline\hline
+	DES		& 8			& 8 (without MSB!) \\ \hline
+	IDEA		& 8			& 16 \\ \hline
+	Blowfish	& 8			& 1 - 56 \\ \hline\hline
+	RC4		& -			& 1 - 256 \\ \hline
+	\end   {tabular}
+\end   {center}
+
+
+\section {Message digests}
+
+6 message digests are implemented:
+
+\begin {enumerate}
+\item	2 crc checkers, taken from PGP and library \lib {zlib}, under
+	the names \cmd {crc} and \cmd {crc-zlib} resp.
+\item	The adler-checksum, taken from \lib {zlib} too.
+\item	MD5
+\item	SHA (or SHS)
+\item	HAVAL
+\end   {enumerate}
+
+The commands to invoke them are identical to the names, converted to
+all lowercase. In immediate mode no options are allowed. Attached
+digests have to submodes available:
+
+\begin {itemize}
+\item[-mode]	The allowed arguments are ``absorb'', ``write'' and
+		all unique abbreviations.
+
+		In the first submode written data is not changed
+		except for attachment of the message digest at then
+		end of the input. During reading a digest is computed
+		too and then compared to the one attached. The
+		'-matchflag' must be defined to propagate the result
+		of the comparison to the tcl-level (``ok'' or ``failed'').
+
+		In the second submode read or written data goes into
+		nirwana, their digests are computed as
+		sideeffect. After the channel is closed the computed
+		digests are written to the channels specified with
+		'-read/write-dest'.
+
+\item[-matchflag]	The value specifies the name of global
+			variable to write the result of a digest
+			comparison to. Allowed for mode ``absorb''
+			only. Its definition for a writeonly channel
+			will be ignored.
+
+\item[-write-dest]	The value must specify a writable channel. The
+			message digest computed for data written to
+			the attached channel is written into it after
+			closing the attached channel. Allowed for mode
+			``write'' only. Its definition for a readonly
+			channel is ignored.
+
+\item[-read-dest]	The value must specify a writable channel. The
+			message digest computed for data read from
+			the attached channel is written into it after
+			closing the attached channel. Allowed for mode
+			``write'' only. Its definition for a writeonly
+			channel is ignored.
+\end   {itemize}
+
+
+\section {Data conversion}
+
+All data conversion commands support only one option, ``-mode''.
+Allowed values are ``encode'', ``decode'' and all unique
+abbreviations. It specifies the operation to be executed in immediate
+mode or the operation executed upon write! if attached to a channel.
+
+Encode converts from binary data into the described representation,
+decode does the reverse (obviously :-).
+
+Standard conversions are
+\begin {itemize}
+\item[bin]	Converts bytes into dual representation.
+\item[oct]	Converts bytes into octal representation.
+\item[hex]	Converts bytes into hexadecimal representation.
+\end   {itemize}
+None of them buffers characters internally.
+
+\begin {itemize}
+\item[uuencode]	Blocks of 3 characters are uuencoded/decoded. Will
+		buffer 2 characters internally until a block is complete.
+\item[base64]	Blocks of 3 characters are
+		base64-encoded/decoded. This is equivalent to PGP's
+		ascii armor. Used by MIME too. Will buffer 2
+		characters internally until a block is complete.
+\item[ascii85]	Blocks of 4 characters will be encoded into Ascii85
+		representation as defined in the 'Postscript Reference
+		Manual' (2nd Edition, section 3.13, page 129).
+\end   {itemize}
+All of these are able to convert an incomplete block at the end of
+input.
+
+\section {Misc.}
+
+4 other commands are available, not fitting into the categories above:
+
+\begin	{enumerate}
+\item	The reed-solomon error correcting coder available as \cmd
+	{rs\_ecc}. The one and only option understood is ``-mode''. It
+	is equivalent to the option understood by the conversion
+	commands in the last section. The coder operates on blocks of
+	248 characters each, therefore buffering 247 characters.
+
+\item	A compressor based upon the \lib {zlib} library. It is
+	available as \cmd {zip} and understands the following options:
+
+	\begin	{itemize}
+	\item[-mode]	Allowed arguments are ``compress'',
+			``'decompress' and all unique abbreviations of
+			these.
+	\item[-level]	Possible arguments are ``default'' and integer
+			numbers in the range 1 \dots{} 9. It specifies
+			the used compression level.
+	\end	{itemize}
+
+\item	\cmd {unstack}. This command must be used to remove a
+	conversion channel. The underlying channel is uncovered and
+	accessible again. It requires a channelhandle as its only
+	argument. Its application to a normal channel (file, socket,
+	\dots {}) is identical to \cmd {close}.
+
+\item	\cmd {binio}. See file \file {doc/binio.proposal} for more
+	information.
+\end	{enumerate}
+
+\chapter {Copyrights}\label {copyright}
+
+Copyright notes and acknowledgements for the different ciphers,
+message digests, \dots {}:
+
+\begin {enumerate}
+\item	MD5 is copyright 'RSA Data Security, Inc'. The note at the
+	beginning of \file {md5.h} says:
+
+	\begin {quotation}
+		License to copy and use this software is granted
+		provided that it is identified as the "RSA Data
+		Security, Inc. MD5 Message-Digest Algorithm" in all
+		material mentioning or referencing this software or
+		this function.
+                                                                  
+		License is also granted to make and use derivative
+		works provided that such works are identified as
+		"derived from the RSA Data Security, Inc. MD5
+		Message-Digest Algorithm" in all material mentioning
+		or referencing the derived work.
+	\end   {quotation}
+
+	I consider the terms of the license fullfilled by this
+	quotation. 
+
+\item	HAVAL is copyright $C^3SR$ and may not be sold or used as
+	inducement to buy a product without the written permission of
+	$C^3SR$. For technical questions or questions regarding the
+	code used here contact the author of HAVAL (and code): Yuliang
+	Zheng (yuliang@cs.uow.edu.au).
+
+	I made some minor changes to eliminate masses of \cmd
+	{gcc}-warnings regarding operator priority in expressions, but
+	did not change the semantics.
+
+
+\item	SHA / SHS was specified by the US government agency
+	NIST. Primary author of the code used here seems to be Peter
+	C. Gutmann (pgut01@cs.auckland.ac.nz), with heavily
+	modifications from Uwe Hollerbach (uh@alumni.caltech.edu).
+
+\item	The implementation of DES (libdes) used here is copyrighted by
+	Eric Young (eay@mincom.oz.au).
+
+\item	IDEA (International Data Encryption Algorithm) is a block
+	cipher developed  by  Dr.  Xuejia  Lai  and
+	Prof. Dr. J. L. Massey at the Swiss Federal Institute of
+	Technology.
+
+	The implementation used here was written by Richard De Moliner
+	(demoliner@isi.ee.ethz.ch).
+
+	\strong {Warning}:
+	\begin {quotation}
+		The IDEA(tm) block cipher is covered by a patent held
+		by ETH and a Swiss company called Ascom-Tech AG.  The
+		Swiss patent number is PCT/CH91/00117.  International
+		patents are pending. IDEA(tm) is a trademark of
+		Ascom-Tech AG.  \strong {There is no license fee required for
+		noncommercial use}.  Commercial users may obtain
+		licensing details from Dieter Profos, Ascom Tech AG,
+		Solothurn Lab, Postfach 151, 4502 Solothurn,
+		Switzerland, Tel +41 65 242885, Fax +41 65 235761. 
+	\end {quotation}
+
+\item	Blowfish was invented by Bruce Schneier
+	(schneier@counterpane.com) and is decribed in the 2nd edition
+	of his book ``Applied Cryptography''. His sources were used,
+	with small modifications to interface it with this package.
+
+	The statement of the author about the legal state of the
+	algorithm:
+
+	\begin {quotation}
+		Blowfish is unpatented, and will remain so in all
+		countries. The algorithm is hereby placed in the
+		public domain, and can be freely used by anyone.
+	\end {quotation}
+
+\item	RC4 was invented by RSA Data Security, Inc and considered a
+	``Trade Secret''. Somewhere in this big world it was
+	reengineered and the result made public, rendering the secret
+	useless.
+
+	I don't know that RSADSI will try to inflict on people using it
+	in the USA. Use it at your own risk.
+
+\item	The Reed-Solomon error correcting coder is copyrighted by Paul
+	Flaherty (paulf@stanford.edu) under the terms of the GNU
+	General Public License.
+
+\item	The library \lib {zlib} (base of compressor) is copyrighted by
+	Jean-Loup Gailly (gzip@prep.ai.mit.edu) and Mark Adler
+	(madler@alumni.caltech.edu).
+
+\end   {enumerate}
+
+
+\chapter {Future}
+
+Things to be done in future.
+
+\begin {itemize}
+\item	The tests are incomplete, expand them.
+\item	Add more ciphers (PGP!).
+%\item	Add data compression.
+\item	Transparent mode for digests.
+\item	Channel doing special framing after a fixed (user-defined)
+	number of characters
+\item	Random-byte generator (as real channeltype, no transformation!)
+\item	Identity-transformation with ability to gather statistics
+	about the information flowing through it.
+\end   {itemize}
+
+\end {document}

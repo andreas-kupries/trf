@@ -1,0 +1,22 @@
+# -*- tcl -*-
+# Commands covered:	none!
+#
+# this file checks the integrity of the complete package
+#
+# Copyright (c) 1996 Andreas Kupries (a.kupries@westend.com)
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# $Id$
+
+
+cd ..
+
+foreach md {crc crc-zlib adler md5 sha haval} {
+    catch {
+	exec ./tclsh tools/md -a $md -c digests.$md -z fake | sed -e {s/^/	/} >@ stdout
+    }
+}
+
+cd tests

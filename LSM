@@ -1,0 +1,35 @@
+Begin3
+Title:          trf
+Version:        @VERSION@
+Entered-date:   @DATE@
+Description:    loadable extension, provides commands for
+                data conversion, encryption, message digests,
+                compression, error-correction, channel-based
+		manipulation of binary data
+Keywords:       tcl, conversion, encryption, message digests,
+                compression, error-correction, binary io
+Author:         a.kupries@westend.com  (Andreas Kupries)
+Maintained-by:  a.kupries@westend.com  (Andreas Kupries)
+Primary-URL:	ftp.kisters.de/pub/lang/tcl/ext/trf1.0b2.tar.gz (~500 K)
+		ftp.kisters.de/pub/lang/tcl/ext/trf1.0b2.readme (~2 K)
+Platforms:	Linux 1.2.13	(gcc 2.7.0)	Development sytem
+		IRIX 6.2	(cc only)
+		ULTRIX 4.1	(both cc and gcc)
+		ULTRIX 4.4	(cc 3.0)
+		HP-UX-9		(both cc and gcc)
+		HP-UX-10.2
+		Solaris 2.5	(gcc only)
+		Other machines and OS's should work too. 
+Copying-policy: BSDStyle (-> tcl)
+Dependencies:   tcl (7.6 or higher)
+                plus-patches as of 5-Dec-1996 or later (optional)
+                memchan 1.0 or higher (optional)
+                zlib-1.0.4  or higher (optional)
+                libdes-3.21 or higher (optional)
+
+Comments:	BEWARE: The US places export restrictions
+		upon cryptographic software.
+
+                Because of this the package was not loaded to the
+		primary tcl-archive at neosoft.com.
+End

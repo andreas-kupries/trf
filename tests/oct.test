@@ -1,0 +1,162 @@
+# -*- tcl -*-
+# Commands covered:  oct
+#
+# This file contains a collection of tests for one or more of the trf
+# commands of the TRF extension. Sourcing this file into Tcl runs the
+# tests and generates output for errors.  No output means no errors were
+# found.
+#
+# Copyright (c) 1995 Andreas Kupries (a.kupries@westend.com)
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# $Id$
+
+if {[string compare test [info procs test]] == 1} then {source defs}
+
+set text	{hello}
+set text_c	{hellh}
+set text_oct	{150145154154157}
+set text_oct_c	{15014515415415}
+set wrong_oct	{101010090010101010200}
+
+
+test oct-1.0 {octal representation, convert into} {
+    puts -nonewline [set ma [memchan]] $text
+    seek $ma 0
+
+    oct -mode encode $ma [set mb [memchan]]
+    seek $mb 0
+
+    set result [list [fconfigure $mb -length] [read -nonewline $mb]]
+
+    close $ma
+    close $mb
+
+    set result
+} [list 15 $text_oct]
+
+
+test oct-1.1 {octal representation, convert from} {
+    puts -nonewline [set ma [memchan]] $text_oct
+    seek $ma 0
+
+    oct -mode decode $ma [set mb [memchan]]
+    seek $mb 0
+
+    set result [list [fconfigure $mb -length] [read -nonewline $mb]]
+
+    close $ma
+    close $mb
+
+    set result
+} [list 5 $text]
+
+
+
+
+test oct-2.0 {oct argument errors} {
+    catch {oct} msg
+    set msg
+} {mode not defined}
+
+
+test oct-2.1 {oct argument errors} {
+    catch {oct -mode} msg
+    set msg
+} {oct: wrong # args}
+
+
+test oct-2.2 {oct argument errors} {
+    catch {oct -o x} msg
+    set msg
+} {unknown option '-o'}
+
+
+test oct-2.3 {oct argument errors} {
+    catch {oct -m x} msg
+    set msg
+} {unknown mode 'x'}
+
+
+test oct-2.4 {oct argument errors} {
+    catch {oct -m decode} msg
+    set msg
+} {oct: source, destination missing}
+
+
+test oct-2.5 {oct argument errors} {
+    catch {oct -m decode xx} msg
+    set msg
+} {oct: wrong # args}
+
+
+test oct-2.6 {oct argument errors} {
+    catch {oct -m decode xx zz} msg
+    set msg
+} {can not find channel named "xx"}
+
+
+test oct-2.7 {oct argument errors} {
+    set ma [open __xx w]
+    set mb [memchan]
+
+    catch {oct -m decode $ma $mb} msg
+
+    close $ma
+    close $mb
+
+    set msg
+} {oct: source-channel not readable}
+
+
+test oct-2.8 {oct argument errors} {
+    set ma [memchan]
+    set mb [open __xx r]
+
+    catch {oct -m decode $ma $mb} msg
+
+    close $ma
+    close $mb
+
+    set msg
+} {oct: destination-channel not writable}
+
+
+test oct-2.9 {oct argument errors} {
+    catch {oct -a x} msg
+    set msg
+} {can not find channel named "x"}
+
+
+test oct-3.0 {oct conversion errors} {
+    puts -nonewline [set ma [memchan]] $wrong_oct
+    seek $ma 0
+
+    catch {oct -mode decode $ma [set mb [memchan]]} msg
+
+    close $ma
+    close $mb
+
+    set msg
+} {illegal character '9' found in input}
+
+
+test oct-4.0 {octal representation, partial conversion} {
+    puts -nonewline [set ma [memchan]] $text_oct_c
+    seek $ma 0
+
+    oct -mode decode $ma [set mb [memchan]]
+    seek $mb 0
+
+    set result [list [fconfigure $mb -length] [read -nonewline $mb]]
+
+    close $ma
+    close $mb
+
+    set result
+} [list 5 $text_c]
+
+
+unset text text_c text_oct text_oct_c wrong_oct

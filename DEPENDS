@@ -1,0 +1,9 @@
+# -*- tcl -*-
+# dependency information of Tcl-TRF
+
+# required tools
+tool get-manifest
+tool install-sh
+tool mkinstalldirs
+
+# other required modules

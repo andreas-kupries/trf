@@ -1,0 +1,61 @@
+# -*- tcl -*-
+# Commands covered:	haval one-way
+#
+# This file contains a collection of tests for one or more of the commands
+# the TRF extension. Sourcing this file into Tcl runs the
+# tests and generates output for errors.  No output means no errors were
+# found.
+#
+# Copyright (c) 1996 Andreas Kupries (a.kupries@westend.com)
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# $Id$
+
+if {[string compare test [info procs test]] == 1} then {source defs}
+
+
+array set io {
+    a
+    5BCB16472639B8E63CA1E2B347D9038F7A808D8B317CBE4F202DFB9C0529B0FD
+
+    HAVAL
+    7208A60270D70EE998F942B03D5D3ACF5B3AA4A841F21360896948D0B78CACD2
+
+    0123456789
+    CC2CE6F921AA5423E1EEAB178AE0FFD293972C2530DCE9C7FE8A7EA77C8ACEAC
+
+    abcdefghijklmnopqrstuvwxyz
+    DB9CEDB76576C2BFF4345F3D17C241CB1B4D29B0DBBE8F263E463BFFD260AC89
+
+    ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
+    8FB83BFDA5F8324DFBA078B3DB48A95B7C7C4023F8FB70045EF875425AF83868
+}
+
+
+proc haval2hex {text} {
+    puts -nonewline [set ma [memchan]] $text
+    seek $ma 0
+
+    hex -attach [set mb [memchan]] -mode encode
+    haval $ma $mb
+
+    unstack $mb
+    seek $mb 0
+
+    set text [read $mb]
+
+    close $ma
+    close $mb
+
+    return $text
+}
+
+
+foreach in [array names io] {
+    test haval-1.$in {haval, hash string} {
+	haval2hex $in
+    } $io($in)
+}
+

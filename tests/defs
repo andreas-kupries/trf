@@ -1,0 +1,281 @@
+# -*- tcl -*-
+# This file contains support code for the TRF test suite.  It is
+# normally sourced by the individual files in the test suite before
+# they run their tests.  This improved approach to testing was designed
+# and initially implemented by Mary Ann May-Pumphrey of Sun Microsystems.
+#
+# Copyright (c) 1990-1994 The Regents of the University of California.
+# Copyright (c) 1994 Sun Microsystems, Inc.
+# Modified      1995 Andreas Kupries (a.kupries@westend.com)
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# CVS: $Id$
+
+package require Memchan
+
+if ![info exists VERBOSE] {
+    set VERBOSE 0
+}
+if ![info exists TESTS] {
+    set TESTS {}
+}
+
+# If tests are being run as root, issue a warning message and set a
+# variable to prevent some tests from running at all.
+
+set user {}
+catch {set user [exec whoami]}
+if {$user == "root"} {
+    puts stdout "Warning: you're executing as root.  I'll have to"
+    puts stdout "skip some of the tests, since they'll fail as root."
+}
+
+# Some of the tests don't work on some system configurations due to
+# differences in word length, file system configuration, etc.  In order
+# to prevent false alarms, these tests are generally only run in the
+# master development directory for Tcl.  The presence of a file
+# "doAllTests" in this directory is used to indicate that the non-portable
+# tests should be run.
+
+set doNonPortableTests [file exists doAllTests]
+
+proc print_verbose {test_name test_description contents_of_test code answer} {
+    puts stdout "\n"
+    puts stdout "==== $test_name $test_description"
+    puts stdout "==== Contents of test case:"
+    puts stdout "$contents_of_test"
+    if {$code != 0} {
+	if {$code == 1} {
+	    puts stdout "==== Test generated error:"
+	    puts stdout $answer
+	} elseif {$code == 2} {
+	    puts stdout "==== Test generated return exception;  result was:"
+	    puts stdout $answer
+	} elseif {$code == 3} {
+	    puts stdout "==== Test generated break exception"
+	} elseif {$code == 4} {
+	    puts stdout "==== Test generated continue exception"
+	} else {
+	    puts stdout "==== Test generated exception $code;  message was:"
+	    puts stdout $answer
+	}
+    } else {
+	puts stdout "==== Result was:"
+	puts stdout "$answer"
+    }
+}
+
+proc test {test_name test_description contents_of_test passing_results} {
+    global VERBOSE
+    global TESTS
+    if {[string compare $TESTS ""] != 0} then {
+	set ok 0
+	foreach test $TESTS {
+	    if [string match $test $test_name] then {
+		set ok 1
+		break
+	    }
+        }
+	if !$ok then return
+    }
+    set code [catch {uplevel $contents_of_test} answer]
+#
+#    memory active $test_name
+#
+    if {$code != 0} {
+	print_verbose $test_name $test_description $contents_of_test \
+		$code $answer
+    } elseif {[string compare $answer $passing_results] == 0} then { 
+	if $VERBOSE then {
+	    print_verbose $test_name $test_description $contents_of_test \
+		    $code $answer
+	    puts stdout "++++ $test_name PASSED"
+	}
+    } else {
+	print_verbose $test_name $test_description $contents_of_test $code \
+		$answer 
+	puts stdout "---- Result should have been:"
+	puts stdout "$passing_results"
+	puts stdout "---- $test_name FAILED" 
+    }
+}
+
+proc dotests {file args} {
+    global TESTS
+    set savedTests $TESTS
+    set TESTS $args
+    source $file
+    set TESTS $savedTests
+}
+
+
+# -- attention procs --
+
+proc attention-a {} {
+    puts {-- ATTENTION --
+    Due to the inportability of binary data these tests
+    may fail on some machines although the extension was
+    compiled successfully and correctly.  The tests will
+    account for endianess in prediction of tests-results,
+    but not different type sizes. Assumed are:
+
+	char   = 1 byte
+	short  = 2 byte
+	int    = 4 byte
+	long   = 4 byte
+	float  = 4 byte
+	double = 8 byte
+
+    ----------------------------------------------------
+}
+rename attention-a {}
+}
+
+
+proc attention-b {} {
+    global known_machines
+
+    puts "-- ATTENTION again --\n\
+    Testing float, double now. The results depend\n\
+    completely upon processor architecture.\n\
+    Tested for \{$known_machines\} only!\n\
+"
+rename attention-b {}
+}
+
+
+proc use {little big} {
+    if {"little" == [blob endian]} {
+	return $little
+    } else {
+	return $big
+    }
+}
+
+proc m_use {def} {
+    global tcl_platform
+    set m $tcl_platform(machine)
+    array set x $def
+    return $x($m)
+}
+
+# list of machines we have floating point tests for.
+set known_machines {i486 IP20 IP22}
+
+
+proc known_machine? {} {
+    global tcl_platform known_machines
+    set m $tcl_platform(machine)
+    return [expr {[lsearch -exact $known_machines $m] >= 0}]
+}
+
+
+# utilities for easy specification and use of constant values (hex)
+
+proc defblock {name hexdata} {
+    upvar $name x
+
+    regsub -all { *} $hexdata {} hexdata
+    regsub -all "\n" $hexdata {} hexdata
+    # single long hex string now
+
+    set x $hexdata
+}
+
+
+proc hex2chan {hexdata} {
+    set               x [memchan]
+
+    fconfigure       $x -translation binary
+    hex  -attach     $x -mode decode
+    puts -nonewline  $x $hexdata
+#
+    unstack          $x
+
+    seek             $x 0
+    return           $x
+}
+
+
+proc text2hex {data} {
+    set               x [memchan]
+    fconfigure       $x -translation binary
+    hex  -attach     $x -mode encode
+    puts -nonewline  $x $data
+    unstack	     $x
+
+    seek             $x 0
+    set data   [read $x]
+    close            $x
+
+    return           $data
+}
+
+
+proc text2chan {data} {
+    set               x [memchan]
+    fconfigure       $x -translation binary
+    puts -nonewline  $x $data
+    seek             $x 0
+
+    return           $x
+}
+
+
+proc exec_bc {bc key iv in bc_args} {
+    set _key [hex2chan $key]
+    set _iv  [hex2chan $iv]
+    set _in  [hex2chan $in]
+    set has_out 0
+    set text ""
+
+    regsub -all {@key} $bc_args $_key bc_args
+    regsub -all {@iv}  $bc_args $_iv  bc_args
+    regsub -all {@in}  $bc_args $_in  bc_args
+
+    if {[regexp -- {@out} $bc_args]} {
+	set _out [memchan]
+	hex -attach $_out -mode encode
+	regsub -all {@out}  $bc_args $_out bc_args
+
+	set has_out 1
+    }
+
+    eval $bc $bc_args
+
+    close $_key
+    close $_iv
+    close $_in
+
+    if {$has_out} {
+	unstack $_out
+	seek $_out 0
+	set text [read $_out]
+	close $_out
+    }
+
+    return $text
+}
+
+
+proc xx_cmp {a b blocksize} {
+    set bsi [expr {$blocksize - 1}]
+
+    while {([string length $a] > 0) || ([string length $b] > 0)} {
+	set af [string range $a 0 $bsi]
+	set bf [string range $b 0 $bsi]
+
+	set a [string range $a $blocksize end]
+	set b [string range $b $blocksize end]
+
+	if {0 != [string compare $af $bf]} {
+	    puts -nonewline stdout "* "
+	} else {
+	    puts -nonewline stdout "  "
+	}
+
+	puts stdout "$af  $bf"
+    }
+}

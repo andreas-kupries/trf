@@ -1,0 +1,62 @@
+# -*- tcl -*-
+# Commands covered:	crc
+#
+# This file contains a collection of tests for one or more of the commands
+# the TRF extension. Sourcing this file into Tcl runs the tests and generates
+# output for errors.  No output means no errors were found.
+#
+# Copyright (c) 1996 Andreas Kupries (a.kupries@westend.com)
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# $Id$
+
+if {[string compare test [info procs test]] == 1} then {source defs}
+
+
+test crc-1.0 {argument errors} {
+    catch {crc} msg
+    set msg
+} {crc: source, destination missing}
+
+
+test crc-1.1 {argument errors} {
+    catch {crc x} msg
+    set msg
+} {crc: wrong # args}
+
+
+
+test crc-2.0 {crc} {
+    puts -nonewline [set ma [memchan]] {hello world}
+    seek $ma 0
+
+    crc  $ma [set mb [memchan]]
+    seek $mb 0
+
+    hex  -mode encode $mb [set mc [memchan]]
+    seek $mc 0
+
+    set res [read -nonewline $mc]
+
+    close $ma
+    close $mb
+    close $mc
+
+    set res
+} {B03CB7}
+
+
+# -- irrelevant now
+# -- see ftp://ftp.rocksoft.com/pub/clients/papers/crc_v3.txt
+#puts {
+#    Do you posess a generic crc generation package (or know about such)?
+#    Please mail me, so that i can integrate it, greatly enhancing the
+#    functionality provided here.  Commercial packs are of less interest
+#    to me, sorry.
+#}
+
+# remove globals
+#rename x {}
+

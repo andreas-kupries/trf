@@ -1,0 +1,18 @@
+#!/bin/sh
+# remove list of files from manifest difference list
+
+cat - > /tmp/$$
+
+# remove diff-garbage
+grep missing < /tmp/$$ > /tmp/$$.m
+grep added   < /tmp/$$ > /tmp/$$.a
+echo '--'	       > /tmp/$$.s
+cat  /tmp/$$.s /tmp/$$.m /tmp/$$.s /tmp/$$.a > /tmp/$$
+
+for pattern in "$@"
+do
+  grep -v "$pattern\$" < /tmp/$$ > /tmp/$$.x
+  mv	/tmp/$$.x /tmp/$$
+done
+
+cat /tmp/$$

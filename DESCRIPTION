@@ -1,0 +1,53 @@
+# -*- tcl -*-
+extension trf {
+    author       {Andreas Kupries (a.kupries@westend.com)}
+    maintenance  {Andreas Kupries (a.kupries@westend.com)}
+
+    version	   1.0b2
+    copying-policy {BSD-Style, see 'tcl'-license}
+    date           {@DATE@}
+
+    description {
+	Collection of transformation procedures
+	* Encryption      (des, idea, blowfish, rc4)
+	* Message digests (crc (pgp), md5, sha, haval, crc32, adler32 (both zlib))
+	* Data conversion (dual, hexadecimal, octal, uu, base64, ascii85)
+	* Error correcting coding (reed-solomon coder)
+	* Compression (zlib based).
+	* (un)pack binary data (as in perl)
+    }
+
+    primary-urls {
+	ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.tar.gz (~500 K)
+	ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.readme (~2 K)
+    }
+
+    development-platform {Linux 1.2.13, gcc 2.7.0}
+    platforms {
+	Linux 1.2.13	(gcc 2.7.0)	Development sytem
+	IRIX 6.2	(cc only)
+	ULTRIX 4.1	(both cc and gcc)
+	ULTRIX 4.4	(cc 3.0)
+	HP-UX-9		(both cc and gcc)
+	HP-UX-10.2
+	Solaris 2.5	(gcc only)
+
+	Other machines and OS's should work too. 
+    }
+
+    dependencies {
+	tcl (7.6 or higher)
+	plus-patches as of Dec 5, 1996 or later (optional)
+	memchan 1.0 or higher (optional)
+	zlib-1.0.4  or higher (optional)
+	libdes-3.21 or higher (optional)
+    }
+
+    comments {
+	BEWARE: The USA places export restrictions
+	upon cryptographic software.
+
+	Because of this the package was not loaded to the
+	primary tcl-archive at neosoft.com.
+    }
+}

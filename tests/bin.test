@@ -1,0 +1,162 @@
+# -*- tcl -*-
+# Commands covered:  bin
+#
+# This file contains a collection of tests for one or more of the trf
+# commands of the TRF extension. Sourcing this file into Tcl runs the
+# tests and generates output for errors.  No output means no errors were
+# found.
+#
+# Copyright (c) 1995 Andreas Kupries (a.kupries@westend.com)
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# $Id$
+
+if {[string compare test [info procs test]] == 1} then {source defs}
+
+set text	{hello}
+set text_c	{hell`}
+set text_bin	{0110100001100101011011000110110001101111}
+set text_bin_c	{01101000011001010110110001101100011}
+set wrong_bin	{101010020010101010200}
+
+
+test bin-1.0 {dual representation, convert into} {
+    puts -nonewline [set ma [memchan]] $text
+    seek $ma 0
+
+    bin -mode encode $ma [set mb [memchan]]
+    seek $mb 0
+
+    set result [list [fconfigure $mb -length] [read -nonewline $mb]]
+
+    close $ma
+    close $mb
+
+    set result
+} [list 40 $text_bin]
+
+
+test bin-1.1 {dual representation, convert from} {
+    puts -nonewline [set ma [memchan]] $text_bin
+    seek $ma 0
+
+    bin -mode decode $ma [set mb [memchan]]
+    seek $mb 0
+
+    set result [list [fconfigure $mb -length] [read -nonewline $mb]]
+
+    close $ma
+    close $mb
+
+    set result
+} [list 5 $text]
+
+
+
+
+test bin-2.0 {bin argument errors} {
+    catch {bin} msg
+    set msg
+} {mode not defined}
+
+
+test bin-2.1 {bin argument errors} {
+    catch {bin -mode} msg
+    set msg
+} {bin: wrong # args}
+
+
+test bin-2.2 {bin argument errors} {
+    catch {bin -o x} msg
+    set msg
+} {unknown option '-o'}
+
+
+test bin-2.3 {bin argument errors} {
+    catch {bin -m x} msg
+    set msg
+} {unknown mode 'x'}
+
+
+test bin-2.4 {bin argument errors} {
+    catch {bin -m decode} msg
+    set msg
+} {bin: source, destination missing}
+
+
+test bin-2.5 {bin argument errors} {
+    catch {bin -m decode xx} msg
+    set msg
+} {bin: wrong # args}
+
+
+test bin-2.6 {bin argument errors} {
+    catch {bin -m decode xx zz} msg
+    set msg
+} {can not find channel named "xx"}
+
+
+test bin-2.7 {bin argument errors} {
+    set ma [open __xx w]
+    set mb [memchan]
+
+    catch {bin -m decode $ma $mb} msg
+
+    close $ma
+    close $mb
+
+    set msg
+} {bin: source-channel not readable}
+
+
+test bin-2.8 {bin argument errors} {
+    set ma [memchan]
+    set mb [open __xx r]
+
+    catch {bin -m decode $ma $mb} msg
+
+    close $ma
+    close $mb
+
+    set msg
+} {bin: destination-channel not writable}
+
+
+test bin-2.9 {bin argument errors} {
+    catch {bin -a x} msg
+    set msg
+} {can not find channel named "x"}
+
+
+test bin-3.0 {bin conversion errors} {
+    puts -nonewline [set ma [memchan]] $wrong_bin
+    seek $ma 0
+
+    catch {bin -mode decode $ma [set mb [memchan]]} msg
+
+    close $ma
+    close $mb
+
+    set msg
+} {illegal character '2' found in input}
+
+
+test bin-4.0 {dual representation, partial conversion} {
+    puts -nonewline [set ma [memchan]] $text_bin_c
+    seek $ma 0
+
+    bin -mode decode $ma [set mb [memchan]]
+    seek $mb 0
+
+    set result [list [fconfigure $mb -length] [read -nonewline $mb]]
+
+    close $ma
+    close $mb
+
+    set result
+} [list 5 $text_c]
+
+
+unset text text_c text_bin text_bin_c wrong_bin

@@ -1,0 +1,50 @@
+
+think about make-tape extension to allow different prepares
+=>	international / us distribution
+=>	us distrib should contain stubs for all ciphers except DES!
+=>	there shall be exist some law banning import!! of strong crypto
+	(ref: jacob levy).
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<>	corrected error in tclIO.c
+	regarding delivery of empty buffer by transformation sequence
+	(got into infinite loop)
+---------------------------------------------------------------------
+
+
+fragments for emacs registers
+
+clientData
+ClientData clientData;
+, clientData
+,
+						     ClientData clientData
+
+
+-----------------------------------------------------------------------
+documentation to schedule interface.
+
+typedef void (Trf_BCSchedule)     _ANSI_ARGS_ ((VOID*  key, int wanted,
+						VOID** e_schedule,
+						VOID** d_schedule));
+possible calls:
+
+	key, encrypt, *e/d_schedule = NULL
+
+		generate encryption schedule (may generate decryption schedule too!)
+
+	key, decrypt, *e/d_schedule = NULL
+
+		generate decryption schedule (may generate encryption schedule too!)
+		(higher prob. of latter, as d_schedule often derived from e_schedule).
+
+	key, encrypt, *e_schedule != NULL
+
+		nothing to do for encryption schedule.
+		may generate decryption schedule.
+
+	key, decrypt, *d_schedule != NULL
+
+		nothing to do for decryption schedule.
+		may generate encryption schedule.

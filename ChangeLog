@@ -1,0 +1,356 @@
+Fri Jan 31 18:43:29 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* libdes.c, zlib.c: use library names without path, use OS
+	  facilities for searching (LD_LIBRARY_PATH, et.al).
+
+	* tools/ldAout.tcl: search for symbols did not account for
+	  capitals. Found after building libz.a without zsymbols.c
+
+	* digest.c: had unsigned <-> signed comparison.
+
+Thu Jan 30 22:32:45 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* compat/tclLoadShl.c (dlopen): improved error messaging for HP-UX
+	  upon failed loads.
+
+	* Makefile.in: removed superfl. targets for 'zsymbols.o' and
+	  'ld_sysmbols.o'.
+
+	* configure.in: use default (/usr/local) for prefix instead of NONE.
+
+	* got patch from Jan fixing some minor things. see above ^.
+
+Sun Jan 26 21:18:56 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* binio.c (FLIP (in ReorderBytes)): corrected wrong indexing in
+	  first assignment.
+	  (UnpackCmd): added format-length and 0-padding to hex
+	  conversions (%x -> %08x, %08lx, %04x).
+
+	* tests/binio.test: added tests for 'binio'.
+
+Mon Jan 20 23:07:01 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* binio.c (PackCmd, UnpackCmd): use Tcl_GetChannelByteorder to
+	  determine wether swapping is required or not. See entry at
+	  Jan 13, -> binio.c too.
+
+	* added *.byteorder patches. These introduce a new channel
+	  attribute, the associated byteorder. It can be retrieved
+	  directly and via 'fconfigure'. Setting is possible by 'fconfigure'
+	  only. This is used by 'binio' to swap word information if required.
+
+Wed Jan 15 19:07:12 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* -- all changes below by Jan Nijtmans. All of Monday, Jan 13 was
+	  covered by his patch too.
+
+	* cipher.c: See Jan 5, (XX). Some remains of same thing.
+
+	* digest.c (DecodeBuffer, l.674): See below, this time the first
+	  argument of 'memcpy'. Cause of (##) ?
+
+	* registry.c (TrfInput, l. 683): Added () around 'trans->result +
+	  toRead', some compiler (which?) choked without.
+
+	* configure.in (line 261): SHLIB_LD_ALL must be set in all
+	  cases. Without it "make libz" and "make libdes" will work on
+	  Ultrix, but not on other machines. 
+
+	* zip.c: See Jan 5, (XX). Some remains of same thing, forward
+	  declarations forgotten.
+
+Tue Jan 14 21:57:19 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* configure.in (line 259): don't bother with -ltclX.Y if not
+	  running under AIX.
+
+	* INSTALL: updated to reflect new search order.
+
+	* configure.in: changed search order: sibling directories before
+	  <prefix> paths. But commandline options (-with-tcl...) overide all.
+
+	* all digests fail on HP A.09.04 (Bus error). Seems to be
+	  something in general code (dig_opt / digest). Had no time to
+	  study it further, but must be done. (##)
+
+	* zip.c: See Jan 5, (XX). Some remains of same thing.
+
+Mon Jan 13 21:41:33 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* haval/haval.c: Most of conversion was already done (See Jan 5),
+	  with the exception of a single place (haval_tailor).
+
+	* blowfish/blowfish.*, idea/idea.*, md5/md5.*, rc4/rc4.*: See
+	  below. Most files integrated from external sources have this
+	  problem.
+
+	* sha/sha.[ch]: added <tcl.h>, _ANSI_ARGS_ (), generally conform
+	  to JO's conventions for extension programming. Removed usage of
+	  ##-operator too (concatenates token processed by preprocessor).
+
+	  REASON: HP (uname -> 'A.09.04 B') choked on prototypes and the
+	  like.
+
+	* configure.in (AC_PATH_PROG(MAKEDEPEND)): see below (-> depend).
+	  (sizeof int, long int): determine type sizes, required by 'binio'.
+
+	* Makefile.in (BASE_SRC, BASE_OBJ): added 'binio'.
+	  (depend): changed 'makedepend' to '@MAKEDEPEND@', let configure
+	  determine its location. Use ':' if not found (as for the HP used
+	  by my employer).
+
+	* binio.c: new file and command 'binio'. Based on Jacobs
+	  (Jacob.Levvy@eng.sun.com) proposal. Exception: reordering of
+	  bytes (see ### BYTEORDER ###). Need a flag to tell me the
+	  byteorder associated to the used channels.
+
+        * ======================= released 1.0b1 =======================	
+
+Fri Jan 10 12:48:13 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* registry.c (TrfInput): fixed error preventing read/gets from
+	  stacked channels to work properly (set trans->used to 0, then!
+	  used it, argh).
+
+	* configure.in: Added 8.0, 8.0a1 to search sequences.
+
+	* doc/INSTALL, doc/INSTALL.optional, doc/man.tex: updated
+	  dependency information.
+
+Mon Jan  6 19:14:20 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* patches/core7.6.patch, patches/core8.0a1.patch: Added patch files
+	  for tcl-core to remove dependency on plus-patches.
+
+Sun Jan  5 22:26:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* --> Jan's patch integrated now.
+
+	* Makefile.in: adapted to changes in 'configure.in'.
+
+	* configure.in: streamlined handling of Ultrix 4.4 and other Aout
+	  systems. External libraries now must have extension '.a'.
+
+	* compat/tclLoadNone.c: changed to include all global symbols
+	  exported by libz and libdes resp. This forces static linkage on
+	  systems not supporting dynamic loading.
+
+	* haval/haval.h, haval/haval.c: changed header prototypes to
+	  _ANSI_ARGS_-notation of Tcl. Changed prototypes to K&R style.
+
+	* registry.c, unstack.c: Removed superfluous '&'s.
+
+	* transform.h.in: const -> CONST
+
+	* asc85code.c, b64code.c, bincode.c, hexcode.c, octcode.c,	(XX)
+	  uucode.c, rs_ecc.c, blockcipher.c, digest.c:
+	  I consistently used 'Trf_WriteProc fun' instead of
+	  'Trf_WriteProc* fun' in declarations and definitions of
+	  'Create(En/De)coder'. Severe case of cut/copy/paste
+	  disease. Found by an older compiler under Ultrix 4.1.
+
+	* Back from christmas holiday. --> Integrate patch send by Jan at
+	  Dec 20, 1996. 
+
+Wed Dec 18 18:46:58 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+
+        * ======================= released 1.0a3 =======================
+	
+	* PREPARE: change title of MANIFEST.
+
+	* Makefile.in (distclean): removed MANIFEST from list.
+
+Tue Dec 17 17:35:13 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* transform.h.in, c_opt.c, rc4.c, templates/c_template.c: extended
+	  interface analogously to message digests, blockcipher to allow
+	  dynamic loading. RC4 does not require this, but later
+	  functionality might do.
+
+	* Makefile.in (depend): added -D___MAKEDEPEND___, see below.
+
+	* transformInt.h: use ___MAKEDEPEND__ to hide 'zlib.h', 'des.h'
+	  during makedepend runs.
+
+	* tests/sha.test: see below, added expansion of file 'sha.test.vec'.
+
+	* tests/sha.test.vec: reduced from 1e6 bytes to 1000 bytes. Will
+	  be blown up at test time! Should reduce distribution size
+	  about 100 K.
+
+	* doc/INSTALL.optional: new file, instructions and comments
+	  related to building shared libraries for ZLIB and
+	  LIBDES. --==** Important **==--.
+
+	* compat/ld_symbols.c: see below, copied and modified. valid for
+	  libdes 3.23.
+
+	* compat/zsymbols.c: new file, contains functionality to enable
+	  dyn. loading for a.out (Ultrix). Got from Jan. Valid for zlib 1.0.4.
+
+	* transformInt.h: HAVE_LIBDES_H -> HAVE_DES_H.
+
+	* compat/tclLoadNone.c, compat/_eprintf.c: new files, for systems
+	  without dyn. loading, and to avoid problems with gcc and
+	  assert. Send in by Jan.
+
+	* compat/tclLoadAout.c: new version from Jan, had problems on
+	  Ultrix due to some unknown symbols.
+
+	* sha/sha.c (sha_final): removed superfluous '&' (sha_info->data,
+	  lines 170, 175, 177).
+
+	* registry.c (TrfWatch): removed 'return' in void-procedure. Why
+	  did 'gcc -Wall' did not complain?
+
+Mon Dec 16 18:29:27 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* des.c, bc_opt.c, transformInt.h, libdes.c: LIBDES will be loaded
+	  on demand now. Removed from distribution.
+
+	* ZLIB removed from distribution, will be loaded if required
+	  (commands: adler, crc-zlib, zip).
+
+	* adler.c, crc_zlib.c (MD_Check): checkProc searches and loads
+	  'libz'.
+
+	* sha.c, md5.c, crc.c, haval.c: no checkProc required.
+
+	* dig_opt.c (checkOptions): Calls 'checkProc' now.
+
+	* transform.h.in: Extended interface to digests (Trf_MDCheck, checkProc).
+
+	* zip_opt.c (checkOptions): load libz here.
+
+	* Makefile.in (zlib): new target to make libz.
+
+	* configure.in: added code to enable generation of libz as shared
+	  library.
+
+Sat Dec 14 19:17:56 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* integrated information from patch (*2) into configure.in and
+	  Makefile.in. New directory 'compat' with dll-loading code for
+	  various OS (taken from tcl).
+
+	* blowfish/blowfish.c (Blowfish_decipher): changed assignments
+	  'Xl = *xl', 'Xr = *xr' to 'Xl.word = *xl', 'Xr.word = *xr'. The
+	  assigment to the union was accepted by gcc, but not Ultrix 4.4, cc3.0.
+
+	* blowfish/bf_tab.h: The '\'s introduced by Jans patch (see *1)
+	  got through the Ultrix 4.4, cc3.0 preprocessor and let the
+	  compiler bark. Removed now.
+
+	* blockcipher.c, bc_util.c, cipher.c, blowfish.c. zip.c: see below.
+
+	* md5.c, haval.c, sha.c (MD_Update(Buf), MD_Final): see below.
+
+	* digest.c: all allocates now cast to the correct type (there were
+	  some casts missing, causing ULTRIX 4.4, cc3.0 to barf).
+
+	* hexcode.c, octcode.c, bincode.c: encode uses table-lookup now,
+	  no more bitfiddling.
+
+Wed Dec 11 20:54:10 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* zip.c, rs_ecc.c: Done too.
+
+	* Got patch from Jan Nijtmans (*2) to load arbitrary dynamic
+	  libraries, enabling me to remove 'zlib' and 'libdes' from
+	  distribution. Integration defered until all and everything is
+	  updated to handle character buffers.
+
+	* blockcipher.c: Updated to handle character buffers as well.
+
+Tue Dec 10 21:22:02 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* md5.c, crc.c, crc_zlib.c, haval.c: All updated to handle buffers
+	  containing more than one character. For speedups see doc/speed/*
+
+	* sha.c (MD_UpdateBuf): New procedure to handle a buffer of
+	  characters. Depending on input-size 'sha' is now ~2-3 times as
+	  fast.
+
+	* digest.c (Encode-, Decodebuffer): New procedures to convert
+	  complete buffers. Use a procedure to convert a buffer of
+	  characters, if defined by the digest.
+
+	* registry.c (TransformImmediate): read 4K chunks of characters
+	  now, instead one by one. Use a procedure to convert a buffer of
+	  characters, if defined by the transformation.
+	  
+Thu Dec  5 20:19:31 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+
+        * ======================= released 1.0a2 =======================
+	
+	* The last changes reworked the package installation to conform to
+	  the new standard set by the core: library and package index go
+	  into a subdirectory of the library directory (making it a
+	  sibling to tclX.Y).
+
+	* Makefile.in (EXTENSION): set to Trf, the official name of this extension.
+	  (LIB_RUNTIME_DIR): use EXTENSION, VERSION to determine complete path.
+	  (install): target 'install-package' removed.
+	  (install-lib): install package index too.
+
+	* got a patch from Jan Nijtmans <nijtmans@nici.kun.nl> (*1):
+
+	- Addition of LIB_RUNTIME_DIR (needed for Solaris, otherwise
+	  the custom tclsh cannot find libtrf1.0.so at run-time.)
+	- Changed pkgIndex.tcl such that the library is only loaded
+	  when one of the commands are used for the first time
+	  (like memchan).
+	- Add a Tcl_StaticPackage() call in tclAppInit.c
+	- blowfish/bf_tab.h needs to be devided into 4 blocks with
+	  {}'s around it, otherwise a warning is given (gcc -Wall (aku)).
+
+Wed Dec  4 20:18:20 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* registry.c (TrfWatch): now forwards request to parent too.
+
+Tue Dec  3 22:38:05 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* digest.c: fixed problem regarding to 'XX->dest'. NULL's were not
+	  handled. Tripped by new 'TrfClose' in registry.c
+
+	* tests:  These were changed too, to use 'unstack $XX' instead of
+	  'transform remove $XX head'.
+
+	* registry.c: Twiddled with it the last 2 days to use the simpler
+	  Tcl_ReplaceChannel API, as propossed by J.Nijtmans. Now the package
+	  again compiles, links and passes all tests. // This is a branch //
+
+Wed Oct 16 21:59:39 1996  Andreas Kupries  <aku@bluepeak.oche.de>
+
+	* tools/md: new example for generation and check of message
+	  digests. supersedes example 'md5sum'. independent of external
+	  script libraries.
+
+Tue Oct 15 00:06:20 1996  Andreas Kupries  <aku@bluepeak.oche.de>
+
+	* init.c (Trf_Init): register new digests.
+
+	* adler32.c, crc32.c: added message digests algorithm contained in
+	  zlib as separate commands.
+
+	* templates/cvt_template.c: see below.
+
+	* templates/opt_template.c: fixed errors in template
+	  (clientData).
+
+	* init.c (Trf_Init): register compressor.
+
+	* doc/man.tex: added description of "zip"-command, extended
+	  chapter containing the references to external copyrights.
+
+	* zip_opt.c: option processor for compressor.
+
+	* zip.c: added compressor based on zlib library (authors:
+	  Jean-Loup Gailly (gzip@prep.ai.mit.edu)
+          Mark Adler (madler@alumni.caltech.edu)).
+
+Mon Oct  7 22:55:44 1996  Andreas Kupries  <aku@bluepeak.oche.de>
+
+	* Module ready for delivery. Starting official log now.
+
