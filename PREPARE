@@ -12,7 +12,8 @@ mExclude PREPARE customers
 set mInfo(@TRF_VERSION@)     $mInfo(@mVersion@)
 set mInfo(@configure_input@) "Distributed at $mInfo(@mDate@)"
 
-file copy generic/pkgIndex.tcl.in win/pkgIndex.tcl
+# no, use the now existing file in win instead!
+#file copy generic/pkgIndex.tcl.in win/pkgIndex.tcl
 
 mInsertInfo \
 	README DESCRIPTION PORTING                 \
@@ -23,7 +24,8 @@ mInsertInfo \
 
 set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mShortDosVersion@).dll"
 mInsertInfo \
-	win/README  win/pkgIndex.tcl  win/makefile.vc
+	win/README      win/pkgIndex.tcl \
+	win/makefile.vc win/makefile.vc5
 
 mGetDescription
 mExpandUrls
