@@ -1513,26 +1513,29 @@ Trf_Options        optInfo;
      */
 
     if (res != TCL_OK) {
-      Tcl_Free (r.buf);
+      if (r.buf != NULL)
+	Tcl_Free (r.buf);
     } else {
-#if (TCL_MAJOR_VERSION < 8)
       Tcl_ResetResult (interp);
 
-      /*
-       * r.buf is always overallocated, see 'PutInterpResult'.
-       * No danger in simply writing the '\0'. Do this to
-       * prevent setting a string longer than given as result.
-       */      
-
-      r.buf [r.used] = '\0';
-      Tcl_AppendResult (interp, r.buf, (char*) NULL);
+      if (r.buf != NULL) {
+#if (TCL_MAJOR_VERSION < 8)
+	/*
+	 * r.buf is always overallocated, see 'PutInterpResult'.
+	 * No danger in simply writing the '\0'. Do this to
+	 * prevent setting a string longer than given as result.
+	 */
+ 
+	r.buf [r.used] = '\0';
+	Tcl_AppendResult (interp, r.buf, (char*) NULL);
 #else
-      Tcl_Obj* o = Tcl_NewStringObj (r.buf, r.used);
+	Tcl_Obj* o = Tcl_NewStringObj (r.buf, r.used);
 
-      Tcl_IncrRefCount (o);
-      Tcl_SetObjResult (interp, o);
-      Tcl_DecrRefCount (o);
+	Tcl_IncrRefCount (o);
+	Tcl_SetObjResult (interp, o);
+	Tcl_DecrRefCount (o);
 #endif
+      }
     }
   }
 
