@@ -68,7 +68,7 @@ set fail [catch {
     set ipath [file join [file dirname [file dirname [info library]]] include]
     set src   [file join generic transform.h]
 
-    exec c2man -U__GNUC__ -odoc/man -I$ipath -v $src
+    exec c2man -U__GNUC__ -odoc/man -I$ipath -v $src 2>/dev/null >/dev/null
     #          ~~~~~~~~~~ => remove gcc specific syntax from header files
     cd doc
 } msg]	;#{}
@@ -81,15 +81,15 @@ set fail [catch {
     set ipath [file join [file dirname [file dirname [info library]]] include]
     set src   [file join generic transform.h]
 
-    exec c2man -U__GNUC__ -odoc/html/capi -I$ipath -Th $src
+    exec c2man -U__GNUC__ -odoc/html/capi -I$ipath -Th $src 2>/dev/null >/dev/null
     #          ~~~~~~~~~~ => remove gcc specific syntax from header files
     cd doc
 } msg]	;#{}
 if {$fail} {mLog log error $msg}
 
 # generate base page for c-api documentation
-exec ./capibase
-mExclude capibase > html/capi/capi.html
+exec ./capibase > html/capi/capi.html
+mExclude capibase
 
 
 mLatex2html \
