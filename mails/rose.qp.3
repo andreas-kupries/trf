@@ -1,7 +1,89 @@
+Return-Path: bluepeak.westend.com!popeye
+Return-Path: <popeye@bluepeak.westend.com>
+Received: from popeye.bluepeak.westend.com by bluepeak  with smtp
+	(Smail3.2 #1) id m113uA8-00027cC; Tue, 13 Jul 1999 06:27:24 +0200 (MEST)
+Received: from genesis for a.kupries
+ with Cubic Circle's cucipop (v1.10 1996/09/06) Tue Jul 13 06:23:26 1999
+X-From_: mrose@dbc.mtview.ca.us  Tue Jul 13 02:56:32 1999
+Received: from smtp1-alterdial.uu.net (smtp1-alterdial.uu.net [192.48.96.19])
+	by genesis.westend.com (8.8.6/8.8.6) with ESMTP id CAA06390
+	for <a.kupries@westend.com>; Tue, 13 Jul 1999 02:56:30 +0200 (MET DST)
+Received: from pixymisa by smtp1-alterdial.uu.net with SMTP 
+	(peer crosschecked as: [207.247.127.238])
+	id QQgxpr08956;
+	Tue, 13 Jul 1999 00:56:23 GMT
+Message-ID: <019e01beccca$7d516920$02c8a8c0@dbc.mtview.ca.us>
+From: "Marshall Rose" <mrose@dbc.mtview.ca.us>
+To: <a.kupries@westend.com>
+Cc: <mrose@dbc.mtview.ca.us>
+Subject: qpcode.c
+Date: Mon, 12 Jul 1999 18:55:06 -0600
+MIME-Version: 1.0
+Content-Type: multipart/mixed;
+	boundary="----=_NextPart_000_0199_01BECC98.0E68D840"
+X-Priority: 3
+X-MSMail-Priority: Normal
+X-Mailer: Microsoft Outlook Express 5.00.2314.1300
+X-MimeOLE: Produced By Microsoft MimeOLE V5.00.2314.1300
+
+This is a multi-part message in MIME format.
+
+------=_NextPart_000_0199_01BECC98.0E68D840
+Content-Type: multipart/alternative;
+	boundary="----=_NextPart_001_019A_01BECC98.0E68D840"
+
+
+------=_NextPart_001_019A_01BECC98.0E68D840
+Content-Type: text/plain;
+	charset="Windows-1252"
+Content-Transfer-Encoding: 7bit
+
+after some intensive testing, i found a bug.
+
+here is the fixed and final version!
+
+thanks,
+
+/mtr
+
+
+------=_NextPart_001_019A_01BECC98.0E68D840
+Content-Type: text/html;
+	charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD>
+<META content=3D"text/html; charset=3Dwindows-1252" =
+http-equiv=3DContent-Type>
+<META content=3D"MSHTML 5.00.2614.3401" name=3DGENERATOR>
+<STYLE></STYLE>
+</HEAD>
+<BODY bgColor=3D#ffffff>
+<DIV><FONT size=3D2>after some intensive testing, i found a =
+bug.</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2>here is the fixed and final version!</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2>thanks,</FONT></DIV>
+<DIV>&nbsp;</DIV>
+<DIV><FONT size=3D2>/mtr</FONT></DIV>
+<DIV>&nbsp;</DIV></BODY></HTML>
+
+------=_NextPart_001_019A_01BECC98.0E68D840--
+
+------=_NextPart_000_0199_01BECC98.0E68D840
+Content-Type: application/octet-stream;
+	name="qpcode.c"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+	filename="qpcode.c"
+
 /*
  * qpcode.c --
  *
- *      Implements and registers conversion from and to quoted-printable representation.
+ *      Implements and registers conversion from and to quoted-printable =
+representation.
  *
  *
  * Copyright (c) 1999 Marshall Rose (mrose@dbc.mtview.ca.us)
@@ -13,13 +95,16 @@
  * above copyright notice and the following two paragraphs appear in
  * all copies of this software.
  *
- * IN NO EVENT SHALL I LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, SPECIAL,
+ * IN NO EVENT SHALL I LIABLE TO ANY PARTY FOR DIRECT, INDIRECT, =
+SPECIAL,
  * INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OF THIS
  * SOFTWARE AND ITS DOCUMENTATION, EVEN IF I HAVE BEEN ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * I SPECIFICALLY DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * I SPECIFICALLY DISCLAIM ANY WARRANTIES, INCLUDING, BUT NOT LIMITED =
+TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A =
+PARTICULAR
  * PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS ON AN "AS IS" BASIS, AND
  * I HAVE NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT, UPDATES,
  * ENHANCEMENTS, OR MODIFICATIONS.
@@ -38,9 +123,12 @@
  *      RFC 2045
  *
  * Encoding:
- *      Printable characters (other than "=") are passed through; otherwise a
- *      character is represented by "=" followed by the two-digit hexadecimal
- *      representation of the character's value. Ditto for trailing whitespace
+ *      Printable characters (other than "=3D") are passed through; =
+otherwise a
+ *      character is represented by "=3D" followed by the two-digit =
+hexadecimal
+ *      representation of the character's value. Ditto for trailing =
+whitespace
  *      at the end of a line.
  *
  * Decoding:
@@ -52,58 +140,91 @@
  * Declarations of internal procedures.
  */
 
-static Trf_ControlBlock CreateEncoder  _ANSI_ARGS_ ((ClientData writeClientData,
+static Trf_ControlBlock CreateEncoder  _ANSI_ARGS_ ((ClientData =
+writeClientData,
                                                      Trf_WriteProc *fun,
-                                                     Trf_Options optInfo,
-                                                     Tcl_Interp*   interp,
-                                                     ClientData clientData));
-static void             DeleteEncoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-                                                     ClientData clientData));
-static int              Encode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-                                                     unsigned int character,
+                                                     Trf_Options =
+optInfo,
+                                                     Tcl_Interp*   =
+interp,
+                                                     ClientData =
+clientData));
+static void             DeleteEncoder  _ANSI_ARGS_ ((Trf_ControlBlock =
+ctrlBlock,
+                                                     ClientData =
+clientData));
+static int              Encode         _ANSI_ARGS_ ((Trf_ControlBlock =
+ctrlBlock,
+                                                     unsigned int =
+character,
                                                      Tcl_Interp* interp,
-                                                     ClientData clientData));
-static int              EncodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-                                                     unsigned char* buffer, int bufLen,
+                                                     ClientData =
+clientData));
+static int              EncodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock =
+ctrlBlock,
+                                                     unsigned char* =
+buffer, int bufLen,
                                                      Tcl_Interp* interp,
-                                                     ClientData clientData));
-static int              FlushEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+                                                     ClientData =
+clientData));
+static int              FlushEncoder   _ANSI_ARGS_ ((Trf_ControlBlock =
+ctrlBlock,
                                                      Tcl_Interp* interp,
-                                                     ClientData clientData));
-static void             ClearEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-                                                     ClientData clientData));
+                                                     ClientData =
+clientData));
+static void             ClearEncoder   _ANSI_ARGS_ ((Trf_ControlBlock =
+ctrlBlock,
+                                                     ClientData =
+clientData));
 
-static Trf_ControlBlock CreateDecoder  _ANSI_ARGS_ ((ClientData writeClientData,
+static Trf_ControlBlock CreateDecoder  _ANSI_ARGS_ ((ClientData =
+writeClientData,
                                                      Trf_WriteProc *fun,
-                                                     Trf_Options optInfo,
-                                                     Tcl_Interp*   interp,
-                                                     ClientData clientData));
-static void             DeleteDecoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-                                                     ClientData clientData));
-static int              Decode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-                                                     unsigned int character,
+                                                     Trf_Options =
+optInfo,
+                                                     Tcl_Interp*   =
+interp,
+                                                     ClientData =
+clientData));
+static void             DeleteDecoder  _ANSI_ARGS_ ((Trf_ControlBlock =
+ctrlBlock,
+                                                     ClientData =
+clientData));
+static int              Decode         _ANSI_ARGS_ ((Trf_ControlBlock =
+ctrlBlock,
+                                                     unsigned int =
+character,
                                                      Tcl_Interp* interp,
-                                                     ClientData clientData));
-static int              DecodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-                                                     unsigned char* buffer, int bufLen,
+                                                     ClientData =
+clientData));
+static int              DecodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock =
+ctrlBlock,
+                                                     unsigned char* =
+buffer, int bufLen,
                                                      Tcl_Interp* interp,
-                                                     ClientData clientData));
-static int              FlushDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+                                                     ClientData =
+clientData));
+static int              FlushDecoder   _ANSI_ARGS_ ((Trf_ControlBlock =
+ctrlBlock,
                                                      Tcl_Interp* interp,
-                                                     ClientData clientData));
-static void             ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-                                                     ClientData clientData));
+                                                     ClientData =
+clientData));
+static void             ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock =
+ctrlBlock,
+                                                     ClientData =
+clientData));
 
 
 /*
  * Converter definition.
  */
 
-static Trf_TypeDefinition convDefinition =
+static Trf_TypeDefinition convDefinition =3D
 {
   "quoted-printable",
   NULL, /* clientData not used by conversions. */
-  NULL, /* set later by TrfInit_QP */ /* THREADING: serialize initialization */
+  NULL, /* set later by TrfInit_QP */ /* THREADING: serialize =
+initialization */
   {
     CreateEncoder,
     DeleteEncoder,
@@ -150,7 +271,7 @@ typedef struct _DecoderControl_ {
 
 } DecoderControl;
 
-static char hex2nib[0x80] = {
+static char hex2nib[0x80] =3D {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -159,18 +280,18 @@ static char hex2nib[0x80] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
     0x08, 0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x00, 
+    0x00, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x00,=20
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x00, 
+    0x00, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x00,=20
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
 
-
+=0C
 
 /*
  *------------------------------------------------------*
@@ -195,12 +316,12 @@ TrfInit_QP (interp)
 Tcl_Interp* interp;
 {
   TrfLock; /* THREADING: serialize initialization */
-  convDefinition.options = Trf_ConverterOptions ();
+  convDefinition.options =3D Trf_ConverterOptions ();
   TrfUnlock;
 
   return Trf_Register (interp, &convDefinition);
 }
-
+=0C
 /*
  *------------------------------------------------------*
  *
@@ -230,9 +351,9 @@ ClientData clientData;
 {
   EncoderControl* c;
 
-  c = (EncoderControl*) Tcl_Alloc (sizeof (EncoderControl));
-  c->write           = fun;
-  c->writeClientData = writeClientData;
+  c =3D (EncoderControl*) Tcl_Alloc (sizeof (EncoderControl));
+  c->write           =3D fun;
+  c->writeClientData =3D writeClientData;
 
   /* initialize conversion specific items here (qp encode) */
 
@@ -240,7 +361,7 @@ ClientData clientData;
 
   return ((ClientData) c);
 }
-
+=0C
 /*
  *------------------------------------------------------*
  *
@@ -264,13 +385,13 @@ DeleteEncoder (ctrlBlock, clientData)
 Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {
-  EncoderControl* c = (EncoderControl*) ctrlBlock;
+  EncoderControl* c =3D (EncoderControl*) ctrlBlock;
 
   /* release conversion specific items here (qp encode) */
 
   Tcl_Free ((char*) c);
 }
-
+=0C
 /*
  *------------------------------------------------------*
  *
@@ -297,67 +418,71 @@ unsigned int character;
 Tcl_Interp* interp;
 ClientData clientData;
 {
-  EncoderControl* c = (EncoderControl*) ctrlBlock;
+  EncoderControl* c =3D (EncoderControl*) ctrlBlock;
 
   /* execute conversion specific code here (qp encode) */
 
   int i;
-  char x = character & 0xff;
+  char x =3D character & 0xff;
 
   /*in case we need to indicate trailing whitespace... */
-  if ((c -> charCount >= CPERLIN - 1)
-        && ((x != '\n') || (c -> buf[c -> charCount -1] != '\r'))
-        && ((i = FlushEncoder (ctrlBlock, interp, clientData)) != TCL_OK))
+  if ((c -> charCount >=3D CPERLIN - 1)
+        && ((x !=3D '\n') || (c -> buf[c -> charCount -1] !=3D '\r'))
+        && ((i =3D FlushEncoder (ctrlBlock, interp, clientData)) !=3D =
+TCL_OK))
     return i;
 
   /* avoid common problems in old software... */
   switch (c -> charCount) {
     case 1:
-      if (c -> buf[0] == '.') {
-        (void) sprintf (c -> buf, "=%02X", '.');
-        c -> charCount = 3;
+      if (c -> buf[0] =3D=3D '.') {
+        (void) sprintf (c -> buf, "=3D%02X", '.');
+        c -> charCount =3D 3;
       }
       break;
 
     case 5:
       if (!strcmp (c -> buf, "From ")) {
-        (void) sprintf (c -> buf, "=%02Xrom ", 'F');
-        c -> charCount = 7;
+        (void) sprintf (c -> buf, "=3D%02Xrom ", 'F');
+        c -> charCount =3D 7;
       }
       break;
   }
 
   switch (x) {
     case '\n':
-      if ((c -> charCount > 0) && (c -> buf[c -> charCount - 1] == '\r'))
+      if ((c -> charCount > 0) && (c -> buf[c -> charCount - 1] =3D=3D =
+'\r'))
 	c -> charCount--;
 	/* and fall... */
 
     case ' ':
     case '\t':
     case '\r':
-      c -> buf[c -> charCount++] = character;
+      c -> buf[c -> charCount++] =3D character;
       break;
 
     default:
-      if (('!' <= x) && (x <= '~')) {
-        c -> buf[c -> charCount++] = character;
+      if (('!' <=3D x) && (x <=3D '~')) {
+        c -> buf[c -> charCount++] =3D character;
         break;
       }
       /* else fall... */
-    case '=':
-      (void) sprintf (c -> buf + c -> charCount, "=%02X", (unsigned char) x);
-      c -> charCount += 3;
+    case '=3D':
+      (void) sprintf (c -> buf + c -> charCount, "=3D%02X", (unsigned =
+char) x);
+      c -> charCount +=3D 3;
       break;
   }
 
-  if ((x == '\n')
-        && ((i = FlushEncoder (ctrlBlock, interp, clientData)) != TCL_OK))
+  if ((x =3D=3D '\n')
+        && ((i =3D FlushEncoder (ctrlBlock, interp, clientData)) !=3D =
+TCL_OK))
     return i;
 
   return TCL_OK;
 }
-
+=0C
 /*
  *------------------------------------------------------*
  *
@@ -385,20 +510,20 @@ int bufLen;
 Tcl_Interp* interp;
 ClientData clientData;
 {
-  /* EncoderControl* c = (EncoderControl*) ctrlBlock; unused */
+  /* EncoderControl* c =3D (EncoderControl*) ctrlBlock; unused */
   /* execute conversion specific code here (qp encode) */
 
-  int    i = TCL_OK;
+  int    i =3D TCL_OK;
 
   while (bufLen-- > 0) {
-    if ((i = Encode (ctrlBlock, *buffer++ & 0xff, interp, clientData))
-        != TCL_OK)
+    if ((i =3D Encode (ctrlBlock, *buffer++ & 0xff, interp, clientData))
+        !=3D TCL_OK)
       break;
   }
 
   return i;
 }
-
+=0C
 /*
  *------------------------------------------------------*
  *
@@ -424,41 +549,41 @@ Trf_ControlBlock ctrlBlock;
 Tcl_Interp* interp;
 ClientData clientData;
 {
-  EncoderControl* c = (EncoderControl*) ctrlBlock;
+  EncoderControl* c =3D (EncoderControl*) ctrlBlock;
 
   /* execute conversion specific code here (qp encode) */
 
   int i;
 
-  if (c -> charCount == 0)
+  if (c -> charCount =3D=3D 0)
     return TCL_OK;
-  
-  if (c -> buf[c -> charCount - 1] == '\n') {
+ =20
+  if (c -> buf[c -> charCount - 1] =3D=3D '\n') {
     if (c -> charCount > 1)
       switch (c -> buf[c -> charCount - 2]) {
         case ' ':
         case '\t':
-          (void) strcpy (c -> buf + c -> charCount - 1, "=\n\n");
-          c -> charCount += 2;
+          (void) strcpy (c -> buf + c -> charCount - 1, "=3D\n\n");
+          c -> charCount +=3D 2;
           break;
 
         default:
           break;
       }
   } else {
-    (void) strcpy (c -> buf + c -> charCount, "=\n");
-    c -> charCount += 2;
+    (void) strcpy (c -> buf + c -> charCount, "=3D\n");
+    c -> charCount +=3D 2;
   }
-  
-  if ((i = c -> write (c -> writeClientData, c -> buf, c -> charCount,
-                       interp)) != TCL_OK)
+ =20
+  if ((i =3D c -> write (c -> writeClientData, c -> buf, c -> charCount,
+                       interp)) !=3D TCL_OK)
     return i;
 
   ClearEncoder (ctrlBlock, clientData);
 
   return TCL_OK;
 }
-
+=0C
 /*
  *------------------------------------------------------*
  *
@@ -482,14 +607,14 @@ ClearEncoder (ctrlBlock, clientData)
 Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {
-  EncoderControl* c = (EncoderControl*) ctrlBlock;
+  EncoderControl* c =3D (EncoderControl*) ctrlBlock;
 
   /* execute conversion specific code here (qp encode) */
 
-  c -> charCount = 0;
+  c -> charCount =3D 0;
   memset (c -> buf, '\0', sizeof c -> buf);
 }
-
+=0C
 /*
  *------------------------------------------------------*
  *
@@ -518,10 +643,10 @@ Tcl_Interp*   interp;
 ClientData clientData;
 {
   DecoderControl* c;
-  
-  c = (DecoderControl*) Tcl_Alloc (sizeof (DecoderControl));
-  c->write           = fun;
-  c->writeClientData = writeClientData;
+ =20
+  c =3D (DecoderControl*) Tcl_Alloc (sizeof (DecoderControl));
+  c->write           =3D fun;
+  c->writeClientData =3D writeClientData;
 
   /* initialize conversion specific items here (qp decode) */
 
@@ -529,7 +654,7 @@ ClientData clientData;
 
   return ((ClientData) c);
 }
-
+=0C
 /*
  *------------------------------------------------------*
  *
@@ -553,13 +678,13 @@ DeleteDecoder (ctrlBlock, clientData)
 Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {
-  DecoderControl* c = (DecoderControl*) ctrlBlock;
+  DecoderControl* c =3D (DecoderControl*) ctrlBlock;
 
   /* release conversion specific items here (qp decode) */
 
   Tcl_Free ((char*) c);
 }
-
+=0C
 /*
  *------------------------------------------------------*
  *
@@ -586,12 +711,12 @@ unsigned int character;
 Tcl_Interp* interp;
 ClientData clientData;
 {
-  DecoderControl* c = (DecoderControl*) ctrlBlock;
+  DecoderControl* c =3D (DecoderControl*) ctrlBlock;
 
   /* execute conversion specific code here (qp decode) */
 
   int i;
-  char x = character & 0xff;
+  char x =3D character & 0xff;
 
   switch (c -> quoted) {
     case 0:
@@ -603,16 +728,16 @@ ClientData clientData;
         case ' ':
         case '\t':
         case '\n':
-          i = c -> write (c -> writeClientData, &x, 1, interp);
+          i =3D c -> write (c -> writeClientData, &x, 1, interp);
           break;
 
 	case '\r':
-	  i = TCL_OK;
+	  i =3D TCL_OK;
 	  break;
 
-        case '=':
-          c -> quoted = 1;
-          i = TCL_OK;
+        case '=3D':
+          c -> quoted =3D 1;
+          i =3D TCL_OK;
           break;
       }
       break;
@@ -620,20 +745,20 @@ ClientData clientData;
     case 1:
       switch (x) {
         case '\n':
-          c -> quoted = 0;
-          i = TCL_OK;
+          c -> quoted =3D 0;
+          i =3D TCL_OK;
           break;
- 
+=20
         case '\r':
-          i = TCL_OK;
+          i =3D TCL_OK;
           break;
 
         default:
           if (!isxdigit (x))
               goto invalid_hex;
-          c -> mask = hex2nib[x & 0x7f];
-          c -> quoted = 2;
-          i = TCL_OK;
+          c -> mask =3D hex2nib[x & 0x7f];
+          c -> quoted =3D 2;
+          i =3D TCL_OK;
           break;
       }
       break;
@@ -641,10 +766,10 @@ ClientData clientData;
     default:
       if (!isxdigit (x))
         goto invalid_hex;
-      c -> mask <<= 4;
-      c -> mask |= hex2nib[x & 0x7f];
-      c -> quoted = 0;
-      i = c -> write (c -> writeClientData, &c -> mask, 1, interp);
+      c -> mask <<=3D 4;
+      c -> mask |=3D hex2nib[x & 0x7f];
+      c -> quoted =3D 0;
+      i =3D c -> write (c -> writeClientData, &c -> mask, 1, interp);
       break;
   }
 
@@ -653,7 +778,8 @@ ClientData clientData;
 invalid_hex: ;
     if (interp) {
       Tcl_ResetResult (interp);
-      Tcl_AppendResult (interp, "expecting hexadecimal digit", (char *) NULL);
+      Tcl_AppendResult (interp, "expecting hexadecimal digit", (char *) =
+NULL);
     }
     return TCL_ERROR;
 
@@ -665,7 +791,7 @@ invalid_encoding: ;
     }
     return TCL_ERROR;
 }
-
+=0C
 /*
  *------------------------------------------------------*
  *
@@ -693,20 +819,20 @@ int bufLen;
 Tcl_Interp* interp;
 ClientData clientData;
 {
-  /* DecoderControl* c = (DecoderControl*) ctrlBlock; unused */
+  /* DecoderControl* c =3D (DecoderControl*) ctrlBlock; unused */
   /* execute conversion specific code here (qp decode) */
 
-  int    i = TCL_OK;
+  int    i =3D TCL_OK;
 
   while (bufLen-- > 0) {
-    if ((i = Decode (ctrlBlock, *buffer++ & 0xff, interp, clientData))
-        != TCL_OK)
+    if ((i =3D Decode (ctrlBlock, *buffer++ & 0xff, interp, clientData))
+        !=3D TCL_OK)
       break;
   }
-  
+ =20
   return i;
 }
-
+=0C
 /*
  *------------------------------------------------------*
  *
@@ -732,7 +858,7 @@ Trf_ControlBlock ctrlBlock;
 Tcl_Interp* interp;
 ClientData clientData;
 {
-  DecoderControl* c = (DecoderControl*) ctrlBlock;
+  DecoderControl* c =3D (DecoderControl*) ctrlBlock;
 
   /* execute conversion specific code here (qp decode) */
 
@@ -740,7 +866,8 @@ ClientData clientData;
     if (interp) {
       Tcl_ResetResult (interp);
       Tcl_AppendResult (interp, c -> quoted > 1
-                                  ? "expecting another hexadecimal digit"
+                                  ? "expecting another hexadecimal =
+digit"
                                   : "expecting addition characters",
                         (char *) NULL);
     }
@@ -752,7 +879,7 @@ ClientData clientData;
 
   return TCL_OK;
 }
-
+=0C
 /*
  *------------------------------------------------------*
  *
@@ -776,11 +903,12 @@ ClearDecoder (ctrlBlock, clientData)
 Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {
-  DecoderControl* c = (DecoderControl*) ctrlBlock;
+  DecoderControl* c =3D (DecoderControl*) ctrlBlock;
 
   /* execute conversion specific code here (qp decode) */
 
-  c -> quoted = 0;
-  c -> mask = 0;
+  c -> quoted =3D 0;
+  c -> mask =3D 0;
 }
 
+------=_NextPart_000_0199_01BECC98.0E68D840--

@@ -582,13 +582,14 @@ ClientData clientData;
  */
 
 static int
-Execute (c, interp, op, buf, bufLen, transmit)
+Execute (c, interp, op, buf, bufLen, transmit, preserve)
 EncoderControl* c;
 Tcl_Interp*     interp;
 unsigned char*  op;
 unsigned char*  buf;
 int             bufLen;
 int             transmit;
+int             preserve;
 {
   /* Generate the real command from -command by appending name of
    * operation and buffer to operate upon, evaluate it at the global
@@ -599,12 +600,18 @@ int             transmit;
 
 #if (TCL_MAJOR_VERSION >= 8)
   Tcl_Obj* command;
+  Tcl_SavedResult ciSave;
 
   command = Tcl_DuplicateObj (c->command);
   Tcl_IncrRefCount (command);
 
+  if (preserve) {
+    Tcl_SaveResult (ctrl->interp, &ciSave);
+  }
+
   if (command == (Tcl_Obj*) NULL) {
-    return TCL_ERROR;
+    res = TCL_ERROR;
+    goto cleanup;
   }
 
   res = Tcl_ListObjAppendElement (interp, command,
@@ -612,8 +619,13 @@ int             transmit;
   if (res != TCL_OK)
     goto cleanup;
 
+#if GT81
+  res = Tcl_ListObjAppendElement (interp, command,
+				  Tcl_NewByteArrayObj ((char*) buf, bufLen));
+#else
   res = Tcl_ListObjAppendElement (interp, command,
 				  Tcl_NewStringObj ((char*) buf, bufLen));
+#endif
   if (res != TCL_OK)
     goto cleanup;
 
@@ -628,11 +640,14 @@ int             transmit;
   if (res != TCL_OK) {
     /* copy error message from 'c->interp' to actual 'interp'. */
 
-    if ((interp != (Tcl_Interp*) NULL) && (c->interp != interp)) {
-      Tcl_SetObjResult (interp, Tcl_GetObjResult (c->interp));
+    if ((interp != (Tcl_Interp*) NULL) &&
+	(ctrl->interp != interp) &&
+	!preserve) {
+    
+        Tcl_SetObjResult (interp, Tcl_GetObjResult (ctrl->interp));
     }
 
-    return res;
+    goto cleanup;
   }
 
   if (transmit) {
@@ -649,10 +664,21 @@ int             transmit;
     Tcl_ResetResult (c->interp);
   }
 
+  if (preserve) {
+    Tcl_RestoreResult (ctrl->interp, &ciSave);
+  }
+
   return res;
 
 cleanup:
-  Tcl_DecrRefCount (command);
+  if (preserve) {
+    Tcl_RestoreResult (ctrl->interp, &ciSave);
+  }
+
+  if (command != (Tcl_Obj*) NULL) {
+    Tcl_DecrRefCount (command);
+  }
+
   return res;
 
 #else

@@ -1,3 +1,48 @@
+Sat Jul 17 18:10:28 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/reflect.c: Changed to use a byte-array for the buffer
+	  argument incase of compilation against 8.1 or higher.
+
+	* generic/registry.c: Finalized adaption to 8.2, and the runtime
+	  switching.
+
+Tue Jul 13 18:40:44 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/registry.c: Changed the registry from a hashtable to a
+	  real structure (containing the old hashtable and some more),
+	  changed all places acessing. Added 'patchIntegrated' flag and
+	  changed all places using 'trans->parent' to check
+	  'patchIntegrated' to determine the correct method of finding the
+	  downstream channel.
+
+	  Reason: Trf is now able to work with 8.1 and 8.2 without
+	  recompilation for the specific interpreter. Compilation may
+	  happen with 8.1 or 8.2, it makes no difference, the extension
+	  adapts itself to the changed semantics.
+
+	* unix/configure.in: Fixed a bug in the parameter generation for
+	  shared libraries, sent in by Jan, modeled after fix in Tk.
+
+	* generic/transformInt.h: See below.
+
+	* generic/registry.c (TrfExecuteObjCmd): See below.
+
+	* generic/unstack.c (TrfUnstackCmd): See below.
+
+	* patches/v8.1/standard.patch: Modified to use the new and
+	  official names for the functions in the patch (Tcl_StackChannel,
+	  Tcl_UnstackChannel).
+
+	* generic/loadman.h: See below.
+
+	* unix/configure.in (): Newer versions of OpenSSL place their
+	includes in .../openssl/include/openssl/ instead of
+	.../openssl/include/. Changed to allow both, with the new
+	placement considered first.
+
+	* generic/qpcode.c: More corrections from Marshall Rose,
+	  quoted-printable this time.
+
 Fri Jul  9 16:51:14 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* tests/base64.test: Adapted to changes in 'base64'.

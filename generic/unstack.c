@@ -63,10 +63,10 @@ TrfUnstackCmd (notUsed, interp, argc, argv)
   Tcl_Channel chan;
   int         mode;
 
-#if GT81
+#ifdef USE_TCL_STUBS
   const char* cmd = argv [0];
 
-  if (Tcl_UndoReplaceChannel == NULL) {
+  if (Tcl_UnstackChannel == NULL) {
     Tcl_AppendResult (interp, cmd, " is not available as the required ",
 		      "patch to the core was not applied", (char*) NULL);
     return TCL_ERROR;
@@ -85,7 +85,7 @@ TrfUnstackCmd (notUsed, interp, argc, argv)
     return TCL_ERROR;
   }
 
-  Tcl_UndoReplaceChannel (interp, chan);
+  Tcl_UnstackChannel (interp, chan);
   return TCL_OK;
 }
 

@@ -97,6 +97,24 @@ panic _ANSI_ARGS_ ((char* format, ...));
 #define Tcl_Panic panic
 #endif
 
+/*
+ * A single structure of the type below is created and maintained for
+ * every interpreter. Beyond the table of registered transformers it
+ * contains version information about the interpreter used to switch
+ * runtime behaviour.
+ */
+
+typedef struct _Trf_Registry_ {
+  Tcl_HashTable* registry;        /* Table containing all registered
+				   * transformers. */
+  int            patchIntegrated; /* Boolean flag, set to one if the patch
+				   * is integrated into the core. If yes
+				   * switch some runtime behaviour, as the
+				   * integrated patch has some semantic
+				   * differences. This information is
+				   * propagated into the state of running
+				   * transformers as well. */
+} Trf_Registry;
 
 /*
  * A structure of the type below is created and maintained
@@ -104,6 +122,8 @@ panic _ANSI_ARGS_ ((char* format, ...));
  */
 
 typedef struct _Trf_RegistryEntry_ {
+  Trf_Registry*       registry;   /* Backpointer to the registry */
+
   Trf_TypeDefinition* trfType;    /* reference to transformer specification */
   Tcl_ChannelType*    transType;  /* reference to derived channel type specification */
   Tcl_Command         trfCommand; /* command associated to the transformer */
@@ -117,10 +137,10 @@ typedef struct _Trf_RegistryEntry_ {
  * names to structures of type 'Trf_RegistryEntry' (see above).
  */
 
-EXTERN Tcl_HashTable* 
+EXTERN Trf_Registry*
 TrfGetRegistry  _ANSI_ARGS_ ((Tcl_Interp* interp));
 
-EXTERN Tcl_HashTable*
+EXTERN Trf_Registry*
 TrfPeekForRegistry _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int
@@ -132,14 +152,19 @@ Trf_Unregister _ANSI_ARGS_ ((Tcl_Interp*        interp,
  * Procedures used by 3->4 encoders (uu, base64).
  */
 
-EXTERN void TrfSplit3to4 _ANSI_ARGS_ ((CONST unsigned char* in, unsigned char* out, int length));
-EXTERN void TrfMerge4to3 _ANSI_ARGS_ ((CONST unsigned char* in, unsigned char* out));
+EXTERN void TrfSplit3to4 _ANSI_ARGS_ ((CONST unsigned char* in,
+				       unsigned char* out, int length));
 
-EXTERN void TrfApplyEncoding   _ANSI_ARGS_ ((unsigned char* buf, int length, CONST char* map));
-EXTERN int  TrfReverseEncoding _ANSI_ARGS_ ((unsigned char* buf, int length, CONST char* reverseMap,
-					     unsigned int padChar, int* hasPadding));
+EXTERN void TrfMerge4to3 _ANSI_ARGS_ ((CONST unsigned char* in,
+				       unsigned char* out));
 
+EXTERN void TrfApplyEncoding   _ANSI_ARGS_ ((unsigned char* buf, int length,
+					     CONST char* map));
 
+EXTERN int  TrfReverseEncoding _ANSI_ARGS_ ((unsigned char* buf, int length,
+					     CONST char* reverseMap,
+					     unsigned int padChar,
+					     int* hasPadding));
 
 /*
  * Definition of option information for message digests and accessor
@@ -261,14 +286,21 @@ typedef struct ZFunctions {
   VOID *handle;
   int (* deflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
   int (* deflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
-  int (* deflateInit_)      _ANSI_ARGS_ ((z_streamp strm, int level, CONST char *version, int stream_size));
+  int (* deflateInit_)      _ANSI_ARGS_ ((z_streamp strm, int level,
+					  CONST char *version,
+					  int stream_size));
   int (* deflateReset)      _ANSI_ARGS_ ((z_streamp strm));
   int (* inflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
   int (* inflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
-  int (* inflateInit_)      _ANSI_ARGS_ ((z_streamp strm, CONST char *version, int stream_size));
+  int (* inflateInit_)      _ANSI_ARGS_ ((z_streamp strm, CONST char *version,
+					  int stream_size));
   int (* inflateReset)      _ANSI_ARGS_ ((z_streamp strm));
-  unsigned long (* adler32) _ANSI_ARGS_ ((unsigned long adler, CONST unsigned char *buf, unsigned int len));
-  unsigned long (* crc32)   _ANSI_ARGS_ ((unsigned long crc, CONST unsigned char *buf, unsigned int len));
+  unsigned long (* adler32) _ANSI_ARGS_ ((unsigned long adler,
+					  CONST unsigned char *buf,
+					  unsigned int len));
+  unsigned long (* crc32)   _ANSI_ARGS_ ((unsigned long crc,
+					  CONST unsigned char *buf,
+					  unsigned int len));
 } zFunctions;
 
 
@@ -291,12 +323,17 @@ TrfLoadZlib _ANSI_ARGS_ ((Tcl_Interp *interp));
 
 typedef struct BZFunctions {
   VOID *handle;
-  int (WINAPI * compress)           _ANSI_ARGS_ ((bz_stream* strm, int action));
+  int (WINAPI * compress)           _ANSI_ARGS_ ((bz_stream* strm,
+						  int action));
   int (WINAPI * compressEnd)        _ANSI_ARGS_ ((bz_stream* strm));
-  int (WINAPI * compressInit)       _ANSI_ARGS_ ((bz_stream* strm, int blockSize100k, int verbosity, int workFactor));
+  int (WINAPI * compressInit)       _ANSI_ARGS_ ((bz_stream* strm,
+						  int blockSize100k,
+						  int verbosity,
+						  int workFactor));
   int (WINAPI * decompress)         _ANSI_ARGS_ ((bz_stream* strm));
   int (WINAPI * decompressEnd)      _ANSI_ARGS_ ((bz_stream* strm));
-  int (WINAPI * decompressInit)     _ANSI_ARGS_ ((bz_stream* strm, int verbosity, int small));
+  int (WINAPI * decompressInit)     _ANSI_ARGS_ ((bz_stream* strm,
+						  int verbosity, int small));
 } bzFunctions;
 
 
@@ -306,16 +343,21 @@ EXTERN int
 TrfLoadBZ2lib _ANSI_ARGS_ ((Tcl_Interp *interp));
 
 /*
- * Macro to use to determine the offset of a structure member
- * in bytes from the beginning of the structure.
+ * The following definitions have to be usable for 7.6, 8.0.x, 8.1.x and 8.2
+ * and beyond. The differences between these versions:
+ *
+ * 7.6, 8.0.x: Trf usable only if core is patched, to check at compile time
+ *             (Check = Fails to compile, for now).
+ * 8.1:        Trf usable with unpatched core, but restricted, check at
+ *             compile time for missing definitions, check at runtime to
+ *             disable the missing features.
+ * 8.2:        Changed semantics for Tcl_StackChannel (Tcl_ReplaceChannel).
+ *             Check at runtime to switch the behaviour. The patch is part
+ *             of the core from now on.
  */
 
-#ifndef offsetof
-#define offsetof(type, field) ((int) ((char *) &((type *) 0)->field))
-#endif
-
 #ifdef USE_TCL_STUBS
-#ifndef Tcl_ReplaceChannel
+#ifndef Tcl_StackChannel
 /* The core we are compiling against is not patched, so supply the
  * necesssary definitions here by ourselves. The form chosen for
  * the procedure macros (reservedXXX) will notify us if the core
@@ -323,23 +365,34 @@ TrfLoadBZ2lib _ANSI_ARGS_ ((Tcl_Interp *interp));
  *
  * !! Synchronize the procedure indices in their definitions with
  *    the patch to tcl.decls, as they have to be the same.
-
  */
 
 /* 281 */
-typedef Tcl_Channel (trf_ReplaceChannel) _ANSI_ARGS_((Tcl_Interp* interp,
-						      Tcl_ChannelType* typePtr,
-						      ClientData instanceData,
-						      int mask,
-						      Tcl_Channel prevChan));
+typedef Tcl_Channel (trf_StackChannel) _ANSI_ARGS_((Tcl_Interp* interp,
+						    Tcl_ChannelType* typePtr,
+						    ClientData instanceData,
+						    int mask,
+						    Tcl_Channel prevChan));
 /* 282 */
-typedef void (trf_UndoReplaceChannel) _ANSI_ARGS_((Tcl_Interp* interp,
-						   Tcl_Channel chan));
+typedef void (trf_UnstackChannel) _ANSI_ARGS_((Tcl_Interp* interp,
+					       Tcl_Channel chan));
 
-#define Tcl_ReplaceChannel     ((trf_ReplaceChannel*) tclStubsPtr->reserved281)
-#define Tcl_UndoReplaceChannel ((trf_UndoReplaceChannel*) tclStubsPtr->reserved282)
+#define Tcl_StackChannel     ((trf_StackChannel*) tclStubsPtr->reserved281)
+#define Tcl_UnstackChannel ((trf_UnstackChannel*) tclStubsPtr->reserved282)
 
-#endif /* Tcl_ReplaceChannel */
+#endif /* Tcl_StackChannel */
+
+#ifndef Tcl_GetStackedChannel
+/*
+ * Separate definition, available in 8.2, but not 8.1 and before !
+ */
+
+/* 283 */
+typedef Tcl_Channel (trf_GetStackedChannel) _ANSI_ARGS_((Tcl_Channel chan));
+
+#define Tcl_GetStackedChannel ((trf_GetStackedChannel*) tclStubsPtr->reserved283)
+
+#endif /* Tcl_GetStackedChannel */
 #endif /* USE_TCL_STUBS */
 
 

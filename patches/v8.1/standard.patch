@@ -32,12 +32,12 @@
 + # version into the new one).
 + 
 + declare 281 generic {
-+     Tcl_Channel Tcl_ReplaceChannel(Tcl_Interp *interp, \
++     Tcl_Channel Tcl_StackChannel(Tcl_Interp *interp, \
 + 	    Tcl_ChannelType *typePtr, ClientData instanceData, \
 + 	    int mask, Tcl_Channel prevChan)
 + }
 + declare 282 generic {
-+     void Tcl_UndoReplaceChannel(Tcl_Interp *interp, Tcl_Channel chan)
++     void Tcl_UnstackChannel(Tcl_Interp *interp, Tcl_Channel chan)
 + }
 + 
   # Reserved for future use (8.0.x vs. 8.1)
@@ -61,12 +61,12 @@
   /* 280 */
   EXTERN void		Tcl_InitMemory _ANSI_ARGS_((Tcl_Interp * interp));
 ! /* 281 */
-! EXTERN Tcl_Channel	Tcl_ReplaceChannel _ANSI_ARGS_((Tcl_Interp * interp, 
+! EXTERN Tcl_Channel	Tcl_StackChannel _ANSI_ARGS_((Tcl_Interp * interp, 
 ! 				Tcl_ChannelType * typePtr, 
 ! 				ClientData instanceData, int mask, 
 ! 				Tcl_Channel prevChan));
 ! /* 282 */
-! EXTERN void		Tcl_UndoReplaceChannel _ANSI_ARGS_((
+! EXTERN void		Tcl_UnstackChannel _ANSI_ARGS_((
 ! 				Tcl_Interp * interp, Tcl_Channel chan));
   /* Slot 283 is reserved */
   /* Slot 284 is reserved */
@@ -85,8 +85,8 @@
       void (*tcl_PanicVA) _ANSI_ARGS_((char * format, va_list argList)); /* 278 */
       void (*tcl_GetVersion) _ANSI_ARGS_((int * major, int * minor, int * patchLevel, int * type)); /* 279 */
       void (*tcl_InitMemory) _ANSI_ARGS_((Tcl_Interp * interp)); /* 280 */
-!     Tcl_Channel (*tcl_ReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_ChannelType * typePtr, ClientData instanceData, int mask, Tcl_Channel prevChan)); /* 281 */
-!     void (*tcl_UndoReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_Channel chan)); /* 282 */
+!     Tcl_Channel (*tcl_StackChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_ChannelType * typePtr, ClientData instanceData, int mask, Tcl_Channel prevChan)); /* 281 */
+!     void (*tcl_UnstackChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_Channel chan)); /* 282 */
       void *reserved283;
       void *reserved284;
       void *reserved285;
@@ -104,13 +104,13 @@
   #define Tcl_InitMemory \
   	(tclStubsPtr->tcl_InitMemory) /* 280 */
   #endif
-! #ifndef Tcl_ReplaceChannel
-! #define Tcl_ReplaceChannel \
-! 	(tclStubsPtr->tcl_ReplaceChannel) /* 281 */
+! #ifndef Tcl_StackChannel
+! #define Tcl_StackChannel \
+! 	(tclStubsPtr->tcl_StackChannel) /* 281 */
 ! #endif
-! #ifndef Tcl_UndoReplaceChannel
-! #define Tcl_UndoReplaceChannel \
-! 	(tclStubsPtr->tcl_UndoReplaceChannel) /* 282 */
+! #ifndef Tcl_UnstackChannel
+! #define Tcl_UnstackChannel \
+! 	(tclStubsPtr->tcl_UnstackChannel) /* 282 */
 ! #endif
   /* Slot 283 is reserved */
   /* Slot 284 is reserved */
@@ -130,7 +130,7 @@
 +    * The single change to the internal datastructures of the core. Every
 +    * channel now maintains a reference to the channel he is stacked upon.
 +    * This reference is NULL for normal channels. Only the two exported
-+    * procedures (Tcl_ReplaceChannel and Tcl_UndoReplaceChannel, see at the
++    * procedures (Tcl_StackChannel and Tcl_UnstackChannel, see at the
 +    * end of 'tcl.h') use this field in a non-trivial way.
 +    *
 +    * Of the existing procedures the only following are affected by this
@@ -221,7 +221,7 @@
 + /*
 +  *----------------------------------------------------------------------
 +  *
-+  * Tcl_ReplaceChannel --
++  * Tcl_StackChannel --
 +  *
 +  *	Replaces an entry in the hash table for a Tcl_Channel
 +  *	record. The replacement is a new channel with same name,
@@ -240,7 +240,7 @@
 +  */
 + 
 + Tcl_Channel
-+ Tcl_ReplaceChannel(interp, typePtr, instanceData, mask, prevChan)
++ Tcl_StackChannel(interp, typePtr, instanceData, mask, prevChan)
 +     Tcl_Interp*      interp;       /* The interpreter we are working in */
 +     Tcl_ChannelType *typePtr;	   /* The channel type record for the new
 + 				    * channel. */
@@ -380,10 +380,10 @@
 + /*
 +  *----------------------------------------------------------------------
 +  *
-+  * Tcl_UndoReplaceChannel --
++  * Tcl_UnstackChannel --
 +  *
 +  *	Unstacks an entry in the hash table for a Tcl_Channel
-+  *	record. This is the reverse to 'Tcl_ReplaceChannel'.
++  *	record. This is the reverse to 'Tcl_StackChannel'.
 +  *	The old, superceded channel is uncovered and re-registered
 +  *	in the appropriate datastructures.
 +  *
@@ -397,7 +397,7 @@
 +  */
 + 
 + void
-+ Tcl_UndoReplaceChannel (interp, chan)
++ Tcl_UnstackChannel (interp, chan)
 + Tcl_Interp* interp; /* The interpreter we are working in */
 + Tcl_Channel chan;   /* The channel to unstack */
 + {
@@ -508,8 +508,8 @@
       Tcl_PanicVA, /* 278 */
       Tcl_GetVersion, /* 279 */
       Tcl_InitMemory, /* 280 */
-!     Tcl_ReplaceChannel, /* 281 */
-!     Tcl_UndoReplaceChannel, /* 282 */
+!     Tcl_StackChannel, /* 281 */
+!     Tcl_UnstackChannel, /* 282 */
       NULL, /* 283 */
       NULL, /* 284 */
       NULL, /* 285 */
@@ -523,23 +523,23 @@
   
 + /* Slot 345 */
 + Tcl_Channel
-+ Tcl_ReplaceChannel(interp, typePtr, instanceData, mask, prevChan)
++ Tcl_StackChannel(interp, typePtr, instanceData, mask, prevChan)
 +     Tcl_Interp * interp;
 +     Tcl_ChannelType * typePtr;
 +     ClientData instanceData;
 +     int mask;
 +     Tcl_Channel prevChan;
 + {
-+     return (tclStubsPtr->tcl_ReplaceChannel)(interp, typePtr, instanceData, mask, prevChan);
++     return (tclStubsPtr->tcl_StackChannel)(interp, typePtr, instanceData, mask, prevChan);
 + }
 + 
 + /* Slot 346 */
 + void
-+ Tcl_UndoReplaceChannel(interp, chan)
++ Tcl_UnstackChannel(interp, chan)
 +     Tcl_Interp * interp;
 +     Tcl_Channel chan;
 + {
-+     (tclStubsPtr->tcl_UndoReplaceChannel)(interp, chan);
++     (tclStubsPtr->tcl_UnstackChannel)(interp, chan);
 + }
 + 
   

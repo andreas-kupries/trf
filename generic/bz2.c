@@ -491,7 +491,7 @@ ClearEncoder (ctrlBlock, clientData)
 Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {
-  EncoderControl* c = (EncoderControl*) ctrlBlock;
+  /* EncoderControl* c = (EncoderControl*) ctrlBlock; */
 
   /* execute conversion specific code here (BZ2) */
 
@@ -818,7 +818,7 @@ ClearDecoder (ctrlBlock, clientData)
 Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {
-  DecoderControl* c = (DecoderControl*) ctrlBlock;
+  /*  DecoderControl* c = (DecoderControl*) ctrlBlock; */
 
   /* execute conversion specific code here (BZ2) */
 

@@ -52,10 +52,13 @@ int
 Trf_Init (interp)
 Tcl_Interp* interp;
 {
-  Tcl_HashTable* hTablePtr;
+  Trf_Registry*  registry;
 
-#if GT81
-  if (Tcl_InitStubs(interp, "8.1", 0) == NULL) {
+#ifdef USE_TCL_STUBS
+  char* actualVersion;
+
+  actualVersion = Tcl_InitStubs(interp, "8.1", 0);
+  if (actualVersion == NULL) {
     return TCL_ERROR;
   }
 #endif
@@ -67,10 +70,19 @@ Tcl_Interp* interp;
       return TCL_OK;
     }
 
-  hTablePtr = TrfGetRegistry (interp);
+  registry = TrfGetRegistry (interp);
 
-  if (hTablePtr) {
+  if (registry) {
     int res;
+
+#ifdef USE_TCL_STUBS
+#define BEYOND81 (actualVersion [0] > '8') || \
+    ((actualVersion [0] == '8') && (actualVersion [2] > '1'))
+
+    registry->patchIntegrated = (BEYOND81 ? 1 : 0);
+#else
+    registry->patchIntegrated = 0;
+#endif
 
     /* register extension as now available package */
     Tcl_PkgProvide (interp, "Trf", TRF_VERSION);
@@ -277,11 +289,11 @@ int
 Trf_IsInitialized (interp)
 Tcl_Interp* interp;
 {
-  Tcl_HashTable* hTablePtr;
+  Trf_Registry* registry;
 
-  hTablePtr = TrfPeekForRegistry (interp);
+  registry = TrfPeekForRegistry (interp);
 
-  return hTablePtr != (Tcl_HashTable*) NULL;
+  return registry != (Trf_Registry*) NULL;
 }
 
 #if GT81 && defined (TCL_THREADS) /* THREADING: lock procedures */

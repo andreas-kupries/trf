@@ -77,11 +77,16 @@ typedef struct _ResultBuffer_ {
   int            used;
 } ResultBuffer;
 
+/** XXX change definition for 8.2, at compile time */
 
 typedef struct _TrfTransformationInstance_ {
+  int patchIntegrated; /* Boolean flag, see transformInt.h, Trf_Registry */
+
   /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com> */
-  Tcl_Channel self;  /* Our own Channel handle */
-  Tcl_Channel parent; /* The channel superceded by this one */
+  Tcl_Channel self;   /* Our own Channel handle */
+  Tcl_Channel parent; /* The channel superceded by this one. Only if the
+		       * patch is not integrated (see above).
+		       */
 
   int readIsFlushed; /* flag to note wether in.flushProc was called or not */
 
@@ -219,6 +224,11 @@ ChannelHandler _ANSI_ARGS_ ((ClientData clientData, int mask));
 
 static void
 ChannelHandlerTimer _ANSI_ARGS_ ((ClientData clientData));
+
+
+static Tcl_Channel
+DownChannel _ANSI_ARGS_ ((TrfTransformationInstance* ctrl));
+
 
 /*
  *------------------------------------------------------*
@@ -241,24 +251,25 @@ ChannelHandlerTimer _ANSI_ARGS_ ((ClientData clientData));
  *------------------------------------------------------*
  */
 
-Tcl_HashTable*
+Trf_Registry*
 TrfGetRegistry (interp)
 Tcl_Interp* interp;
 {
-  Tcl_HashTable* hTablePtr;
+  Trf_Registry* registry;
 
-  hTablePtr = TrfPeekForRegistry (interp);
+  registry = TrfPeekForRegistry (interp);
 
-  if (hTablePtr == (Tcl_HashTable*) NULL) {
-    hTablePtr = (Tcl_HashTable*) Tcl_Alloc (sizeof (Tcl_HashTable));
+  if (registry == (Trf_Registry*) NULL) {
+    registry           = (Trf_Registry*)  Tcl_Alloc (sizeof (Trf_Registry));
+    registry->registry = (Tcl_HashTable*) Tcl_Alloc (sizeof (Tcl_HashTable));
 
-    Tcl_InitHashTable (hTablePtr, TCL_STRING_KEYS);
+    Tcl_InitHashTable (registry->registry, TCL_STRING_KEYS);
 
     Tcl_SetAssocData (interp, ASSOC, TrfDeleteRegistry,
-		      (ClientData) hTablePtr);
+		      (ClientData) registry);
   }
 
-  return hTablePtr;
+  return registry;
 }
 
 /*
@@ -281,7 +292,7 @@ Tcl_Interp* interp;
  *------------------------------------------------------*
  */
 
-Tcl_HashTable*
+Trf_Registry*
 TrfPeekForRegistry (interp)
 Tcl_Interp* interp;
 {
@@ -289,7 +300,7 @@ Tcl_Interp* interp;
 
   proc = TrfDeleteRegistry;
 
- return (Tcl_HashTable*) Tcl_GetAssocData (interp, ASSOC, &proc);
+ return (Trf_Registry*) Tcl_GetAssocData (interp, ASSOC, &proc);
 }
 
 /*
@@ -318,18 +329,18 @@ Trf_Register (interp, type)
 Tcl_Interp*               interp;
 CONST Trf_TypeDefinition* type;
 {
+  Trf_Registry*      registry;
   Trf_RegistryEntry* entry;
-  Tcl_HashTable*     hTablePtr;
   Tcl_HashEntry*     hPtr;
   int                new;
 
-  hTablePtr = TrfGetRegistry (interp);
+  registry = TrfGetRegistry (interp);
 
   /*
    * Already defined ?
    */
 
-  hPtr = Tcl_FindHashEntry (hTablePtr, (char*) type->name);
+  hPtr = Tcl_FindHashEntry (registry->registry, (char*) type->name);
 
   if (hPtr != (Tcl_HashEntry*) NULL) {
     return TCL_ERROR;
@@ -370,6 +381,7 @@ CONST Trf_TypeDefinition* type;
    */
 
   entry            = (Trf_RegistryEntry*)Tcl_Alloc (sizeof(Trf_RegistryEntry));
+  entry->registry  = registry;
   entry->transType = (Tcl_ChannelType*)  Tcl_Alloc (sizeof(Tcl_ChannelType));
   entry->trfType   = (Trf_TypeDefinition*) type;
   entry->interp    = interp;
@@ -419,7 +431,7 @@ CONST Trf_TypeDefinition* type;
    * Add entry to internal registry.
    */
 
-  hPtr = Tcl_CreateHashEntry (hTablePtr, (char*) type->name, &new);
+  hPtr = Tcl_CreateHashEntry (registry->registry, (char*) type->name, &new);
   Tcl_SetHashValue (hPtr, entry);
 
   return TCL_OK;
@@ -448,11 +460,12 @@ Trf_Unregister (interp, entry)
 Tcl_Interp*        interp;
 Trf_RegistryEntry* entry;
 {
+  Trf_Registry*  registry;
   Tcl_HashEntry* hPtr;
-  Tcl_HashTable* hTablePtr;
 
-  hTablePtr = TrfGetRegistry    (interp);
-  hPtr      = Tcl_FindHashEntry (hTablePtr, (char*) entry->trfType->name);
+  registry  = TrfGetRegistry    (interp);
+  hPtr      = Tcl_FindHashEntry (registry->registry,
+				 (char*) entry->trfType->name);
 
   Tcl_Free ((char*) entry->transType);
   Tcl_Free ((char*) entry);
@@ -487,14 +500,14 @@ TrfDeleteRegistry (clientData, interp)
 ClientData  clientData;
 Tcl_Interp* interp;
 {
-  Tcl_HashTable* hTablePtr;
-  hTablePtr = (Tcl_HashTable*) clientData;
+  Trf_Registry* registry = (Trf_Registry*) clientData;
 
   /*
    * The commands are already deleted, therefore the hashtable is empty here.
    */
 
-  Tcl_DeleteHashTable (hTablePtr);
+  Tcl_DeleteHashTable (registry->registry);
+  Tcl_Free ((char*) registry);
 }
 
 /* (readable) shortcuts for calling the option processing vectors.
@@ -910,8 +923,8 @@ struct Tcl_Obj* CONST * objv;
      * existence of the necessary patches ! Bail out if not.
      */
 
-#if GT81
-    if (Tcl_ReplaceChannel == NULL) {
+#ifdef USE_TCL_STUBS
+    if (Tcl_StackChannel == NULL) {
       Tcl_AppendResult (interp, cmd, ": this feature (-attach) is not ",
 			"available as the required patch to the core ",
 			"was not applied", (char*) NULL);
@@ -997,75 +1010,26 @@ TrfBlock (instanceData, mode)
 ClientData  instanceData;
 int mode;
 {
-
-#if 0
-  /* Internal definitions from tclIO.c. Would hep to implement convenience
-   * functionality. Switched off, decision that it is not worth it.
-   * Possible the moment these definitions (or setblockmode) goes public.
-   */
-
-#define CHANNEL_NONBLOCKING	(1<<3)	/* Channel is currently in
-					 * nonblocking mode. */
-#define BG_FLUSH_SCHEDULED	(1<<7)	/* A background flush of the
-					 * queued output buffers has been
-                                         * scheduled. */
-  typedef struct Channel {
-    void *channelName;		/* The name of the channel instance in Tcl
-                                 * commands. Storage is owned by the generic IO
-                                 * code,  is dynamically allocated. */
-    int	flags;			/* ORed combination of the flags defined
-                                 * below. */
-  } Channel;
-
-  Tcl_ChannelType* ctype;
-  int res;
-#endif
-
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
-  CONST char*                block;
+  char                   block [2] = {0,0};
+
+#ifdef USE_TCL_STUBS
+  Tcl_Channel parent = (trans->patchIntegrated ?
+			DownChannel (trans)    :
+			trans->parent);
+#else
+  Tcl_Channel parent = trans->parent;
+#endif
 
   if (mode == TCL_MODE_NONBLOCKING) {
     trans->flags |= CHANNEL_ASYNC;
-    block = "0";
+    block [0] = '0';
   } else {
     trans->flags &= ~(CHANNEL_ASYNC);
-    block = "1";
-  }
-#if 0
-  /* Forwarding of this action to underlying channel by myself, not Matt.
-   * This should make it easier to generate a consistent blocking mode across
-   * the whole stack of channels.
-   */
-
-  Tcl_SetChannelOption (NULL, trans->parent, "-blocking", block);
-
-    return Tcl_SetChannelOption(statePtr->interp, statePtr->parent,
-		"-blocking", (mode == TCL_MODE_NONBLOCKING) ? "0" : "1");
-
-#endif
-#if 0
-  /* not yet, need 'tclIO.c/SetBlockMode', which is internal, and interp
-   * Or some other internal definitions from TclInt.h
-   */
-
-  ctype = Tcl_GetChannelType (trans->parent);
-
-  res = 0;
-  if (ctype->blockModeProc != (Tcl_DriverBlockModeProc *) NULL) {
-    res = ctype->blockModeProc (Tcl_GetChannelInstanceData (trans->parent),
-				 mode);
-  }
-  if (res != 0) {
-    Tcl_SetErrno(res);
-    return res;
-  }
-  if (mode == TCL_MODE_BLOCKING) {
-    ((Channel*)trans->parent)->flags &= (~(CHANNEL_NONBLOCKING | BG_FLUSH_SCHEDULED));
-  } else {
-    ((Channel*)trans->parent)->flags |= CHANNEL_NONBLOCKING;
+    block [0] = '1';
   }
 
-#endif
+  Tcl_SetChannelOption (NULL, parent, "-blocking", block);
   return 0;
 }
 
@@ -1101,12 +1065,20 @@ Tcl_Interp* interp;
 
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
 
+#ifdef USE_TCL_STUBS
+  Tcl_Channel parent = (trans->patchIntegrated ?
+			DownChannel (trans)    :
+			trans->parent);
+#else
+  Tcl_Channel parent = trans->parent;
+#endif
+
   /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
    * Remove event handler to underlying channel, this could
    * be because we are closing for real, or being "unstacked".
    */
 
-  Tcl_DeleteChannelHandler (trans->parent, ChannelHandler, (ClientData) trans);
+  Tcl_DeleteChannelHandler (parent, ChannelHandler, (ClientData) trans);
 
 
   if (trans->timer != (Tcl_TimerToken) NULL) {
@@ -1182,6 +1154,14 @@ int*       errorCodePtr;
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
   int gotBytes, read, i, res;
 
+#ifdef USE_TCL_STUBS
+  Tcl_Channel parent = (trans->patchIntegrated ?
+			DownChannel (trans)    :
+			trans->parent);
+#else
+  Tcl_Channel parent = trans->parent;
+#endif
+
   /* should assert (trans->mode & TCL_READABLE) */
 
   gotBytes = 0;
@@ -1232,7 +1212,7 @@ int*       errorCodePtr;
      * information read from the parent channel.
      */
 
-    read = Tcl_Read (trans->parent, buf, toRead);
+    read = Tcl_Read (parent, buf, toRead);
 
     if (read < 0) {
       /* Report errors to caller.
@@ -1243,7 +1223,7 @@ int*       errorCodePtr;
     }
 
     if (read == 0) {
-      /* Check wether we hit on EOF in 'trans->parent' or
+      /* Check wether we hit on EOF in 'parent' or
        * not. If not differentiate between blocking and
        * non-blocking modes. In non-blocking mode we ran
        * temporarily out of data. Signal this to the caller
@@ -1256,7 +1236,7 @@ int*       errorCodePtr;
 
       /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
        */
-      if (! Tcl_Eof (trans->parent)) {
+      if (! Tcl_Eof (parent)) {
 	if (gotBytes == 0 && trans->flags & CHANNEL_ASYNC) {
 	  *errorCodePtr = EWOULDBLOCK;
 	  return -1;
@@ -1406,6 +1386,14 @@ int*       errorCodePtr;	/* Location of error flag. */
   int result;
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
 
+#ifdef USE_TCL_STUBS
+  Tcl_Channel parent = (trans->patchIntegrated ?
+			DownChannel (trans)    :
+			trans->parent);
+#else
+  Tcl_Channel parent = trans->parent;
+#endif
+
   /*
    * Flush data waiting for output, discard everything in the input buffers.
    */
@@ -1421,7 +1409,7 @@ int*       errorCodePtr;	/* Location of error flag. */
     trans->readIsFlushed = 0;
   }
 
-  result = Tcl_Seek (trans->parent, offset, mode);
+  result = Tcl_Seek (parent, offset, mode);
   *errorCodePtr = (result == -1) ? Tcl_GetErrno ():0;
   return result;
 }
@@ -1469,10 +1457,7 @@ int        mask;		/* Events of interest */
    */
 
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
-#if 0
-  Tcl_ChannelType*     p_type     = Tcl_GetChannelType         (trans->parent);
-  ClientData           p_instance = Tcl_GetChannelInstanceData (trans->parent);
-#endif
+  Tcl_Channel               parent;
 
   if (mask == trans->watchMask) {
     /* No changes in the expressed interest, skip this call.
@@ -1480,12 +1465,18 @@ int        mask;		/* Events of interest */
     return;
   }
 
+#ifdef USE_TCL_STUBS
+  parent = (trans->patchIntegrated ? DownChannel (trans) : trans->parent);
+#else
+  parent = trans->parent;
+#endif
+
   if (trans->watchMask) {
     /*
      * Remove event handler to underlying channel, this could
      * be because we are closing for real, or being "unstacked".
      */
-    Tcl_DeleteChannelHandler (trans->parent, ChannelHandler,
+    Tcl_DeleteChannelHandler (parent, ChannelHandler,
 			      (ClientData) trans);
   }
 
@@ -1493,20 +1484,9 @@ int        mask;		/* Events of interest */
 
   if (trans->watchMask) {
     /* Setup active monitor for events on underlying Channel */
-    Tcl_CreateChannelHandler (trans->parent, trans->watchMask,
+    Tcl_CreateChannelHandler (parent, trans->watchMask,
 			      ChannelHandler, (ClientData) trans);
   }
-
-#if 0
-  /* ** OLD CODE DISABLED **
-   * Forward request to channel we are stacked upon.
-   */
-#if (TCL_MAJOR_VERSION < 8)
-  p_type->watchChannelProc (p_instance, mask);
-#else
-  p_type->watchProc (p_instance, mask);
-#endif
-#endif
 }
 
 #if (TCL_MAJOR_VERSION < 8)
@@ -1614,7 +1594,15 @@ ClientData* handlePtr;		/* Place to store the handle into */
 
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
 
-  return Tcl_GetChannelHandle (trans->parent, direction, handlePtr);
+#ifdef USE_TCL_STUBS
+  Tcl_Channel parent = (trans->patchIntegrated ?
+			DownChannel (trans)    :
+			trans->parent);
+#else
+  Tcl_Channel parent = trans->parent;
+#endif
+
+  return Tcl_GetChannelHandle (parent, direction, handlePtr);
 }
 #endif
 
@@ -1842,6 +1830,9 @@ Tcl_Interp*        interp;
 
   trans = (TrfTransformationInstance*) Tcl_Alloc (sizeof (TrfTransformationInstance));
 
+  trans->patchIntegrated = entry->registry->patchIntegrated;
+
+
   /* trans->standard.typePtr = entry->transType; */
   trans->clientData       = entry->trfType->clientData;
   trans->parent           = attach;
@@ -1885,7 +1876,7 @@ Tcl_Interp*        interp;
    */
 
   if (trans->mode & TCL_WRITABLE) {
-    trans->out.control = trans->out.vectors->createProc ((ClientData) trans->parent,
+    trans->out.control = trans->out.vectors->createProc ((ClientData) trans,
 							 PutDestination,
 							 optInfo, interp,
 							 trans->clientData);
@@ -1917,14 +1908,25 @@ Tcl_Interp*        interp;
    * shall attach to.
    */
 
-  trans->self = Tcl_ReplaceChannel (interp, entry->transType,
-				    (ClientData) trans, trans->mode,
-				    attach);
+  /* Discard information dangerous for the integrated patch.
+   * (This makes sure that we don't miss any place using this pointer
+   * without generating a crash (instead of some silent failure, like
+   * thrashing far away memory)).
+   */
+
+  if (trans->patchIntegrated) {
+    trans->parent = NULL;
+  }
+  
+  trans->self = Tcl_StackChannel (interp, entry->transType,
+				  (ClientData) trans, trans->mode,
+				  attach);
+  
 
 
   if (trans->self == (Tcl_Channel) NULL) {
     Tcl_Free ((char*) trans);
-    Tcl_AppendResult (interp, "internal error in Tcl_ReplaceChannel",
+    Tcl_AppendResult (interp, "internal error in Tcl_StackChannel",
 		      (char*) NULL);
     return TCL_ERROR;
   }
@@ -1961,17 +1963,25 @@ unsigned char* outString;
 int            outLen;
 Tcl_Interp*    interp;
 {
-  Tcl_Channel destination = (Tcl_Channel) clientData;
+  TrfTransformationInstance* trans = (TrfTransformationInstance*) clientData;
   int         res;
 
-  res = Tcl_Write (destination, (char*) outString, outLen);
+#ifdef USE_TCL_STUBS
+  Tcl_Channel parent = (trans->patchIntegrated ?
+			DownChannel (trans)    :
+			trans->parent);
+#else
+  Tcl_Channel parent = trans->parent;
+#endif
+
+  res = Tcl_Write (parent, (char*) outString, outLen);
 
   if (res < 0) {
     if (interp) {
-      Tcl_AppendResult (interp, "error writing \"",               (char*)NULL);
-      Tcl_AppendResult (interp, Tcl_GetChannelName (destination), (char*)NULL);
-      Tcl_AppendResult (interp, "\": ",                           (char*)NULL);
-      Tcl_AppendResult (interp, Tcl_PosixError (interp),          (char*)NULL);
+      Tcl_AppendResult (interp, "error writing \"",          (char*) NULL);
+      Tcl_AppendResult (interp, Tcl_GetChannelName (parent), (char*) NULL);
+      Tcl_AppendResult (interp, "\": ",                      (char*) NULL);
+      Tcl_AppendResult (interp, Tcl_PosixError (interp),     (char*) NULL);
     }
     return TCL_ERROR;
   }
@@ -2122,7 +2132,9 @@ int            mask;
 
   TrfTransformationInstance* trans = (TrfTransformationInstance*) clientData;
 
-  Tcl_NotifyChannel (trans->self, mask);
+  if (!trans->patchIntegrated) {
+    Tcl_NotifyChannel (trans->self, mask);
+  }
 
 #if (TCL_MAJOR_VERSION >= 8)
   /* Check the I/O-Buffers of this channel for waiting information.
@@ -2139,13 +2151,21 @@ int            mask;
     trans->timer = (Tcl_TimerToken) NULL;
   }
 
-  if ((mask & TCL_READABLE) &&
-      (Tcl_InputBuffered (trans->self) > 0)) {
-    /* Data is waiting, flush it out in short time
-     */
+  /* Check for waiting data, flush it out with a timer.
+   */
 
-    trans->timer = Tcl_CreateTimerHandler (DELAY, ChannelHandlerTimer,
-					   (ClientData) trans);
+  if (trans->patchIntegrated) {
+    if ((mask & TCL_READABLE) && (trans->result.used > 0)) {
+      trans->timer = Tcl_CreateTimerHandler (DELAY, ChannelHandlerTimer,
+					     (ClientData) trans);
+    }
+  } else {
+    if ((mask & TCL_READABLE) &&
+	((trans->result.used > 0) ||
+	 (Tcl_InputBuffered (trans->self) > 0))) {
+      trans->timer = Tcl_CreateTimerHandler (DELAY, ChannelHandlerTimer,
+					     (ClientData) trans);
+    }
   }
 #endif
 }
@@ -2177,5 +2197,54 @@ ClientData clientData; /* Transformation to query */
 
   trans->timer = (Tcl_TimerToken) NULL;
 
-  ChannelHandler (clientData, trans->watchMask);
+  if (trans->patchIntegrated) {
+    Tcl_NotifyChannel (trans->self, mask);
+  } else {
+    ChannelHandler (clientData, trans->watchMask);
+  }
 }
+#ifdef USE_TCL_STUBS
+/*
+ *------------------------------------------------------*
+ *
+ *	DownChannel --
+ *
+ *	Helper procedure. Finds the downstream channel.
+ *
+ *	Sideeffects:
+ *		May modify 'self'.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static Tcl_Channel
+DownChannel (ctrl)
+    TrfTransformationInstance* ctrl;
+{
+  /* The reason for the existence of this procedure is
+   * the fact that stacking a transform over another
+   * transform will leave our internal pointer unchanged,
+   * and thus pointing to the new transform, and not the
+   * Channel structure containing the saved state of this
+   * transform. This is the price to pay for leaving
+   * Tcl_Channel references intact. The only other solution
+   * is an extension of Tcl_ChannelType with another driver
+   * procedure to notify a Channel about the (un)stacking.
+   *
+   * It walks the chain of Channel structures until it
+   * finds the one pointing having 'ctrl' as instanceData
+   * and then returns the superceding channel to that.
+   */
+
+  Tcl_Channel self = ctrl->self;
+
+  while ((ClientData) ctrl != Tcl_GetChannelInstanceData (self)) {
+    self = Tcl_GetStackedChannel (self);
+  }
+
+  return Tcl_GetStackedChannel (self);
+}
+#endif 

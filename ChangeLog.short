@@ -1,3 +1,20 @@
+Changes from 1.7 to 1.8
+
+*	Marshall Rose made the 'base64' encoding MIME compliant
+	and additionally donated his 'quoted-printable' converter.
+
+*	Jan Nijtmans donated the 'bzip2' (de)compressor transform. It
+	is unfortunately not yet complete, the decompressor is not
+	working.
+
+*	Rewrote the base code to handle the inclusion of the patch
+	into the Tcl core (since 8.2) and the associated changes
+	to the semantics of some of the functions. It now especially
+	automagically distinguishes between unpatched 8.0, patched 8.0,
+	unpatched 8.1, patched 8.1, 8.2 and beyond, and adapts
+	itself accordingly, either at compile time (8.0.x) or
+	runtime (8.1 and beyond).
+
 Changes from 1.6 to 1.7
 
 *	Headers now usable with a C++ compiler.

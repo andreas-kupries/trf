@@ -47,13 +47,21 @@ extern "C" {
 #include "transformInt.h"
 
 #ifdef HAVE_MD2_H
-#   include <md2.h>
+#   ifdef OPENSSL_SUB
+#       include <openssl/md2.h>
+#   else
+#       include <md2.h>
+#   endif
 #else
 #   include "../compat/md2.h"
 #endif
 
 #ifdef HAVE_SHA_H
-#   include <sha.h>
+#   ifdef OPENSSL_SUB
+#       include <openssl/sha.h>
+#   else
+#       include <sha.h>
+#   endif
 #else
 #   include "../compat/sha.h"
 #endif

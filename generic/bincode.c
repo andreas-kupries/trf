@@ -30,6 +30,14 @@
 #include <limits.h>
 #include "transformInt.h"
 
+/* On some systems this definition seems to be missing.
+ */
+
+#ifndef CHAR_BIT
+#define CHAR_BIT 8
+#endif
+
+
 /*
  * Converter description
  * ---------------------
