@@ -1,9 +1,20 @@
-*** ./tcl.decls.orig	Sat Apr 10 16:03:23 1999
---- ./tcl.decls	Sat Apr 10 16:25:38 1999
+*** ./tcl.decls.orig	Sat Apr 10 17:50:50 1999
+--- ./tcl.decls	Mon Apr 19 19:58:16 1999
 ***************
-*** 1251,1256 ****
---- 1251,1279 ----
-     int Tcl_Chdir(CONST char *dirName)
+*** 967,977 ****
+      void Tcl_InitMemory(Tcl_Interp *interp)
+  }
+  
+  # Reserved for future use (8.0.x vs. 8.1)
+- #  declare 281 generic {
+- #  }
+- #  declare 282 generic {
+- #  }
+  #  declare 283 generic {
+  #  }
+  #  declare 284 generic {
+--- 967,996 ----
+      void Tcl_InitMemory(Tcl_Interp *interp)
   }
   
 + # Andreas Kupries <a.kupries@westend.com>, 03/21/1999
@@ -20,106 +31,92 @@
 + # (patch usually has no problems to integrate the patch file for the last
 + # version into the new one).
 + 
-+ declare 380 generic {
++ declare 281 generic {
 +     Tcl_Channel Tcl_ReplaceChannel(Tcl_Interp *interp, \
 + 	    Tcl_ChannelType *typePtr, ClientData instanceData, \
 + 	    int mask, Tcl_Channel prevChan)
 + }
-+ declare 381 generic {
++ declare 282 generic {
 +     void Tcl_UndoReplaceChannel(Tcl_Interp *interp, Tcl_Channel chan)
 + }
 + 
-  ##############################################################################
-  
-  # Define the platform specific public Tcl interface.  These functions are
-*** ./tclDecls.h.orig	Sat Apr 10 16:03:23 1999
---- ./tclDecls.h	Sat Apr 10 16:25:38 1999
+  # Reserved for future use (8.0.x vs. 8.1)
+  #  declare 283 generic {
+  #  }
+  #  declare 284 generic {
+*** ./tclDecls.h.orig	Sat Apr 10 17:50:50 1999
+--- ./tclDecls.h	Mon Apr 19 19:58:16 1999
 ***************
-*** 1118,1123 ****
---- 1118,1144 ----
-  				Tcl_DString * cwdPtr));
-  /* 366 */
-  EXTERN int		Tcl_Chdir _ANSI_ARGS_((CONST char * dirName));
-+ /* Slot 367 is reserved */
-+ /* Slot 368 is reserved */
-+ /* Slot 369 is reserved */
-+ /* Slot 370 is reserved */
-+ /* Slot 371 is reserved */
-+ /* Slot 372 is reserved */
-+ /* Slot 373 is reserved */
-+ /* Slot 374 is reserved */
-+ /* Slot 375 is reserved */
-+ /* Slot 376 is reserved */
-+ /* Slot 377 is reserved */
-+ /* Slot 378 is reserved */
-+ /* Slot 379 is reserved */
-+ /* 380 */
-+ EXTERN Tcl_Channel	Tcl_ReplaceChannel _ANSI_ARGS_((Tcl_Interp * interp, 
-+ 				Tcl_ChannelType * typePtr, 
-+ 				ClientData instanceData, int mask, 
-+ 				Tcl_Channel prevChan));
-+ /* 381 */
-+ EXTERN void		Tcl_UndoReplaceChannel _ANSI_ARGS_((
-+ 				Tcl_Interp * interp, Tcl_Channel chan));
-  
-  typedef struct TclStubHooks {
-      struct TclPlatStubs *tclPlatStubs;
+*** 875,882 ****
+  				int * patchLevel, int * type));
+  /* 280 */
+  EXTERN void		Tcl_InitMemory _ANSI_ARGS_((Tcl_Interp * interp));
+! /* Slot 281 is reserved */
+! /* Slot 282 is reserved */
+  /* Slot 283 is reserved */
+  /* Slot 284 is reserved */
+  /* Slot 285 is reserved */
+--- 875,888 ----
+  				int * patchLevel, int * type));
+  /* 280 */
+  EXTERN void		Tcl_InitMemory _ANSI_ARGS_((Tcl_Interp * interp));
+! /* 281 */
+! EXTERN Tcl_Channel	Tcl_ReplaceChannel _ANSI_ARGS_((Tcl_Interp * interp, 
+! 				Tcl_ChannelType * typePtr, 
+! 				ClientData instanceData, int mask, 
+! 				Tcl_Channel prevChan));
+! /* 282 */
+! EXTERN void		Tcl_UndoReplaceChannel _ANSI_ARGS_((
+! 				Tcl_Interp * interp, Tcl_Channel chan));
+  /* Slot 283 is reserved */
+  /* Slot 284 is reserved */
+  /* Slot 285 is reserved */
 ***************
-*** 1520,1525 ****
---- 1541,1561 ----
-      int (*tcl_ParseVarName) _ANSI_ARGS_((Tcl_Interp * interp, char * string, int numBytes, Tcl_Parse * parsePtr, int append)); /* 364 */
-      char * (*tcl_GetCwd) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_DString * cwdPtr)); /* 365 */
-      int (*tcl_Chdir) _ANSI_ARGS_((CONST char * dirName)); /* 366 */
-+     void *reserved367;
-+     void *reserved368;
-+     void *reserved369;
-+     void *reserved370;
-+     void *reserved371;
-+     void *reserved372;
-+     void *reserved373;
-+     void *reserved374;
-+     void *reserved375;
-+     void *reserved376;
-+     void *reserved377;
-+     void *reserved378;
-+     void *reserved379;
-+     Tcl_Channel (*tcl_ReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_ChannelType * typePtr, ClientData instanceData, int mask, Tcl_Channel prevChan)); /* 380 */
-+     void (*tcl_UndoReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_Channel chan)); /* 381 */
-  } TclStubs;
-  
-  extern TclStubs *tclStubsPtr;
+*** 1434,1441 ****
+      void (*tcl_PanicVA) _ANSI_ARGS_((char * format, va_list argList)); /* 278 */
+      void (*tcl_GetVersion) _ANSI_ARGS_((int * major, int * minor, int * patchLevel, int * type)); /* 279 */
+      void (*tcl_InitMemory) _ANSI_ARGS_((Tcl_Interp * interp)); /* 280 */
+!     void *reserved281;
+!     void *reserved282;
+      void *reserved283;
+      void *reserved284;
+      void *reserved285;
+--- 1440,1447 ----
+      void (*tcl_PanicVA) _ANSI_ARGS_((char * format, va_list argList)); /* 278 */
+      void (*tcl_GetVersion) _ANSI_ARGS_((int * major, int * minor, int * patchLevel, int * type)); /* 279 */
+      void (*tcl_InitMemory) _ANSI_ARGS_((Tcl_Interp * interp)); /* 280 */
+!     Tcl_Channel (*tcl_ReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_ChannelType * typePtr, ClientData instanceData, int mask, Tcl_Channel prevChan)); /* 281 */
+!     void (*tcl_UndoReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_Channel chan)); /* 282 */
+      void *reserved283;
+      void *reserved284;
+      void *reserved285;
 ***************
-*** 2985,2990 ****
---- 3021,3047 ----
-  #ifndef Tcl_Chdir
-  #define Tcl_Chdir \
-  	(tclStubsPtr->tcl_Chdir) /* 366 */
-+ #endif
-+ /* Slot 367 is reserved */
-+ /* Slot 368 is reserved */
-+ /* Slot 369 is reserved */
-+ /* Slot 370 is reserved */
-+ /* Slot 371 is reserved */
-+ /* Slot 372 is reserved */
-+ /* Slot 373 is reserved */
-+ /* Slot 374 is reserved */
-+ /* Slot 375 is reserved */
-+ /* Slot 376 is reserved */
-+ /* Slot 377 is reserved */
-+ /* Slot 378 is reserved */
-+ /* Slot 379 is reserved */
-+ #ifndef Tcl_ReplaceChannel
-+ #define Tcl_ReplaceChannel \
-+ 	(tclStubsPtr->tcl_ReplaceChannel) /* 380 */
-+ #endif
-+ #ifndef Tcl_UndoReplaceChannel
-+ #define Tcl_UndoReplaceChannel \
-+ 	(tclStubsPtr->tcl_UndoReplaceChannel) /* 381 */
+*** 2657,2664 ****
+  #define Tcl_InitMemory \
+  	(tclStubsPtr->tcl_InitMemory) /* 280 */
   #endif
-  
-  #endif /* defined(USE_TCL_STUBS) && !defined(USE_TCL_STUB_PROCS) */
-*** ./tclIO.c.orig	Sat Apr 10 16:03:23 1999
---- ./tclIO.c	Sat Apr 10 16:25:38 1999
+! /* Slot 281 is reserved */
+! /* Slot 282 is reserved */
+  /* Slot 283 is reserved */
+  /* Slot 284 is reserved */
+  /* Slot 285 is reserved */
+--- 2663,2676 ----
+  #define Tcl_InitMemory \
+  	(tclStubsPtr->tcl_InitMemory) /* 280 */
+  #endif
+! #ifndef Tcl_ReplaceChannel
+! #define Tcl_ReplaceChannel \
+! 	(tclStubsPtr->tcl_ReplaceChannel) /* 281 */
+! #endif
+! #ifndef Tcl_UndoReplaceChannel
+! #define Tcl_UndoReplaceChannel \
+! 	(tclStubsPtr->tcl_UndoReplaceChannel) /* 282 */
+! #endif
+  /* Slot 283 is reserved */
+  /* Slot 284 is reserved */
+  /* Slot 285 is reserved */
+*** ./tclIO.c.orig	Sat Apr 10 17:50:52 1999
+--- ./tclIO.c	Mon Apr 19 19:58:16 1999
 ***************
 *** 202,207 ****
 --- 202,229 ----
@@ -495,34 +492,29 @@
       }
   
       /*
-*** ./tclStubInit.c.orig	Sat Apr 10 16:03:23 1999
---- ./tclStubInit.c	Sat Apr 10 16:25:38 1999
+*** ./tclStubInit.c.orig	Sat Apr 10 17:50:52 1999
+--- ./tclStubInit.c	Mon Apr 19 19:58:16 1999
 ***************
-*** 436,441 ****
---- 436,456 ----
-      Tcl_ParseVarName, /* 364 */
-      Tcl_GetCwd, /* 365 */
-      Tcl_Chdir, /* 366 */
-+     NULL, /* 367 */
-+     NULL, /* 368 */
-+     NULL, /* 369 */
-+     NULL, /* 370 */
-+     NULL, /* 371 */
-+     NULL, /* 372 */
-+     NULL, /* 373 */
-+     NULL, /* 374 */
-+     NULL, /* 375 */
-+     NULL, /* 376 */
-+     NULL, /* 377 */
-+     NULL, /* 378 */
-+     NULL, /* 379 */
-+     Tcl_ReplaceChannel, /* 380 */
-+     Tcl_UndoReplaceChannel, /* 381 */
-  };
-  
-  TclIntStubs tclIntStubs = {
-*** ./tclStubs.c.orig	Sat Apr 10 16:03:23 1999
---- ./tclStubs.c	Sat Apr 10 16:25:38 1999
+*** 350,357 ****
+      Tcl_PanicVA, /* 278 */
+      Tcl_GetVersion, /* 279 */
+      Tcl_InitMemory, /* 280 */
+!     NULL, /* 281 */
+!     NULL, /* 282 */
+      NULL, /* 283 */
+      NULL, /* 284 */
+      NULL, /* 285 */
+--- 350,357 ----
+      Tcl_PanicVA, /* 278 */
+      Tcl_GetVersion, /* 279 */
+      Tcl_InitMemory, /* 280 */
+!     Tcl_ReplaceChannel, /* 281 */
+!     Tcl_UndoReplaceChannel, /* 282 */
+      NULL, /* 283 */
+      NULL, /* 284 */
+      NULL, /* 285 */
+*** ./tclStubs.c.orig	Sat Apr 10 17:50:52 1999
+--- ./tclStubs.c	Mon Apr 19 19:58:16 1999
 ***************
 *** 3263,3267 ****
 --- 3263,3288 ----

@@ -875,8 +875,14 @@ EXTERN void		Tcl_GetVersion _ANSI_ARGS_((int * major, int * minor,
 				int * patchLevel, int * type));
 /* 280 */
 EXTERN void		Tcl_InitMemory _ANSI_ARGS_((Tcl_Interp * interp));
-/* Slot 281 is reserved */
-/* Slot 282 is reserved */
+/* 281 */
+EXTERN Tcl_Channel	Tcl_ReplaceChannel _ANSI_ARGS_((Tcl_Interp * interp, 
+				Tcl_ChannelType * typePtr, 
+				ClientData instanceData, int mask, 
+				Tcl_Channel prevChan));
+/* 282 */
+EXTERN void		Tcl_UndoReplaceChannel _ANSI_ARGS_((
+				Tcl_Interp * interp, Tcl_Channel chan));
 /* Slot 283 is reserved */
 /* Slot 284 is reserved */
 /* Slot 285 is reserved */
@@ -1118,27 +1124,6 @@ EXTERN char *		Tcl_GetCwd _ANSI_ARGS_((Tcl_Interp * interp,
 				Tcl_DString * cwdPtr));
 /* 366 */
 EXTERN int		Tcl_Chdir _ANSI_ARGS_((CONST char * dirName));
-/* Slot 367 is reserved */
-/* Slot 368 is reserved */
-/* Slot 369 is reserved */
-/* Slot 370 is reserved */
-/* Slot 371 is reserved */
-/* Slot 372 is reserved */
-/* Slot 373 is reserved */
-/* Slot 374 is reserved */
-/* Slot 375 is reserved */
-/* Slot 376 is reserved */
-/* Slot 377 is reserved */
-/* Slot 378 is reserved */
-/* Slot 379 is reserved */
-/* 380 */
-EXTERN Tcl_Channel	Tcl_ReplaceChannel _ANSI_ARGS_((Tcl_Interp * interp, 
-				Tcl_ChannelType * typePtr, 
-				ClientData instanceData, int mask, 
-				Tcl_Channel prevChan));
-/* 381 */
-EXTERN void		Tcl_UndoReplaceChannel _ANSI_ARGS_((
-				Tcl_Interp * interp, Tcl_Channel chan));
 
 typedef struct TclStubHooks {
     struct TclPlatStubs *tclPlatStubs;
@@ -1455,8 +1440,8 @@ typedef struct TclStubs {
     void (*tcl_PanicVA) _ANSI_ARGS_((char * format, va_list argList)); /* 278 */
     void (*tcl_GetVersion) _ANSI_ARGS_((int * major, int * minor, int * patchLevel, int * type)); /* 279 */
     void (*tcl_InitMemory) _ANSI_ARGS_((Tcl_Interp * interp)); /* 280 */
-    void *reserved281;
-    void *reserved282;
+    Tcl_Channel (*tcl_ReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_ChannelType * typePtr, ClientData instanceData, int mask, Tcl_Channel prevChan)); /* 281 */
+    void (*tcl_UndoReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_Channel chan)); /* 282 */
     void *reserved283;
     void *reserved284;
     void *reserved285;
@@ -1541,21 +1526,6 @@ typedef struct TclStubs {
     int (*tcl_ParseVarName) _ANSI_ARGS_((Tcl_Interp * interp, char * string, int numBytes, Tcl_Parse * parsePtr, int append)); /* 364 */
     char * (*tcl_GetCwd) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_DString * cwdPtr)); /* 365 */
     int (*tcl_Chdir) _ANSI_ARGS_((CONST char * dirName)); /* 366 */
-    void *reserved367;
-    void *reserved368;
-    void *reserved369;
-    void *reserved370;
-    void *reserved371;
-    void *reserved372;
-    void *reserved373;
-    void *reserved374;
-    void *reserved375;
-    void *reserved376;
-    void *reserved377;
-    void *reserved378;
-    void *reserved379;
-    Tcl_Channel (*tcl_ReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_ChannelType * typePtr, ClientData instanceData, int mask, Tcl_Channel prevChan)); /* 380 */
-    void (*tcl_UndoReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_Channel chan)); /* 381 */
 } TclStubs;
 
 extern TclStubs *tclStubsPtr;
@@ -2693,8 +2663,14 @@ extern TclStubs *tclStubsPtr;
 #define Tcl_InitMemory \
 	(tclStubsPtr->tcl_InitMemory) /* 280 */
 #endif
-/* Slot 281 is reserved */
-/* Slot 282 is reserved */
+#ifndef Tcl_ReplaceChannel
+#define Tcl_ReplaceChannel \
+	(tclStubsPtr->tcl_ReplaceChannel) /* 281 */
+#endif
+#ifndef Tcl_UndoReplaceChannel
+#define Tcl_UndoReplaceChannel \
+	(tclStubsPtr->tcl_UndoReplaceChannel) /* 282 */
+#endif
 /* Slot 283 is reserved */
 /* Slot 284 is reserved */
 /* Slot 285 is reserved */
@@ -3021,27 +2997,6 @@ extern TclStubs *tclStubsPtr;
 #ifndef Tcl_Chdir
 #define Tcl_Chdir \
 	(tclStubsPtr->tcl_Chdir) /* 366 */
-#endif
-/* Slot 367 is reserved */
-/* Slot 368 is reserved */
-/* Slot 369 is reserved */
-/* Slot 370 is reserved */
-/* Slot 371 is reserved */
-/* Slot 372 is reserved */
-/* Slot 373 is reserved */
-/* Slot 374 is reserved */
-/* Slot 375 is reserved */
-/* Slot 376 is reserved */
-/* Slot 377 is reserved */
-/* Slot 378 is reserved */
-/* Slot 379 is reserved */
-#ifndef Tcl_ReplaceChannel
-#define Tcl_ReplaceChannel \
-	(tclStubsPtr->tcl_ReplaceChannel) /* 380 */
-#endif
-#ifndef Tcl_UndoReplaceChannel
-#define Tcl_UndoReplaceChannel \
-	(tclStubsPtr->tcl_UndoReplaceChannel) /* 381 */
 #endif
 
 #endif /* defined(USE_TCL_STUBS) && !defined(USE_TCL_STUB_PROCS) */

@@ -158,7 +158,7 @@ mConfigure unix
 
 file copy win/trf1380.dll win/trf1480.dll
 file copy win/trf1380.lib win/trf1480.lib
-file rename win/trf1380.README win/trf1480.README
+file rename win/trf1380.README win/trf1580.README
 
 set bindir  "[::pool::string::cap $mName]${mVersion}"
 

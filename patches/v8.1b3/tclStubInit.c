@@ -350,8 +350,8 @@ TclStubs tclStubs = {
     Tcl_PanicVA, /* 278 */
     Tcl_GetVersion, /* 279 */
     Tcl_InitMemory, /* 280 */
-    NULL, /* 281 */
-    NULL, /* 282 */
+    Tcl_ReplaceChannel, /* 281 */
+    Tcl_UndoReplaceChannel, /* 282 */
     NULL, /* 283 */
     NULL, /* 284 */
     NULL, /* 285 */
@@ -436,21 +436,6 @@ TclStubs tclStubs = {
     Tcl_ParseVarName, /* 364 */
     Tcl_GetCwd, /* 365 */
     Tcl_Chdir, /* 366 */
-    NULL, /* 367 */
-    NULL, /* 368 */
-    NULL, /* 369 */
-    NULL, /* 370 */
-    NULL, /* 371 */
-    NULL, /* 372 */
-    NULL, /* 373 */
-    NULL, /* 374 */
-    NULL, /* 375 */
-    NULL, /* 376 */
-    NULL, /* 377 */
-    NULL, /* 378 */
-    NULL, /* 379 */
-    Tcl_ReplaceChannel, /* 380 */
-    Tcl_UndoReplaceChannel, /* 381 */
 };
 
 TclIntStubs tclIntStubs = {

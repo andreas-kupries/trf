@@ -43,5 +43,14 @@ node trf_home {
 	[tcl]-level commands was implemented, most of them related to
 	cryptography. Additionally some binary data support is put in as well.
 	"
+
+	hr
+
+	p "Other extensions using this one are
+	"
+
+	bullet_list {
+	    li "[link trfcrypt], by myself"
+	}
     }
 }
