@@ -404,6 +404,7 @@ proc makeFile {contents name} {
 	puts $fd $contents
     }
     close $fd
+    return $name
 }
 
 proc removeFile {name} {

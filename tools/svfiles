@@ -150,3 +150,7 @@ svfile patches/v8.1.1/README {
     {		Trf@mFullVersion@/patches/v8.1/}
     {		Trf2.1p2/patches/v8.1/}
 }
+svfile common/trf_version.inc {
+    {[vset trf_version 2.1p2]}
+    {[vset trf_version @mFullVersion@]}
+}

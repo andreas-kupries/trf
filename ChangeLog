@@ -1,3 +1,22 @@
+2003-03-26  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
+
+	* tools/svfiles: Added 'doc/common/trf_version.inc' to list of
+	  files which have to be patched when updating the version of the
+	  package.
+
+	* doc/common/trf_version.inc: Set true version, 2.1p2.
+
+	* tea.tests/md5_crash.test: 
+	* tests/md5_crash.test: Added tests to check against/for bug
+	  #667168. Preparation of tests on machine reproducing the bug and
+	  that the patch actually fixes the problem. ... Note: The test
+	  suite should be converted to use the tcltest package instead of
+	  its own set of commands, which are near to tcltest, but not
+	  quite the same, as they are older.
+
+	* tests/defs: Made it a bit nearer to the same command in tcltest
+	  (returning the path of the file).
+
 2003-03-12  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/adler.man:              Added doctools based documentation to Trf.
