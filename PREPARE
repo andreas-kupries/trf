@@ -107,6 +107,7 @@ exec nodeCompile westend html nodes
 
 cd ..
 mDocTGZArchive doc/html
+mDocZIPArchive doc/html
 cd doc
 
 eval file delete -force [glob html/*.html]
