@@ -3247,7 +3247,7 @@ Tcl_SetDefaultEncodingDir(path)
     (tclStubsPtr->tcl_SetDefaultEncodingDir)(path);
 }
 
-/* Slot 343 */
+/* Slot 345 */
 Tcl_Channel
 Tcl_ReplaceChannel(interp, typePtr, instanceData, mask, prevChan)
     Tcl_Interp * interp;
@@ -3259,7 +3259,7 @@ Tcl_ReplaceChannel(interp, typePtr, instanceData, mask, prevChan)
     return (tclStubsPtr->tcl_ReplaceChannel)(interp, typePtr, instanceData, mask, prevChan);
 }
 
-/* Slot 344 */
+/* Slot 346 */
 void
 Tcl_UndoReplaceChannel(interp, chan)
     Tcl_Interp * interp;

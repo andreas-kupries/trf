@@ -1182,12 +1182,12 @@ declare 342 generic {
 # (patch usually has no problems to integrate the patch file for the last
 # version into the new one).
 
-declare 343 generic {
+declare 345 generic {
     Tcl_Channel Tcl_ReplaceChannel(Tcl_Interp *interp, \
 	    Tcl_ChannelType *typePtr, ClientData instanceData, \
 	    int mask, Tcl_Channel prevChan)
 }
-declare 344 generic {
+declare 346 generic {
     void Tcl_UndoReplaceChannel(Tcl_Interp *interp, Tcl_Channel chan)
 }
 

@@ -20,12 +20,12 @@
 + # (patch usually has no problems to integrate the patch file for the last
 + # version into the new one).
 + 
-+ declare 343 generic {
++ declare 345 generic {
 +     Tcl_Channel Tcl_ReplaceChannel(Tcl_Interp *interp, \
 + 	    Tcl_ChannelType *typePtr, ClientData instanceData, \
 + 	    int mask, Tcl_Channel prevChan)
 + }
-+ declare 344 generic {
++ declare 346 generic {
 +     void Tcl_UndoReplaceChannel(Tcl_Interp *interp, Tcl_Channel chan)
 + }
 + 
@@ -40,12 +40,12 @@
   EXTERN char *		Tcl_GetDefaultEncodingDir _ANSI_ARGS_((void));
   /* 342 */
   EXTERN void		Tcl_SetDefaultEncodingDir _ANSI_ARGS_((char * path));
-+ /* 343 */
++ /* 345 */
 + EXTERN Tcl_Channel	Tcl_ReplaceChannel _ANSI_ARGS_((Tcl_Interp * interp, 
 + 				Tcl_ChannelType * typePtr, 
 + 				ClientData instanceData, int mask, 
 + 				Tcl_Channel prevChan));
-+ /* 344 */
++ /* 346 */
 + EXTERN void		Tcl_UndoReplaceChannel _ANSI_ARGS_((
 + 				Tcl_Interp * interp, Tcl_Channel chan));
   
@@ -57,8 +57,10 @@
       char * (*tcl_GetString) _ANSI_ARGS_((Tcl_Obj * objPtr)); /* 340 */
       char * (*tcl_GetDefaultEncodingDir) _ANSI_ARGS_((void)); /* 341 */
       void (*tcl_SetDefaultEncodingDir) _ANSI_ARGS_((char * path)); /* 342 */
-+     Tcl_Channel (*tcl_ReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_ChannelType * typePtr, ClientData instanceData, int mask, Tcl_Channel prevChan)); /* 343 */
-+     void (*tcl_UndoReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_Channel chan)); /* 344 */
+      void* reserved343;
+      void* reserved344;
++     Tcl_Channel (*tcl_ReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_ChannelType * typePtr, ClientData instanceData, int mask, Tcl_Channel prevChan)); /* 345 */
++     void (*tcl_UndoReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_Channel chan)); /* 346 */
   } TclStubs;
   
   extern TclStubs *tclStubsPtr;
@@ -71,11 +73,11 @@
 + #endif
 + #ifndef Tcl_ReplaceChannel
 + #define Tcl_ReplaceChannel(interp, typePtr, instanceData, mask, prevChan) \
-+ 	(tclStubsPtr->tcl_ReplaceChannel)(interp, typePtr, instanceData, mask, prevChan) /* 343 */
++ 	(tclStubsPtr->tcl_ReplaceChannel)(interp, typePtr, instanceData, mask, prevChan) /* 345 */
 + #endif
 + #ifndef Tcl_UndoReplaceChannel
 + #define Tcl_UndoReplaceChannel(interp, chan) \
-+ 	(tclStubsPtr->tcl_UndoReplaceChannel)(interp, chan) /* 344 */
++ 	(tclStubsPtr->tcl_UndoReplaceChannel)(interp, chan) /* 346 */
   #endif
   
   #endif /* defined(USE_TCL_STUBS) && !defined(USE_TCL_STUB_PROCS) */
@@ -87,8 +89,9 @@
       Tcl_GetString, /* 340 */
       Tcl_GetDefaultEncodingDir, /* 341 */
       Tcl_SetDefaultEncodingDir, /* 342 */
-+     Tcl_ReplaceChannel, /* 343 */
-+     Tcl_UndoReplaceChannel, /* 344 */
+      NULL, NULL,
++     Tcl_ReplaceChannel, /* 345 */
++     Tcl_UndoReplaceChannel, /* 346 */
   };
   
   TclStubs *tclStubsPtr = &tclStubs;
@@ -100,7 +103,7 @@
       (tclStubsPtr->tcl_SetDefaultEncodingDir)(path);
   }
   
-+ /* Slot 343 */
++ /* Slot 345 */
 + Tcl_Channel
 + Tcl_ReplaceChannel(interp, typePtr, instanceData, mask, prevChan)
 +     Tcl_Interp * interp;
@@ -112,7 +115,7 @@
 +     return (tclStubsPtr->tcl_ReplaceChannel)(interp, typePtr, instanceData, mask, prevChan);
 + }
 + 
-+ /* Slot 344 */
++ /* Slot 346 */
 + void
 + Tcl_UndoReplaceChannel(interp, chan)
 +     Tcl_Interp * interp;

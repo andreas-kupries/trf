@@ -1048,12 +1048,12 @@ EXTERN char *		Tcl_GetString _ANSI_ARGS_((Tcl_Obj * objPtr));
 EXTERN char *		Tcl_GetDefaultEncodingDir _ANSI_ARGS_((void));
 /* 342 */
 EXTERN void		Tcl_SetDefaultEncodingDir _ANSI_ARGS_((char * path));
-/* 343 */
+/* 345 */
 EXTERN Tcl_Channel	Tcl_ReplaceChannel _ANSI_ARGS_((Tcl_Interp * interp, 
 				Tcl_ChannelType * typePtr, 
 				ClientData instanceData, int mask, 
 				Tcl_Channel prevChan));
-/* 344 */
+/* 346 */
 EXTERN void		Tcl_UndoReplaceChannel _ANSI_ARGS_((
 				Tcl_Interp * interp, Tcl_Channel chan));
 
@@ -1434,8 +1434,10 @@ typedef struct TclStubs {
     char * (*tcl_GetString) _ANSI_ARGS_((Tcl_Obj * objPtr)); /* 340 */
     char * (*tcl_GetDefaultEncodingDir) _ANSI_ARGS_((void)); /* 341 */
     void (*tcl_SetDefaultEncodingDir) _ANSI_ARGS_((char * path)); /* 342 */
-    Tcl_Channel (*tcl_ReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_ChannelType * typePtr, ClientData instanceData, int mask, Tcl_Channel prevChan)); /* 343 */
-    void (*tcl_UndoReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_Channel chan)); /* 344 */
+    void *reserved343;
+    void *reserved344;
+    Tcl_Channel (*tcl_ReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_ChannelType * typePtr, ClientData instanceData, int mask, Tcl_Channel prevChan)); /* 345 */
+    void (*tcl_UndoReplaceChannel) _ANSI_ARGS_((Tcl_Interp * interp, Tcl_Channel chan)); /* 346 */
 } TclStubs;
 
 extern TclStubs *tclStubsPtr;
@@ -2805,11 +2807,11 @@ extern TclStubs *tclStubsPtr;
 #endif
 #ifndef Tcl_ReplaceChannel
 #define Tcl_ReplaceChannel(interp, typePtr, instanceData, mask, prevChan) \
-	(tclStubsPtr->tcl_ReplaceChannel)(interp, typePtr, instanceData, mask, prevChan) /* 343 */
+	(tclStubsPtr->tcl_ReplaceChannel)(interp, typePtr, instanceData, mask, prevChan) /* 345 */
 #endif
 #ifndef Tcl_UndoReplaceChannel
 #define Tcl_UndoReplaceChannel(interp, chan) \
-	(tclStubsPtr->tcl_UndoReplaceChannel)(interp, chan) /* 344 */
+	(tclStubsPtr->tcl_UndoReplaceChannel)(interp, chan) /* 346 */
 #endif
 
 #endif /* defined(USE_TCL_STUBS) && !defined(USE_TCL_STUB_PROCS) */

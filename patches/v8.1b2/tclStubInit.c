@@ -412,8 +412,9 @@ TclStubs tclStubs = {
     Tcl_GetString, /* 340 */
     Tcl_GetDefaultEncodingDir, /* 341 */
     Tcl_SetDefaultEncodingDir, /* 342 */
-    Tcl_ReplaceChannel, /* 343 */
-    Tcl_UndoReplaceChannel, /* 344 */
+    NULL, NULL
+    Tcl_ReplaceChannel, /* 345 */
+    Tcl_UndoReplaceChannel, /* 346 */
 };
 
 TclStubs *tclStubsPtr = &tclStubs;
