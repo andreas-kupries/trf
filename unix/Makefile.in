@@ -331,7 +331,7 @@ check:	test
 
 test:	application
 	TCL_LIBRARY=$(TCL_SRC_DIR)/library; export TCL_LIBRARY; \
-	LD_LIBRARY_PATH="$(srcdir):../unix:$(TCL_LIB_DIR)"; export LD_LIBRARY_PATH; \
+	LD_LIBRARY_PATH="$(srcdir):unix:$(TCL_LIB_DIR)"; export LD_LIBRARY_PATH; \
 	echo cd $(TOP_DIR)/tests \; source all | $(APP)
 
 # 'unix' is required to have a path for the
