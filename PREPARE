@@ -216,6 +216,7 @@ mNormalPermissions [pwd]
 # and now the tuning
 exec      chmod u+w unix mac win tests
 eval exec chmod u+x unix/configure [glob tools/*]
+eval exec chmod u+x tea/configure tea/mkinstalldirs tea/testshell tea/install-sh
 
 
 # should secure digest files and checker application against

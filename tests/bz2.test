@@ -16,7 +16,8 @@
 if {[string compare test [info procs test]] == 1} then {source defs}
 
 set text                   "hello, hello!"
-set text_compressed_as_hex "425A68393141592653592C546C72000003110060040244A0002129A3108603690E70"
+set text_compressed_as_hex "425A68393141592653592C546C72000003110060040244A0002129A3108603690E70A1E2EE48A70A12058A8D8E40"
+
 
 
 # differentiate tcl versions
