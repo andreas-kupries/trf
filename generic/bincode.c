@@ -662,8 +662,6 @@ ClientData       clientData;
 
       c->bench     = '\0';
       c->charCount = 0;
-
-      return res;
     }
   }
 
