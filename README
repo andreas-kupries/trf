@@ -8,10 +8,6 @@ This directory contains a freely distributable extension to Tcl/Tk called Tcl
 Data transformations (Tcl-Trf). The collection of provided transformation
 procedures includes:
 
-*	Data encryption:
-
-	IDEA, Blowfish, RC4, RC2, DES
-
 *	Generation of message digests (hash values, checksums)
 
 	MD2, MD5, SHA/SHS, SHA-1, HAVAL, RIPEMD-128, -160
@@ -24,31 +20,34 @@ procedures includes:
 	uuencoding, base64-encoding, ASCII85-encoding
 
 *	A reed-solomon error correcting coder.
-*	(De)Compression based on zlib 1.0.4	(if available as shared library)
+
+*	(De)Compression based on zlib 1.0.4 or higher (1.1.2 is current)
+	(if available as shared library)
+
+*	Data encryption:
+
+	Was removed from the base package, but is available
+	separately (TrfCrypt).
+
 
 Example applications distributed with the package are:
 
-*	'tools/md', a message digest generator. Upwardly compatible to 'md5sum'.
+*	'tools/md', a message digest generator.
+	Upwardly compatible to 'md5sum'.
 
-Tcl-Trf is developed for Tcl 7.6 or higher.  It is a pure Tcl extension, Tk is
-not required.  The extension requires a patched core. Patch files for 7.6 and
-8.0 are part of the distribution.  The plus-patches maintained by Jan
-Nijtmans (nijtmans@nici.kun.nl) contain this patch too .  Supporting (optional)
-packages are:
+Tcl-Trf is developed for Tcl 7.6 or higher.  It is a pure Tcl extension,
+Tk is not required.  The extension requires a patched core. Patch files
+for 7.6, 8.0 and 8.0a2 are part of the distribution.  The plus-patches
+maintained by Jan Nijtmans (nijtmans@nici.kun.nl) contain this patch too .
+
+Supporting (optional) packages are:
 
 *	memchan 1.0  or higher (required by testsuite)
-*	zlib-1.0.4   or higher
-*	libdes 3.21  or higher
-*	SSLeay-0.6.6 or higher
+*	zlib-1.0.4   or higher (1.1.2 is current!)
 
 
 This distribution contains the source code for Tcl-Trf + documentation
 describing commands (-> latex) and c-level interfaces (-> man-pages).
-
-
-There will be NO upload to the official ftp-archive at ftp.neosoft.com
-to avoid problems with US export regulations (ITAR, cryptography
-is ammunition).
 
 
 
@@ -70,7 +69,7 @@ or
 
 PLATFORMS
 	tested:
-		Linux 2.0.29	(gcc 2.7.2.1)	Development system
+		Linux 2.0.29	(gcc 2.7.2.3)	Development system
 		IRIX 6.2	(cc only)
 		ULTRIX 4.1	(both cc and gcc)
 		ULTRIX 4.4	(cc 3.0)

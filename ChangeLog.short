@@ -1,3 +1,10 @@
+Changes from 1.1 to 1.2
+
+*	Moved all encryption aware code and definitions into a
+	separate package, TrfCrypt. This allows the inclusion
+	of the base package into the consortium CD ROM (and
+	the upload to Neosoft).
+
 Changes from 1.0 to 1.1
 
 *	Adapted to C-API changes between 8.0 and 8.1

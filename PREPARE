@@ -4,6 +4,7 @@
 # do it ourself, must not be included into digest files!
 mExclude PREPARE
 
+
 # O. insert various information into some files
 #    (version, patchlevel, current date)
 
@@ -15,7 +16,7 @@ file copy generic/pkgIndex.tcl.in win/pkgIndex.tcl
 
 mInsertInfo \
 	README DESCRIPTION PORTING                 \
-	doc/install.tex doc/man.tex                 \
+	doc/nodes/home.node doc/nodes/install.node  \
 	generic/transform.h generic/patchlevel.h     \
 	mac/README                                    \
 	unix/README unix/configure.in unix/Makefile.in
@@ -32,11 +33,12 @@ mGenerateANNOUNCE
 
 
 # I.   clean documentation
-# I.a  remove inofficial documents
+# I.a  remove inofficial and old documents
 
 eval mExclude \
 	mails patches/v8.0a1 patches/v8.0a2 patches/v8.0b1 patches/v8.0b2 \
 	[glob patches/v8.0/*.orig] \
+	doc/install.text doc/man.tex doc/html.sty doc/defs.tex \
 	[glob patches/nijtmans.*] DEPENDS doc/file doc/delete \
 	doc/FUN doc/ascii.man doc/ascii85 doc/scratch-pad \
 	doc/code34 doc/Notes doc/ToDo doc/trf.def \
@@ -44,23 +46,10 @@ eval mExclude \
 	doc/ROADMAP doc/speed
 
 # I.b  generate official manual, diverse variants (dvi, ps)
-mLog info generating manual variants (dvi, ps)
-
+mLog info generating manual 
 
 cd doc
-file mkdir man html html/install html/man html/capi
-
-catch {exec latex man}
-catch {exec latex man}
-catch {exec latex man}
-catch {exec dvips man.dvi -o man.ps}
-
-catch {exec latex install}
-catch {exec latex install}
-catch {exec latex install}
-catch {exec dvips install.dvi -o install.ps}
-
-mExclude defs.aux man.idx
+file mkdir man html html/capi html/img
 
 
 # I.c  generate official manual of c-level interface
@@ -95,35 +84,30 @@ set fail [catch {
 if {$fail} {mLog error $msg}
 
 # generate base page for c-api documentation
-exec ./capibase > html/capi.html
+exec ./capibase > nodes/capi.node
+
 #mExclude capibase
-file rename html/capi.html html/capi/capi.html
+#file rename html/capi.html html/capi/capi.html
 
 
-mLatex2html \
-	-title    {man "Trf Manual"          install "Trf Installation manual"} \
-	-up       {man "../../../tcltk.html" install "../man/man.html"}         \
-	-up-title {man "Tcl/Tk"              install "Trf Manual"} \
-	\
-	-nav      arrows \
-	-htmldir  html   \
-	\
-	man.tex install.tex
+# Now generate documentation for linkage into my
+# site and standalone distribution
 
 # -up-man assumes that the document is part of the
 # hierarchy at http://www.westend.com/~kupries
-# It resides at '.../doc/trf/man/man.html'
-# The tcltk page is 'tcltk.html'
-
-# compact the pages a little
-eval exec html_crunch [glob html/install/*.html]
-eval exec html_crunch [glob html/capi/*.html]
-eval exec html_crunch [glob html/man/*.html]
+# It resides at '~kupries/doc/trf/index.html'
+# The tcltk page is '~kupries/tcltk.html'
 
 
-# remove temp files from latex runs
-file delete install.aux install.log install.toc
-file delete man.aux man.log man.toc
+exec nodeCompile westend html nodes 
+
+mDocTGZArchive html
+eval file delete -force [glob html/*.html]
+
+
+file delete -force node/up.def
+exec nodeCompile     plain html          nodes
+exec nodeMakeSitemap plain html trf_home nodes
 
 cd ..
 # pwd = root of distribution

@@ -1,3 +1,15 @@
+Tue Jun 30 22:41:18 1998  Andreas Kupries  <a.kupries@westend.com>
+
+	* doc/: Added nodes directory, contains the base of html
+	  documentation which replaces the old latex files.
+
+Mon Jun 29 20:13:55 1998  Andreas Kupries  <a.kupries@westend.com>
+
+	* Done. System compiles without problems. The only thing
+	  containing references to encryption is the documentation.
+
+	* Started the removal of encryption related code.
+
 Wed Jun 17 21:38:32 1998  Andreas Kupries  <a.kupries@westend.com>
 
 	* doc/*.tex: Checked the urls, removed some broken ones. Added
