@@ -102,7 +102,7 @@ foreach md {crc crc-zlib adler md5 sha haval} {
 mNormalPermissions [pwd]
 
 # win, unix, mac, tests should be writable
-chmod u+w win unix mac tests
+exec chmod u+w win unix mac tests
 
 
 # should secure digest files and checker application against
