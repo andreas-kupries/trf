@@ -355,9 +355,25 @@ else
     DL_OBJS=""
 fi
 
-if test "x$CC" = "xgcc" -o `$CC -v 2>&1 | grep -c gcc` != "0" ; then
-    DL_OBJS="$DL_OBJS _eprintf.o"
+# -----------------------------------------------------------------------
+AC_MSG_CHECKING(if assert needs __eprintf)
+cat > conftest.$ac_ext <<EOF
+#include "confdefs.h"
+#include "assert.h"
+int main(argc)
+    int argc;
+{
+assert(argc);
+; return 0; }
+EOF
+${TCL_CC-cc} -c $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext 1>&5
+if test "x`nm conftest.o |grep __eprintf`" != "x"; then
+    AC_MSG_RESULT(yes)
+    DL_OBJS="${DL_OBJS} _eprintf.o"
+else
+    AC_MSG_RESULT(no)
 fi
+rm -f conftest*
 
 dirs="/lib/libm${TEST_SUFFIX}* /usr/lib/libm${TEST_SUFFIX}*"
 for i in $dirs ; do

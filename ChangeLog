@@ -1,3 +1,15 @@
+Thu Mar  6 20:13:55 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* Integrated patch send by Jan. Description:
+
+	  "Further on, I improved the test for the need of _eprintf.o,
+	  because I noted that sometimes _eprintf.o is included when it is
+	  not needed at all. Finally I implemented the LD_LIBRARY_PATH
+	  environment variable in tclLoadAout.c, such that it works the
+	  same as on other machines. See patches below. Both of these
+	  improvements are already in the current Img1.0b1, but they are
+	  useful in Trf as well."
+
 Sun Mar  2 11:27:49 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* PORTING: new file. database of porting notes, hints, tricks,

@@ -154,10 +154,9 @@ dlopen(path, flags)
   unsigned long relocatedSize;	/* Size of the relocated text */
   char * startAddress;		/* Starting address of the module */
   int status;			/* Status return from Tcl_ calls */
-  char *p;
-  Tcl_Interp *interp;
-
-  interp = NULL;
+  char *p, *q;
+  Tcl_Interp *interp = NULL;
+  Tcl_DString fullPath;
 
   errno = 0;
   if (errorMessage) {
@@ -180,6 +179,27 @@ dlopen(path, flags)
 
   interp = Tcl_CreateInterp();
 
+  Tcl_DStringInit (&fullPath);
+  if (Tcl_GetPathType(path) == TCL_PATH_RELATIVE) {
+      p = getenv("LD_LIBRARY_PATH");
+      while (p) {
+          if ((q = strchr(p,':')) == NULL) {
+              q = p; while(*q) q++;
+          }
+          if (p == q) break;
+          Tcl_DStringAppend(&fullPath, p, q-p);
+          Tcl_DStringAppend(&fullPath, "/", 1);
+          Tcl_DStringAppend(&fullPath, path, -1);
+          if (access(Tcl_DStringValue(&fullPath), F_OK) != -1) {
+              break;
+          }
+          Tcl_DStringSetLength(&fullPath, 0);
+          p = q; if (*p) p++;
+      }
+  }
+  if (*Tcl_DStringValue(&fullPath) == 0) {
+    Tcl_DStringAppend(&fullPath, path, -1);
+  }
   tmpnam (relocatedFileName);
   Tcl_DStringInit (&linkCommandBuf);
   Tcl_DStringAppend (&linkCommandBuf, "exec ld -o ", -1);
@@ -188,16 +208,28 @@ dlopen(path, flags)
   Tcl_DStringAppend (&linkCommandBuf, " -G 0 ", -1);
 #endif
   Tcl_DStringAppend (&linkCommandBuf, " -u TclLoadDictionary_", -1);
-  GuessPackageName(path, &linkCommandBuf);
+  GuessPackageName(Tcl_DStringValue(&fullPath), &linkCommandBuf);
   Tcl_DStringAppend (&linkCommandBuf, " -A ", -1);
   Tcl_DStringAppend (&linkCommandBuf, inputSymbolTable, -1);
   Tcl_DStringAppend (&linkCommandBuf, " -N -T XXXXXXXX ", -1);
-  Tcl_DStringAppend (&linkCommandBuf, (char *) path, -1);
+  Tcl_DStringAppend (&linkCommandBuf, Tcl_DStringValue(&fullPath), -1);
+  p = getenv("LD_LIBRARY_PATH");
+  while (p) {
+    if ((q = strchr(p,':')) == NULL) {
+      q = p; while(*q) q++;
+    }
+    if (p == q) break;
+    Tcl_DStringAppend(&linkCommandBuf, " -L", 3);
+    Tcl_DStringAppend(&linkCommandBuf, p, q-p);
+    p = q; if (*p) p++;
+  }
   Tcl_DStringAppend (&linkCommandBuf, " ", -1);
-  if (FindLibraries (path, &linkCommandBuf) != TCL_OK) {
+  if (FindLibraries (Tcl_DStringValue(&fullPath), &linkCommandBuf) != TCL_OK) {
     Tcl_DStringFree (&linkCommandBuf);
+    Tcl_DStringFree (&fullPath);
     goto error;
   }
+  Tcl_DStringFree (&fullPath);
   linkCommand = Tcl_DStringValue (&linkCommandBuf);
 
   /* Determine the starting address, and plug it into the command */
