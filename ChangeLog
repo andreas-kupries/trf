@@ -1,3 +1,7 @@
+Mon Dec 13 20:08:07 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* -- Release 2.0p2 --
+
 Fri Dec 10 18:32:48 1999  Andreas Kupries  <a.kupries@westend.com>
 	
 	* (tea|unix)/configure.in: Fixed problem with definition of
