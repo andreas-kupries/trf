@@ -1,3 +1,26 @@
+Wed Feb  5 23:35:17 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* Reorganization for multiplatform development and use
+	  (unix, mac, win). Shuffled all files around. Adapted unix
+	  makefile to changes. Nothing for Mac and Windows yet.
+
+	  Rewrote generation of distribution (PREPARE, make-tape).
+	  'DESCRIPTION' now central point for version information. The
+	  data obtained there is placed into all relevant files at
+	  distribution time (README, LSM, ...), especially
+	  'generic/transform.h' and 'generic/patchlevel.h' (former names
+	  had '.in' suffixes). 'Configur'ing these files made it
+	  impossible to use them for Windows/Mac development.
+
+	  Note: 'PREPARE' is an file internal to the package. It contains
+	  tcl-code preparing the package for distribution (removing
+	  inofficial and/or internal files, manpage generation, ...). It
+	  is not part of the distribution however.
+
+Wed Feb  4 21:18:15 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+        * ======================= released 1.0b2 =======================
+
 Fri Jan 31 18:43:29 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* libdes.c, zlib.c: use library names without path, use OS
@@ -105,7 +128,7 @@ Mon Jan 13 21:41:33 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  bytes (see ### BYTEORDER ###). Need a flag to tell me the
 	  byteorder associated to the used channels.
 
-        * ======================= released 1.0b1 =======================	
+        * ======================= released 1.0b1 =======================
 
 Fri Jan 10 12:48:13 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 

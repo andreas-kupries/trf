@@ -428,4 +428,4 @@ fi
 
 
 dnl
-AC_OUTPUT(Makefile pkgIndex.tcl)
+AC_OUTPUT(Makefile ../generic/pkgIndex.tcl)

@@ -16,8 +16,11 @@ VERSION		=	@TRF_VERSION@
 # the configuration script).
 #----------------------------------------------------------------
 
-# Directory in which the source of this extension can be found
+# Directory containing the unix specific part of the extension
 srcdir		=	@srcdir@
+TOP_DIR		=	@srcdir@/..
+GENERIC_DIR	=	$(TOP_DIR)/generic
+UNIX_DIR	=	@srcdir@
 
 # Directories in which the tcl core can be found
 TCL_INCLUDE_DIR		=	@TCL_INCLUDE_DIR@
@@ -35,7 +38,7 @@ prefix		=	@prefix@
 exec_prefix	=	@exec_prefix@
 
 # Directory containing scripts supporting the work of this makefile
-tool		=	$(srcdir)/tools
+tool		=	$(TOP_DIR)/tools
 
 
 # The following definition can be set to non-null for special systems
@@ -156,16 +159,18 @@ CC_SWITCHES	=	$(CFLAGS) $(TRF_SHLIB_CFLAGS) $(CPPFLAGS)	\
 # $(TCL_CC_SWITCHES)
 CPPFLAGS	=	$(DEFINES) $(INCLUDES)
 
-INCLUDES	=	-I. -I$(srcdir) -I$(TCL_INCLUDE_DIR)
+INCLUDES	=	-I. -I$(srcdir) -I$(GENERIC_DIR) -I$(TOP_DIR) -I$(TCL_INCLUDE_DIR)
 DEFINES		=	$(PROTO_FLAGS) $(MEM_DEBUG_FLAGS) @DEFS@
 
-HEADER		=	transform.h transformInt.h crc.h
+HEADER		=	$(GENERIC_HDRS)
+GENERIC_HDRS	=	$(GENERIC_DIR)/transform.h $(GENERIC_DIR)/transformInt.h $(GENERIC_DIR)/crc.h
 
 SOURCES		=	$(BASE_SRC) $(CVT_SRC) $(MD_SRC) $(CRYPT_SRC) $(ECC_SRC) $(COMPRESS_SRC)
 OBJECTS		=	$(BASE_OBJ) $(CVT_OBJ) $(MD_OBJ) $(CRYPT_OBJ) $(ECC_OBJ) $(COMPRESS_OBJ)
 
 #		fundamentals of this library
-BASE_SRC	=	zlib.c libdes.c init.c registry.c unstack.c binio.c
+BASE_SRC	=	$(GENERIC_DIR)/zlib.c     $(GENERIC_DIR)/libdes.c  $(GENERIC_DIR)/init.c  \
+			$(GENERIC_DIR)/registry.c $(GENERIC_DIR)/unstack.c $(GENERIC_DIR)/binio.c
 BASE_OBJ	=	zlib.o libdes.o init.o registry.o unstack.o binio.o @DL_OBJS@
 
 #		conversions, base & algorithms
@@ -173,46 +178,53 @@ CVT_SRC		=	$(CVT_BASE_SRC) $(CVT_ALG_SRC)
 CVT_OBJ		=	$(CVT_BASE_OBJ) $(CVT_ALG_OBJ)
 
 #		utilities for conversions
-CVT_BASE_SRC	=	convert.c util.c
+CVT_BASE_SRC	=	$(GENERIC_DIR)/convert.c $(GENERIC_DIR)/util.c
 CVT_BASE_OBJ	=	convert.o util.o
 
 #		conversion algorithms
-CVT_ALG_SRC	=	bincode.c hexcode.c octcode.c uucode.c b64code.c asc85code.c
+CVT_ALG_SRC	=	$(GENERIC_DIR)/bincode.c $(GENERIC_DIR)/hexcode.c $(GENERIC_DIR)/octcode.c	\
+			$(GENERIC_DIR)/uucode.c  $(GENERIC_DIR)/b64code.c $(GENERIC_DIR)/asc85code.c
 CVT_ALG_OBJ	=	bincode.o hexcode.o octcode.o uucode.o b64code.o asc85code.o
 
-#		message digests, base & 		algorithms
-MD_SRC		=		dig_opt.c digest.c	crc.c md5.c haval.c sha.c adler.c crc_zlib.c
-MD_OBJ		=		dig_opt.o digest.o	crc.o md5.o haval.o sha.o adler.o crc_zlib.o
+
+#		message digests, base & algorithms
+MD_SRC		=	$(GENERIC_DIR)/dig_opt.c $(GENERIC_DIR)/digest.c			\
+			$(GENERIC_DIR)/crc.c $(GENERIC_DIR)/md5.c   $(GENERIC_DIR)/haval.c	\
+			$(GENERIC_DIR)/sha.c $(GENERIC_DIR)/adler.c $(GENERIC_DIR)/crc_zlib.c
+MD_OBJ		=	dig_opt.o digest.o	crc.o md5.o haval.o sha.o adler.o crc_zlib.o
+
 
 #		encryption, base & algorithms
 CRYPT_SRC	=	$(CRYPT_BASE_SRC) $(CRYPT_ALG_SRC)
 CRYPT_OBJ	=	$(CRYPT_BASE_OBJ) $(CRYPT_ALG_OBJ)
 
 #		encryption base
-CRYPT_BASE_SRC	=	bc_opt.c blockcipher.c bc_util.c c_opt.c cipher.c
+CRYPT_BASE_SRC	=	$(GENERIC_DIR)/bc_opt.c $(GENERIC_DIR)/blockcipher.c $(GENERIC_DIR)/bc_util.c	\
+			$(GENERIC_DIR)/c_opt.c  $(GENERIC_DIR)/cipher.c
 CRYPT_BASE_OBJ	=	bc_opt.o blockcipher.o bc_util.o c_opt.o cipher.o
 
 #		encryption algorithms
-CRYPT_ALG_SRC	=	idea.c blowfish.c des.c rc4.c
+CRYPT_ALG_SRC	=	$(GENERIC_DIR)/idea.c $(GENERIC_DIR)/blowfish.c	\
+			$(GENERIC_DIR)/des.c  $(GENERIC_DIR)/rc4.c
 CRYPT_ALG_OBJ	=	idea.o blowfish.o des.o rc4.o
 
 #		error correction
-ECC_SRC		=	rs_ecc.c
+ECC_SRC		=	$(GENERIC_DIR)/rs_ecc.c
 ECC_OBJ		=	rs_ecc.o
 
 #		compression, base
-COMPRESS_SRC	=	zip_opt.c zip.c
+COMPRESS_SRC	=	$(GENERIC_DIR)/zip_opt.c $(GENERIC_DIR)/zip.c
 COMPRESS_OBJ	=	zip_opt.o zip.o
 
 
 #		initialization for tclsh with trf preloaded
-TCLSH_OBJS	=	$(srcdir)/app/tclAppInit.o
+TCLSH_OBJS	=	$(TOP_DIR)/app/tclAppInit.o
 
-DOCTEMP		=	doc/man.log	\
-			doc/man.aux	\
-			doc/man.toc	\
-			doc/man.dvi	\
-			doc/man.ps
+DOCTEMP		=	$(TOP_DIR)/doc/man.log	\
+			$(TOP_DIR)/doc/man.aux	\
+			$(TOP_DIR)/doc/man.toc	\
+			$(TOP_DIR)/doc/man.dvi	\
+			$(TOP_DIR)/doc/man.ps
 
 APP		=	$(srcdir)/tclsh
 
@@ -231,7 +243,7 @@ clean:
 
 distclean:	clean
 	rm -f config.status config.cache config.log Makefile \
-	patchlevel.h transform.h pkgIndex.tcl
+	$(GENERIC_DIR)/patchlevel.h $(GENERIC_DIR)/pkgIndex.tcl
 
 install:	install-lib install-header @install_other@
 
@@ -247,7 +259,7 @@ install-lib: $(TRF_LIB_FILE)
 install-header:
 	$(tool)/mkinstalldirs  $(INCLUDE_INSTALL_DIR)
 	@echo "Installing transform.h"
-	@$(INSTALL_DATA) $(srcdir)/transform.h $(INCLUDE_INSTALL_DIR)
+	@$(INSTALL_DATA) $(GENERIC_DIR)/transform.h $(INCLUDE_INSTALL_DIR)
 
 install-bin:	application
 	$(tool)/mkinstalldirs  $(BIN_INSTALL_DIR)
@@ -276,10 +288,10 @@ TAGS:
 		etags *.[ch]
 
 check-package:
-	@mv $(srcdir)/MANIFEST /tmp/MANIFEST
+	@mv $(TOP_DIR)/MANIFEST /tmp/MANIFEST
 	@$(tool)/get-manifest $(EXTENSION)
 	@-diff /tmp/MANIFEST MANIFEST | sed -e 's/</missing:/' -e 's/>/added:  /' | $(tool)/skip-trash Makefile Makefile.bak depend patchlevel.h transform.h pkgIndex.tcl "config.*"
-	@mv /tmp/MANIFEST $(srcdir)/MANIFEST
+	@mv /tmp/MANIFEST $(TOP_DIR)/MANIFEST
 
 
 check:	test
@@ -287,28 +299,140 @@ check:	test
 test:	application
 	TCL_LIBRARY=$(TCL_SRC_DIR)/library; export TCL_LIBRARY; \
 	LD_LIBRARY_PATH="$(srcdir):$(TCL_LIB_DIR)"; export LD_LIBRARY_PATH; \
-	echo cd $(srcdir)/tests \; source all | $(APP)
+	echo cd $(TOP_DIR)/tests \; source all | $(APP)
+
+#-------------------------------------------------------#
+# unix specific files
 
 .c.o:
 	$(CC) -c $(CC_SWITCHES) $< -o $@
 
-tclLoadAix.o:	compat/tclLoadAix.c
-	$(CC) -c $(CC_SWITCHES) compat/tclLoadAix.c -o $@
+#-------------------------------------------------------#
+# generic files
 
-tclLoadDld.o:	compat/tclLoadDld.c
-	$(CC) -c $(CC_SWITCHES) compat/tclLoadDld.c -o $@
+zlib.o: $(GENERIC_DIR)/zlib.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/zlib.c -o $@
 
-tclLoadShl.o:	compat/tclLoadShl.c
-	$(CC) -c $(CC_SWITCHES) compat/tclLoadShl.c -o $@
+libdes.o: $(GENERIC_DIR)/libdes.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/libdes.c -o $@
 
-tclLoadAout.o:	compat/tclLoadAout.c
-	$(CC) -c $(CC_SWITCHES) compat/tclLoadAout.c -o $@
+init.o: $(GENERIC_DIR)/init.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/init.c -o $@
 
-tclLoadNone.o:	compat/tclLoadNone.c
-	$(CC) -c $(CC_SWITCHES) compat/tclLoadNone.c -o $@
+registry.o: $(GENERIC_DIR)/registry.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/registry.c -o $@
 
-_eprintf.o:	compat/_eprintf.c
-	$(CC) -c $(CC_SWITCHES) compat/_eprintf.c -o $@
+unstack.o: $(GENERIC_DIR)/unstack.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/unstack.c -o $@
+
+binio.o: $(GENERIC_DIR)/binio.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/binio.c -o $@
+
+convert.o: $(GENERIC_DIR)/convert.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/convert.c -o $@
+
+util.o: $(GENERIC_DIR)/util.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/util.c -o $@
+
+bincode.o: $(GENERIC_DIR)/bincode.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/bincode.c -o $@
+
+hexcode.o: $(GENERIC_DIR)/hexcode.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/hexcode.c -o $@
+
+octcode.o: $(GENERIC_DIR)/octcode.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/octcode.c -o $@
+
+uucode.o: $(GENERIC_DIR)/uucode.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/uucode.c -o $@
+
+b64code.o: $(GENERIC_DIR)/b64code.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/b64code.c -o $@
+
+asc85code.o: $(GENERIC_DIR)/asc85code.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/asc85code.c -o $@
+
+dig_opt.o: $(GENERIC_DIR)/dig_opt.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/dig_opt.c -o $@
+
+digest.o: $(GENERIC_DIR)/digest.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/digest.c -o $@
+
+crc.o: $(GENERIC_DIR)/crc.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/crc.c -o $@
+
+md5.o: $(GENERIC_DIR)/md5.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/md5.c -o $@
+
+haval.o: $(GENERIC_DIR)/haval.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/haval.c -o $@
+
+sha.o: $(GENERIC_DIR)/sha.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/sha.c -o $@
+
+adler.o: $(GENERIC_DIR)/adler.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/adler.c -o $@
+
+crc_zlib.o: $(GENERIC_DIR)/crc_zlib.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/crc_zlib.c -o $@
+
+bc_opt.o: $(GENERIC_DIR)/bc_opt.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/bc_opt.c -o $@
+
+blockcipher.o: $(GENERIC_DIR)/blockcipher.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/blockcipher.c -o $@
+
+bc_util.o: $(GENERIC_DIR)/bc_util.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/bc_util.c -o $@
+
+c_opt.o: $(GENERIC_DIR)/c_opt.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/c_opt.c -o $@
+
+cipher.o: $(GENERIC_DIR)/cipher.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/cipher.c -o $@
+
+idea.o: $(GENERIC_DIR)/idea.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/idea.c -o $@
+
+blowfish.o: $(GENERIC_DIR)/blowfish.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/blowfish.c -o $@
+
+des.o: $(GENERIC_DIR)/des.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/des.c -o $@
+
+rc4.o: $(GENERIC_DIR)/rc4.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/rc4.c -o $@
+
+rs_ecc.o: $(GENERIC_DIR)/rs_ecc.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/rs_ecc.c -o $@
+
+zip_opt.o: $(GENERIC_DIR)/zip_opt.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/zip_opt.c -o $@
+
+zip.o: $(GENERIC_DIR)/zip.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/zip.c -o $@
+
+
+#-------------------------------------------------------#
+# compat files
+
+tclLoadAix.o:	$(TOP_DIR)/compat/tclLoadAix.c
+	$(CC) -c $(CC_SWITCHES) $(TOP_DIR)/compat/tclLoadAix.c -o $@
+
+tclLoadDld.o:	$(TOP_DIR)/compat/tclLoadDld.c
+	$(CC) -c $(CC_SWITCHES) $(TOP_DIR)/compat/tclLoadDld.c -o $@
+
+tclLoadShl.o:	$(TOP_DIR)/compat/tclLoadShl.c
+	$(CC) -c $(CC_SWITCHES) $(TOP_DIR)/compat/tclLoadShl.c -o $@
+
+tclLoadAout.o:	$(TOP_DIR)/compat/tclLoadAout.c
+	$(CC) -c $(CC_SWITCHES) $(TOP_DIR)/compat/tclLoadAout.c -o $@
+
+tclLoadNone.o:	$(TOP_DIR)/compat/tclLoadNone.c
+	$(CC) -c $(CC_SWITCHES) $(TOP_DIR)/compat/tclLoadNone.c -o $@
+
+_eprintf.o:	$(TOP_DIR)/compat/_eprintf.c
+	$(CC) -c $(CC_SWITCHES) $(TOP_DIR)/compat/_eprintf.c -o $@
 
 #-------------------------------------------------------#
 
@@ -324,8 +448,8 @@ $(APP): $(TCLSH_OBJS) $(TRF_LIB_FILE)
 #-------------------------------------------------------#
 # support for external libraries (zlib, libdes)
 
-zlibdir		=	$(srcdir)/zlib
-libdesdir	=	$(srcdir)/libdes
+zlibdir		=	$(TOP_DIR)/zlib
+libdesdir	=	$(TOP_DIR)/libdes
 
 
 ZLIB_SRC	=	\
