@@ -89,7 +89,7 @@ cd $libdir
 puts "Making pkgIndex.tcl in [file join [pwd] $package]"
 
 if {$tcl_platform(platform) == "unix"} {
-    pkg_mkIndex $package [file join .. lib${package}*[info sharedlibextension]] *.tcl
+    pkg_mkIndex -direct $package [file join .. lib${package}*[info sharedlibextension]] *.tcl
 } else {
-    pkg_mkIndex $package [file join .. .. bin *[info sharedlibextension]]
+    pkg_mkIndex -direct $package [file join .. .. bin *[info sharedlibextension]]
 }

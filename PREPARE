@@ -45,6 +45,7 @@ file delete AMAIL
 # I.a  remove inofficial and old documents
 
 eval mExclude \
+	[glob patches/v7*] \
 	mails patches/v8.0a1 patches/v8.0a2 patches/v8.0b1 patches/v8.0b2 \
 	[glob patches/*/*.orig] generic/pkgIndex.tcl.in \
 	doc/install.tex doc/man.tex doc/html.sty doc/defs.tex \
