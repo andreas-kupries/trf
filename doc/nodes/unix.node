@@ -36,8 +36,8 @@ node trf_cunix {
 
 	    li "
 	    To check the extension, type [cmd {make test}] or
-	    [cmd {make check}]. This will build a tclsh containing just tcl and
-	    trf and then runs some test-scripts checking the behaviour of
+	    [cmd {make check}]. This will build a tclsh containing just [tcl]
+	    and trf, and then runs some test-scripts checking the behaviour of
 	    the created library."
 
 	    li "

@@ -2,7 +2,7 @@
 # binio
 
 node trf_binio {
-    title       "Trf: The bibio command"
+    title       "Trf: The binio command"
     shortTitle  "binio"
     description "Trf commands: binio"
     parent      trf_misc
@@ -14,33 +14,34 @@ node trf_binio {
 	    term [strong "binio copy inChannel outChannel ?count?"]
 	    term_definition {
 		Copies from inChannel to outChannel, up to the number of bytes
-		indicated by the optional count argument or up to end of file on
-		inChannel. inChannel must have been opened for reading and
+		indicated by the optional count argument or up to end of file
+		on inChannel. inChannel must have been opened for reading and
 		outChannel must have been opened for writing. This operation
 		returns the number of bytes copied, or -1 on error.
 	    }
 
 	    term [strong "binio pack outChannel format ?data1 data2 ...?"]
 	    term_definition {
-		Packs binary data onto outChannel, a channel that must have been
-		opened for writing. The format argument determines how the
+		Packs binary data onto outChannel, a channel that must have
+		been opened for writing. The format argument determines how the
 		optional data1 through datan arguments are interpreted. This
 		operation returns the number of data items successfully packed
 		on outChannel or -1 if an error occurred. If an error occurred,
 		it is possible that some output has already occurred. The
 		various specifications that can appear in the format string are
-		explained below. This operation reorders the bytes of each datum
-		to match the order expected on outChannel if its byte order is
-		different from that of the architecture on which the Tcl command
-		is being executed.
+		explained below. This operation reorders the bytes of each
+		datum to match the order expected on outChannel if its byte
+		order is different from that of the architecture on which the
+		Tcl command is being executed.
 	    }
 
 	    term [strong "binio unpack inChannel format ?var1 var2 ...?"]
 	    term_definition {
-		Unpacks binary data from inChannel into the named variables. The
-		inChannel argument must denote a channel opened for reading. The
-		format argument determines how the data obtained from the channel
-		is translated into string representation and stored in the var1
+		Unpacks binary data from inChannel into the named variables.
+		The inChannel argument must denote a channel opened for
+		reading. The format argument determines how the data obtained
+		from the channel is translated into string representation and
+		stored in the var1
 		through varn variables. If any of the variables are not
 		initialized then the command creates them as local variables.
 		This operation returns the number of data items successfully
@@ -49,8 +50,8 @@ node trf_binio {
 		occurred. The various format specifications that can appear in
 		the format string are explained below. This operation reorders
 		the bytes of each datum to match the byte order expected on the
-		architecture on which the command is executed if it is different
-		from the byte order that is in effect on inChannel.
+		architecture on which the command is executed if it is
+		different from the byte order that is in effect on inChannel.
 	    }
 	}
 
