@@ -155,7 +155,7 @@ package) in general:
 
 \begin {enumerate}
 \item	Whatever you do, don't forget to switch the used channels into
-	binary mode, i.e. execute ``fconfigure <channel> -translation
+	binary mode, i.e. execute ``fconfigure $<$channel$>$ -translation
 	binary''. Not doing this will produce all kind of strange
 	errors, even on unix machines, as the default translation mode
 	(``auto'') will not only convert CR LF into LF, but a single
@@ -365,7 +365,7 @@ The SAFER blockcipher understands 2 additional options:
 	14. The default value depends on the chosen keyschedule and
 	the length of the key:
 
-	\begin {tabular} {l|l|l|}\hline
+	\begin {tabular} {|l|l|l|}\hline
 	Strong schedule & Keylength & Default	\\ \hline\hline
 	0		&  8	    &	 6	\\ \hline
 	0		& 16	    &	10	\\ \hline
@@ -394,8 +394,8 @@ digests have two submodes available:
 
 \begin {itemize}
 \item [-mode]
-	The allowed arguments are ``absorb'', ``write'' and all unique
-	abbreviations. 
+	The allowed arguments are ``absorb'', ``write'',
+	``transparent'' and all unique abbreviations. 
 
 	In the first submode written data is not changed except for
 	attachment of the message digest at the end of the
@@ -408,6 +408,12 @@ digests have two submodes available:
 	their digests are computed as side effect. After the channel
 	is closed the computed digests are written to the variables
 	and/or channels specified with '-read/write-destination'.
+
+	The ``transparent'' mode is a mixture of both of the above. As
+	with ``absorb'' all data flows through the filter
+	unchanged. The generated digests however are handled the same
+	way as is done by the ``write''-mode.
+
 
 \item [-matchflag]
 	The value specifies the name of global variable to write the
@@ -624,6 +630,7 @@ found in a separate table afterward.
 	ripemd160	& Message digest		& \trf	\\ \hline
 	ripemd128	& Message digest		& \trf	\\ \hline
 	rs\_ecc		& Error correcting coder	& \trf	\\ \hline
+	safer		& Blockcipher			& \trf	\\ \hline
 	sha		& Message digest		& \trf	\\ \hline
 	sha1		& Message digest		& \SSLeay \\ \hline
 	transform	& General transformation	& \trf	\\ \hline
@@ -740,10 +747,33 @@ message digests, \dots {}:
 		Switzerland, Tel +41 65 242885, Fax +41 65 235761. 
 	\end {quotation}
 
-\item	Blowfish was invented by \schneier{} and is decribed in the
-	2nd edition of his book ``Applied Cryptography''. His sources
-	were used, with small modifications to interface it with this
-	package.
+\item	SAFER (Safe And Fast Encryption Routine) is a block cipher
+	developed by \massey{} at the \sfit{}. The development was
+	sponsored by Cylink, Sunnyvale, CA, USA. From the file
+	\file{generic/safer/SAFERCMD.TXT}:
+
+	\begin {quotation}
+		Although our design of SAFER K-64 was sponsored  by
+		Cylink Corporation  (Sunnyvale,  CA,  USA),  Cylink
+		has explicitly relinquished any proprietary rights to
+		this algorithm.  This largesse  on the part of Cylink
+		was motivated by the reasoning that the company would
+		gain more from new business  than it  would  lose from
+		competition should many new users adopt this publicly
+		available cipher.  SAFER  K-64  has  not  been
+		patented  and, to the best of our knowledge, is free
+		for use by anyone without fees of any kind and with no
+		violation  of any rights of ownership, intellectual or
+		otherwise.
+	\end {quotation}
+
+	The implementation used here was written by \demoliner.
+
+
+\item	Blowfish is a block cipher invented by \schneier{}, it is
+	decribed in the 2nd edition of his book ``Applied
+	Cryptography''. His sources were used, with small
+	modifications to interface it with this package.
 
 	The statement of the author about the legal state of the
 	algorithm:
@@ -784,7 +814,7 @@ Things to be done in future.
 %	\strong {Hm, better make a separate package. This is
 %	primarily a transformer package, not a crypto toolkit}.
 
-\item	Transparent mode for digests.
+%%\item	Transparent mode for digests.
 %%	Mixture of 'absorb' and 'write'.
 
 \item	Channel doing special framing after a fixed (user-defined)
