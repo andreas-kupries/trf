@@ -37,7 +37,7 @@ list of them:
 
 \begin{itemize}
 \item	\strong {\tcl}, of course. The package will compile with 7.6
-	and 8.0b1. Version 8.0a1/a2 cannot be used anymore.
+	and 8.0. Version 8.0a1/a2/b1/b2 cannot be used anymore.
 
 	This package requires manipulation of the core, hence a
 	\strong {source distribution} is required. Instructions on how
@@ -64,18 +64,18 @@ list of them:
 	
 \item	\strong {\zlib}. This package is used to implement the 'zip'
 	compression command/filter. It will be loaded at runtime, if
-	required. It is therefore optional. See chapter \ref {zlib} for
+	required and is therefore optional. See chapter \ref {zlib} for
 	more info.
 
 \item	\strong {libdes}. This package is used to implement the 'des'
 	encryption facility. It will be loaded at runtime, if
-	required. It is therefore optional. See chapter \ref {libdes}
+	required and is therefore optional. See chapter \ref {libdes}
 	for more info.
 
 \item	\strong {\SSLeay}. Another implementation of 'des',
 	additionally used to implement 'rc2', 'md2' and 'sha1'. Has
 	priority over 'libdes' because of this. It will be loaded at
-	runtime, if required. It is therefore optional. See chapter
+	runtime, if required and is therefore optional. See chapter
 	\ref {libdes} for more info.
 \end{itemize}
 
@@ -119,7 +119,7 @@ Now you have two choices.
 
 	\begin {tabular} {|l|l|} \hline
 	7.6, 7.6p2	& tcl$<$version$>$		\\ \hline
-	8.0b1		& tcl$<$version$>$/generic	\\ \hline
+	8.0		& tcl$<$version$>$/generic	\\ \hline
 	\end {tabular}
 
 	\strong {Remark}: The byteorder patch is required only if the
@@ -128,7 +128,7 @@ Now you have two choices.
 
 	\strong {Recommendation}: Unter 7.6 it is a good choice to
 	activate \cmd {binio}, as there is no equivalent functionality
-	available. Tcl 8.0b1 on the other hand has \cmd {fcopy} and
+	available. Tcl 8.0 on the other hand has \cmd {fcopy} and
 	\cmd {binary}, so it is no loss if \cmd {binio} is left out.
 
 \end   {enumerate}
@@ -297,7 +297,6 @@ you.
 	\begin {enumerate}
 	\item	\$(TCL\_INCLUDE\_DIR)
 	\item	\file {../../tcl8.0/generic}
-	\item	\file {../../tcl8.0b*/generic}
 	\item	\file {../../tcl7.6/generic}
 	\item	\file {../../tcl/generic}
 	\item	\file {../../tcl}
@@ -324,7 +323,6 @@ you.
 	\begin {enumerate}
 	\item	\$(TCL\_LIB\_DIR)
 	\item	\file {../../tcl8.0/unix}
-	\item	\file {../../tcl8.0b*/unix}
 	\item	\file {../../tcl7.6/unix}
 	\item	\file {../../tcl/unix}
 	\item	\file {../../tcl}
