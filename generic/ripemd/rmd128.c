@@ -25,7 +25,9 @@
 
 /********************************************************************/
 
-void MDinit(dword *MDbuf)
+void
+ripemd128_MDinit (MDbuf)
+     dword *MDbuf;
 {
    MDbuf[0] = 0x67452301UL;
    MDbuf[1] = 0xefcdab89UL;
@@ -37,7 +39,10 @@ void MDinit(dword *MDbuf)
 
 /********************************************************************/
 
-void compress(dword *MDbuf, dword *X)
+void
+ripemd128_compress (MDbuf, X)
+     dword* MDbuf;
+     dword* X;
 {
    dword aa = MDbuf[0],  bb = MDbuf[1],  cc = MDbuf[2],  dd = MDbuf[3];
    dword aaa = MDbuf[0], bbb = MDbuf[1], ccc = MDbuf[2], ddd = MDbuf[3];
@@ -198,7 +203,12 @@ void compress(dword *MDbuf, dword *X)
 
 /********************************************************************/
 
-void MDfinish(dword *MDbuf, byte *strptr, dword lswlen, dword mswlen)
+void
+ripemd128_MDfinish (MDbuf, strptr, lswlen, mswlen)
+     dword* MDbuf;
+     byte*  strptr;
+     dword  lswlen;
+     dword  mswlen;
 {
    dword        i;                                 /* counter       */
    dword        X[16];                             /* message words */
@@ -216,14 +226,14 @@ void MDfinish(dword *MDbuf, byte *strptr, dword lswlen, dword mswlen)
 
    if ((lswlen & 63) > 55) {
       /* length goes to next block */
-      compress(MDbuf, X);
+      ripemd128_compress(MDbuf, X);
       memset(X, 0, 16*sizeof(dword));
    }
 
    /* append length in bits*/
    X[14] = lswlen << 3;
    X[15] = (lswlen >> 29) | (mswlen << 3);
-   compress(MDbuf, X);
+   ripemd128_compress(MDbuf, X);
 
    return;
 }
