@@ -81,7 +81,8 @@ TRFOBJS = \
 	$(TMPDIR)\hexcode.obj \
 	$(TMPDIR)\idea.obj \
 	$(TMPDIR)\init.obj \
-	$(TMPDIR)\libdes.obj \
+	$(TMPDIR)\load.obj \
+	$(TMPDIR)\loadman.obj \
 	$(TMPDIR)\md5.obj \
 	$(TMPDIR)\md2.obj \
 	$(TMPDIR)\octcode.obj \
@@ -225,7 +226,7 @@ bindist:      $(TRFDLL)
 	-@md	$(TRF)
 	-@md	$(TRF)\patches
 	-@md	$(TRF)\patches\v76
-	-@md	$(TRF)\patches\v80a2
+	-@md	$(TRF)\patches\v80b1
 	-@$(CP)	$(TRFDLL)		$(TRF)\$(TRFDLL)
 	-@$(CP)	$(WINDIR)\pkgIndex.tcl	$(TRF)\pkgIndex.tcl
 	-@$(CP)	$(WINDIR)\README.VC	$(TRF)\README.VC
@@ -234,10 +235,10 @@ bindist:      $(TRFDLL)
 	-@$(CP) $(ROOT)\patches\v7.6\standard.patch	$(TRF)\patches\v76
 	-@$(CP) $(ROOT)\patches\v7.6\tcl.h		$(TRF)\patches\v76
 	-@$(CP) $(ROOT)\patches\v7.6\tclIO.c		$(TRF)\patches\v76
-	-@$(CP) $(ROOT)\patches\v8.0a2\byteorder.patch	$(TRF)\patches\v80a2
-	-@$(CP) $(ROOT)\patches\v8.0a2\standard.patch	$(TRF)\patches\v80a2
-	-@$(CP) $(ROOT)\patches\v8.0a2\tcl.h		$(TRF)\patches\v80a2
-	-@$(CP) $(ROOT)\patches\v8.0a2\tclIO.c		$(TRF)\patches\v80a2
+	-@$(CP) $(ROOT)\patches\v8.0b1\byteorder.patch	$(TRF)\patches\v80b1
+	-@$(CP) $(ROOT)\patches\v8.0b1\standard.patch	$(TRF)\patches\v80b1
+	-@$(CP) $(ROOT)\patches\v8.0b1\tcl.h		$(TRF)\patches\v80b1
+	-@$(CP) $(ROOT)\patches\v8.0b1\tclIO.c		$(TRF)\patches\v80b1
 	$(PKZIP) -r $(TRF)bin.zip $(TRF)\*.*
 	-@$(RM)	$(TRF)\$(TRFDLL)
 	-@$(RM)	$(TRF)\pkgIndex.tcl
@@ -248,11 +249,11 @@ bindist:      $(TRFDLL)
 	-@$(RM) $(TRF)\patches\v76\tcl.h
 	-@$(RM) $(TRF)\patches\v76\tclIO.c
 	-@rd	$(TRF)\patches\v76
-	-@$(RM) $(TRF)\patches\v80a2\byteorder.patch
-	-@$(RM) $(TRF)\patches\v80a2\standard.patch
-	-@$(RM) $(TRF)\patches\v80a2\tcl.h
-	-@$(RM) $(TRF)\patches\v80a2\tclIO.c
-	-@rd	$(TRF)\patches\v80a2
+	-@$(RM) $(TRF)\patches\v80b1\byteorder.patch
+	-@$(RM) $(TRF)\patches\v80b1\standard.patch
+	-@$(RM) $(TRF)\patches\v80b1\tcl.h
+	-@$(RM) $(TRF)\patches\v80b1\tclIO.c
+	-@rd	$(TRF)\patches\v80b1
 	-@rd	$(TRF)\patches
 	-@rd	$(TRF)
 
