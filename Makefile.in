@@ -354,9 +354,9 @@ $($(PACKAGE)_LIB_FILE): $($(PACKAGE)_OBJECTS)
 	$(RANLIB) $($(PACKAGE)_LIB_FILE)
 
 $($(PACKAGE)stub_LIB_FILE): $($(PACKAGE)stub_OBJECTS)
-	-rm -f $($(PACKAGE)_LIB_FILE)
+	-rm -f $($(PACKAGE)stub_LIB_FILE)
 	${MAKE_STUB_LIB}
-	$(RANLIB) $($(PACKAGE)_LIB_FILE)
+	$(RANLIB) $($(PACKAGE)stub_LIB_FILE)
 
 #========================================================================
 # MD5 targets
