@@ -170,8 +170,8 @@ DEFINES		=	$(PROTO_FLAGS) $(MEM_DEBUG_FLAGS) @DEFS@
 HEADER		=	$(GENERIC_HDRS)
 GENERIC_HDRS	=	$(GENERIC_DIR)/transform.h $(GENERIC_DIR)/transformInt.h $(GENERIC_DIR)/crc.h
 
-SOURCES		=	$(BASE_SRC) $(CVT_SRC) $(MD_SRC) $(CRYPT_SRC) $(ECC_SRC) $(COMPRESS_SRC)
-OBJECTS		=	$(BASE_OBJ) $(CVT_OBJ) $(MD_OBJ) $(CRYPT_OBJ) $(ECC_OBJ) $(COMPRESS_OBJ)
+SOURCES		=	$(BASE_SRC) $(CVT_SRC) $(MD_SRC) $(ECC_SRC) $(COMPRESS_SRC)
+OBJECTS		=	$(BASE_OBJ) $(CVT_OBJ) $(MD_OBJ) $(ECC_OBJ) $(COMPRESS_OBJ)
 
 #		fundamentals of this library
 BASE_SRC	=	$(GENERIC_DIR)/zlib.c		\
@@ -222,28 +222,6 @@ MD_OBJ		=	dig_opt.o digest.o crc.o md5.o haval.o sha.o	\
 			adler.o crc_zlib.o md2.o sha1.o rmd160.o rmd128.o
 
 
-#		encryption, base & algorithms
-CRYPT_SRC	=	$(CRYPT_BASE_SRC) $(CRYPT_ALG_SRC)
-CRYPT_OBJ	=	$(CRYPT_BASE_OBJ) $(CRYPT_ALG_OBJ)
-
-#		encryption base
-CRYPT_BASE_SRC	=	$(GENERIC_DIR)/bc_opt.c		\
-			$(GENERIC_DIR)/blockcipher.c	\
-			$(GENERIC_DIR)/bc_util.c	\
-			$(GENERIC_DIR)/c_opt.c		\
-			$(GENERIC_DIR)/c_util.c		\
-			$(GENERIC_DIR)/cipher.c
-CRYPT_BASE_OBJ	=	bc_opt.o blockcipher.o bc_util.o c_opt.o c_util.o cipher.o
-
-#		encryption algorithms
-CRYPT_ALG_SRC	=	$(GENERIC_DIR)/idea.c		\
-			$(GENERIC_DIR)/blowfish.c	\
-			$(GENERIC_DIR)/des.c		\
-			$(GENERIC_DIR)/rc4.c		\
-			$(GENERIC_DIR)/rc2.c		\
-			$(GENERIC_DIR)/rot.c		\
-			$(GENERIC_DIR)/safer.c
-CRYPT_ALG_OBJ	=	idea.o blowfish.o des.o rc4.o rc2.o rot.o safer.o
 
 #		error correction
 ECC_SRC		=	$(GENERIC_DIR)/rs_ecc.c
@@ -433,45 +411,6 @@ adler.o: $(GENERIC_DIR)/adler.c
 
 crc_zlib.o: $(GENERIC_DIR)/crc_zlib.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/crc_zlib.c -o $@
-
-bc_opt.o: $(GENERIC_DIR)/bc_opt.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/bc_opt.c -o $@
-
-blockcipher.o: $(GENERIC_DIR)/blockcipher.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/blockcipher.c -o $@
-
-bc_util.o: $(GENERIC_DIR)/bc_util.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/bc_util.c -o $@
-
-c_opt.o: $(GENERIC_DIR)/c_opt.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/c_opt.c -o $@
-
-c_util.o: $(GENERIC_DIR)/c_util.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/c_util.c -o $@
-
-cipher.o: $(GENERIC_DIR)/cipher.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/cipher.c -o $@
-
-idea.o: $(GENERIC_DIR)/idea.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/idea.c -o $@
-
-blowfish.o: $(GENERIC_DIR)/blowfish.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/blowfish.c -o $@
-
-des.o: $(GENERIC_DIR)/des.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/des.c -o $@
-
-rc4.o: $(GENERIC_DIR)/rc4.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/rc4.c -o $@
-
-rc2.o: $(GENERIC_DIR)/rc2.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/rc2.c -o $@
-
-rot.o: $(GENERIC_DIR)/rot.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/rot.c -o $@
-
-safer.o: $(GENERIC_DIR)/safer.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/safer.c -o $@
 
 rs_ecc.o: $(GENERIC_DIR)/rs_ecc.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/rs_ecc.c -o $@

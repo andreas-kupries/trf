@@ -22,7 +22,7 @@ fi
 
 AC_PROG_CC
 dnl AC_PATH_PROG(MAKEDEPEND,makedepend,:)
-AC_HAVE_HEADERS(dlfcn.h zlib.h stdlib.h des.h)
+AC_HAVE_HEADERS(dlfcn.h zlib.h stdlib.h)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long int)
 
