@@ -1,10 +1,18 @@
+Sat Mar 11 13:24:33 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* doc/nodes/md.node: Added reference to 'TclAH', another extension
+	  providing message digests (a.k.a. authentication hashes). Author
+	  is Greg Retkowski <greg@rage.net>.
+
 Fri Feb 25 17:27:47 2000  Andreas Kupries  <a.kupries@westend.com>
 
-	* generic/registry.c (TransformImmeediate): Thomas Schwarze
+	* -- Release 2.0p6 --
+
+	* generic/registry.c (TransformImmediate): Thomas Schwarze
 	  <schwarze@gfai.de> catched a little nasty memory leak. The block
 	  from lines 2512-2526 had a call to 'ResultClear' in one branch,
 	  but not the other, leaking memory the size of the result for
-	  each call to a trf command. Ouch. Fixed.
+	  each successful! call to a trf command. Ouch. Fixed.
 
 	* generic/init.c (Trf_Init): Little bugfix for compilation of Trf
 	  as static library (line 90, +'&& defined(USE_TRF_STUBS)').
@@ -55,11 +63,11 @@ Fri Dec 10 18:32:48 1999  Andreas Kupries  <a.kupries@westend.com>
 	  CRYPT_LIB_NAME, reported by Tyler Riddle <triddle@iz-inc.com>.
 
 	* Backed out all of the changes below, they cause miscompilation
-	  here. Now the radical approach: Removed all gcc/libc
+	  here. Now the radical approach: Go and remove all gcc/libc
 	  dependencies from the code.
 
 	* md5-crypt/crypt.h: Now switchable between inclusion of
-	  features.h and trf_features.h. Switch based on infomration
+	  features.h and trf_features.h. Switch based on information
 	  coming from the configure. See below. 
 
 	* md5-crypt/trf_features.h: The hacked 'features.h' under a new
