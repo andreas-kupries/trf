@@ -83,6 +83,8 @@ foreach f {bz2.dll zlib.dll crypt.dll} {
     file rename $f jan.3/
 }
 
+cd ../..
+
 mHandleBinaryDistributions \
 	doc/license.terms README \
 	win/bdist/WARNING.zlib \
