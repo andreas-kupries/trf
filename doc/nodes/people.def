@@ -14,6 +14,11 @@ personM gvvaughan {Gary V. Vaughan}    {gvaughan@oranda.demon.co.uk}
 personM fmeyer    {Fred Meyer}         {fred@sga.co.za}
 personM jyl       {Jacob Levy}	       {jyl@tcl-tk.com}
 
+personMH bsoadams \
+	{Bruce S. O. Adams} \
+	{brucea@cybernetics.demon.co.uk} \
+	{http:///www.cybernetics.demon.co.uk/}
+
 personMH pgutmann \
 	{Peter C. Gutmann} \
 	{pgut001@cs.auckland.ac.nz} \

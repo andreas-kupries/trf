@@ -8,6 +8,13 @@ node trf_md {
     parent      trf_cmds
 
     contents {
+	p "In case you want to use only the MD5 message digest
+	you may want to take a look at [bsoadams] [adams_md5]
+	instead.
+	"
+
+	hr
+
 	p "The package implements 10 message digests"
 
 	bullet_list {

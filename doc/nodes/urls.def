@@ -10,6 +10,8 @@ proc url {code text url} {
 
 # -------------------------------------------------
 
+url adams_md5 "[lib MD5] package" http:///www.cybernetics.demon.co.uk/projects/md5/md5.html
+
 url tcl       [lang tcl]               http://www.scriptics.com/
 #url sun       Sun                      http://www.scriptics.com/
 url scriptics Scriptics                http://www.scriptics.com/

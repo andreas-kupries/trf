@@ -28,6 +28,7 @@ TCL_INCLUDE_DIR		=	@TCL_INCLUDE_DIR@
 TCL_LIB_DIR		=	@TCL_LIB_DIR@
 TCL_LIB			=	@TCL_LIB@
 TCL_SRC_DIR		=	@TCL_SRC_DIR@
+TCL_VERSION		=	@TCL_VERSION@
 #SSL_INSTALL_DIR		=	/usr/local/ssl
 
 # Directories for zlib / ssl (message digests)

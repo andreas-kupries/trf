@@ -16,7 +16,7 @@ node trf_cwin {
 
 	bullet_list {
 	    li	nmake
-	    li	nmake install
+	    li	"nmake install"
 	}
 
 	p "

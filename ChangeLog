@@ -1,3 +1,9 @@
+Thu Sep  2 21:23:21 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* doc/nodes/md.node: Added reference to Bruce Adams
+ 	  <brucea@cybernetics.demon.co.uk> Md5 extension at
+ 	  http:///www.cybernetics.demon.co.uk/projects/md5/md5.html
+
 Sat Jul 17 18:10:28 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/reflect.c: Changed to use a byte-array for the buffer
