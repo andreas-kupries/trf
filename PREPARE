@@ -101,17 +101,15 @@ file rename html/capi.html html/capi/capi.html
 
 
 mLatex2html \
-	-title-man        "Trf Manual"		\
-	-up-man           "../../../tcltk.html"	\
-	-up-title-man     "Tcl/Tk"		\
+	-title    {man "Trf Manual"          install "Trf Installation manual"} \
+	-up       {man "../../../tcltk.html" install "../man/man.html"}         \
+	-up-title {man "Tcl/Tk"              install "Trf Manual"}
 	\
-	-title-install    "Trf Installation manual"	\
-	-up-install       "../man/man.html"		\
-	-up-title-install "Trf Manual"			\
+	-nav      arrows \
+	-htmldir  html   \
 	\
-	-nav           arrows \
-	-htmldir       html \
 	man.tex install.tex
+
 # -up-man assumes that the document is part of the
 # hierarchy at http://www.westend.com/~kupries
 # It resides at '.../doc/trf/man/man.html'
