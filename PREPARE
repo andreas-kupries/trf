@@ -58,8 +58,6 @@ eval mExclude \
 	patches/v8.1/getcurrent patches/v8.1/setorig \
 	patches/rc.h patches/patch.mp
 
-
-file delete -force win/bdist ; # no win release yet.
 #mHandleBinaryDistributions
 mHandleBinaryDistributions doc/license.terms README win/msvcrt.dll
 
