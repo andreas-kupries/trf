@@ -173,50 +173,6 @@ proc text2chan {data} {
 }
 
 if {[info tclversion] < 8.0} {
-    proc exec_cipher {bc key iv in bc_args} {
-	set _key [hex2chan $key]
-	set _in  [hex2chan $in]
-	if {$iv != {}} {set _iv [hex2chan $iv]}
-
-	set has_out 0
-	set text ""
-
-	regsub -all {@key} $bc_args $_key bc_args
-	regsub -all {@in}  $bc_args "-in $_in"  bc_args
-
-	if {$iv != {}} {regsub -all {@iv} $bc_args $_iv bc_args}
-
-	if {[regexp -- {@out} $bc_args]} {
-	    set _out [memchan]
-	    hex -attach $_out -mode encode
-	    regsub -all {@out}  $bc_args "-out $_out" bc_args
-	    
-	    set has_out 1
-	}
-
-	#puts "<<$bc $bc_args -key-type channel>>"
-
-	if {$iv == {}} {
-	    eval $bc $bc_args -key-type channel
-	} else {
-	    eval $bc $bc_args -key-type channel -iv-type channel
-	}
-
-	close $_key
-	close $_in
-	if {$iv != {}} {close $_iv}
-
-	if {$has_out} {
-	    unstack $_out
-	    seek $_out 0
-	    set text [read $_out]
-	    close $_out
-	}
-
-	return $text
-    }
-
-
     proc exec_md {md hexinput} {
 	set              in [memchan]
 	hex -attach     $in -m d
@@ -239,10 +195,6 @@ if {[info tclversion] < 8.0} {
     }
 
 } else {
-    proc exec_cipher {bc key iv in bc_args} {
-	error "don't use exec_cipher with tcl 8.x and higher"
-    }
-
     proc exec_md {md hexinput} {
 	error "don't use exec_md with tcl 8.x and higher"
     }
