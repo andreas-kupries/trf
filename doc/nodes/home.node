@@ -60,6 +60,11 @@ node trf_home {
 	cryptography. Additionally some binary data support is put in as well.
 	"
 
+	p "[cem Note:] The patches mentionend above are required only for Tcl
+	8.0.x and 8.1.x. Since version 8.2 the Trf patches are an official
+	part of the core.
+	"
+
 	hr
 
 	p "Packages built upon the fundament provided by [trf] are
