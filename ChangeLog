@@ -1,3 +1,18 @@
+Sat Nov 11 13:14:05 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/zip.c: Added 'MaxRead' vector to restrict the number of
+ 	  read characters to at most one (decompressor only). This will
+ 	  cause most probably a loss of performance, but also makes the
+ 	  transformation robust against garbage following after the
+ 	  compressed stream. Without this change the transformation ran
+ 	  into an error (Z_BUF_ERROR = no progress) or an infinite loop
+ 	  after reaching Z_STREAM_END.
+
+	  Future: Extend the Tcl API to allow transformations to push back
+ 	  any unconsumed bytes. This will allow us to read large chunks
+ 	  again (= higher performance), while also getting the problem
+ 	  solved. Will have to write a TIP for this.
+
 Wed Oct  4 20:44:40 2000  Andreas Kupries  <a.kupries@westend.com>
 
 	* tools/fixhbline:
@@ -8,7 +23,7 @@ Wed Oct  4 20:44:40 2000  Andreas Kupries  <a.kupries@westend.com>
 
 Wed Aug  9 20:52:41 2000  Andreas Kupries  <a.kupries@westend.com>
 
-	* -- Released 2.1. --
+	* -- Released 2.1 --
 
 	* Consolidation complete to the point that Trf passes its
 	  testsuite for the following combinations of core compiled
@@ -262,7 +277,7 @@ Mon Oct 25 22:10:01 1999  Andreas Kupries  <a.kupries@westend.com>
 	* Applied patch from Jan to make zip compatible to the official
 	  distribution fo zlib. This additionally fixes the problem with
 	  the -nowrap option where I had to resort to some hackery to stop
-	  a Z_BUF_ERROR from bothering me. The new code iis the official
+	  a Z_BUF_ERROR from bothering me. The new code is the official
 	  sanctioned way of making it work (Additional dummy input byte).
 
 Sat Oct 23 00:54:38 1999  Andreas Kupries  <a.kupries@westend.com>

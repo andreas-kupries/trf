@@ -1,3 +1,13 @@
+Changes from 2.1 to 2.1p1
+
+*	Fixes in some tools used during installation (findinpath,
+	fixhbline).
+
+*	[zip] is now able to handle additional data behind the
+	compressed stream. By not reading it. No infinite loop for
+	that case anymore. This also means that a pure-tcl version of
+	gzip should be possible. Any takers ?
+
 Changes from 2.0p7 to 2.1
 
 *	Adapted to the rewrite of the stacked channel functionality in

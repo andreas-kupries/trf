@@ -99,6 +99,9 @@ static const char*
 ZlibErrorMsg _ANSI_ARGS_ ((z_streamp   state,
 			   int         errcode));
 
+static int
+MaxReadDecoder _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     ClientData       clientData));
 
 /*
  * Converter definition.
@@ -124,7 +127,7 @@ static Trf_TypeDefinition convDefinition =
     DecodeBuffer,
     FlushDecoder,
     ClearDecoder,
-    NULL /* no MaxRead */
+    MaxReadDecoder
   },
   TRF_UNSEEKABLE
 };
@@ -155,7 +158,7 @@ typedef struct _DecoderControl_ {
 
   z_stream state;	/* decompressor state */
   char*    output_buffer;
-  /*  int      stop;        / * Boolean flag. Set after
+  int      stop;        /* Boolean flag. Set after
 			 * reaching Z_STREAM_END */
 } DecoderControl;
 
@@ -613,7 +616,7 @@ ClientData     clientData;
   c->write           = fun;
   c->writeClientData = writeClientData;
   c->nowrap          = o->nowrap;
-  /*  c->stop            = 0; */
+  c->stop            = 0;
 
   /* initialize conversion specific items here (ZIP) */
 
@@ -769,17 +772,17 @@ ClientData clientData;
       }
     }
 
-    /* 29.11.1999, AK * /
+    /* 29.11.1999, AK */
     if (res == Z_STREAM_END) {
-      / * Don't process the remainining characters, they are not part of the
+      /* Don't process the remainining characters, they are not part of the
        * compressed stream. Push them back into the channel downward and then
        * fake our upstream user into EOF.
-       * /
+       */
 
       PRINTLN ("STOP");
       c->stop = 1;
       break;
-    }*/
+    } /**/
 
     if (c->state.avail_in > 0) {
       PRINTLN ("More to process");
@@ -868,17 +871,17 @@ ClientData clientData;
       }
     }
 
-    /* 29.11.1999, AK * /
+    /* 29.11.1999, AK */
     if (res == Z_STREAM_END) {
-      / * Don't process the remainining characters, they are not part of the
+      /* Don't process the remainining characters, they are not part of the
        * compressed stream. Push them back into the channel downward and then
        * fake our upstream user into EOF.
-       * /
+       */
 
       PRINTLN ("STOP");
       c->stop = 1;
       break;
-    }*/
+    }/**/
 
 
     if (c->state.avail_in > 0) {
@@ -1013,6 +1016,49 @@ ClientData clientData;
   zf.inflateReset (&c->state);
 
   DONE (ZipClearDecoder); 
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	MaxReadDecoder --
+ *
+ *	------------------------------------------------*
+ *	Depending on the state of the decompressor the layer above is
+ *	told to read exactly one byte or nothing at all. The latter
+ *	happens iff the decompressor found that he is at the end of
+ *	the compressed stream (Z_STREAM_END). The former (reading
+ *	exactly one byte) is necessary to avoid reading data behind
+ *	the end of the compressed stream. We are unable to give this
+ *	data back to the channel below, i.e. it is lost after this
+ *	transformation is unstacked. A most undesirable property. The
+ *	disadvantage of the current solution is of course a loss of
+ *	performance.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		The number of characters the generic Trf layer is
+ *		allowed to read from the channel below.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+MaxReadDecoder (ctrlBlock, clientData)
+     Trf_ControlBlock ctrlBlock;
+     ClientData       clientData;
+{
+  DecoderControl* c = (DecoderControl*) ctrlBlock;
+  int           max = c->stop ? 0 : 1;
+
+  START (MaxReadDecoder);
+  PRINT ("Stop = %d --> %d\n", c->stop, max); FL;
+  DONE  (MaxReadDecoder); 
+
+  return max;
 }
 
 /*
