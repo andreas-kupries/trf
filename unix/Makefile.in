@@ -295,7 +295,7 @@ install-lib: $(TRF_LIB_FILE)
 	@echo "Installing $(TRF_LIB_FILE)"
 	@$(INSTALL_DATA) $(TRF_LIB_FILE) $(LIB_INSTALL_DIR)
 	@$(RANLIB) $(LIB_INSTALL_DIR)/$(TRF_LIB_FILE)
-	@$(INSTALL_DATA) $(srcdir)/pkgIndex.tcl $(LIB_INSTALL_DIR)/pkgIndex.tcl
+	@$(INSTALL_DATA) $(UNIX_DIR)/pkgIndex.tcl $(LIB_INSTALL_DIR)/pkgIndex.tcl
 
 
 install-header:
