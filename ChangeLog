@@ -1,3 +1,51 @@
+2003-03-12  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
+
+	* doc/adler.man:              Added doctools based documentation to Trf.
+	* doc/ascii85.man:
+	* doc/base64.man:
+	* doc/bin.man:
+	* doc/bz2.man:
+	* doc/common/options.inc:
+	* doc/common/sections.inc:
+	* doc/common/trf_header.inc:
+	* doc/common/trf_version.inc:
+	* doc/compress/footer.inc:
+	* doc/compress/header.inc:
+	* doc/compress/middle.inc:
+	* doc/compress/options.inc:
+	* doc/crc-zlib.man:
+	* doc/crc.man:
+	* doc/crypt.man:
+	* doc/digest/footer.inc:
+	* doc/digest/header.inc:
+	* doc/digest/main.inc:
+	* doc/digest/options.inc:
+	* doc/digest/ripemd.inc:
+	* doc/encoding/footer.inc:
+	* doc/encoding/header.inc:
+	* doc/encoding/middle.inc:
+	* doc/encoding/options.inc:
+	* doc/haval.man:
+	* doc/hex.man:
+	* doc/md2.man:
+	* doc/md5.man:
+	* doc/md5_otp.man:
+	* doc/md5crypt.man:
+	* doc/oct.man:
+	* doc/otp_words.man:
+	* doc/quoted-printable.man:
+	* doc/ripemd128.man:
+	* doc/ripemd160.man:
+	* doc/rs_ecc.man:
+	* doc/sha.man:
+	* doc/sha1.man:
+	* doc/sha1_otp.man:
+	* doc/transform.man:
+	* doc/trf.man:
+	* doc/unstack.man:
+	* doc/uuencode.man:
+	* doc/zip.man:
+
 2003-01-20  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tools/rules/manpage.html.site: Redone in the likeness of memchan.
@@ -2505,4 +2553,3 @@ Tue Oct 15 00:06:20 1996  Andreas Kupries  <andreas_kupries@users.sourceforge.ne
 Mon Oct  7 22:55:44 1996  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* Module ready for delivery. Starting official log now.
-
