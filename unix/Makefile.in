@@ -231,16 +231,18 @@ CRYPT_BASE_SRC	=	$(GENERIC_DIR)/bc_opt.c		\
 			$(GENERIC_DIR)/blockcipher.c	\
 			$(GENERIC_DIR)/bc_util.c	\
 			$(GENERIC_DIR)/c_opt.c		\
+			$(GENERIC_DIR)/c_util.c		\
 			$(GENERIC_DIR)/cipher.c
-CRYPT_BASE_OBJ	=	bc_opt.o blockcipher.o bc_util.o c_opt.o cipher.o
+CRYPT_BASE_OBJ	=	bc_opt.o blockcipher.o bc_util.o c_opt.o c_util.o cipher.o
 
 #		encryption algorithms
 CRYPT_ALG_SRC	=	$(GENERIC_DIR)/idea.c		\
 			$(GENERIC_DIR)/blowfish.c	\
 			$(GENERIC_DIR)/des.c		\
 			$(GENERIC_DIR)/rc4.c		\
-			$(GENERIC_DIR)/rc2.c
-CRYPT_ALG_OBJ	=	idea.o blowfish.o des.o rc4.o rc2.o
+			$(GENERIC_DIR)/rc2.c		\
+			$(GENERIC_DIR)/rot.c
+CRYPT_ALG_OBJ	=	idea.o blowfish.o des.o rc4.o rc2.o rot.o
 
 #		error correction
 ECC_SRC		=	$(GENERIC_DIR)/rs_ecc.c
@@ -443,6 +445,9 @@ bc_util.o: $(GENERIC_DIR)/bc_util.c
 c_opt.o: $(GENERIC_DIR)/c_opt.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/c_opt.c -o $@
 
+c_util.o: $(GENERIC_DIR)/c_util.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/c_util.c -o $@
+
 cipher.o: $(GENERIC_DIR)/cipher.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/cipher.c -o $@
 
@@ -460,6 +465,9 @@ rc4.o: $(GENERIC_DIR)/rc4.c
 
 rc2.o: $(GENERIC_DIR)/rc2.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/rc2.c -o $@
+
+rot.o: $(GENERIC_DIR)/rot.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/rot.c -o $@
 
 rs_ecc.o: $(GENERIC_DIR)/rs_ecc.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/rs_ecc.c -o $@
