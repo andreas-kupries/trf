@@ -2160,8 +2160,18 @@ TrfSetOption (instanceData, interp, optionName, value)
     }
 
   } else {
-    int res = Tcl_SetChannelOption (interp, DownChannel (trans),
-				    optionName, value);
+    Tcl_Channel parent;
+    int res;
+
+#ifdef USE_TCL_STUBS
+    parent = (trans->patchIntegrated ?
+	      DownChannel (trans)    :
+	      trans->parent);
+#else
+    parent = trans->parent;
+#endif
+
+    res = Tcl_SetChannelOption (interp, parent, optionName, value);
     DONE (TrfSetOption);
     return res;
   }
@@ -2655,16 +2665,18 @@ Tcl_Interp*        interp;
        * transformation.
        */
 
+#if GT81
       Tcl_SavedResult ciSave;
       Tcl_SaveResult (interp, &ciSave);
-
+#endif
 #ifdef USE_TCL_STUBS
       Tcl_UnstackChannel (interp, trans->self);
 #else
       Tcl_UndoReplaceChannel (interp, trans->self); /* Tcl 8.0.x or below */
 #endif
+#if GT81
       Tcl_RestoreResult (interp, &ciSave);
-
+#endif
       DONE (AttachTransform);
       return TCL_ERROR;
     }
@@ -3340,7 +3352,11 @@ SeekCalculatePolicies (trans)
   int stopped = 0;
 
   while (self != (Tcl_Channel) NULL) {
+#if GT81
     next = Tcl_GetStackedChannel (self);
+#else
+    next = trans->parent;
+#endif
 
     if (next == (Tcl_Channel) NULL) {
       /* self points to base channel (ii).
@@ -3355,29 +3371,40 @@ SeekCalculatePolicies (trans)
 	stopped = 1;
 	break;
       }
-    } else if (Tcl_GetStackedChannel (next) != (Tcl_Channel) NULL) {
-      /* next points to a transformation below the top (i).
-       * Assume unseekable for a non-trf transformation, else peek directly
-       * into the relevant structure
-       */
+    } else {
+      Tcl_Channel nextAfter;
 
-      if (Tcl_GetChannelType (next)->seekProc != TrfSeek) {
-	TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
-	trans->seekCfg.overideAllowed = 0;
-	stopped = 1;
-      } else {
-	TrfTransformationInstance* down = 
-	  (TrfTransformationInstance*) Tcl_GetChannelInstanceData (next);
+#if GT81
+      nextAfter = Tcl_GetStackedChannel (next);
+#else
+      nextAfter = ((TrfTransformationInstance*) 
+		   Tcl_GetChannelInstanceData (next))->parent;
+#endif
 
-	if (!down->seekState.allowed) {
+      if (nextAfter != (Tcl_Channel) NULL) {
+	/* next points to a transformation below the top (i).
+	 * Assume unseekable for a non-trf transformation, else peek directly
+	 * into the relevant structure
+	 */
+
+	if (Tcl_GetChannelType (next)->seekProc != TrfSeek) {
 	  TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
 	  trans->seekCfg.overideAllowed = 0;
 	  stopped = 1;
+	} else {
+	  TrfTransformationInstance* down = 
+	    (TrfTransformationInstance*) Tcl_GetChannelInstanceData (next);
+	  
+	  if (!down->seekState.allowed) {
+	    TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
+	    trans->seekCfg.overideAllowed = 0;
+	    stopped = 1;
+	  }
 	}
+      } else {
+	/* Next points to the base channel */
+	/* assert (0); */
       }
-    } else {
-      /* Next points to the base channel */
-      /* assert (0); */
     }
 
     self = next;
