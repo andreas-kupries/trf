@@ -68,7 +68,7 @@ static void CountLength  _ANSI_ARGS_ ((ripemd_context* ctx,
  */
 
 static Trf_MessageDigestDescription mdDescription = {
-  "ripemd-128",
+  "ripemd128",
   sizeof (ripemd_context),
   DIGEST_SIZE,
   MD_Start,
