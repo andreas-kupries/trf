@@ -10,7 +10,8 @@ node trf_md {
     contents {
 	p "In case you want to use only the MD5 message digest
 	you may want to take a look at [bsoadams] [adams_md5]
-	instead.
+	or [ellson_ftp] instead. The latter location provides
+	SHA too.
 	"
 
 	hr

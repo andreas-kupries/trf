@@ -16,6 +16,9 @@ url trf_bdist18 "Trf 1.8 binary distributions" http://www.oche.de/~akupries/soft
 
 url adams_md5 "[lib MD5] package" http://www.cybernetics.demon.co.uk/projects/md5/md5.html
 
+url ellson_ftp "John Ellson's ftp place" http://www.tcltk.com/ftp/ellson/
+
+
 url tcl       [lang tcl]               http://www.scriptics.com/
 #url sun       Sun                      http://www.scriptics.com/
 url scriptics Scriptics                http://www.scriptics.com/
