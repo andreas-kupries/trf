@@ -36,8 +36,8 @@ mGenerateANNOUNCE
 
 package require MSA
 mGenerateAnnounceMail tcl-announce@mitchell.org lvirden@cas.org
-mSupport AMAIL
-
+mSupport    AMAIL
+file delete AMAIL
 
 
 # I.   clean documentation
