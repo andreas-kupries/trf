@@ -19,7 +19,11 @@
 #	stdout.
 
 package require Trf
-package require Memchan
+if {[info tclversion] < 8.0} {
+    package require -exact Memchan 1.2
+} else {
+    package require Memchan
+}
 
 # --- internal library --- --- --- --- --- --- --- --- ---
 
