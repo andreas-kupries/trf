@@ -5,8 +5,6 @@
 \def\file#1{{\tt #1}}
 \def\arg#1{{\tt $<$#1$>$}}
 \def\trf{\strong {trf}}
-\def\blob{\strong {blob}}
-\def\blobx{\strong {blobX}}
 \def\tcl{\lang {tcl}}
 \def\tclsh{\cmd {tclsh}}
 \def\wish{\cmd {wish}}
@@ -15,18 +13,22 @@
 \def\man#1{{\tt #1}}
 \def\lib#1{{\tt #1}}
 \def\url#1{{\tt #1}}
-\def\tm{$^{(tm)}$}
+\def\tm{$^\mbox{(tm)}$}
 \def\ra{$\rightarrow$}
 \def\eq{$\equiv$}
+\def\dos{{\tt DOS}}
+\def\win{{\tt Windows\tm{}}}
+\def\winnt{{\tt Windows NT\tm{}}}
 
 \def\version{1.0}
 \begin {document}
 \tableofcontents
 
 \chapter {Introduction}
-This is the installation manual of Tcl-Trf @VERSION@, as distributed
-at @DATE@. For a documentation of the available commands see \file
-{man.tex} or one of its derivatives (\file {man.dvi}, \file {man.ps}).
+This is the installation manual of Tcl-Trf @VERSION@, as of
+@DATE@. For a documentation of the available commands see \file
+{man.tex} or one of its derivatives (\file {man.dvi}, \file
+{man.ps}).
 
 
 \chapter {Common info}
@@ -100,7 +102,7 @@ Now you have two choices.
 \item	Copy the 4 files \file {tcl.h}, \file {tclIO.c}, \file
 	{configure.in} and \file {configure} to the appropriate
 	locations, as given in the table below\footnote {People using
-	Windows\tm{} should do this. They can safely ignore the files \file
+	\win{} should do this. They can safely ignore the files \file
 	{configure} and \file {configure.in}}
 
 	\begin {tabular} {|l|l|} \hline
@@ -142,20 +144,21 @@ without such \strong {don't} loose however.
 	\lib {zlib} source distribution is available as subdirectory
 	\file {zlib} (a sibling to \file {unix} !).
 
-\item	A binary distribution for windows is available, see \url {}.
+\item	A binary distribution for \win{} is available, see \url
+	{http://www.winimage.com/zLibDll}. 
 
-	A note of caution: The library provided contains a
-	hand-optimized assembler version of the compression
-	algorithm. At least for me it crashes often enough to be
-	unusable. YMMV however.
+	A note of caution: The provided library kept crashing on my
+	\winnt{} system. At least often enough to render it unusable in
+	my eyes. YMMV however.
 
 	Because of this the subdirectory \file {zlib.vc} contains
 	everything to compile zlib as shared library (with MSVC++
-	4.2). Just copy \file {makefile.vc} to \file {makefile}, adapt
-	the paths to your directory structure, then type \cmd {nmake}.
+	4.2). Just copy its contents in a zlib source distribution,
+	copy \file {makefile.vc} to \file {makefile}, adapt the paths
+	to your directory structure, then type \cmd {nmake}.
 
 	At last copy the newly generated \file {zlib.dll} into the
-	windows system directory of your machine.
+	system directory of your machine.
 
 \item	I have no information about its availability on Macintoshes.
 \end   {itemize}
@@ -165,9 +168,51 @@ without such \strong {don't} loose however.
 
 \chapter {libdes, DES encryption}\label {libdes}
 
- The home page of \strong
-	{SSLeay} is \url {} (libdes is part of SSLeay).
-libdes\_lib\_name = crypto32.dll on windows to use ssleay
+\cmd {DES} support is based upon libdes, a freely available
+implementation of this algorithm, written by Eric A. Young (\url
+{eay@mincom.com}). I used version 3.23 directly. Higher versions are
+part of \cmd {SSLeay}, Erics implementation of the \strong{S}ecure
+\strong{S}ockets \strong{L}ayer.
+
+The official FAQ page is \url
+{http://www.psy.uq.edu.au:8080/~ftp/Crypto/}. 
+
+Master locations are
+\begin {tabular} {l|l}\hline
+     ftp://ftp.psy.uq.oz.au/pub/Crypto/SSL & SSLeay source \\
+     ftp://ftp.psy.uq.oz.au/pub/Crypto/SSLapps & SSL applications \\
+     ftp://ftp.psy.uq.oz.au/pub/Crypto/SSLapps/PORT4-5 & porting notes \\ \hline
+     http://www.psy.uq.oz.au/~ftp/Crypto/ssl.html & SSLeay Programmer Reference \\
+\end {tabular}
+
+The list of mirror sites is too long to be included here, the FAQ
+contains them all.
+
+
+\trf{} requires a shared library version of \lib {libdes}. People
+without such \strong {don't} loose however.
+
+\begin {itemize}
+\item	The unix-specific makefile contains the target ``libdes''. This
+	will generate a shared library for \lib {libdes}. It assumes that the
+	\lib {libdes} source distribution is available as subdirectory
+	\file {libdes} (a sibling to \file {unix} !).
+
+\item	A binary distribution for \win{} is available, at the master
+	location and the associated mirrors. This is not a binary
+	distribution of \lib {libdes} alone, but of \lib {SSLeay}. The
+	shared library \file {crypto32.dll} contains the required DES
+	functionality\footnote {IDEA and RC4 as well, but these are
+	\trf {} builtins. I am tempted to integrate the RSA
+	functionality though}.
+
+	Either rename this DLL to \file {libdes.dll} or uncomment the
+	definition of \var {LIBDES} in \file {makefile.vc} before
+	compilation of \trf {}.
+
+\item	I have no information about its availability on Macintoshes.
+\end   {itemize}
+
 
 \chapter {Compilation and installation}
 \section {Macintosh}
@@ -280,13 +325,13 @@ you.
 
 
 
-\section {Windows}
+\section {\win{}}
 
 A single file \file {makefile.vc} is provided. It is designed to
 work with \cmd {MSVC++ 4.2}. Just rename it to \file {makefile}, adapt
 the paths\footnote {The available variables are described in the
 makefile} at the top of it as required by your setup (aka directory
-structure), then type
+structure), then type\footnote {Inside of a \dos {} box}
 
 \begin{verbatim}
 	>	nmake
