@@ -42,7 +42,7 @@ mExclude \
 mLog log info generating manual variants (dvi, ps)
 
 # pwd = doc
-file mkdir man html html/install html/manual
+file mkdir man html html/install html/man
 
 catch {exec latex man}
 catch {exec latex man}
@@ -75,14 +75,14 @@ if {$fail} {mLog log error $msg}
 # nav-ICONs from america, have to change that
 mLog log info hyperized manual
 set fail [catch {
-    exec latex2html -dir html/man -t "Trf Manual" man.tex
+    exec latex2html -dir html/man -t "Trf Manual" man.tex 2>/dev/null >/dev/null
     eval file delete [glob html/man/.*.dir html/man/.*.pag html/man/*.pl html/man/images.*]
 } msg]	;#{}
 if {$fail} {mLog log error $msg}
 
 mLog log info hyperized installation manual
 set fail [catch {
-    exec latex2html -dir html/install -t "Trf Installation manual" install.tex
+    exec latex2html -dir html/install -t "Trf Installation manual" install.tex 2>/dev/null >/dev/null
     eval file delete [glob html/install/.*.dir html/install/.*.pag html/install/*.pl html/install/images.*]
 } msg]	;#{}
 if {$fail} {mLog log error $msg}
