@@ -15,10 +15,12 @@ Umstellung SSL, roadmap fuer Arbeiten an Trf
 	um soviele Anforderungen wie moeglich zu befriedigen.
 	(US / non-US Distributionen, trf, trfcrypt Bibliotheken)
 
+	/OK/
 
 *2a	Uebrig bleiben	BLOWFISH, HAVAL.
 		Koennen eigentlich auch in die separate Bibliothek.
 
+	/OK/
 
 *3	Weitere Funktionen von SSL verstehen und einbinden
 	(RSA, Diffie/Hellman, DSA)
