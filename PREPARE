@@ -61,41 +61,13 @@ eval mExclude \
 	patches/v8.1/gendiff patches/v8.1/getorig patches/v8.1/genstubs \
 	patches/v8.1/getcurrent patches/v8.1/setorig \
 	patches/rc.h patches/patch.mp \
-	[glob win/*.dll] [glob win/*.lib] win/trf1380.README \
-	win/bdist/jan.4/SETUP.ISS
+	[glob win/*.dll] [glob win/*.lib] win/trf1380.README
 
 # mHandleBinaryDistributions
 # Remove older distribution (1.x), they are distributed as part of the
 # 1.8 site from now on.
 
-mExclude \
-	unix/bdist/ak.1 unix/bdist/ak.2 \
-	unix/bdist/ak.3 unix/bdist/ak.4 \
-	unix/bdist/ak.5                 \
-	win/bdist/cygwin.jan.17.1 win/bdist/jan.2 win/bdist/jan.4
-
-cd win/bdist
-
-if {0} {
-    foreach f {WARNING.zlib NOTE.crypt} {
-	file copy   $f jan.3/
-	file copy   $f jan.5/
-	file delete $f
-    }
-}
-foreach f {bz2.dll zlib.dll crypt.dll} {
-    #file copy   $f aku.1/
-    file rename $f jan.3/
-}
-
-cd ../..
-
-mHandleBinaryDistributions \
-	doc/license.terms README \
-	win/bdist/WARNING.zlib \
-	win/bdist/NOTE.crypt \
-	unix/bdist/libcrypt.so
-
+mHandleBinaryDistributions trf doc/license.terms README
 mGenNews
 mGenChangeLog
 
