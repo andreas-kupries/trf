@@ -1,7 +1,7 @@
 # -*- tcl -*-
 extension trf {
     description {
-	A loadable extension providing commands for data conversion,
+	A loadable extension to Tcl providing commands for data conversion,
 	encryption, message digests, zlib based compression,
 	error-correction, channel-based manipulation of binary data.
 
