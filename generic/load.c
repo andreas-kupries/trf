@@ -18,7 +18,7 @@
 /*
  *----------------------------------------------------------------------
  *
- * TrfLoadLib --
+ * Trf_LoadLibrary --
  *
  *	This procedure is called to load a shared library into memory.
  *	If the extension is ".so" (e.g. Solaris, Linux) or ".sl" (HP-UX)
@@ -53,7 +53,7 @@ typedef struct Functions {
 #define FAILED ((VOID *) -114)
 
 int
-TrfLoadLibrary (interp, libName, handlePtr, symbols, num)
+Trf_LoadLibrary (interp, libName, handlePtr, symbols, num)
     Tcl_Interp *interp;
     CONST char *libName;
     VOID **handlePtr;
@@ -130,7 +130,7 @@ TrfLoadLibrary (interp, libName, handlePtr, symbols, num)
 /*
  *----------------------------------------------------------------------
  *
- * TrfLoadFailed --
+ * Trf_LoadFailed --
  *
  *	Mark the loaded library as invalid. Remove it from memory
  *	if possible. It will no longer be used in the future.
@@ -146,7 +146,7 @@ TrfLoadLibrary (interp, libName, handlePtr, symbols, num)
  */
 
 void
-TrfLoadFailed (handlePtr)
+Trf_LoadFailed (handlePtr)
     VOID **handlePtr;
 {
     if ((*handlePtr != NULL) && (*handlePtr != FAILED)) {

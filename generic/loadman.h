@@ -42,20 +42,10 @@
 
 #include "transformInt.h"
 
-#ifdef HAVE_DES_H
-#   include <des.h>
-#else
-#   include "compat/des.h"
-#endif
 #ifdef HAVE_MD2_H
 #   include <md2.h>
 #else
 #   include "compat/md2.h"
-#endif
-#ifdef HAVE_RC2_H
-#   include <rc2.h>
-#else
-#   include "compat/rc2.h"
 #endif
 #ifdef HAVE_SHA_H
 #   include <sha.h>
@@ -64,38 +54,6 @@
 #endif
 
 
-/* DES, symmetric block cipher.
- * Affected command in case of failure: des
- */
-
-typedef struct DesFunctions {
-  long loaded;
-  void (* set_key)     _ANSI_ARGS_ ((des_cblock *key, des_key_schedule schedule));
-  void (* ecb_encrypt) _ANSI_ARGS_ ((des_cblock *input,des_cblock *output,
-				     des_key_schedule schedule, int enc));
-} desFunctions;
-
-EXTERN desFunctions desf;
-
-EXTERN int
-TrfLoadDes _ANSI_ARGS_ ((Tcl_Interp *interp));
-
-
-/* RC2, symmetric block cipher.
- * Affected command in case of failure: rc2
- */
-
-typedef struct Rc2Functions {
-  long loaded;
-  void (* set_key)     _ANSI_ARGS_ ((RC2_KEY *ks, int len, unsigned char* key, int bits));
-  void (* ecb_encrypt) _ANSI_ARGS_ ((unsigned char* in, unsigned char* out,
-				     RC2_KEY* schedule, int enc));
-} rc2Functions;
-
-EXTERN rc2Functions rc2f;
-
-EXTERN int
-TrfLoadRC2 _ANSI_ARGS_ ((Tcl_Interp *interp));
 
 
 /* MD2, message digest.

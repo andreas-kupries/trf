@@ -128,45 +128,6 @@ Tcl_Interp* interp;
       return res;
 
     /*
-     * Register encryption algorithms.
-     */
-
-    res = TrfInit_IDEA (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_BLOWFISH (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_DES (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_RC4 (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_RC2 (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_ROT (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_SAFER (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    /*
      * Register message digests
      */
 

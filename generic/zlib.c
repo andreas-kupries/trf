@@ -46,5 +46,5 @@ int
 TrfLoadZlib (interp)
     Tcl_Interp* interp;
 {
-  return TrfLoadLibrary (interp, Z_LIB_NAME, (VOID**) &z, symbols, 10);
+  return Trf_LoadLibrary (interp, Z_LIB_NAME, (VOID**) &z, symbols, 10);
 }

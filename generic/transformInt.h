@@ -40,7 +40,6 @@
 #ifdef MAC_TCL
 #include "compat:dlfcn.h"
 #include "compat:zlib.h"
-#include "compat:des.h"
 #else
 #ifdef HAVE_DLFCN_H
 #   include <dlfcn.h>
@@ -107,27 +106,6 @@ EXTERN int  TrfReverseEncoding _ANSI_ARGS_ ((unsigned char* buf, int length, CON
 					     unsigned int padChar, int* hasPadding));
 
 
-/*
- * Helper procedures for ciphers.
- */
-
-#if (TCL_MAJOR_VERSION < 8)
-EXTERN int
-TrfGetData _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* dataName, int dataIsChannel,
-			 CONST char* data, unsigned short min_bytes, unsigned short max_bytes,
-			 VOID** buf, int* length));
-#else
-EXTERN int
-TrfGetData _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* dataName, int dataIsChannel,
-			 CONST Tcl_Obj* data, unsigned short min_bytes, unsigned short max_bytes,
-			 VOID** buf, int* length));
-#endif
-
-EXTERN int
-TrfGetDataType _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* dataName,
-			     CONST char* typeString, int* isChannel));
-
-
 
 /*
  * Definition of option information for message digests and accessor
@@ -173,107 +151,6 @@ TrfMDOptions _ANSI_ARGS_ ((void));
 
 
 
-/*
- * Definition of option information for blockciphers and accessor
- * to set of vectors processing these.
- */
-
-typedef struct _TrfBlockcipherOptionBlock {
-  int   direction;      /* encryption, decryption (TRF_ENCRYPT / TRF_DECRYPT) */
-  int   operation_mode; /* ECB, CBC, CFB, OFB */
-  int   shift_width;    /* shift per operation for feedback modes.
-			 * given in bytes. */
-
-  int   keyDataIsChan; /* Flag for interpretation of keyData */
-  int   ivDataIsChan;  /* Flag for interpretation of ivData  */
-
-#if (TCL_MAJOR_VERSION < 8)
-  unsigned char* keyData;  /* Key information */
-  unsigned char* ivData;   /* IV  information */
-#else
-  Tcl_Obj*       keyData;  /* Key information */
-  Tcl_Obj*       ivData;   /* IV  information */
-#endif
-
-  Trf_Options  cOptionInfo; /* reference to cipher specific option
-			     * information. */
-
-  /* ---- derived information ----
-   *
-   * Area used for communication between vectors
-   *
-   *	Trf_TypeDefinition.encoder.create,
-   *	Trf_TypeDefinition.decoder.create
-   *
-   * to avoid duplicate execution of complex and/or common operations.
-   */
-
-  int   key_length;     /* length of key (required for ciphers with
-			 * variable keysize) */
-  VOID* key;            /* key data */
-  VOID* iv;             /* initialization vector for stream modes. */
-
-  int eks_length;
-  int dks_length;
-
-  VOID* encrypt_keyschedule; /* expansion of key into subkeys for encryption */
-  VOID* decrypt_keyschedule; /* expansion of key into subkeys for decryption */
-
-} TrfBlockcipherOptionBlock;
-
-#define TRF_ECB_MODE (1)
-#define TRF_CBC_MODE (2)
-#define TRF_CFB_MODE (3)
-#define TRF_OFB_MODE (4)
-
-EXTERN Trf_OptionVectors*
-TrfBlockcipherOptions _ANSI_ARGS_ ((void));
-
-
-/*
- * Definition of option information for ciphers and accessor
- * to set of vectors processing these.
- */
-
-typedef struct _TrfCipherOptionBlock {
-  int   direction;      /* encryption, decryption */
-
-  int   keyDataIsChan; /* Flag for interpretation of keyData */
-
-#if (TCL_MAJOR_VERSION < 8)
-  unsigned char* keyData;  /* Key information */
-#else
-  Tcl_Obj*       keyData;  /* Key information */
-#endif
-
-  Trf_Options    cOptionInfo; /* reference to cipher specific option
-			       * information. */
-
-  /* ---- derived information ----
-   *
-   * Area used for communication between vectors
-   *
-   *	Trf_TypeDefinition.encoder.create,
-   *	Trf_TypeDefinition.decoder.create
-   *
-   * to avoid duplicate execution of complex and/or common operations.
-   */
-
-  int   key_length;     /* length of key (required for ciphers with
-			 * variable keysize) */
-  VOID* key;            /* key data */
-
-  int eks_length;
-  int dks_length;
-
-  VOID* encrypt_keyschedule; /* expansion of key into subkeys for encryption */
-  VOID* decrypt_keyschedule; /* expansion of key into subkeys for decryption */
-
-} TrfCipherOptionBlock;
-
-
-EXTERN Trf_OptionVectors*
-TrfCipherOptions _ANSI_ARGS_ ((void));
 
 
 /*
@@ -326,19 +203,6 @@ TrfZIPOptions _ANSI_ARGS_ ((void));
 
 
 /*
- * General purpose library loader functionality.
- * Used by -> TrfLoadZlib, -> TrfLoadLibdes.
- */
-
-EXTERN int
-TrfLoadLibrary _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* libName,
-			    VOID** handlePtr, char** symbols, int num));
-
-EXTERN void
-TrfLoadFailed _ANSI_ARGS_ ((VOID** handlePtr));
-
-
-/*
  * 'zlib' will be dynamically loaded. Following a structure to
  * contain the addresses of all functions required by this extension.
  *
@@ -388,14 +252,6 @@ EXTERN int TrfInit_ADLER     _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_CRC_ZLIB  _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_RIPEMD128 _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_RIPEMD160 _ANSI_ARGS_ ((Tcl_Interp* interp));
-
-EXTERN int TrfInit_IDEA      _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_BLOWFISH  _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_DES       _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_RC4       _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_RC2       _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_ROT       _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_SAFER     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int TrfInit_RS_ECC    _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_ZIP       _ANSI_ARGS_ ((Tcl_Interp* interp));
