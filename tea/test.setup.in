@@ -21,7 +21,7 @@ proc write_file {file data} {
 proc read_zip {file} {
     set fd [open $file]
     fconfigure $fd -translation binary
-    zip -attach $fd -mode decompress
+    zip -attach $fd -mode compress
     fconfigure $fd -translation binary
     set data [read $fd]
     close $fd
