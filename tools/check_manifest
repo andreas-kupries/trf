@@ -4,10 +4,11 @@
 
 set manifest [lindex $argv 0]
 
-proc file {name} {
+rename file ori_file
+proc   file {name} {
     global files
     set    files(name) 1
-    if {! [file exists $name]} {
+    if {! [ori_file exists $name]} {
 	puts stdout "missing: $name"
     }
 }
