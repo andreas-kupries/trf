@@ -147,7 +147,7 @@ extern void DumpString  _ANSI_ARGS_ ((int level, int len, char* bytes));
 #if ! (GT81)
 /* enable use of procedure internal to tcl */
 EXTERN void
-panic _ANSI_ARGS_ (TCL_VARARGS(CONST char* format, ...));
+panic _ANSI_ARGS_ (TCL_VARARGS(CONST char*, format));
 
 #undef  Tcl_Panic
 #define Tcl_Panic panic
