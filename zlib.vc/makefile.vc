@@ -63,8 +63,8 @@ ZLIBOBJS	=	\
 	$(TMPDIR)\infutil.obj	\
 	$(TMPDIR)\trees.obj	\
 	$(TMPDIR)\uncompr.obj	\
-	$(TMPDIR)\zutil.obj	\
-	$(TMPDIR)\dllentry.obj
+	$(TMPDIR)\zutil.obj
+
 
 
 PATH=$(TOOLS32)\bin;$(PATH)
@@ -77,7 +77,7 @@ CP      	= copy
 RM      	= del
 
 ZLIB_INCLUDES	= -I$(ROOT)
-ZLIB_DEFINES	= -nologo -D__WIN32__
+ZLIB_DEFINES	= -nologo -D__WIN32__ -D_WINDOWS -DZLIB_DLL
 
 ZLIB_CFLAGS	=	$(cdebug) $(cflags) $(cvarsdll) $(include32) \
 			$(ZLIB_INCLUDES) $(ZLIB_DEFINES)
