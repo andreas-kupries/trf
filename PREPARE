@@ -59,7 +59,15 @@ eval mExclude \
 	patches/v8.1/getcurrent patches/v8.1/setorig \
 	patches/rc.h patches/patch.mp
 
-#mHandleBinaryDistributions
+# mHandleBinaryDistributions
+# Remove older distribution (1.x), they are distributed as part of the
+# 1.8 site from now on.
+
+mExclude \
+	unix/bdist/ak.1 unix/bdist/ak.2 \
+	unix/bdist/ak.3 unix/bdist/ak.4 \
+	win/bdist/cygwin.jan.17.1 win/bdist/jan.2
+
 mHandleBinaryDistributions doc/license.terms README win/msvcrt.dll
 
 
