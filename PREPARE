@@ -92,6 +92,8 @@ mHandleBinaryDistributions \
 	win/bdist/NOTE.crypt \
 	unix/bdist/libcrypt.so
 
+mGenNews
+
 # I.b  generate official manual, diverse variants (dvi, ps)
 mLog info generating manual 
 
