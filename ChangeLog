@@ -1,3 +1,18 @@
+Mon Jul 28 20:34:05 1997  Andreas Kupries  <a.kupries@westend.com>
+
+	* doc/man.tex (section {Message digests}): Added explanation of
+	  transparent mode.
+
+	* generic/dig_opt.c, digest.c, transformInt.h: Added transparent
+	  mode to general message digest code. A mixture of absorb and
+	  write, see 'doc/man.tex' for more.
+
+	* doc/defs.tex: Some more homepages found, updated references to
+	  Jan Nijtmans.
+
+	* doc/man.tex (chapter {Copyrights}\label {copyright}): Added
+	  section about SAFER.
+
 Sat Jul 26 18:32:35 1997  Andreas Kupries  <a.kupries@westend.com>
 
 	* tests/safer.test: New file, testing safer implementation.
