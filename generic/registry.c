@@ -50,6 +50,8 @@ typedef struct _DirectionInfo_ {
 typedef struct _TrfTransformationInstance_ {
   Tcl_Channel parent; /* The channel superceded by this one */
 
+  int readIsFlushed; /* flag to note wether in.flushProc was called or not */
+
   /* Tcl_Transformation standard;   data required for all transformation instances */
   DirectionInfo      in;         /* information for conversion of read data */
   DirectionInfo      out;        /* information for conversion of written data */
@@ -819,7 +821,9 @@ Tcl_Interp* interp;
    */
 
   trans->out.vectors->flushProc (trans->out.control, (Tcl_Interp*) NULL, trans->clientData);
-  trans->in.vectors->flushProc  (trans->in.control,  (Tcl_Interp*) NULL, trans->clientData);
+
+  if (!trans->readIsFlushed)
+    trans->in.vectors->flushProc (trans->in.control,  (Tcl_Interp*) NULL, trans->clientData);
 
   trans->out.vectors->deleteProc (trans->out.control, trans->clientData);
   trans->in.vectors->deleteProc  (trans->in.control,  trans->clientData);
@@ -874,7 +878,9 @@ int*       errorCodePtr;
 
 	memcpy ((VOID*) buf, (VOID*) trans->result, toRead);
 	if (trans->used > toRead) {
-	  memmove ((VOID*) trans->result, (VOID*) (trans->result + toRead), toRead - trans->used);
+	  memmove ((VOID*) trans->result,
+		   (VOID*) (trans->result + toRead),
+		   trans->used - toRead);
 	}
 
 	trans->used -= toRead;
@@ -925,6 +931,7 @@ int*       errorCodePtr;
       if (! Tcl_Eof (trans->parent)) {
 	return gotBytes;
       } else {
+	trans->readIsFlushed = 1;
 	res = trans->in.vectors->flushProc (trans->in.control,
 					    (Tcl_Interp*) NULL,
 					    trans->clientData);
@@ -1064,7 +1071,7 @@ int*       errorCodePtr;	/* Location of error flag. */
 
   trans->out.vectors->flushProc (trans->out.control, (Tcl_Interp*) NULL, trans->clientData);
   trans->in.vectors->clearProc  (trans->in.control, trans->clientData);
-
+  trans->readIsFlushed = 0;
 
   result = Tcl_Seek (trans->parent, offset, mode);
   *errorCodePtr = (result == -1) ? Tcl_GetErrno ():0;
@@ -1301,6 +1308,7 @@ Tcl_Interp*        interp;
   /* trans->standard.typePtr = entry->transType; */
   trans->clientData       = entry->trfType->clientData;
   trans->parent           = attach;
+  trans->readIsFlushed    = 0;
 
   if (ENCODE_REQUEST (entry, optInfo)) {
     /* ENCODE on write

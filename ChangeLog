@@ -1,3 +1,15 @@
+Sat Mar  1 15:50:50 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* generic/registry.c: Bugfix in 'TrfInput' (-> Feb 14) caused
+	  the system to call read-flush twice. Noted due to doublesized
+	  results for message digests. New flag 'readIsFlushed' to prevent
+	  this.
+
+	* doc/install.tex: Complete.
+
+	* generic/registry.c (TrfInput): fixed bug regarding calculation
+	  of bytes to move down via 'memmove' (operands were in wrong order).
+
 Wed Feb 26 18:31:50 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* win/makefile.vc (LIBDES): new configuration variable. allows
