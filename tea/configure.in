@@ -105,7 +105,7 @@ AC_CHECK_LIB(crypt, md5_init_ctx, HAS_LIBCRYPT_MD5=1, HAS_LIBCRYPT_MD5=0)
 #--------------------------------------------------------------------
 
 case "`uname -s`" in
-    *win32* | *WIN32* | *CYGWIN_NT*)
+    *win32* | *WIN32* | *CYGWIN_NT* | *CYGWIN_98* | *CYGWIN_95*)
 	CYGPATH="cygpath -w"
     ;;
     *)
@@ -146,7 +146,7 @@ SC_LOAD_TCLCONFIG
 #--------------------------------------------------------------------
 
 case "`uname -s`" in
-    *win32* | *WIN32* | *CYGWIN_NT*)
+    *win32* | *WIN32* | *CYGWIN_NT* | *CYGWIN_98* | *CYGWIN_95*)
 	AC_DEFINE(BUILD_Trf)
 	CLEANFILES="*.lib *.dll *.exp *.ilk *.pdb vc50.pch"
 	AC_SUBST(CLEANFILES)
@@ -235,7 +235,7 @@ eval "UNSHARED_LIB_SUFFIX=${TCL_UNSHARED_LIB_SUFFIX}"
 #--------------------------------------------------------------------
 
 case "`uname -s`" in
-    *win32* | *WIN32* | *CYGWIN_NT*)
+    *win32* | *WIN32* | *CYGWIN_NT* | *CYGWIN_98* | *CYGWIN_95*)
 	if test "${SHARED_BUILD}" = "1" ; then
 	    SHLIB_LD_LIBS="\"`cygpath -w ${TCL_BIN_DIR}/${TCL_STUB_LIB_FILE}`\" ${TCL_SHLIB_LD_LIBS}"
 	    eval "${PACKAGE}_LIB_FILE=${PACKAGE}${SHARED_LIB_SUFFIX}"
@@ -275,16 +275,7 @@ AC_SUBST(SHLIB_LD_LIBS)
 # bugs in the pkg_mkIndex routine.
 #--------------------------------------------------------------------
 
-AC_PATH_PROGS(TCLSH_PROG,
-	tclsh8.2${EXEEXT} tclsh82${EXEEXT} tclsh${EXEEXT},
-	:,
-	${exec_prefix}/bin:${prefix}/bin:${PATH})
-
-if test "x${TCLSH_PROG}" = "x:" ; then
-    AC_MSG_WARN(No tclsh executable found.  You will have to build the pkgIndex.tcl file manually.)
-fi
-AC_SUBST(TCLSH_PROG)
-
+SC_PROG_TCLSH
 
 #--------------------------------------------------------------------
 # Check which of the loader modules we need to get at shared libraries dynamically

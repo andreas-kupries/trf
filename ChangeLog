@@ -1,3 +1,8 @@
+Tue Apr 18 19:01:27 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* tea/tcl.m4, tea/configure.in: Accepted patch from Jan Nijtmans
+	  to enable usage of tea build with mingw32 environment on Win.
+
 Wed Mar 22 19:48:30 2000  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/init.c (Trf_Init, line 90): Removed '&&

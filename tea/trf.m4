@@ -49,11 +49,11 @@ AC_ARG_ENABLE(static-md5,
 	[STATIC_MD5=$enableval], [STATIC_MD5=no])
 
 AC_ARG_ENABLE(trf_debug,
-	[  --enable-debug              enable debugging output],
+	[  --enable-trf-debug             enable debugging output],
 	[trf_debug=$enableval], [trf_debug=no])
 
 AC_ARG_ENABLE(stream_debug,
-	[  --enable-stream-debug              enable debugging of IO streams],
+	[  --enable-stream-debug          enable debugging of IO streams],
 	[stream_debug=$enableval], [stream_debug=no])
 
 
