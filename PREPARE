@@ -42,17 +42,17 @@ mExclude \
 mLog log info generating manual variants (dvi, ps)
 
 # pwd = doc
+file mkdir man html html/install html/manual
+
 catch {exec latex man}
 catch {exec latex man}
 catch {exec latex man}
 catch {exec dvips man.dvi -o man.ps}
-file delete man.aux man.log man.toc
 
 catch {exec latex install}
 catch {exec latex install}
 catch {exec latex install}
 catch {exec dvips install.dvi -o install.ps}
-file delete install.aux install.log install.toc
 
 
 
@@ -61,13 +61,30 @@ file delete install.aux install.log install.toc
 mLog log info generating manpages
 
 # pwd = doc
-file mkdir man
+
+# manual pages of C API out of header comments (c2man)
 catch {
     set ipath [file join [file dirname [file dirname [info library]]] include]
     set src   [file join [pwd] .. generic transform.h]
 
     exec c2man -oman -I$ipath -v $src
 }
+
+# html'ized manual from lates source (latex2html)
+# nav-ICONs from america, have to change that
+catch {
+    latex2html -dir html/man -t "Trf Manual" manual.tex
+    eval file delete [glob html/man/.*.dir html/man/.*.pag html/man/*.pl html/man/images.*]
+}
+catch {
+    latex2html -dir html/install -t "Trf Installation manual" install.tex
+    eval file delete [glob html/install/.*.dir html/install/.*.pag html/install/*.pl html/install/images.*]
+}
+
+
+# remove temp files from latex runs
+file delete install.aux install.log install.toc
+file delete man.aux man.log man.toc
 
 cd ..
 # pwd = root of distribution
