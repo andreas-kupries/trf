@@ -17,6 +17,7 @@ node trf_home {
     logo   [trf_logo]
 
     menu {
+	trf_news
 	trf_intro   trf_where      trf_ack
 	trf_danger
 	trf_install trf_cmds       trf_capi

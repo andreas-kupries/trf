@@ -336,6 +336,7 @@ install-header:
 	$(tool)/mkinstalldirs  $(INCLUDE_INSTALL_DIR)
 	@echo "Installing transform.h"
 	@$(INSTALL_DATA) $(GENERIC_DIR)/transform.h $(INCLUDE_INSTALL_DIR)
+	@$(INSTALL_DATA) $(GENERIC_DIR)/trfDecls.h $(INCLUDE_INSTALL_DIR)
 
 install-bin:	application
 	$(tool)/mkinstalldirs  $(BIN_INSTALL_DIR)

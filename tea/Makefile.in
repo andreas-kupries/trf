@@ -208,7 +208,8 @@ $(MD5_LIB_FILE)_OBJECTS		=	$(MD5_OBJECTS)
 # This is a list of header files to be installed
 #========================================================================
 
-GENERIC_HDRS	=	$(TRF_GENSRCDIR)/transform.h
+GENERIC_HDRS	=	$(TRF_GENSRCDIR)/transform.h	\
+			$(TRF_GENSRCDIR)/trfDecls.h
 
 #========================================================================
 # Define a list of files containing the stub declarations.

@@ -1,5 +1,16 @@
+Tue Nov  9 22:19:55 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* PREPARE: Added generation of 'news' page from ChangeLog.short.
+
+	* doc/nodes/home.node: Added reference to 'news' page.
+
+	* md5-crypt/crypt.h: Moved structure out of the conditional
+	  (__USE_GNU). 
+
 Mon Nov  8 20:43:24 1999  Andreas Kupries  <a.kupries@westend.com>
 
+	* ------ 2.0 re-release ------
+	
 	* win/makefile.vc: Jan Nijtmans expanded the original makefile.vc
 	  and makefile.vc to allow the usage of MS VC++ 2.0 up to 6.0.
 
@@ -11,11 +22,13 @@ Wed Oct 27 21:05:07 1999  Andreas Kupries  <a.kupries@westend.com>
 	* tests/common_seek.test/transform.test: Slight differences for
 	  8.0. 
 
-	* generic/registry.c: Some arts of the new code contained 8.1
+	* generic/registry.c: Some parts of the new code contained 8.1
 	  specific code. Added code for 8.0 too. GT81 used to
 	  differentiate.
 
 Mon Oct 25 22:10:01 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* ------ 2.0 released ------
 
 	* Got new bindist too, and a self extracting
 	  executable/installer. The latter is now a new bindist.

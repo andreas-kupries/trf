@@ -33,7 +33,6 @@ __BEGIN_DECLS
 extern char *crypt __P ((__const char *__key, __const char *__salt));
 
 
-#ifdef __USE_GNU
 /* Reentrant versions of the functions above.  The additional argument
    points to a structure where the results are placed in.  */
 struct crypt_data
@@ -49,6 +48,8 @@ struct crypt_data
     long int current_saltbits;
     int direction, initialized;
   };
+
+#ifdef __USE_GNU
 
 extern char *crypt_r __P ((__const char *__key, __const char *__salt,
 			   struct crypt_data *__restrict __data));
