@@ -37,7 +37,7 @@ proc usage {args} {
     puts stdout "\t-c file\t\tenter check mode, read data from file"
     puts stdout "\t-a alg\t\tuse specified algorithm to generate/check digests"
     puts stdout ""
-    puts stdout "\tallowed algorithms are: md5, haval, sha, crc, crc-zlib, adler"
+    puts stdout "\tallowed algorithms are: md5, haval, sha, crc, crc-zlib, adler, ripemd160, ripemd128"
     puts stdout ""
 
     exit
