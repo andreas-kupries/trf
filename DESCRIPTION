@@ -36,7 +36,7 @@ extension trf {
     author       {Andreas Kupries (a.kupries@westend.com)}
     maintenance  {Andreas Kupries (a.kupries@westend.com)}
 
-    version	   2.0p4
+    version	   2.0p5
     copying-policy {BSD-Style, see 'tcl'-license}
     date           {@mDate@}
 

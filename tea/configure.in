@@ -82,6 +82,15 @@ AC_EXEEXT
 AC_C_BIGENDIAN
 
 #--------------------------------------------------------------------
+# If ltoa is present, use it to convert integer values into strings.
+# If not, sprintf is used, which is slower and requires more code.
+#--------------------------------------------------------------------
+
+AC_CHECK_FUNCS(ltoa)
+AC_CHECK_LIB(crypt, main,         HAS_LIBCRYPT=1,     HAS_LIBCRYPT=0)
+AC_CHECK_LIB(crypt, md5_init_ctx, HAS_LIBCRYPT_MD5=1, HAS_LIBCRYPT_MD5=0)
+
+#--------------------------------------------------------------------
 # "cygpath" is used on windows to generate native path names for include
 # files. These variables should only be used with the compiler and linker
 # since they generate native path names.
@@ -203,16 +212,6 @@ fi
 #--------------------------------------------------------------------
 
 AC_DEFINE(USE_TCL_STUBS)
-
-#--------------------------------------------------------------------
-# If ltoa is present, use it to convert integer values into strings.
-# If not, sprintf is used, which is slower and requires more code.
-#--------------------------------------------------------------------
-
-AC_CHECK_FUNCS(ltoa)
-AC_CHECK_LIB(crypt, main,         HAS_LIBCRYPT=1,     HAS_LIBCRYPT=0)
-AC_CHECK_LIB(crypt, md5_init_ctx, HAS_LIBCRYPT_MD5=1, HAS_LIBCRYPT_MD5=0)
-
 
 #--------------------------------------------------------------------
 # This macro generates a line to use when building a library.  It
@@ -353,6 +352,7 @@ else
 		MD5_LIB_FILE=libmd5crypt$TCL_SHLIB_SUFFIX
 		TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=\\\"libmd5crypt$TCL_SHLIB_SUFFIX\\\""
 		LIBS="-lcrypt $LIBS"
+		SHLIB_LD_LIBS="-lcrypt $SHLIB_LD_LIBS"
 	fi
 fi
 

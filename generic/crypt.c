@@ -69,7 +69,7 @@ TrfCryptObjCmd (notUsed, interp, objc, objv)
   const char* salt;
   Tcl_Obj*    res;
 
-  if ((objc < 1) || (objc > 3)) {
+  if (objc != 3) {
     Tcl_AppendResult (interp,
 		      "wrong # args: should be \"crypt passwd salt\"",
 		      (char*) NULL);
@@ -127,7 +127,7 @@ TrfMd5CryptObjCmd (notUsed, interp, objc, objv)
     return TCL_ERROR;
   }
 
-  if ((objc < 1) || (objc > 3)) {
+  if (objc != 3) {
     Tcl_AppendResult (interp,
 		      "wrong # args: should be \"md5crypt passwd salt\"",
 		      (char*) NULL);

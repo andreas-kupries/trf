@@ -1,3 +1,7 @@
+Changes from 2.0p4 to 2.0p5
+
+*	Bugfix in the TEA configure related to md5-crypt.
+
 Changes from 2.0p3 to 2.0p4
 
 *	Bugfix in the TEA makefile.
