@@ -1005,7 +1005,6 @@ ClientData clientData;
     }
 
     if (k < bc_desc->block_size) {
-printf ("----------------- check with incomplete buffer too ---------------\n");
       memcpy ((VOID*) (c->block + c->byteCount), (VOID*) buffer, k);
 
       (*bc_desc->decryptProc) (c->block, c->output, c->key);
@@ -1030,40 +1029,6 @@ printf ("----------------- check with incomplete buffer too ---------------\n");
      * Process all blocks in the buffer.
      */
 
-    /* DEBUG */
-    printf ("ciphertext______   iv______________   ->   plaintext_______   iv'_____________\n");
-
-    while (bufLen >= bc_desc->block_size) {
-
-      TrfDumpHex (stdout, buffer, 8, 1); 
-      TrfDumpHex (stdout, c->iv,  8, 1); 
-      printf ("->   ");
-
-      (*bc_desc->decryptProc) (buffer, c->output, c->key);
-
-      Trf_XorBuffer (c->output, c->iv, bc_desc->block_size);
-
-      TrfDumpHex (stdout, c->output,  8, 1); 
-
-      res = c->write (c->writeClientData, c->output, bc_desc->block_size, interp);
-
-      /* use ENCRYPTED block as new IV !! */
-      memcpy ((VOID*) c->iv, (VOID*) buffer, bc_desc->block_size);
-
-      TrfDumpHex (stdout, c->iv,  8, 2); 
-
-      buffer += bc_desc->block_size;
-      bufLen -= bc_desc->block_size;
-
-      if (res != TCL_OK)
-	return res;
-    }
-
-    printf ("ciphertext______   iv______________   ->   plaintext_______   iv'_____________\n");
-    fflush (stdout);
-    /* DEBUG */
-
-#if 0
     while (bufLen >= bc_desc->block_size) {
       (*bc_desc->decryptProc) (buffer, c->output, c->key);
 
@@ -1080,7 +1045,6 @@ printf ("----------------- check with incomplete buffer too ---------------\n");
       if (res != TCL_OK)
 	return res;
     }
-#endif
     break;
 
 
@@ -1327,10 +1291,6 @@ Trf_BlockcipherDescription* bc_desc;
     direction = TRF_ENCRYPT;
   }
 
-  /* DEBUG */  
-  printf ("user_key = "); TrfDumpHex (stdout, o->key, o->key_length, 2);
-  /* DEBUG */
-
   if (direction == TRF_ENCRYPT) {
     if (o->encrypt_keyschedule == NULL) {
       (*bc_desc->scheduleProc) (o->key, o->key_length, direction,
@@ -1363,18 +1323,6 @@ Trf_BlockcipherDescription* bc_desc;
       if (o->encrypt_keyschedule != NULL) {
 	o->eks_length = bc_desc->ks_size;
       }
-
-      /* DEBUG */
-      printf ("key expansion = (%d) {\n", o->dks_length);
-      {
-	short i;
-	unsigned char* b = (unsigned char*) o->decrypt_keyschedule;
-	for (i=0; i < o->dks_length; i+=8, b+= 8) {
-	  printf ("\t"); TrfDumpHex (stdout, b, 8, 1); TrfDumpShort (stdout, b, 8, 2);
-	}
-      }
-      printf ("}\n");
-      /* DEBUG */
     }
 
     memcpy ((VOID*) c->key, o->decrypt_keyschedule, bc_desc->ks_size);

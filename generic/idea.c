@@ -89,13 +89,6 @@ int
 TrfInit_IDEA (interp)
 Tcl_Interp* interp;
 {
-  /* DEBUG */
-  printf ("block size   = %5d [byte]\n", BLOCK_SIZE);
-  printf ("min key size = %5d [byte]\n", MIN_KEYSIZE);	
-  printf ("max key size = %5d [byte]\n", MAX_KEYSIZE);
-  printf ("keyschedule  = %5d [byte]\n", KEYSCHEDULE_SIZE);
-  /* DEBUG */
-
   return Trf_RegisterBlockcipher (interp, &bcDescription);
 }
 
@@ -131,30 +124,12 @@ VOID** d_schedule;
   memcpy (K, key, MIN_KEYSIZE);
   FLIP   (K,      MIN_KEYSIZE);
 
-  /* DEBUG */  
-  printf ("user_key'= "); TrfDumpHex   (stdout, K, MIN_KEYSIZE, 2);
-  printf ("user_key'= "); TrfDumpShort (stdout, K, MIN_KEYSIZE, 2);
-  printf ("dir      = %d (e%d/d%d)\n", direction, TRF_ENCRYPT, TRF_DECRYPT);
-  /* DEBUG */
-
   /* Generate encryption schedule every time!
    */
 
   if (*e_schedule == NULL) {
     *e_schedule = Tcl_Alloc (KEYSCHEDULE_SIZE);
     Idea_ExpandUserKey (K, * ((Idea_Key*) *e_schedule));
-
-      /* DEBUG */
-      printf ("key expansion (e,%d) {\n", KEYSCHEDULE_SIZE);
-      {
-	short i;
-	unsigned char* b = (unsigned char*) *e_schedule;
-	for (i=0; i < KEYSCHEDULE_SIZE; i+=8, b+= 8) {
-	  printf ("\t"); TrfDumpHex (stdout, b, 8, 1); TrfDumpShort (stdout, b, 8, 2);
-	}
-      }
-      printf ("}\n");
-      /* DEBUG */
   }
 
   if (direction == TRF_ENCRYPT) {
