@@ -58,8 +58,8 @@ url OpenSSL   OpenSSL http://www.openssl.org/
 # -------------------------------------------------
 
 url zlib_home \
-	http://www.cdrom.com/pub/infozip/zlib/ \
-	http://www.cdrom.com/pub/infozip/zlib/
+	http://www.info-zip.org/pub/infozip/zlib/ \
+	http://www.info-zip.org/pub/infozip/zlib/
 
 url zlib_win \
 	http://www.winimage.com/zLibDll \
