@@ -101,12 +101,12 @@ AC_CACHE_CHECK(for directory with tcl.h,
 	trf_cv_path_TCL_INCLUDE_DIR,
 	[trf_cv_path_TCL_INCLUDE_DIR=""
 	 places="$TCL_INCLUDE_DIR \
-		$prefix/include \
 		../../tcl8.0/generic \
 		../../tcl8.0b*/generic \
 		../../tcl7.6/generic \
 		../../tcl/generic \
 		../../tcl \
+		$prefix/include \
 		/usr/local/include \
 		/usr/include"
      for dir in $places; do
