@@ -25,9 +25,9 @@ Platforms:	Linux 2.0.29	(gcc 2.7.2.1)	Development system
 		Solaris 2.5	(gcc only)
 		Other machines and OS's should work too. 
 Copying-policy: BSDStyle (-> tcl)
-Dependencies:   tcl (7.6 or higher)
+Dependencies:   tcl (7.6 or higher (8.0b1, not a1, a2!))
                 plus-patches as of 5-Dec-1996 or later (optional)
-                memchan 1.0  or higher (optional)
+                memchan 1.0  or higher (required by testsuite)
                 zlib-1.0.4   or higher (optional)
                 libdes-3.21  or higher (optional)
 		SSLeay-0.6.6 or higher (optional)

@@ -51,7 +51,9 @@ Changes from b1 to b2:
 	(Un)packing will reorder bytes as needed, using the information
 	mentioned above.
 
-The package compiles cleanly with tcl 7.6, 8.0a2 (not a1!).
+
+The package compiles cleanly with tcl 7.6, 8.0b1 (not a1, a2!).
+
 
 It can be found at
         <ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.tar.gz>

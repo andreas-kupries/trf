@@ -54,6 +54,7 @@ catch {exec latex install}
 catch {exec latex install}
 catch {exec dvips install.dvi -o install.ps}
 
+mExclude defs.aux man.idx
 
 
 # I.c  generate official manual of c-level interface
@@ -89,16 +90,21 @@ if {$fail} {mLog log error $msg}
 
 # generate base page for c-api documentation
 exec ./capibase > html/capi.html
-mExclude capibase
+#mExclude capibase
 file rename html/capi.html html/capi/capi.html
 
 
 mLatex2html \
 	-title-man     "Trf Manual" \
 	-title-install "Trf Installation manual" \
+	-up-man        "../../../software.html"
 	-nav           arrows \
 	-htmldir       html \
 	man.tex install.tex
+# -up-man assumes that the document is part of the
+# hierarchy at http://www.westend.com/~kupries
+# It resides at '.../doc/trf/man/man.html'
+# The software page is 'software.html'
 
 # remove temp files from latex runs
 file delete install.aux install.log install.toc

@@ -1,5 +1,15 @@
 Sat May 31 00:04:27 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
+	* doc/install.tex): brought uptodate, some enhancements.
+
+	* unix/configure.in: Removed references to a2 relase of tcl 8.0.
+
+	* doc/man.tex: brought uptodate, some enhancements.
+
+	* win/makefile.vc (BINIO): see '--enable-binio' below.
+
+	* --------- morning ---------
+
 	* tests went through without problems.
 
 	* trf now compiles again, without warnings.
@@ -49,7 +59,7 @@ Thu May 29 21:16:05 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  (SetOption): changed 'long' to 'int' for 3rd arg. to 'Tcl_GetIntFromObj'.
 
 	* generic/util.c (TrfGetChannel): Disabled this code, not required
-	  anymore, see below.
+	  anymore, see below. See Feb 11 too.
 
 	* generic/transformInt.h (ADD_RES, RESET_RES): 8.0b1 has smoothed
 	  out the problems arising from having two results (string,

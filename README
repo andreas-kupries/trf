@@ -14,7 +14,7 @@ procedures includes:
 
 *	Generation of message digests (hash values, checksums)
 
-	MD2, MD5, SHA/SHS, SHA-1, HAVAL
+	MD2, MD5, SHA/SHS, SHA-1, HAVAL, RIPEMD-128, -160
 	CRC (polynomial used by PGP)
 	ADLER (based upon zlib)
 
@@ -32,11 +32,11 @@ Example applications distributed with the package are:
 
 Tcl-Trf is developed for Tcl 7.6 or higher.  It is a pure Tcl extension, Tk is
 not required.  The extension requires a patched core. Patch files for 7.6 and
-8.0a1 are part of the distribution.  The plus-patches maintained by Jan
+8.0b1 are part of the distribution.  The plus-patches maintained by Jan
 Nijtmans (nijtmans@nici.kun.nl) contain this patch too .  Supporting (optional)
 packages are:
 
-*	memchan 1.0  or higher
+*	memchan 1.0  or higher (required by testsuite)
 *	zlib-1.0.4   or higher
 *	libdes 3.21  or higher
 *	SSLeay-0.6.6 or higher
@@ -47,20 +47,24 @@ describing commands (-> latex) and c-level interfaces (-> man-pages).
 
 Primary ftp-site is
 
-	<ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.tar.gz>
-	<ftp://ftp.westend.com/pub/aku/trf@mDosVersion@.zip>
-	<ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.readme>
+	ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.tar.gz
+	ftp://ftp.westend.com/pub/aku/trf@mDosVersion@.zip
+	ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.readme
 
 Secondary ftp-site is
 
-	<ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz>
-	<ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip>
-	<ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme>
+	ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz
+	ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip
+	ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme
 
 And for convenience:
+        ftp://ftp.westend.com/pub/aku/zlib-1.0.4.tar.gz
+        ftp://ftp.westend.com/pub/aku/libdes-3.23.tar.gz
 
-        <ftp://ftp.kisters.de/pub/lang/tcl/ext/zlib-1.0.4.tar.gz>
-        <ftp://ftp.kisters.de/pub/lang/tcl/ext/libdes-3.23.tar.gz>
+or
+        ftp://ftp.kisters.de/pub/lang/tcl/ext/zlib-1.0.4.tar.gz
+        ftp://ftp.kisters.de/pub/lang/tcl/ext/libdes-3.23.tar.gz
+
 
 There will be NO upload to the official ftp-archive at ftp.neosoft.com
 to avoid problems with US export regulations (ITAR, cryptography
@@ -70,8 +74,9 @@ is ammunition).
 
 COMPILING/USING Tcl-Trf
 
-To compile Tcl-Trf follow the instructions in the file INSTALL (and
-INSTALL.optional) in the 'doc' subdirectory.
+To compile Tcl-Trf please follow the instructions in the file
+'install.tex' in the 'doc' subdirectory. This contains a reference
+manual too (man.tex).
 
 To report bugs, bug fixes, descriptions of interesting Tcl-Trf
 applications, and suggested improvements:
