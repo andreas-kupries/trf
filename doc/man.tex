@@ -1,27 +1,21 @@
 % -*- latex -*-
-\documentstyle {report}
-\def\strong#1{{\bf #1}}
-\def\lang#1{{\tt #1}}
-\def\file#1{{\tt #1}}
-\def\arg#1{{\tt $<$#1$>$}}
-\def\trf{\strong {trf}}
-\def\blob{\strong {blob}}
-\def\blobx{\strong {blobX}}
-\def\tcl{\lang {tcl}}
-\def\cmd#1{{\tt #1}}
-\def\opt#1{{\tt #1}}
-\def\man#1{{\tt #1}}
-\def\lib#1{{\tt #1}}
-\def\url#1{{\tt #1}}
+\documentclass {report}
+\usepackage {html}
+\include {defs}
 
-\def\version{1.0}
+% external, but distributed here too
+\def\install{	\htmladdnormallink {install.tex}	 {../install/install.html}}
+\def\installman{\htmladdnormallink {installation manual} {../install/install.html}}
+
+
 \begin {document}
 \tableofcontents
 
 \chapter {Introduction}
-This is the installation manual of Tcl-Trf @mFullVersion@, as distributed
-at @mDate@. For instructions on how to compile and install it see \file
-{install.tex} or one of its derivatives (\file {install.dvi}, \file {install.ps}).
+This is the reference manual of Tcl-Trf @mFullVersion@, as distributed
+at @mDate@. For instructions on how to compile and install it see
+\file {\install} or one of its derivatives (\file {install.dvi},
+\file {install.ps}).
 
 After torturing the world with 2 extensions related to binary support
 in tcl (\blob{} and \blobx{}) I could not resist and wrote another
@@ -35,30 +29,19 @@ in tcl8.0, aka
 \item	and transformation procedures.
 \end{itemize}
 
-\strong {This is not true in the current implementation}. We need
-
-\begin{itemize}
-\item	plain tcl 7.6 or higher (and the appropriate patch-file from
-	subdirectory \file {patches}) or
-
-\item	a tcl patched with Jan Nijtmans (nijtmans@nici.kun.nl)
-	plus-patches as of 12/05/1996 or later.
-
-\item	libz (compression library, optional, some functionality depends on it)
-\item	libdes (DES encryption library, optional, some functionality depends on it)
-\item	memchan 1.0 or higher
-\end{itemize}
+\strong {This is not true in the current implementation}. Please read
+the \installman{} to gain insight into the requirements of this
+extension.
 
 
 \chapter {Acknowledgements}
 
 \begin {itemize}\Large
-\item	Guess who ? John Ousterhout (JohnOusterhout@sun.eng.com) for
-	\tcl {} itself. 
-\item	Jacob Levy (jyl@sun.eng.com)
-\item	Bastiaan Harmsen for general friendship.
-\item	Graham Stoney (greyham@research.canon.oz.au) for \cmd {c2man}.
-\item	Jan Nijtmans (nijtmans@nici.kun.nl) for support, encouragement
+\item	Guess who ? \jo{} for \tcl {} itself. 
+\item	\jyl
+\item	\bast{} for general friendship.
+\item	\greyham{} for \cmd {c2man}.
+\item	\jan{} for support, encouragement
 	(transformation procedures as part of his plus-patches) and
 	several patches enhancing the usability (load-on-demand of
 	libz, \dots{}) of this package.
@@ -146,8 +129,9 @@ The ciphers implemented here are
 
 \begin {enumerate}
 \item	DES 	(the dinosaur)
-\item	IDEA	(used by PGP)
+\item	IDEA	(used by \PGP)
 \item	Blowfish
+\item	RC2
 \item	RC4
 \end   {enumerate}
 
@@ -168,7 +152,7 @@ all lowercase. Options common to them all:
 			be described later.
 \end   {itemize}
 
-The first 3 ciphers are blockciphers, i.e. they do not encrypt single
+The first 4 ciphers are blockciphers, i.e. they do not encrypt single
 characters, but blocks of 2 or more. Such ciphers can be operated in 4
 different modes and therefore have additional options defined:
 
@@ -214,25 +198,27 @@ Cipher characteristics:
 	DES		& 8			& 8 (without MSB!) \\ \hline
 	IDEA		& 8			& 16 \\ \hline
 	Blowfish	& 8			& 1 - 56 \\ \hline
-	RC2		& 8			& 1 - 1024\footnotemark \\ \hline\hline
+	RC2		& 8			& 1 - 1024 \\ \hline\hline
 	RC4		& -			& 1 - 256 \\ \hline
 	\end   {tabular}
 \end   {center}
-\footnotetext{The upper limit is artificially imposed, due to the
-implementation of some operations in the framework.}
+
+The upper limit set upon the keysize of RC2 is artificially imposed,
+due to the implementation of some operations in the framework.
+
 
 \section {Message digests}
 
 10 message digests are implemented:
 
 \begin {enumerate}
-\item	2 crc checkers, taken from PGP and library \lib {zlib}, under
+\item	2 crc checkers, taken from \PGP{} and library \zlib, under
 	the names \cmd {crc} and \cmd {crc-zlib} resp.
-\item	The adler-checksum, taken from \lib {zlib} too.
+\item	The adler-checksum, taken from \zlib{} too.
 \item	MD2, MD5
 \item	SHA (or SHS), SHA-1
 \item	HAVAL
-\item	RIPEMD-128, -160
+\item	\rmd, -128
 \end   {enumerate}
 
 The commands to invoke them are identical to the names, converted to
@@ -300,7 +286,7 @@ None of them buffers characters internally.
 \item[uuencode]	Blocks of 3 characters are uuencoded/decoded. Will
 		buffer 2 characters internally until a block is complete.
 \item[base64]	Blocks of 3 characters are
-		base64-encoded/decoded. This is equivalent to PGP's
+		base64-encoded/decoded. This is equivalent to \PGP{}'s
 		ASCII armor. Used by MIME too. Will buffer 2
 		characters internally until a block is complete.
 \item[ascii85]	Blocks of 4 characters will be encoded into Ascii85
@@ -315,14 +301,16 @@ input.
 4 other commands are available, not fitting into the categories above:
 
 \begin	{enumerate}
-\item	The reed-solomon error correcting coder available as \cmd
-	{rs\_ecc}. The one and only option understood is ``-mode''. It
-	is equivalent to the option understood by the conversion
-	commands in the last section. The coder operates on blocks of
-	248 characters each, therefore buffering 247 characters.
+\item	A reed-solomon error correcting coder is available under the
+	name \cmd {rs\_ecc}. The one and only option understood is
+	``-mode''. It is equivalent to the option understood by the
+	conversion commands in the last section. The coder operates on
+	blocks of 248 characters each, therefore buffering 247
+	characters.
 
-\item	A compressor based upon the \lib {zlib} library. It is
-	available as \cmd {zip} and understands the following options:
+\item	A compressor based upon the \zlib{}-library. It is
+	available under the name \cmd {zip} and understands the
+	following options:
 
 	\begin	{itemize}
 	\item[-mode]	Allowed arguments are ``compress'',
@@ -335,12 +323,12 @@ input.
 
 \item	\cmd {unstack}. This command must be used to remove a
 	conversion channel. The underlying channel is uncovered and
-	accessible again. It requires a channelhandle as its one and only
-	argument. Its application to a normal channel (file, socket,
-	\dots {}) is identical to \cmd {close}.
+	accessible again afterward. It requires a channelhandle as its
+	one and only argument. Its application to a normal channel
+	(file, socket, \dots {}) is identical to \cmd {close}.
 
-\item	\cmd {binio}. See file \file {doc/binio.proposal} for more
-	information.
+\item	\cmd {binio}. See file \file {doc/binio.proposal}
+	for more information.
 \end	{enumerate}
 
 \chapter {Copyrights}\label {copyright}
@@ -349,21 +337,20 @@ Copyright notes and acknowledgements for the different ciphers,
 message digests, \dots {}:
 
 \begin {enumerate}
-\item	MD5 is copyright 'RSA Data Security, Inc'. The note at the
+\item	MD5 is copyright '\rsadsi{}'. The note at the
 	beginning of \file {md5.h} says:
 
 	\begin {quotation}
 		License to copy and use this software is granted
-		provided that it is identified as the "RSA Data
-		Security, Inc. MD5 Message-Digest Algorithm" in all
-		material mentioning or referencing this software or
-		this function.
+		provided that it is identified as the "\rsadsi{} MD5
+		Message-Digest Algorithm" in all material mentioning
+		or referencing this software or this function.
                                                                   
 		License is also granted to make and use derivative
 		works provided that such works are identified as
-		"derived from the RSA Data Security, Inc. MD5
-		Message-Digest Algorithm" in all material mentioning
-		or referencing the derived work.
+		"derived from the \rsadsi{} MD5 Message-Digest
+		Algorithm" in all material mentioning or referencing
+		the derived work.
 	\end   {quotation}
 
 	I consider the terms of the license fulfilled by this
@@ -372,8 +359,7 @@ message digests, \dots {}:
 \item	HAVAL is copyright $C^3SR$ and may not be sold or used as
 	inducement to buy a product without the written permission of
 	$C^3SR$. For technical questions or questions regarding the
-	code used here contact the author of HAVAL (and code): Yuliang
-	Zheng (yuliang@cs.uow.edu.au).
+	code used here contact the author of HAVAL (and code): \yuliang.
 
 	I made some minor changes to eliminate masses of \cmd
 	{gcc}-warnings regarding operator priority in expressions, but
@@ -381,38 +367,34 @@ message digests, \dots {}:
 
 
 \item	SHA / SHS was specified by the US government agency
-	NIST. Primary author of the code used here seems to be Peter
-	C. Gutmann (pgut01@cs.auckland.ac.nz), with heavily
-	modifications from Uwe Hollerbach (uh@alumni.caltech.edu).
+	\NIST. Primary author of the code used here seems to be
+	\pgutmann, with heavily modifications from \uh. 
 
 \item	The implementation of DES (libdes) used here is copyrighted by
-	Eric Young (eay@mincom.oz.au).
+	\eay.
 
 \item	IDEA (International Data Encryption Algorithm) is a block
-	cipher developed  by  Dr.  Xuejia  Lai  and
-	Prof. Dr. J. L. Massey at the Swiss Federal Institute of
-	Technology.
+	cipher developed  by  Dr. Xuejia Lai  and \massey{} at the \sfit{}.
 
-	The implementation used here was written by Richard De Moliner
-	(demoliner@isi.ee.ethz.ch).
+	The implementation used here was written by \demoliner.
 
 	\strong {Warning}:
 	\begin {quotation}
 		The IDEA(tm) block cipher is covered by a patent held
-		by ETH and a Swiss company called Ascom-Tech AG.  The
+		by ETH and a Swiss company called \ascom{}.  The
 		Swiss patent number is PCT/CH91/00117.  International
 		patents are pending. IDEA(tm) is a trademark of
-		Ascom-Tech AG.  \strong {There is no license fee required for
+		\ascom{}.  \strong {There is no license fee required for
 		noncommercial use}.  Commercial users may obtain
-		licensing details from Dieter Profos, Ascom Tech AG,
+		licensing details from Dieter Profos, \ascom{},
 		Solothurn Lab, Postfach 151, 4502 Solothurn,
 		Switzerland, Tel +41 65 242885, Fax +41 65 235761. 
 	\end {quotation}
 
-\item	Blowfish was invented by Bruce Schneier
-	(schneier@counterpane.com) and is decribed in the 2nd edition
-	of his book ``Applied Cryptography''. His sources were used,
-	with small modifications to interface it with this package.
+\item	Blowfish was invented by \schneier{} and is decribed in the
+	2nd edition of his book ``Applied Cryptography''. His sources
+	were used, with small modifications to interface it with this
+	package.
 
 	The statement of the author about the legal state of the
 	algorithm:
@@ -423,22 +405,20 @@ message digests, \dots {}:
 		public domain, and can be freely used by anyone.
 	\end {quotation}
 
-\item	RC4 was invented by RSA Data Security, Inc and considered a
-	``Trade Secret''. Somewhere in this big world it was
-	reengineered and the result made public, rendering the secret
-	useless.
+\item	RC4 was invented by \rsadsi{} and considered a ``Trade
+	Secret''. Somewhere in this big world it was reengineered and
+	the result made public, rendering the secret useless.
 
-	I don't know that RSADSI will try to inflict on people using it
-	in the USA. Use it at your own risk.
+	I don't know that \rsadsi will try to inflict on people using
+	it in the USA. Use it at your own risk.
 
-\item	The Reed-Solomon error correcting coder is copyrighted by Paul
-	Flaherty (paulf@stanford.edu) under the terms of the GNU
-	General Public License.
+\item	The Reed-Solomon error correcting coder is copyrighted by
+	\paulf{} under the terms of the GNU General Public License.
 
-\item	The library \lib {zlib} (base of compressor) is copyrighted by
-	Jean-Loup Gailly (gzip@prep.ai.mit.edu) and Mark Adler
-	(madler@alumni.caltech.edu).
+\item	The library \zlib{} ((de)compression) is copyrighted by
+	\jlgailly{} and \madler.
 
+\item	\rmd{} is copyright \dobbertin{}, \bosselaers{} and \preneel{}.
 \end   {enumerate}
 
 
@@ -448,16 +428,15 @@ Things to be done in future.
 
 \begin {itemize}
 \item	The tests are incomplete, expand them.
-\item	Add more ciphers (PGP!).
-%\item	Add data compression.
+\item	Add more ciphers (\PGP!). Take a look at \pgplib{} by \tage{}.
 \item	Transparent mode for digests.
 \item	Channel doing special framing after a fixed (user-defined)
 	number of characters
 \item	Random-byte generator (as real channeltype, no transformation!)
 \item	Identity-transformation with ability to gather statistics
 	about the information flowing through it.
-\item	Anybody out there wishing more ? Feel free to send me
-	suggestions (\url {a.kupries@westend.com}).
+\item	Anybody out there wishing more ? Feel free to send \me{}
+	suggestions.
 \end   {itemize}
 
 \end {document}

@@ -1,0 +1,23 @@
+#!/bin/sh
+# \
+exec tclsh "$0" ${1+"$@"}
+# -*- tcl -*-
+# ------------------------
+package require cgi
+cgi_uid_check -off
+
+cd html/capi
+set files [glob *.html]
+
+cgi_title "Tcl-Trf C-API Reference"
+cgi_body {
+    cgi_h1 "Tcl-Trf C-API Reference"
+    cgi_hr
+
+    cgi_bullet_list {
+	foreach f [lsort $files] {
+	    set stem [file rootname $f]
+	    cgi_li "[cgi_link _ $stem $f]"
+	}
+    }
+}

@@ -1,35 +1,22 @@
 % -*- latex -*-
-\documentstyle {report}
-\def\strong#1{{\bf #1}}
-\def\lang#1{{\tt #1}}
-\def\file#1{{\tt #1}}
-\def\arg#1{{\tt $<$#1$>$}}
-\def\trf{\strong {trf}}
-\def\tcl{\lang {tcl}}
-\def\tclsh{\cmd {tclsh}}
-\def\wish{\cmd {wish}}
-\def\cmd#1{{\tt #1}}
-\def\opt#1{{\tt #1}}
-\def\var#1{{\tt #1}}
-\def\man#1{{\tt #1}}
-\def\lib#1{{\tt #1}}
-\def\url#1{{\tt #1}}
-\def\tm{$^{\mbox{{\tiny (tm)}}}$}
-\def\ra{$\rightarrow$}
-\def\eq{$\equiv$}
-\def\dos{{\tt DOS}}
-\def\win{{\tt Windows\tm{}}}
-\def\winnt{{\tt Windows NT\tm{}}}
+\documentclass {report}
+\usepackage{html}
+\include {defs}
 
-\def\version{1.0}
+
+% external, but distributed here too
+\def\manual{\htmladdnormallink {man.tex}	  {../man/man.html}}
+\def\refman{\htmladdnormallink {reference manual} {../man/man.html}}
+
+
 \begin {document}
 \tableofcontents
 
 \chapter {Introduction}
 This is the installation manual of Tcl-Trf @mFullVersion@, as of
-@mDate@. For a documentation of the available commands see \file
-{man.tex} or one of its derivatives (\file {man.dvi}, \file
-{man.ps}).
+@mDate@. For a documentation of the available commands you should read
+the \refman{} (\file {man.tex} or one of its derivatives \file
+{man.dvi}, \file {man.ps}).
 
 
 \chapter {Common info}
@@ -49,13 +36,13 @@ This package depends in its operation on quite a few others. Here's
 are list of them:
 
 \begin{itemize}
-\item	\strong {Tcl}, of course. The package will compile with 7.6
+\item	\strong {\tcl}, of course. The package will compile with 7.6
 	and 8.0a2. Version 8.0a1 cannot be used anymore due to the
 	differences in the object API for commands.
 
 	This package requires manipulation of the core, hence a
-	\strong {source distribution} is required. Instruction on how
-	to patch it is provided in a separate chapter (\ra {} \ref {scalpel}).
+	\strong {source distribution} is required. Instructions on how
+	to patch it is provided in chapter \ref {scalpel}.
 
 \item	\strong {Memchan}. Trf can be used without, but the
 	testsuite coming with this distribution requires it.
@@ -63,13 +50,20 @@ are list of them:
 	Current version is 1.2. A binary distribution for Win32 is
 	available.
 
-	\begin {tabular} {|l|l|} \hline
-	src & \url {ftp://ftp.westend.com/pub/aku/memchan1.2.tar.gz} \\ \hline
-	src (win) & \url {ftp://ftp.westend.com/pub/aku/memchan12.zip} \\ \hline
-	bin (win32) & \url {ftp://ftp.westend.com/pub/aku/mchan12b.zip} \\ \hline
-	\end {tabular}
+	\latex{\begin {tabular} {|l|l|} \hline
+	source 	       & \url {ftp://ftp.westend.com/pub/aku/memchan1.2.tar.gz} \\ \hline
+	source (win)   & \url {ftp://ftp.westend.com/pub/aku/memchan12.zip} \\ \hline
+	binary (win32) & \url {ftp://ftp.westend.com/pub/aku/mchan12b.zip} \\ \hline
+	\end {tabular}}
+	\html{	\html{
+	\begin{itemize}
+	\item	\htmladdnormallink {source}{ftp://ftp.westend.com/pub/aku/memchan1.2.tar.gz}
+	\item	\htmladdnormallink {source (win)}{ftp://ftp.westend.com/pub/aku/memchan12.zip}
+	\item	\htmladdnormallink {binary (win32)}{ftp://ftp.westend.com/pub/aku/mchan12b.zip}
+	\end{itemize}}}
+
 	
-\item	\strong {zlib}. This package is used to implement the 'zip'
+\item	\strong {\zlib}. This package is used to implement the 'zip'
 	compression command/filter. It will be loaded at runtime, if
 	required. It is therefore optional. See chapter \ref {zlib} for
 	more info.
@@ -79,7 +73,7 @@ are list of them:
 	required. It is therefore optional. See chapter \ref {libdes}
 	for more info.
 
-\item	\strong {SSLeay}. Another implementation of 'des',
+\item	\strong {\SSLeay}. Another implementation of 'des',
 	additionally used to implement 'rc2', 'md2' and 'sha-1'. Has
 	priority over 'libdes' because of this. It will be loaded at
 	runtime, if required. It is therefore optional. See chapter
@@ -90,10 +84,10 @@ are list of them:
 \chapter  {Patching the core}\label {scalpel}
 
 There is nothing to do if you are using a \tclsh{} or \wish{}
-containing the plus-patches (as provided by Jan Nijtmans (\url {nijtmans@nici.kun.nl})).
-For version 7.6plus please check that your patch was younger then Dec 12, 1996.
-A plus-patch older than this does not contain the required modifications.
-Skip ahead to the next section.
+containing the plus-patches (as provided by \jan). For version 7.6plus
+please check that your patch was younger then Dec 12, 1996. A
+plus-patch older than this does not contain the required
+modifications. Skip ahead to the next section.
 
 
 Well, it seems you have to do all the modifications by yourself. The
@@ -133,16 +127,17 @@ Now you have two choices.
 
 \chapter {zlib, zip compression library}\label{zlib}
 
-\lib {zlib} is a freely available compression library using the
+\zlib{} is a freely available compression library using the
 unpatented ``deflate''-algorithm employed by \cmd {gzip}, \cmd
 {pkzip} and others. Current version is 1.0.4.
+\html{Additional sources of information are \file {rfc1950.txt}, \file
+{rfc1951.txt} and \file {rfc1952.txt}.}
+\latex{The official homepage can be found at \url
+{http://www.cdrom.com/pub/infozip/zlib/}. A downloading page is
+available there too. Additional sources of information are \file
+{rfc1950.txt}, \file {rfc1951.txt} and \file {rfc1952.txt}.}
 
-The official homepage is located at \url
-{http://quest.jpl.nasa.gov/zlib/}. A downloading page is available
-there too. Other sources of information are \file {rfc1950.txt},
-\file {rfc1951.txt} and \file {rfc1952.txt}
-
-\trf{} requires a shared library version of \lib {zlib}. People
+\trf{} requires a shared library version of \zlib. People
 without such \strong {don't} loose however.
 
 \begin {itemize}
@@ -151,15 +146,16 @@ without such \strong {don't} loose however.
 	\lib {zlib} source distribution is available as subdirectory
 	\file {zlib} (a sibling to \file {unix} !).
 
-\item	A binary distribution for \win{} is available, see \url
-	{http://www.winimage.com/zLibDll}. 
+\item	A binary distribution for \win{} is available too, just take a
+	look at
+	\url{http://www.winimage.com/zLibDll}. 
 
 	A note of caution: The provided library kept crashing on my
 	\winnt{} system. At least often enough to render it unusable in
 	my eyes. YMMV however.
 
 	Because of this the subdirectory \file {zlib.vc} contains
-	everything to compile zlib as shared library (with MSVC++
+	everything to compile \zlib{} as shared library (with MSVC++
 	4.2). Just copy its contents into a zlib source distribution,
 	copy \file {makefile.vc} to \file {makefile}, adapt the paths
 	to your directory structure, then type \cmd {nmake}.
@@ -172,34 +168,33 @@ without such \strong {don't} loose however.
 
 
 
-
 \chapter {libdes, DES encryption}\label {libdes}
 
 \cmd {DES} support was originally based upon \lib{libdes}, a freely available
-implementation of this algorithm, written by Eric A. Young (\url
-{eay@mincom.com}). I used version 3.23 directly.
+implementation of this algorithm, written by \eay{}. I used version
+3.23 directly.
 
-Higher versions are now part of \lib {SSLeay}, Erics implementation of
+Higher versions are now part of \SSLeay, Erics implementation of
 the \strong{S}ecure \strong{S}ockets \strong{L}ayer. Because of this I
 have revamped the \cmd{des} loader code to use \lib {libcrypto.so} or
 \lib {libdes.so}, in this order. This had the additional benefit of
 being able to glue in even more crypto algorithms. These are
 \cmd{md2}, \cmd{sha1} and \cmd{rc2}.
 
-
-The official FAQ page is \url {http://www.psy.uq.edu.au:8080/~ftp/Crypto/}. 
+\latex {The official FAQ page is \url{\ssleaypage}.}
+\html  {A \ssleayfaq{} is available.}
 
 Master locations are\vspace {1em}
 
 {\small \begin {tabular} {|l|l|}\hline
-     ftp://ftp.psy.uq.oz.au/pub/Crypto/SSL & SSLeay source \\
-     ftp://ftp.psy.uq.oz.au/pub/Crypto/SSLapps & SSL applications \\
-     ftp://ftp.psy.uq.oz.au/pub/Crypto/SSLapps/PORT4-5 & porting notes \\
-     http://www.psy.uq.oz.au/~ftp/Crypto/ssl.html & Programmer Reference \\ \hline
+ SSLeay source       	& \url {ftp://ftp.psy.uq.oz.au/pub/Crypto/SSL}       		\\
+ SSL applications	& \url {ftp://ftp.psy.uq.oz.au/pub/Crypto/SSLapps}   		\\
+ porting notes		& \url {ftp://ftp.psy.uq.oz.au/pub/Crypto/SSLapps/PORT4-5}	\\
+ Programmer Reference	& \url {http://www.psy.uq.oz.au/~ftp/Crypto/ssl.html}		\\ \hline
 \end {tabular}}\vspace {1em}
 
-The list of mirror sites is too long to be included here, but the FAQ
-contains them all.
+The list of mirror sites is too long to be included here, but the
+\ssleayfaq{} contains them all.
 
 
 \trf{} requires a shared library version of \lib {libdes}. People
@@ -226,7 +221,7 @@ without such \strong {don't} loose however.
 \item	I have no information about its availability on MacIntosh's.
 \end   {itemize}
 
-I'm sorry, but \lib {SSLeay} was to big to be included in the
+I'm sorry, but \SSLeay{} was to big to be included in the
 Makefile. Instructions on how make a shared library for linux, sun,
 solaris and irix are part of it however (as of version 0.6.6).
 
@@ -241,7 +236,7 @@ solaris and irix are part of it however (as of version 0.6.6).
 	of this I am unable to provide a Mac port of this
 	extension.  I will most happily integrate any required
 	changes, makefiles, et cetera into the distribution,
-	if they are send to me (\url {a.kupries@westend.com}).
+	if they are send to \me{}.
 
 
 \section {Unix}

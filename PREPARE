@@ -42,7 +42,7 @@ mExclude \
 mLog log info generating manual variants (dvi, ps)
 
 # pwd = doc
-file mkdir man html html/install html/man
+file mkdir man html html/install html/man html/capi
 
 catch {exec latex man}
 catch {exec latex man}
@@ -58,18 +58,38 @@ catch {exec dvips install.dvi -o install.ps}
 
 # I.c  generate official manual of c-level interface
 #verbose {generate manual of c-level interface}
-mLog log info generating manpages
 
 # pwd = doc
 
 # manual pages of C API out of header comments (c2man)
+mLog log info generating manpages
 set fail [catch {
+    cd ..
     set ipath [file join [file dirname [file dirname [info library]]] include]
-    set src   [file join [pwd] .. generic transform.h]
+    set src   [file join generic transform.h]
 
-    exec c2man -oman -I$ipath -v $src
+    exec c2man -U__GNUC__ -odoc/man -I$ipath -v $src
+    #          ~~~~~~~~~~ => remove gcc specific syntax from header files
+    cd doc
 } msg]	;#{}
 if {$fail} {mLog log error $msg}
+
+# same as above, but hyperized.
+mLog log info generating hyperized manpages
+set fail [catch {
+    cd ..
+    set ipath [file join [file dirname [file dirname [info library]]] include]
+    set src   [file join generic transform.h]
+
+    exec c2man -U__GNUC__ -odoc/html/capi -I$ipath -Th $src
+    #          ~~~~~~~~~~ => remove gcc specific syntax from header files
+    cd doc
+} msg]	;#{}
+if {$fail} {mLog log error $msg}
+
+# generate base page for c-api documentation
+exec ./capibase
+mExclude capibase > html/capi/capi.html
 
 
 mLatex2html \
