@@ -905,6 +905,7 @@ then
 	TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=libcrypt$SHLIB_SUFFIX"
 else
 	if test \( $HAS_LIBCRYPT_MD5 -eq 0 \)
+	then
 		MD5_LIB_FILE=libmd5crypt$SHLIB_SUFFIX
 		TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=libmd5crypt$SHLIB_SUFFIX"
 	fi
