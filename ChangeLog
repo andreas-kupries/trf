@@ -1,3 +1,11 @@
+Tue Jun 29 21:20:23 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* compat/md2.h (MD2_INT): Weird bug discovered by Jan on Windows
+	  (Cygwin compiler) solved, again by Jan. The header in OpenSSL
+	  changed the definition from unsigned char to unsigned int. Now
+	  using the compat header could do nasty things. Got a new DLL
+	  too, making the Windows binary distribution usable.
+
 Mon Jun 28 23:17:35 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* unix/configure.in, Makefile.in: Matt Newman <matt@novadigm.com>

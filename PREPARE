@@ -55,7 +55,8 @@ eval mExclude \
 	patches/v8.1b3/gendiff patches/v8.1b3/getorig \
 	patches/v8.1b3/getcurrent patches/v8.1b3/setorig \
 	patches/v8.1/gendiff patches/v8.1/getorig patches/v8.1/genstubs \
-	patches/v8.1/getcurrent patches/v8.1/setorig
+	patches/v8.1/getcurrent patches/v8.1/setorig \
+	patches/rc.h patches/patch.mp
 
 
 file delete -force win/bdist ; # no win release yet.

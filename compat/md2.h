@@ -64,7 +64,7 @@ extern "C" {
 #define MD2_DIGEST_LENGTH	16
 #define MD2_BLOCK       	16
 
-#define MD2_INT unsigned char
+#define MD2_INT unsigned int
 
 typedef struct MD2state_st
 	{
