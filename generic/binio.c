@@ -51,7 +51,10 @@ static int	GetOctal _ANSI_ARGS_ ((Tcl_Interp* interp, char* text, long int* resu
  * Return at most this number of bytes in one call to Tcl_Read:
  */
 
-#define	READ_CHUNK_SIZE	4096
+#define KILO 1024
+#ifndef READ_CHUNK_SIZE
+#define	READ_CHUNK_SIZE	(16*KILO)
+#endif
 
 /*
  * Union to overlay the different possible types used in 'pack', 'unpack'.

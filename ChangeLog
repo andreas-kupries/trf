@@ -1,4 +1,23 @@
+Sun Mar  2 11:27:49 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* PORTING: new file. database of porting notes, hints, tricks,
+	  etc.
+
+	* generic/idea/idea.c (MulInv): Fred Meyer (fred@sga.co.za) had a
+	  problem with IDEA on its DEC Alpha. Tracked down to this
+	  procedure. Must not be compiled with -O, -O2 or higher. The
+	  overoptimized code will return 0 for many arguments, resulting
+	  in a bad decryption key. The option -O1 is possible though.
+
 Sat Mar  1 15:50:50 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* generic/binio.c (READ_CHUNK_SIZE): allow redefinition of value
+	  via makefile!. Default bumped up to 16k (4k before).
+
+	* PREPARE: see below, generate uncompressed digest files.
+
+	* tests/________: removed '-z', expect uncompressed digest files
+	  (More space, but less dependencies (zlib)).
 
 	* generic/registry.c: Bugfix in 'TrfInput' (-> Feb 14) caused
 	  the system to call read-flush twice. Noted due to doublesized

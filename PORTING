@@ -1,0 +1,12 @@
+Porting notes for Tcl-Trf, the transformers package
+---------------------------------------------------
+
+DEC/OSF1 V3.2
+	generic/idea.c must not be compiled with -O, -O2, -O3, ...
+	-O1 is allowed.
+
+	Reason: With optimization set to high the procedure
+	'MulInv' (residing in included file 'generic/idea/idea.c')
+	will generate erroneous results for a number of arguments
+	(example: MulInv (17)=0 instead of 30841).
+	In the end decryption goes wrong.

@@ -15,7 +15,7 @@ cd ..
 
 foreach md {crc crc-zlib adler md5 sha haval} {
     catch {
-	exec ./tclsh tools/md -a $md -c digests.$md -z fake | sed -e {s/^/	/} >@ stdout
+	exec unix/tclsh tools/md -a $md -c digests.$md | sed -e {s/^/	/} >@ stdout
     }
 }
 

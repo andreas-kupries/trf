@@ -200,3 +200,41 @@ int   length;
   }
 }
 
+/* internal procedures, for testing */
+
+void
+TrfDumpHex (f, buffer, length, next)
+FILE* f;
+VOID* buffer;
+int   length;
+int   next;
+{
+  short i;
+  unsigned char* b = (unsigned char*) buffer;
+
+  for (i=0; i < length; i++) fprintf (f, "%02x", (unsigned int) (b [i]));
+  switch (next) {
+  case 0: break;
+  case 1: fprintf (f, "   ");  break;
+  case 2: fprintf (f, "\n"); break;
+  }
+}
+
+
+void
+TrfDumpShort (f, buffer, length, next)
+FILE* f;
+VOID* buffer;
+int   length;
+int   next;
+{
+  short i;
+  unsigned short* b = (unsigned short*) buffer;
+
+  for (i=0; i < (length/2); i++) fprintf (f, "%06d ", (unsigned int) (b [i]));
+  switch (next) {
+  case 0: break;
+  case 1: fprintf (f, "   ");  break;
+  case 2: fprintf (f, "\n"); break;
+  }
+}
