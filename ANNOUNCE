@@ -21,6 +21,10 @@ Abstract:
 	related to cryptography. Additionally some binary data support
 	is put in as well.
 
+Changes from b3 to final:
+
+*	Added general transformation 'transform'. Reflects the underlying
+	functionality up into the script level.
 
 Changes from b2 to b3:
 
