@@ -45,6 +45,9 @@ MACHINE	= IX86
 # Comment the following line to compile with symbols
 NODEBUG=1
 
+# uncomment the following line to include the command 'binio'.
+#BINIO=-DENABLE_BINIO
+
 
 ######################################################################
 # Do not modify below this line
@@ -112,9 +115,8 @@ WINDIR          = $(ROOT)\win
 GENERICDIR	= $(ROOT)\generic
 
 TRF_INCLUDES	= -I$(WINDIR) -I$(GENERICDIR) -I$(ROOT) -I$(TCL)\include
-TRF_DEFINES	= -nologo -D__WIN32__ -DHAVE_STDLIB_H $(LIBDES)
+TRF_DEFINES	= -nologo -D__WIN32__ -DHAVE_STDLIB_H $(BINIO)
 
-# meaning of -nologo ?
 #!include <ntwin32.mak> # thats this for?
 
 
