@@ -250,6 +250,44 @@ EXTERN zFunctions z;
 EXTERN int
 TrfLoadZlib _ANSI_ARGS_ ((Tcl_Interp *interp));
 
+/*
+ * Macro to use to determine the offset of a structure member
+ * in bytes from the beginning of the structure.
+ */
+
+#ifndef offsetof
+#define offsetof(type, field) ((int) ((char *) &((type *) 0)->field))
+#endif
+
+#if GT81
+#ifndef Tcl_ReplaceChannel
+/* The core we are compiling against is not patched, so supply the
+ * necesssary definitions here by ourselves. The form chosen for
+ * the procedure macros (reservedXXX) will notify us if the core
+ * does not have these reserved locations anymore.
+ *
+ * !! Synchronize the procedure indices in their definitions with
+ *    the patch to tcl.decls, as they have to be the same.
+
+ */
+
+/* 281 */
+typedef Tcl_Channel (trf_ReplaceChannel) _ANSI_ARGS_((Tcl_Interp* interp,
+						      Tcl_ChannelType* typePtr,
+						      ClientData instanceData,
+						      int mask,
+						      Tcl_Channel prevChan));
+/* 282 */
+typedef void (trf_UndoReplaceChannel) _ANSI_ARGS_((Tcl_Interp* interp,
+						   Tcl_Channel chan));
+
+#define Tcl_ReplaceChannel     ((trf_ReplaceChannel*) tclStubsPtr->reserved281)
+#define Tcl_UndoReplaceChannel ((trf_UndoReplaceChannel*) tclStubsPtr->reserved282)
+
+#endif /* Tcl_ReplaceChannel */
+#endif /* GT81 */
+
+
 
 /*
  * Internal initialization procedures for all transformers implemented here.

@@ -50,7 +50,7 @@ TrfUnstackCmd _ANSI_ARGS_ ((ClientData notUsed, Tcl_Interp* interp, int argc, ch
  */
 
 static int
-TrfUnstackCmd(notUsed, interp, argc, argv)
+TrfUnstackCmd (notUsed, interp, argc, argv)
     ClientData  notUsed;		/* Not used. */
     Tcl_Interp* interp;			/* Current interpreter. */
     int         argc;			/* Number of arguments. */
@@ -62,6 +62,16 @@ TrfUnstackCmd(notUsed, interp, argc, argv)
 
   Tcl_Channel chan;
   int         mode;
+
+#if GT81
+  const char* cmd = argv [0];
+
+  if (Tcl_UndoReplaceChannel == NULL) {
+    Tcl_AppendResult (interp, cmd, " is not available as the required ",
+		      "patch to the core was not applied", (char*) NULL);
+    return TCL_ERROR;
+  }
+#endif
 
   if ((argc < 1) || (argc > 2)) {
     Tcl_AppendResult (interp,

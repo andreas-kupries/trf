@@ -8,11 +8,11 @@ set line ""
 
 proc parcel {max cmd buffer} {
     # this transformation takes the incoming byte stream and parcels it into
-    # lines of at most $max characters each. The last line is possibly shorter
-    # only the write part is implemented
+    # lines of at most $max characters each. The last line is possibly shorter.
+    # only the write part is implemented.
     #
     # hm, this could be generalized into a transformation parceling the input
-    # into packets and adding some sort of frame aroound these.
+    # into packets and adding some sort of frame around these.
 
     #puts stderr "$max $cmd [string length $buffer]"
 

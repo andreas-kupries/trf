@@ -892,7 +892,19 @@ struct Tcl_Obj* CONST * objv;
   } else /* TRF_ATTACH */ {
     /*
      * User requested attachment of transformation procedure to a channel.
+     * In case of a stub-aware interpreter use that to check for the
+     * existence of the necessary patches ! Bail out if not.
      */
+
+#if GT81
+    if (Tcl_ReplaceChannel == NULL) {
+      Tcl_AppendResult (interp, cmd, ": this feature (-attach) is not ",
+			"available as the required patch to the core ",
+			"was not applied", (char*) NULL);
+      DELETE_OPTINFO;
+      return TCL_ERROR;
+    }
+#endif
 
     res = AttachTransform (entry, baseOpt.attach, optInfo, interp);
   }

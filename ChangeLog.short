@@ -1,3 +1,25 @@
+Changes from 1.5 to 1.6
+
+*	The following information is valid only if Trf is used in
+	conjunction with a 8.1 interpreter, as that is currently
+	the only one implementing stubs.
+
+	It is known that trf requires a patch to the core for full
+	functionality (stacked channels). The core had to be patched
+	to allow compilation of Trf, and its execution.
+
+	Taking advantage of the new stub-mechanism Trf is now able
+	to check for the existence of its patches at runtime. If
+	loaded by an unpatched interpreter it will disable the
+	features relying on the patch (-attach option of transforms,
+	unstack), but run unimpeded otherwise.
+
+	Due to some magic with #define and #ifdef it is now even
+	possible to compile Trf against unpatched core without
+	causing harm, the resulting library will have the complete
+	functionality.
+
+
 Changes from 1.4 to 1.5
 
 *	Better handling of 'fileevent' and blocking-mode for transforms.

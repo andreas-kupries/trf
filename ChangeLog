@@ -1,3 +1,29 @@
+Thu Apr 22 21:46:12 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* Tested compilation against unpatched core. The resulting library
+	  was usable for a patched core (-attach, unstack), and rejected
+	  these features if loaded by an unpatched interpreter. Wonderful.
+	  No compilation trouble anymore, and only nearly normal usage in
+	  conjunction with an unpatched interpreter.
+
+	* generic/unstack.c (TrfUnstackCmd): Fixed minor spelling errors.
+
+	* generic/transformInt.h (Tcl_UndoReplaceChannel): Fixed spelling
+	  error in the macro.
+
+Wed Apr 21 21:06:02 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/unstack.c (TrfUnstackCmd): See item below, the same
+	  check is added here too.
+
+	* generic/registry.c (TrfExecuteObjCmd): Added a runtime check
+	  verifying that the interpreter using the extension is
+	  patched. Done only for a stub-aware interpreter (see item below
+	  too), and while accessing features depending on the patch.
+
+	* generic/transformInt.h (Trf_ReplaceChannelStub): New macro, to
+	  get at the location of 'Tcl_ReplaceChannel' in the stubs-table.
+
 Mon Apr 19 20:25:41 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* --------------- 1.5 released --------------------
