@@ -99,6 +99,8 @@ typedef struct _SeekConfig_ {
 				* transform definition */
   Trf_SeekInformation  chosen;  /* Seek policy chosen from natural policy
 				 * and the underlying channels; */
+  int identity;                 /* Flag, set if 'identity' was forced by the
+				 * user. */
 } SeekConfig;
 
 
@@ -138,7 +140,6 @@ struct _SeekState_ {
   int aheadOffset;   /* #Bytes DownLoc is after the down location of
 		      * BufEnd. Values > 0 indicate incomplete data in the
 		      * transform buffer itself. */
-  int identity;      /* Flag, set if 'identity' is forced */
   int changed;       /* Flag, set if seeking occured with 'identity' set */
 };
 
@@ -281,8 +282,12 @@ TrfGetFile _ANSI_ARGS_ ((ClientData instanceData, int direction,
 			 ClientData* handlePtr));
 
 static int
-TrfGetOption _ANSI_ARGS_ ((ClientData instanceData, Tcl_Interp *interp,
-			   char *optionName, Tcl_DString *dsPtr));
+TrfGetOption _ANSI_ARGS_ ((ClientData instanceData, Tcl_Interp* interp,
+			   char* optionName, Tcl_DString* dsPtr));
+
+static int
+TrfSetOption _ANSI_ARGS_((ClientData instanceData, Tcl_Interp* interp,
+			  char* optionName, char* value));
 
 static int
 TransformImmediate _ANSI_ARGS_ ((Tcl_Interp* interp, Trf_RegistryEntry* entry,
@@ -292,7 +297,7 @@ TransformImmediate _ANSI_ARGS_ ((Tcl_Interp* interp, Trf_RegistryEntry* entry,
 
 static int
 AttachTransform _ANSI_ARGS_ ((Trf_RegistryEntry* entry,
-			      Tcl_Channel        attach,
+			      Trf_BaseOptions*   baseOpt,
 			      Trf_Options        optInfo,
 			      Tcl_Interp*        interp));
 
@@ -366,6 +371,9 @@ SeekStateGet _ANSI_ARGS_ ((Tcl_Interp* interp, SeekState* state));
 static Tcl_Obj*
 SeekConfigGet _ANSI_ARGS_ ((Tcl_Interp* interp, SeekConfig* cfg));
 
+static void
+SeekPolicyGet _ANSI_ARGS_ ((TrfTransformationInstance* trans,
+			    char*                      policy));
 
 #ifdef TRF_DEBUG
 static void
@@ -562,7 +570,7 @@ CONST Trf_TypeDefinition* type;
   entry->transType->inputProc        = TrfInput;
   entry->transType->outputProc       = TrfOutput;
   entry->transType->seekProc         = TrfSeek;
-  entry->transType->setOptionProc    = NULL;
+  entry->transType->setOptionProc    = TrfSetOption;
   entry->transType->getOptionProc    = TrfGetOption;
   entry->transType->watchProc        = TrfWatch;
   entry->transType->getHandleProc    = TrfGetFile;
@@ -738,6 +746,7 @@ TrfExecuteObjCmd (clientData, interp, objc, objv)
   baseOpt.attach_mode = 0;
   baseOpt.source      = (Tcl_Channel) NULL;
   baseOpt.destination = (Tcl_Channel) NULL;
+  baseOpt.policy      = (Tcl_Obj*)    NULL;
 
   entry = (Trf_RegistryEntry*) clientData;
   cmd   = Tcl_GetStringFromObj (objv [0], NULL);
@@ -836,6 +845,14 @@ TrfExecuteObjCmd (clientData, interp, objc, objv)
 	}
 	break;
 
+      case 's':
+	if (0 != strncmp (option, "-seekpolicy", len))
+	  goto check_for_trans_option;
+
+	baseOpt.policy = optarg;
+	Tcl_IncrRefCount (optarg);
+	break;
+
       default:
       check_for_trans_option:
 	if ((*OPT->setObjProc) == NULL) {
@@ -864,6 +881,18 @@ TrfExecuteObjCmd (clientData, interp, objc, objv)
        (baseOpt.destination != (Tcl_Channel) NULL))) {
     Tcl_AppendResult (interp, cmd,
 	      ": inconsistent options, -in/-out not allowed with -attach",
+		      (char*) NULL);
+
+    PRINT ("Inconsistent options\n"); FL;
+    goto cleanup_after_error;
+  }
+
+  if ((baseOpt.attach == (Tcl_Channel) NULL) &&
+      baseOpt.policy !=  (Tcl_Obj*) NULL) {
+
+    Tcl_AppendResult (interp, cmd,
+		      ": inconsistent options, -seekpolicy ",
+		      "not allowed without -attach",
 		      (char*) NULL);
 
     PRINT ("Inconsistent options\n"); FL;
@@ -920,7 +949,12 @@ TrfExecuteObjCmd (clientData, interp, objc, objv)
     }
 #endif
 
-    res = AttachTransform (entry, baseOpt.attach, optInfo, interp);
+    res = AttachTransform (entry, &baseOpt, optInfo, interp);
+
+    if (baseOpt.policy != (Tcl_Obj*) NULL) {
+      Tcl_DecrRefCount (baseOpt.policy);
+      baseOpt.policy = (Tcl_Obj*) NULL;
+    }
   }
 
   DELETE_OPTINFO;
@@ -1590,7 +1624,7 @@ int*       errorCodePtr;
   /*
    * transformation results are automatically written to
    * the parent channel ('PutDestination' was configured
-   * as write procedure in 'AttachTransformation').
+   * as write procedure in 'AttachTransform').
    */
 
   if (toWrite == 0) {
@@ -1720,7 +1754,8 @@ int*       errorCodePtr;	/* Location of error flag. */
     /* Tell location.
      */
 
-    PRINT ("[Tell], Location = %d\n", trans->seekState.upLoc); FL; DONE (TrfSeek);
+    PRINT ("[Tell], Location = %d\n", trans->seekState.upLoc); FL;
+    DONE (TrfSeek);
     return trans->seekState.upLoc;
   }
 
@@ -1733,9 +1768,9 @@ int*       errorCodePtr;	/* Location of error flag. */
 
   /* Assert: seekState.allowed, numBytesDown > 0, numBytesTransform > 0 */
 
-  if (trans->seekState.identity) {
+  if (trans->seekCfg.identity) {
     /* Pass down mode. Pass request and record the change. This is used after
-     * restoration of constrained seek to force usage of a new zero-point.
+     * restoration of constrained seek to force the usage of a new zero-point.
      */
 
     PRINT ("[Passing down]\n"); FL;
@@ -1778,8 +1813,11 @@ int*       errorCodePtr;	/* Location of error flag. */
   /* Seeking relative to the current location.
    */
 
-  if (offset % trans->seekState.used.numBytesTransform) {
-    /* Seek allowed only for multiples of the input tuples. */
+  newLoc = trans->seekState.upLoc + offset;
+
+  if (newLoc % trans->seekState.used.numBytesTransform) {
+    /* Seek allowed only to locations which are multiples of the input.
+     */
 
     *errorCodePtr = EINVAL;
 
@@ -1787,8 +1825,6 @@ int*       errorCodePtr;	/* Location of error flag. */
     DONE (TrfSeek);
     return -1;
   }
-
-  newLoc = trans->seekState.upLoc + offset;
 
   if (newLoc < 0) {
     *errorCodePtr = EINVAL;
@@ -1974,34 +2010,190 @@ ClientData* handlePtr;		/* Place to store the handle into */
 /*
  *------------------------------------------------------*
  *
- *	TrfGetFile --
+ *	TrfSetOption --
  *
  *	------------------------------------------------*
- *	Called from Tcl_GetChannelHandle to retrieve
- *	OS specific file handle from inside this channel.
+ *	Called by the generic layer to handle the reconfi-
+ *	guration of channel specific options. Unknown
+ *	options are passed downstream.
  *	------------------------------------------------*
  *
  *	Sideeffects:
- *		None.
+ *		As defined by the channel downstream.
  *
  *	Result:
- *		The appropriate Tcl_File or NULL if not
- *		present. 
+ *		A standard TCL error code.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+TrfSetOption (instanceData, interp, optionName, value)
+     ClientData  instanceData;
+     Tcl_Interp* interp;
+     char*       optionName;
+     char*       value;
+{
+  /* Recognized options:
+   *
+   * -seekpolicy	Accepted values: unseekable, identity, {}
+   */
+
+  TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
+
+  START (TrfSetOption);
+
+  if (0 == strcmp (optionName, "-seekpolicy")) {
+    /* The seekpolicy is about to be changed. Make sure that we got a valid
+     * value and that it really changes the used policy. Failing the first
+     * test causes an error, failing the second causes the system to silently
+     * ignore this request. Reconfiguration will fail for a non-overidable
+     * policy too.
+     */
+
+    if (!trans->seekCfg.overideAllowed) {
+      Tcl_SetErrno (EINVAL);
+      Tcl_AppendResult (interp, "It is not allowed to overide ",
+			"the seek policy used by this channel.", NULL);
+      DONE (TrfSetOption);
+      return TCL_ERROR;
+    }
+
+    if (0 == strcmp (value, "unseekable")) {
+      if (!trans->seekState.allowed) {
+	/* Ignore the request if the channel already uses this policy.
+	 */
+	DONE (TrfSetOption);
+	return TCL_OK;
+      }
+
+      TRF_SET_UNSEEKABLE (trans->seekState.used);
+      trans->seekState.allowed = 0;
+      trans->seekCfg.identity  = 0;
+
+      /* Changed is not touched! We might have been forced to identity
+       * before, and have to remember this for any restoration.
+       */
+
+    } else if (0 == strcmp (value, "identity")) {
+
+      if (trans->seekState.allowed &&
+	  (trans->seekState.used.numBytesTransform == 1) &&
+	  (trans->seekState.used.numBytesDown == 1)) {
+
+	/* Ignore the request if the channel already uses this policy.
+	 */
+	DONE (TrfSetOption);
+	return TCL_OK;
+      }
+
+      trans->seekState.used.numBytesTransform = 1;
+      trans->seekState.used.numBytesDown      = 1;
+      trans->seekState.allowed                = 1;
+      trans->seekCfg.identity                 = 1;
+      trans->seekState.changed                = 0;
+
+    } else if (0 == strcmp (value, "")) {
+      if ((trans->seekState.used.numBytesTransform ==
+	   trans->seekCfg.chosen.numBytesTransform) &&
+	  (trans->seekState.used.numBytesDown ==
+	   trans->seekCfg.chosen.numBytesDown)) {
+	/* Ignore the request if the channel already uses hios chosen policy.
+	 */
+	DONE (TrfSetOption);
+	return TCL_OK;
+      }
+
+      trans->seekState.used.numBytesTransform =
+	trans->seekCfg.chosen.numBytesTransform;
+
+      trans->seekState.used.numBytesDown =
+	trans->seekCfg.chosen.numBytesDown;
+
+      trans->seekState.allowed = !TRF_IS_UNSEEKABLE (trans->seekState.used);
+
+      if (trans->seekState.changed) {
+	/* Define new base location. Resync up and down to get the
+	 * proper location without read-ahead. Reinitialize the
+	 * upper location.
+	 */
+
+	Tcl_Channel parent;
+
+#ifdef USE_TCL_STUBS
+	parent = (trans->patchIntegrated ?
+		  DownChannel (trans)    :
+		  trans->parent);
+#else
+	parent = trans->parent;
+#endif
+	SeekSynchronize (trans, parent);
+	trans->seekState.downLoc     = TRF_TELL (parent);
+	trans->seekState.downZero    = trans->seekState.downLoc;
+	trans->seekState.aheadOffset = 0;
+
+	trans->seekState.upLoc         = 0;
+	trans->seekState.upBufStartLoc = 0;
+	trans->seekState.upBufEndLoc   = ResultLength (&trans->result);
+      }
+
+      trans->seekCfg.identity  = 0;
+      trans->seekState.changed = 0;
+
+    } else {
+      Tcl_SetErrno (EINVAL);
+      Tcl_AppendResult (interp, "Invalid value \"", value,
+			"\", must be one of 'unseekable', 'identity' or ''.",
+			NULL);
+      DONE (TrfSetOption);
+      return TCL_ERROR;
+    }
+
+  } else {
+    int res = Tcl_SetChannelOption (interp, DownChannel (trans),
+				    optionName, value);
+    DONE (TrfSetOption);
+    return res;
+  }
+
+  DONE (TrfSetOption);
+  return TCL_OK;
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	TrfGetOption --
+ *
+ *	------------------------------------------------*
+ *	Called by generic layer to handle requests for
+ *	the values of channel specific options. As this
+ *	channel type does not have such, it simply passes
+ *	all requests downstream.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		Adds characters to the DString refered by
+ *		'dsPtr'.
+ *
+ *	Result:
+ *		A standard TCL error code.
  *
  *------------------------------------------------------*
  */
 
 static int
 TrfGetOption (instanceData, interp, optionName, dsPtr)
-ClientData   instanceData;
-Tcl_Interp*  interp;
-char*        optionName;
-Tcl_DString* dsPtr;
+     ClientData   instanceData;
+     Tcl_Interp*  interp;
+     char*        optionName;
+     Tcl_DString* dsPtr;
 {
   /* Recognized options:
    *
    * -seekcfg
    * -seekstate
+   * -seekpolicy
    */
 
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
@@ -2011,6 +2203,11 @@ Tcl_DString* dsPtr;
      */
 
     Tcl_Obj* tmp;
+    char policy [20];
+
+    SeekPolicyGet (trans, policy);
+    Tcl_DStringAppendElement (dsPtr, "-seekpolicy");
+    Tcl_DStringAppendElement (dsPtr, policy);
 
     Tcl_DStringAppendElement (dsPtr, "-seekcfg");
     tmp = SeekConfigGet (interp, &trans->seekCfg);
@@ -2022,28 +2219,52 @@ Tcl_DString* dsPtr;
     Tcl_DStringAppendElement (dsPtr, Tcl_GetStringFromObj (tmp, NULL));
     Tcl_DecrRefCount (tmp);
 
+    /* Pass the request down to all channels below so that we may a complete
+     * state.
+     */
+
+    return Tcl_GetChannelOption (interp, DownChannel (trans),
+				 optionName, dsPtr);
+
+  } else if (0 == strcmp (optionName, "-seekpolicy")) {
+    /* Deduce the policy in effect, use chosen/used
+     * policy and identity to do this. Use a helper
+     * procedure to allow easy reuse in the code above.
+     */
+
+    char policy [20];
+
+    SeekPolicyGet (trans, policy);
+    Tcl_DStringAppend (dsPtr, policy, -1);
     return TCL_OK;
+
   } else if (0 == strcmp (optionName, "-seekcfg")) {
     Tcl_Obj* tmp;
 
-    Tcl_DStringAppendElement (dsPtr, "-seekcfg");
     tmp = SeekConfigGet (interp, &trans->seekCfg);
-    Tcl_DStringAppendElement (dsPtr, Tcl_GetStringFromObj (tmp, NULL));
+    Tcl_DStringAppend (dsPtr, Tcl_GetStringFromObj (tmp, NULL), -1);
     Tcl_DecrRefCount (tmp);
 
     return TCL_OK;
   } else if (0 == strcmp (optionName, "-seekstate")) {
     Tcl_Obj* tmp;
 
-    Tcl_DStringAppendElement (dsPtr, "-seekstate");
     tmp = SeekStateGet (interp, &trans->seekState);
-    Tcl_DStringAppendElement (dsPtr, Tcl_GetStringFromObj (tmp, NULL));
+    Tcl_DStringAppend (dsPtr, Tcl_GetStringFromObj (tmp, NULL), -1);
     Tcl_DecrRefCount (tmp);
 
     return TCL_OK;
   } else {
+    /* Unknown option. Pass it down to the channels below, maybe one of
+     * them isable to handle this request.
+     */
+
+    return Tcl_GetChannelOption (interp, DownChannel (trans),
+				 optionName, dsPtr);
+#if 0
     Tcl_SetErrno (EINVAL);
     return Tcl_BadChannelOption (interp, optionName, "seekcfg seekstate");
+#endif
   }
 }
 
@@ -2261,9 +2482,9 @@ Trf_Options        optInfo;
  */
 
 static int
-AttachTransform (entry, attach, optInfo, interp)
+AttachTransform (entry, baseOpt, optInfo, interp)
 Trf_RegistryEntry* entry;
-Tcl_Channel        attach;
+Trf_BaseOptions*   baseOpt;
 Trf_Options        optInfo;
 Tcl_Interp*        interp;
 {
@@ -2278,7 +2499,7 @@ Tcl_Interp*        interp;
 
   /* trans->standard.typePtr = entry->transType; */
   trans->clientData       = entry->trfType->clientData;
-  trans->parent           = attach;
+  trans->parent           = baseOpt->attach;
   trans->readIsFlushed    = 0;
 
   /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
@@ -2286,7 +2507,7 @@ Tcl_Interp*        interp;
   trans->flags            = 0;
   trans->watchMask        = 0;
 
-  trans->mode             = Tcl_GetChannelMode (attach);
+  trans->mode             = Tcl_GetChannelMode (baseOpt->attach);
   trans->timer            = (Tcl_TimerToken) NULL;
 
   if (ENCODE_REQUEST (entry, optInfo)) {
@@ -2368,20 +2589,20 @@ Tcl_Interp*        interp;
 
 #ifdef USE_TCL_STUBS
   if (trans->patchIntegrated) {
-    trans->self = attach;
+    trans->self = baseOpt->attach;
 
     Tcl_StackChannel (interp, entry->transType,
 		      (ClientData) trans, trans->mode,
-		      attach);
+		      baseOpt->attach);
   } else {
     trans->self = Tcl_StackChannel (interp, entry->transType,
 				    (ClientData) trans, trans->mode,
-				    attach);
+				    baseOpt->attach);
   }
 #else
   trans->self = Tcl_ReplaceChannel (interp, entry->transType,
 				    (ClientData) trans, trans->mode,
-				    attach);
+				    baseOpt->attach);
 #endif
 
   if (trans->self == (Tcl_Channel) NULL) {
@@ -2395,19 +2616,49 @@ Tcl_Interp*        interp;
   /* Initialize the seek subsystem.
    */
 
-  trans->seekCfg.natural.numBytesTransform = entry->trfType->naturalSeek.numBytesTransform;
-  trans->seekCfg.natural.numBytesDown      = entry->trfType->naturalSeek.numBytesDown;
+  trans->seekCfg.natural.numBytesTransform =
+    entry->trfType->naturalSeek.numBytesTransform;
+
+  trans->seekCfg.natural.numBytesDown      =
+    entry->trfType->naturalSeek.numBytesDown;
 
   if (optInfo && (*OPT->seekQueryProc != (Trf_SeekQueryOptions*) NULL)) {
     (*OPT->seekQueryProc) (optInfo, &trans->seekCfg.natural, CLT);
   }
 
-  /* -- todo -- allow runtime reconfiguration of natural ratio --
-   * -- encryptions f.e., but 'transform' too ...
-   */
-
   SeekCalculatePolicies (trans);
   SeekInitialize        (trans);
+
+  /* Check for options overiding the policy. If they do despite being not
+   * allowed to do so we have to remove the transformation and break it down.
+   * We do this by calling 'Unstack', which does all the necessary things for
+   * us.
+   */
+
+  if (baseOpt->policy != (Tcl_Obj*) NULL) {
+    if (TCL_OK != TrfSetOption ((ClientData) trans, interp, "-seekpolicy",
+				Tcl_GetStringFromObj (baseOpt->policy,
+						      NULL))) {
+
+      /* an error prevented setting a policy. Save the resulting error
+       * message across the necessary unstacking of the now faulty
+       * transformation.
+       */
+
+      Tcl_SavedResult ciSave;
+      Tcl_SaveResult (interp, &ciSave);
+
+#ifdef USE_TCL_STUBS
+      Tcl_UnstackChannel (interp, trans->self);
+#else
+      Tcl_UndoReplaceChannel (interp, trans->self); /* Tcl 8.0.x or below */
+#endif
+      Tcl_RestoreResult (interp, &ciSave);
+
+      DONE (AttachTransform);
+      return TCL_ERROR;
+    }
+  }
 
   /*  Tcl_RegisterChannel (interp, new); */
   Tcl_AppendResult (interp, Tcl_GetChannelName (trans->self), (char*) NULL);
@@ -3066,13 +3317,16 @@ SeekCalculatePolicies (trans)
 	  stopped = 1;
 	}
       }
+    } else {
+      /* Next points to the base channel */
+      /* assert (0); */
     }
 
     self = next;
   }
 
   if (!stopped) {
-    if (TRF_IS_UNSEEKABLE (trans->seekCfg.chosen)) {
+    if (TRF_IS_UNSEEKABLE (trans->seekCfg.natural)) {
       /* Naturally unseekable (iii)
        */
 
@@ -3082,15 +3336,24 @@ SeekCalculatePolicies (trans)
       /* Take the natural ratio.
        */
 
-      trans->seekCfg.chosen.numBytesTransform = trans->seekCfg.natural.numBytesTransform;
-      trans->seekCfg.chosen.numBytesDown      = trans->seekCfg.natural.numBytesDown;
+      trans->seekCfg.chosen.numBytesTransform =
+	trans->seekCfg.natural.numBytesTransform;
+
+      trans->seekCfg.chosen.numBytesDown      =
+	trans->seekCfg.natural.numBytesDown;
+
       trans->seekCfg.overideAllowed = 1;
     }
   }
 
-  trans->seekState.used.numBytesTransform = trans->seekCfg.chosen.numBytesTransform;
-  trans->seekState.used.numBytesDown      = trans->seekCfg.chosen.numBytesDown;
-  trans->seekState.allowed                = !TRF_IS_UNSEEKABLE (trans->seekState.used);
+  trans->seekState.used.numBytesTransform =
+    trans->seekCfg.chosen.numBytesTransform;
+
+  trans->seekState.used.numBytesDown      =
+    trans->seekCfg.chosen.numBytesDown;
+
+  trans->seekState.allowed                =
+    !TRF_IS_UNSEEKABLE (trans->seekState.used);
 }
 
 /*
@@ -3137,7 +3400,7 @@ SeekInitialize (trans)
     trans->seekState.aheadOffset = 0;
   }
 
-  trans->seekState.identity = 0;
+  trans->seekCfg.identity   = 0;
   trans->seekState.changed  = 0;
 
   SEEK_DUMP (Seek Initialized);
@@ -3238,11 +3501,56 @@ SeekSynchronize (trans, parent)
   trans->seekState.downLoc += offsetDown;
 }
 
-
 /*
  *------------------------------------------------------*
  *
- *	SeekConfig --
+ *	SeekPolicyGet --
+ *
+ *	Compute the currently used policy and store its
+ *	name into the character buffer.
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static void
+SeekPolicyGet (trans, policy)
+     TrfTransformationInstance* trans;
+     char*                      policy;
+{
+  if (trans->seekCfg.identity) {
+    /* identity forced */
+
+    strcpy (policy, "identity");
+    return;
+  }
+
+  if (!trans->seekState.allowed &&
+      ((trans->seekState.used.numBytesTransform !=
+	trans->seekCfg.chosen.numBytesTransform) ||
+       (trans->seekState.used.numBytesDown !=
+	trans->seekCfg.chosen.numBytesDown))) {
+    /* unseekable forced */
+
+    strcpy (policy, "unseekable");
+    return;
+  }
+
+  /* chosen policy in effect */
+
+  strcpy (policy, "");
+  return;
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	SeekConfigGet --
  *
  *	Generates a list containing the current configuration
  *	of the seek system in a readable manner.
@@ -3298,6 +3606,9 @@ SeekConfigGet (interp, cfg)
   LIST_ADDSTR (error, list, "overideAllowed");
   LIST_ADDINT (error, list, cfg->overideAllowed);
 
+  LIST_ADDSTR (error, list, "identityForced");
+  LIST_ADDINT (error, list, cfg->identity);
+
   return list;
 
 error:
@@ -3321,7 +3632,7 @@ error:
 /*
  *------------------------------------------------------*
  *
- *	SeekState --
+ *	SeekStateGet --
  *
  *	Generates a list containing the current state of
  *	the seek system in a readable manner.
@@ -3381,9 +3692,6 @@ SeekStateGet (interp, state)
 
   LIST_ADDSTR (error, list, "downAhead");
   LIST_ADDINT (error, list, state->aheadOffset);
-
-  LIST_ADDSTR (error, list, "identityForced");
-  LIST_ADDINT (error, list, state->identity);
 
   LIST_ADDSTR (error, list, "changed");
   LIST_ADDINT (error, list, state->changed);
@@ -3488,7 +3796,7 @@ SeekDump (trans, place)
   PRINT ("base             %d\n",
 	 trans->seekState.downZero); FL;
   PRINT ("identity force   %d\n",
-	 trans->seekState.identity); FL;
+	 trans->seekCfg.identity); FL;
   PRINT ("seek while ident %d\n",
 	 trans->seekState.changed); FL;
   PRINT ("read buffer      %d\n",
@@ -3518,7 +3826,7 @@ SeekDump (trans, place)
 	  trans->seekState.aheadOffset,
 	  TRF_TELL (parent),
 	  trans->seekState.downZero,
-	  trans->seekState.identity,
+	  trans->seekCfg.identity,
 	  trans->seekState.changed
 	  ); FL;
 

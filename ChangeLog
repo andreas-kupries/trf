@@ -1,3 +1,33 @@
+Sat Oct  9 13:20:58 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* Added more tests yesterday. Decided to pack the current state
+	  into a pre-release.
+
+Thu Oct  7 22:56:36 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/registry.c (TrfGetOption): Fixed some minor problems in
+ 	  this procedure revealed by the first bunch of tests.
+
+	  (SeekCalculatePolicies): Fixed incorrect condition in this code
+	  leading sometimes to improper initialization of the chosen
+	  transform. Detected by test suite (1.0 / 1.5).
+
+	  (TrfExecuteObjCmd): Added processing of '-seekpolicy'.
+	  (AttachTransform):  Added application of initial '-seekpolicy'.
+
+	* generic/registry.c (TrfSeek): Changed code to check new location
+ 	  for 'modulo numBytesTransform == 0' instead of the offset.
+
+Wed Oct  6 23:22:19 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* Next steps no 1 (see below) now done.
+
+	* generic/registry.c (TrfSetOption): Implemented -seekpolicy.
+	  (TrfGetOption): Added -seekpolicy to set of readable options.
+
+	* doc/nodes/seek.node: Worked on the documentation of the new
+	  behaviour. Actually started on that yesterday.
+
 Sun Oct  3 01:39:02 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/bincode.c, octcode.c: Same as below.

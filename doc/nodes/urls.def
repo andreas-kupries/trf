@@ -11,10 +11,11 @@ proc url {code text url} {
 # -------------------------------------------------
 
 url trf18       "version 1.8" http://www.oche.de/~akupries/soft/trf1.8/
-url trf_bdist18 "Trf 1.8 binary distributions" http://www.oche.de/~akupries/soft/trf1.8/trf_bdist.html
+url trf_bdist18 "Trf 1.8 binary distributions" \
+	http://www.oche.de/~akupries/soft/trf1.8/trf_bdist.html
 
-
-url adams_md5 "[lib MD5] package" http://www.cybernetics.demon.co.uk/projects/md5/md5.html
+url adams_md5 "[lib MD5] package" \
+	http://www.cybernetics.demon.co.uk/projects/md5/md5.html
 
 url ellson_ftp "John Ellson's ftp place" http://www.tcltk.com/ftp/ellson/
 
@@ -65,9 +66,10 @@ url zlib_win \
 
 url zLib [lib zlib] http://www.cdrom.com/pub/infozip/zlib/
 
-url bzlib      [lib bzlib] http://www.muraroa.demon.co.uk/
-url bzip       [cmd bzip]  http://www.muraroa.demon.co.uk/
-url bzlib_home http://www.muraroa.demon.co.uk/ http://www.muraroa.demon.co.uk/
+url bzlib      [lib bzlib] http://sourceware.cygnus.com/bzip2/index.html
+url bzip       [cmd bzip]  http://sourceware.cygnus.com/bzip2/index.html
+url bzlib_home http://sourceware.cygnus.com/bzip2/index.html \
+	http://sourceware.cygnus.com/bzip2/index.html
 
 
 url tls        [lib TLS]    http://www.sensus.org/tcl/
@@ -106,19 +108,20 @@ link transformT transform trf_misc.html#transform
 link rsEccT     rs_ecc    trf_misc.html#rsecc
 link binioT     binio     trf_misc.html#binio
 link unstackT   unstack   trf_misc.html#unstack
+link seeking    seeking   trf_seek.html
 
 
 if {[info exists ::westend]} {
 
     link trfcrypt   TrfCrypt ../trfcrypt/index.html
-    link memchan    Memchan  ../../tcltk.html
+    link memchan    Memchan  ../memchan/index.html
 
 } else {
     link trfcrypt   TrfCrypt \
 	    http://www.oche.de/~akupries/soft/trfcrypt/index.html
 
     link memchan    Memchan \
-            http://www.oche.de/~akupries/tcltk.html
+            http://www.oche.de/~akupries/soft/memchan/index.html
 }
 
 

@@ -153,6 +153,7 @@ TRF_EXPORT (int,Trf_IsInitialized) _ANSI_ARGS_ ((Tcl_Interp* interp));
  *   to option '-attach'.
  * * Handle of channel specified as argument to '-in'.
  * * Handle of channel specified as argument to '-out'.
+ * * Name of the seek policy requested by the user.
  */
 
 typedef struct _Trf_BaseOptions_ {
@@ -161,8 +162,13 @@ typedef struct _Trf_BaseOptions_ {
 
   /* Relevant in immediate mode only! (attach == NULL) */
   Tcl_Channel source;      /* NULL => use non option argument as input */
-  Tcl_Channel destination; /* NULL => leave transformation result in interpreter result area */
+  Tcl_Channel destination; /* NULL => leave transformation result in
+			    * interpreter result area */
+
+  Tcl_Obj* policy;    /* Refers to string object containing the seek policy
+		       * to use, if overiding the chosen one is allowed! */
 } Trf_BaseOptions;
+
 
 
 /*

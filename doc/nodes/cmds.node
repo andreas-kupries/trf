@@ -8,15 +8,18 @@ node trf_cmds {
     parent      trf_home
 
     menu {
-	trf_conv trf_md trf_misc
+	trf_seek trf_conv trf_md trf_misc
     }
 
     contents {
 	p "
 	First a small note: This manual deals with the [tcl]-level commands
 	only. For a description of the C-level API please read the
-	provided manpages or the [link trf_capi] chapter."
-
+	provided manpages or the [link trf_capi] chapter.
+	"
+	p "The behaviour of all transformations with respect to [link seeking] 
+	is described on its own page.
+	"
 	p "
 	All commands are available in 2 modes of operation, ``immediate'' and
 	``attached''.  The generic syntactical forms of these modes are:"

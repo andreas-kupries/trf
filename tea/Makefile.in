@@ -314,7 +314,7 @@ DEFS		= @DEFS@ $(EXTRA_CFLAGS)
 
 ACLOCAL_M4		= $(top_srcdir)/aclocal.m4
 mkinstalldirs		= $(SHELL) $(top_srcdir)/mkinstalldirs
-CONFIG_CLEAN_FILES	= mkIndex.tcl
+CONFIG_CLEAN_FILES	= mkIndex.tcl test.setup
 
 CPPFLAGS	= @CPPFLAGS@
 LIBS		= @LIBS@

@@ -1,0 +1,271 @@
+# -*- tcl -*-
+# compilation on the mac
+
+node trf_seek {
+    title       "Trf: Seeking on transforms"
+    shortTitle  "Seeking"
+    description "Seeking"
+    parent      trf_cmds
+
+    contents {
+	p "The way transforms are handling seek requests was completely
+	revamped in version 2.0. This page now seeks to explain the new
+	behaviour to anyone trying to port an application using old-style
+	seeks.
+	"
+	p "A short recapitulation of how it was before 2.0: Any seek
+	request was passed unchanged to the channel (or transformation)
+	below it. Therefore seeking was always relative to the notion of
+	the base channel about its access point.
+	"
+	p "Before actually stating the possible new behaviours of a
+	transformation with regard to a seek request some notes on
+	how it is selected.
+	"
+
+	hr
+
+	p "The code now places each transformation in one of two groups:
+	"
+	number_list {
+	    li "Either input and out are in a linear relationship,"
+	    li "or they are not."
+	}
+
+	p "The name of attribute used to describe this is the 'seek policy'.
+	In the case of members of the second group its value is 'unseekable'.
+	For all other transformations it is a list of the two numbers
+	describing the ratio between input and output.
+	"
+	p "Examples from the first group are almost all conversions provided
+	by Trf, like 'hex', 'base64', etc. 'hex' for example converts every
+	byte into 2 ASCII characters during encoding, thereas 'base64' encodes
+	every triple of bytes into 4 ASCII characters.
+	"
+	p "Members of the other group are the (de)compression algorithms and
+	the 'ascii85' conversion.
+	"
+	p "What I described above is actually the 'natural seek policy' of
+	the transformation. The moment some transformations are stacked upon
+	each other the new code will consider the properties of the base
+	channel and the policies of all the transformations below it while
+	selected a 'chosen seek policy'. Under most circumstances this is
+	the 'used seek policy', but sometimes the user is allowed to overide
+	the choice with one of his own, so a difference is possible.
+	"
+	p "The rules for the selection of the 'chosen seek policy' are thus:
+	"
+	bullet_list {
+	    li "An 'unseekable' base channel (= no SeekProcedure in his
+	    driver, examples: socket, pipe) implies an 'unseekable'
+	    transformation, regardless of the natural policy. The user
+	    [strong cannot] overide this choice.
+	    "
+	    li "An 'unseekable' transformation below (used! policy) implies
+	    an 'unseekable' transformation, regardless of the natural policy.
+	    The user [strong cannot] overide this choice.
+	    "
+	    li "The natural policy is chosen. The user is allowed to overide
+	    the choice.
+	    "
+	}
+	p "The order of the rules above implies the order of their application
+	and dominance. I.e. the first applicable rule determines the chosen
+	policy, the rules behind it are not considered anymore and have no
+	effects.
+	"
+	p "[strong Remark:] Whereas Trf is able to peek into the structures of
+	the transformations provided by itself it has no way of doing so with
+	transformations coming from different packages. Because of this it
+	goes the safe and easy way, i.e such transformations are considered as
+	'unseekable'. Even if they are not, Trf is unable to ascertain this.
+	"
+	p "In the case of an overidable chosen policy the option
+	[strong -seekpolicy] can be used during attachment of a
+	transformation, or later via 'fconfigure' to enforce the choice of the
+	user. The available values and their meanings are:
+	"
+
+	definition_list {
+	    term            unseekable
+	    term_definition "The transformation is forced to use 'unseekable'
+	    as its seek policy.
+	    "
+
+	    term            identity
+	    term_definition "The transformation is forced to be seekable, with
+	    a ratio of 1:1. This effectively restores the old behaviour of
+	    transformations. [strong Beware] that this is possible only if
+	    neither the base channel nor all transformations below are
+	    unseekable [strong !]
+	    "
+
+	    term            \{\}
+	    term_definition "This value restores the chosen seek policy as the
+	    used one.
+	    "
+	}
+
+	hr
+
+	p "Now we can talk about the behaviour of a transformation under the
+	various seek policies.
+	"
+
+	p "Unseekable"
+
+	bullet_list {
+	    li "An unseekable transformation keeps a running count of the
+	    number of bytes written to or read from it. This number is
+	    returned upon request, i.e. a call to 'tell'.
+	    "
+	}
+
+	p "Seekable with ratio [strong n]:[strong m]"
+
+	bullet_list {
+	    li "[strong n]:[strong m] means that [strong n] bytes in
+	    the input are transformed into [strong m] bytes of output (for
+	    writing to the channel).
+	    "
+	    li "The transformation channel is restricted to seeking to
+	    locations which are multiples of [strong n]. Reading and writing
+	    is not restricted in this way.
+	    "
+	    li "Seeking relative to the end of the stream is not permitted.
+	    (I currently don't quite know how to deal with incomplete data
+	    at the end of the channel downstream. Some transformations are
+	    able to handle such, some are not; and the effects on
+	    [strong where] the end of the stream actually is or should be
+	    are not clear).
+	    "
+	    li "If a non-multiple of [strong n] number of bytes is
+	    written into the channel the incomplete tuple is stored in
+	    the transformation for the next write. A read or seek will
+	    discard this partial information.
+	    "
+	    li "Each seek discards the information in the buffers of
+	    the transformation, both the read-ahead buffer of complete
+	    tuples and internal buffers containing partial information.
+	    Actually a little optimization is made. The read-ahead
+	    buffer is not discarded if the new location of the access
+	    point is still inside its boundaries.
+	    "
+	    li "Seeking a channel X and then stacking a transformation
+	    upon it will cause the transformation to use the current
+	    location in X as its base location, i.e. 0. Seeking behind
+	    that point is not allowed.
+	    "
+	    li "Forcing a transformation into 'identity', seeking it
+	    and then restoring the chosen policy will cause the
+	    transformation to use the new current location in the
+	    channel downstream as its new base location.
+	    "
+	    li "Seeking an unseekable transformation by forcing it into
+	    identity will discard [strong any] state it has.
+	    "
+	}
+
+	hr
+
+	p "Two read-only options to 'fconfigure' are available to get at the
+	current configuration and state of the seek system for a particular
+	transformation:"
+
+	definition_list {
+	    term -seekcfg
+	    term_definition "The value is a list containing keywords and values
+	    (notation suitable for 'array set') describing the current
+	    configuration of the seek (natural and chosen policy, ability to
+	    overide them).
+	    "
+
+	    term -seekstate
+	    term_definition "The value is a list containing keywords and values
+	    (notation suitable for 'array set') describing the current state of
+	    the seek system (used policy, various locations).
+	    "
+	}
+
+	kvtable -seekcfg {
+	    kvrow ratioNatural {
+		p "The value is a list containing two integer numbers
+		describing the natural ratio of input to output for the
+		transformation. If either number is 0 the transformation
+		is unseekable.
+		"
+	    }
+	    kvrow ratioChosen {
+		p "The value is a list as described above, but this time
+		containing the chosen ratio, after considering the base
+		channel and all transformations below.
+		"
+	    }
+	    kvrow overideAllowed {
+		p "A boolean value. Set if the user is allowed to overide
+		'ratioChosen' with his own preferences.
+		"
+	    }
+	    kvrow identityForced {
+		p "A boolean value. Set if the user forced the transformation
+		via -seekpolicy to use 'identity' while doing seeks.
+		"
+	    }
+	}
+
+	kvtable -seekstate {
+	    kvrow ratio {
+		p "See 'ratioNatural' and 'ratioChosen above. Describes the
+		ratio actually used.
+		"
+	    }
+	    kvrow seekable {
+		p "A boolean value, derived from 'ratio'. Set if the
+		transformation is 'unseekable'.
+		"
+	    }
+	    kvrow up {
+		p "An integer number. The location of the access point in the
+		stream before/above the transformation, as the transformation
+		sees it. This value can differ from the one returned by
+		\[tell\], the difference is the number of bytes buffered in
+		the generic I/O layer of Tcl for this channel.
+		"
+	    }
+	    kvrow {upBufStart upBufEnd} {
+		p "See above, describing the range in the transformed stream
+		covered by the read-buffer of the transformation maintained
+		by Trf itself.
+		"
+	    }
+	    kvrow downBase {
+		p "The location in the channel downstream which is equivalent
+		to 'up == 0'. See the description some paragraphs above about
+		a 'base location'.
+		"
+	    }
+	    kvrow down {
+		p "The current location of the access point in the channel
+		downstream. [strong Not] equivalent to 'up' due to the
+		read-ahead done by Trf, but to 'upBufEnd'. Actually not quite
+		excatly equivalent as Trf may have read a non-multiple of
+		[strong m] number of bytes.
+		"
+	    }
+	    kvrow downAhead {
+		p "'down - downAhead' is the real location in downstream
+		equivalent to 'upBufEnd'. It basically is the number of
+		bytes in the last and incomplete tuple read from below.
+		"
+	    }
+	    kvrow changed {
+		p "A boolean value. Set if the transformation was forced into
+		identity (see above) and the user actually seeked after
+		forcing this. 
+		"
+	    }
+	}
+
+	# --------------
+    }
+}

@@ -1,25 +1,31 @@
 Changes from 1.8 to 2.0
 
+*	Dropped support for Tcl 7.6.
+
 *	Added support for TEA compliant building of this extension,
 	see the subdirectory 'tea'. This requires at least Tcl/Tk 8.2.
 
 	The old built facilities (unix, win) still exist and are
-	still usable.
+	still usable. Nevertheless TEA is the prefered way for Unix
+	and Windows.
 
 *	Added stubs, i.e. Trf now exports its own stub table. Thanks
 	to Jan Nijtmans for providing the basic changes to get me
 	started.
 
+*	Revamped the way Trf is handling seek requests for
+	transforms.
+	**BEHAVIOURAL INCOMPATIBILITY**
+
+	See	doc/html/trf_seek.html
+
 *	Squashed the bug in the 'bzip' (de)compressor.
-
-*	Squashed other bugs reported by Matt Newman <matt@sensus.org>
-
-*	Dropped support for Tcl 7.6.
+	Squashed other bugs reported by Matt Newman <matt@sensus.org>
 
 *	Compile time option to link zlib statically.
 	(--enable-static-zlib, -DZLIB_STATIC_BUILD)
 
-*	Compile time option to link bzlib statically.
+	Compile time option to link bzlib statically.
 	(--enable-static-bzlib, -DBZLIB_STATIC_BUILD)
 
 Changes from 1.7 to 1.8
