@@ -15,6 +15,13 @@
 
 if {[string compare test [info procs test]] == 1} then {source defs}
 
+if {[catch {binio} msg] && ("$msg" == "invalid command name \"binio\"")} {
+    puts stdout "\tSkipping 'binio' tests, as the command is not compiled into the package"
+    flush stdout
+    return ""
+}
+
+
 # determine endianess of machine running these tests
 
 proc endianess {} {

@@ -1,5 +1,5 @@
 # -*- tcl -*-
-# Commands covered:	ripemd-128
+# Commands covered:	ripemd128
 #
 # This file contains a collection of tests for one or more of the commands
 # the TRF extension. Sourcing this file into Tcl runs the tests and generates
@@ -15,16 +15,16 @@
 if {[string compare test [info procs test]] == 1} then {source defs}
 
 
-test ripemd-128-1.0 {argument errors} {
-    catch {ripemd-128} msg
+test ripemd128-1.0 {argument errors} {
+    catch {ripemd128} msg
     set msg
-} {ripemd-128: source, destination missing}
+} {ripemd128: source, destination missing}
 
 
-test ripemd-128-1.1 {argument errors} {
-    catch {ripemd-128 x} msg
+test ripemd128-1.1 {argument errors} {
+    catch {ripemd128 x} msg
     set msg
-} {ripemd-128: wrong # args}
+} {ripemd128: wrong # args}
 
 
 foreach {i in out} {
@@ -37,11 +37,11 @@ foreach {i in out} {
     6 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789                   d1e959eb179c911faea4624c60c5c702
     7 12345678901234567890123456789012345678901234567890123456789012345678901234567890 3f45ef194732c2dbb2c4a2c769795fa3
 } {
-    test ripemd-128-2.$i {ripemd-128} {
+    test ripemd128-2.$i {ripemd128} {
 	puts -nonewline [set ma [memchan]] $in
 	seek $ma 0
 
-	ripemd-128  $ma [set mb [memchan]]
+	ripemd128  $ma [set mb [memchan]]
 	seek $mb 0
 
 	hex  -mode encode $mb [set mc [memchan]]
