@@ -11,9 +11,10 @@ node trf_where {
 	p "This library is available for download at the following urls:"
 
 	bullet_list {
-	    li "Sources, [link trf_src_tgz] or [link trf_src_zip]"
+	    li "Sources, [link trf_src_tgz]"
+	    li "or [link trf_src_zip]"
 	    li "The [link trf_readme] with a short explanation"
-	    li "A [link trf_win32bin] for Windows"
+	    #li "A [link trf_win32bin] for Windows"
 	}
     }
 }
