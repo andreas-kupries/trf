@@ -18,7 +18,7 @@
    write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.  */
 
-#include <features.h>
+#include <tcl.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -26,15 +26,23 @@
 
 #include "md5.h"
 
-#ifndef weak_alias
-# define __md5_crypt_r md5_crypt_r
-# define __md5_crypt md5_crypt
-# define __stpncpy stpncpy
+#ifndef MAX
+#define MAX(a,b) ((a) > (b) ? (a) : (b))
+#endif
+
+#ifndef MIN
+#define MIN(a,b) ((a) < (b) ? (a) : (b))
+#endif
+
+
+# define __md5_crypt_r    md5_crypt_r
+# define __md5_crypt      md5_crypt
+# define __stpncpy        stpncpy
 # define __set_errno(val) errno = (val)
 
-char * __stpncpy __P((char *dest, const char *src, size_t n));
+char * __stpncpy _ANSI_ARGS_((char *dest, const char *src, size_t n));
 
-#endif
+
 
 /* Define our magic string to mark salt for MD5 "encryption"
    replacement.  This is meant to be the same as for other MD5 based
@@ -47,9 +55,9 @@ static const char b64t[64] =
 
 
 /* Prototypes for local functions.  */
-extern char *__md5_crypt_r __P ((const char *key, const char *salt,
-			       char *buffer, int buflen));
-extern char *__md5_crypt __P ((const char *key, const char *salt));
+extern char *__md5_crypt_r _ANSI_ARGS_ ((const char *key, const char *salt,
+					 char *buffer, int buflen));
+extern char *__md5_crypt _ANSI_ARGS_ ((const char *key, const char *salt));
 
 
 
@@ -234,9 +242,3 @@ __md5_crypt (key, salt)
 
   return __md5_crypt_r (key, salt, buffer, buflen);
 }
-
-#ifdef weak_alias
-/* Define weak aliases.  */
-weak_alias (__md5_crypt_r, md5_crypt_r)
-weak_alias (__md5_crypt, md5_crypt)
-#endif

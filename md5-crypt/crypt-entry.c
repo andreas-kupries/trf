@@ -22,11 +22,14 @@
 #include <errno.h>
 #include <string.h>
 
-#ifndef weak_alias
-# define __crypt_r crypt_r
-# define __md5_crypt_r md5_crypt_r
-# define __md5_crypt md5_crypt
+#ifndef EOPNOTSUPP
+#define EOPNOTSUPP 122
 #endif
+
+
+# define __crypt_r     crypt_r
+# define __md5_crypt_r md5_crypt_r
+# define __md5_crypt   md5_crypt
 
 /* Define our magic string to mark salt for MD5 encryption
    replacement.  This is meant to be the same as for other MD5 based
@@ -40,16 +43,17 @@ extern char *__md5_crypt_r (const char *key, const char *salt, char *buffer,
 extern char *__md5_crypt (const char *key, const char *salt);
 
 extern char *__crypt_r (const char *key, const char *salt,
-			struct crypt_data *__restrict data);
+			struct crypt_data * data);
 
 /* We recognize an intended call of the MD5 crypt replacement function
    by the first 3 characters of the salt string.  If they match the
    MD5 magic string we want MD5 encryption replacement.  */
+
 char *
 __crypt_r (key, salt, data)
      const char *key;
      const char *salt;
-     struct crypt_data *__restrict data;
+     struct crypt_data * data;
 {
   if (strncmp (md5_salt_prefix, salt, sizeof (md5_salt_prefix) - 1) == 0)
     return __md5_crypt_r (key, salt, (char *) data,
@@ -74,8 +78,3 @@ crypt (key, salt)
   __set_errno (EOPNOTSUPP);
   return NULL;
 }
-
-#ifdef weak_alias
-/* Define weak aliases.  */
-weak_alias (__crypt_r, crypt_r)
-#endif

@@ -23,44 +23,35 @@
  */
 
 #ifndef _CRYPT_H
-
 #define _CRYPT_H	1
 
-#ifdef HAVE_FEATURES_H
-#include <features.h>
-#else
-#include <trf_features.h>
-#endif
-
-
-__BEGIN_DECLS
+#include <tcl.h>
 
 /* Encrypt at most 8 characters from KEY using salt to perturb DES.  */
-extern char *crypt __P ((__const char *__key, __const char *__salt));
+extern char *crypt _ANSI_ARGS_ ((__const char *__key, __const char *__salt));
 
 
 /* Reentrant versions of the functions above.  The additional argument
    points to a structure where the results are placed in.  */
-struct crypt_data
-  {
-    char keysched[16 * 8];
-    char sb0[32768];
-    char sb1[32768];
-    char sb2[32768];
-    char sb3[32768];
-    /* end-of-alignment-critical-data */
-    char crypt_3_buf[14];
-    char current_salt[2];
-    long int current_saltbits;
-    int direction, initialized;
-  };
+struct crypt_data {
+  char      keysched[16 * 8];
+  char      sb0[32768];
+  char      sb1[32768];
+  char      sb2[32768];
+  char      sb3[32768];
+  /* end-of-alignment-critical-data */
+  char      crypt_3_buf[14];
+  char      current_salt[2];
+  long int  current_saltbits;
+  int       direction;
+  int       initialized;
+};
 
 #ifdef __USE_GNU
 
-extern char *crypt_r __P ((__const char *__key, __const char *__salt,
-			   struct crypt_data *__restrict __data));
+extern char *crypt_r _ANSI_ARGS_ ((__const char *__key, __const char *__salt,
+				   struct crypt_data * __data));
 #endif
 
-__END_DECLS
 
 #endif	/* crypt.h */
