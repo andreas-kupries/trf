@@ -1,3 +1,14 @@
+2002-09-27  Andreas Kupries  <andreask@pliers.activestate.com>
+
+	* compat/tclLoadWin.c: Removed inclusion of windows header
+	  to prevent clashes between winsock and winsock2/
+
+	* configure.in: 
+	* Makefile.in:
+	* aclocal.m4:
+	* trf.m4:
+	* tclconfig: Rewritten build system, now based on TEA 2.
+
 2002-09-14  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tools/htdocs_setup:
