@@ -1,7 +1,27 @@
+Thu Jul  2 00:24:59 1998  Andreas Kupries  <a.kupries@westend.com>
+
+	* doc/nodes/*: Removed the descriptions of the various encryption
+	  algorithms.
+
+Wed Jul  1 20:28:20 1998  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/pkgIndex.tcl.in: Changed to load trf immediately upon
+	  request, and not while trying to execute the first
+	  command. Without that the separate crypto package will have
+	  problems attaching itself to the trf core.
+
 Tue Jun 30 22:41:18 1998  Andreas Kupries  <a.kupries@westend.com>
 
-	* doc/: Added nodes directory, contains the base of html
-	  documentation which replaces the old latex files.
+	* PREPARE: Using the 'webTemplate' system (*) to generate
+	  documentation for linkage into my westend site and for
+	  standalone distribution.
+
+	  Ad *) webTemplate is a system for the generation of a whole web
+	  site using node descriptions and a selectable layout/style
+	  definition. Current state: *INTERNAL*.
+
+	* doc/: Replaced latex documentation by native HTML. Added 'nodes'
+	  directory.
 
 Mon Jun 29 20:13:55 1998  Andreas Kupries  <a.kupries@westend.com>
 
@@ -10,6 +30,8 @@ Mon Jun 29 20:13:55 1998  Andreas Kupries  <a.kupries@westend.com>
 
 	* Started the removal of encryption related code.
 
+	* ----------------------------------------------------
+	
 Wed Jun 17 21:38:32 1998  Andreas Kupries  <a.kupries@westend.com>
 
 	* doc/*.tex: Checked the urls, removed some broken ones. Added
