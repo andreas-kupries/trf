@@ -123,7 +123,7 @@ static Trf_TypeDefinition convDefinition =
     CreateDecoder,
     DeleteDecoder,
     Decode,
-    NULL,
+    DecodeBuffer,
     FlushDecoder,
     ClearDecoder
   },
@@ -587,7 +587,6 @@ ClientData       clientData;
   DecoderControl* c   = (DecoderControl*) ctrlBlock;
   char*  out = (unsigned char*) Tcl_Alloc (1+bufLen/2);
   int    res, i, j;
-  CONST char*  ch;
   unsigned char nibble;
 
   for (i=0, j=0; i < bufLen; i++) {

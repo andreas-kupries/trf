@@ -1029,7 +1029,7 @@ ClientData clientData;
  *
  *----------------------------------------------------------------------
  */
-
+#if 0
 static int
 TrfInfoObjCmd (notUsed, interp, objc, objv)
      ClientData              notUsed;	/* Not used. */
@@ -1123,6 +1123,7 @@ TrfInfoObjCmd (notUsed, interp, objc, objv)
   /* We should not come to this place */
   return TCL_ERROR;
 }
+#endif
 
 /*
  *------------------------------------------------------*

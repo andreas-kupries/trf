@@ -49,7 +49,7 @@ static int         SetOption     _ANSI_ARGS_ ((Trf_Options options,
 static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
 					       ClientData clientData));
 
-static int         SeekQueryOptions  _ANSI_ARGS_ ((Trf_Options options,
+static void        SeekQueryOptions  _ANSI_ARGS_ ((Trf_Options options,
 						   Trf_SeekInformation* seekInfo,
 						   ClientData clientData));
 
@@ -323,7 +323,7 @@ ClientData clientData;
  *------------------------------------------------------*
  */
 
-static int
+static void
 SeekQueryOptions (options, seekInfo, clientData)
      Trf_Options options;
      Trf_SeekInformation* seekInfo;

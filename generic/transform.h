@@ -342,9 +342,9 @@ typedef void Trf_SeekQueryOptions  (Trf_Options options,   /* option container t
 				    ClientData  clientData /* arbitrary information, as defined in
 							    * Trf_TypeDefinition.clientData */);
 #else
-typedef int Trf_SeekQueryOptions  _ANSI_ARGS_ ((Trf_Options options,
-						Trf_SeekInformation* seekInfo,
-						ClientData  clientData));
+typedef void Trf_SeekQueryOptions  _ANSI_ARGS_ ((Trf_Options options,
+						 Trf_SeekInformation* seekInfo,
+						 ClientData  clientData));
 #endif
 
 /*

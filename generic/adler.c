@@ -116,7 +116,7 @@ MD_Start (context)
 VOID* context;
 {
   START (adler.MD_Start);
-  PRINT ("Context = %p, Zf = %p\n", context, zf);
+  PRINT ("Context = %p, Zf = %p\n", context, &zf);
 
   /* call md specific initialization here */
 
