@@ -10,10 +10,13 @@ Keywords:       tcl, conversion, encryption, message digests,
                 compression, error-correction, binary io
 Author:         a.kupries@westend.com  (Andreas Kupries)
 Maintained-by:  a.kupries@westend.com  (Andreas Kupries)
-Primary-URL:	ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz (~500 K)
+Primary-URL:	ftp.westend.com/pub/aku/trf@mFullVersion@.tar.gz (~500 K)
+		ftp.westend.com/pub/aku/trf@mDosVersion@.zip (~500 K)
+		ftp.westend.com/pub/aku/trf@mFullVersion@.readme (~2 K)
+Secondary-URL:	ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz (~500 K)
 		ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip (~500 K)
 		ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme (~2 K)
-Platforms:	Linux 1.2.13	(gcc 2.7.0)	Development sytem
+Platforms:	Linux 2.0.29	(gcc 2.7.2.1)	Development sytem
 		IRIX 6.2	(cc only)
 		ULTRIX 4.1	(both cc and gcc)
 		ULTRIX 4.4	(cc 3.0)
@@ -24,9 +27,10 @@ Platforms:	Linux 1.2.13	(gcc 2.7.0)	Development sytem
 Copying-policy: BSDStyle (-> tcl)
 Dependencies:   tcl (7.6 or higher)
                 plus-patches as of 5-Dec-1996 or later (optional)
-                memchan 1.0 or higher (optional)
-                zlib-1.0.4  or higher (optional)
-                libdes-3.21 or higher (optional)
+                memchan 1.0  or higher (optional)
+                zlib-1.0.4   or higher (optional)
+                libdes-3.21  or higher (optional)
+		SSLeay-0.6.6 or higher (optional)
 
 Comments:	BEWARE: The US places export restrictions
 		upon cryptographic software.

@@ -33,7 +33,10 @@ exec /bin/ln -s		../../tests/sha.test.vec f1000000
 cd ..
 
 # pwd = doc
-mExclude file delete FUN ascii.man ascii85 scratch-pad code34 Notes ToDo trf.def hash.operation INSTALL INSTALL.optional
+mExclude \
+	file delete FUN ascii.man ascii85 scratch-pad \
+	code34 Notes ToDo trf.def hash.operation \
+	INSTALL INSTALL.optional ROADMAP
 
 # I.b  generate official manual, diverse variants (dvi, ps)
 mLog log info generating manual variants (dvi, ps)

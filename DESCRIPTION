@@ -9,8 +9,8 @@ extension trf {
 
     description {
 	Collection of transformation procedures
-	* Encryption      (des, idea, blowfish, rc4)
-	* Message digests (crc (pgp), md5, sha, haval, crc32, adler32 (both zlib))
+	* Encryption      (des, idea, blowfish, rc4, rc2)
+	* Message digests (crc (pgp), md2, md5, sha, sha-1, haval, crc32, adler32 (both zlib))
 	* Data conversion (dual, hexadecimal, octal, uu, base64, ascii85)
 	* Error correcting coding (reed-solomon coder)
 	* Compression (zlib based).
@@ -18,14 +18,20 @@ extension trf {
     }
 
     primary-urls {
+	ftp.westend.com/pub/aku/trf@mFullVersion@.tar.gz (~500 K)
+	ftp.westend.com/pub/aku/trf@mDosVersion@.zip (~500 K)
+	ftp.westend.com/pub/aku/trf@mFullVersion@.readme (~2 K)
+    }
+
+    secondary-urls {
 	ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz (~500 K)
 	ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip (~500 K)
 	ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme (~2 K)
     }
 
-    development-platform {Linux 1.2.13, gcc 2.7.0}
+    development-platform {Linux 2.0.29, gcc 2.7.2.1}
     platforms {
-	Linux 1.2.13	(gcc 2.7.0)	Development sytem
+	Linux 2.0.29	(gcc 2.7.2.1)	Development sytem
 	IRIX 6.2	(cc only)
 	ULTRIX 4.1	(both cc and gcc)
 	ULTRIX 4.4	(cc 3.0)
@@ -37,11 +43,12 @@ extension trf {
     }
 
     dependencies {
-	tcl (7.6 or higher)
+	tcl (7.6 or higher (8.0a2, NOT a1))
 	plus-patches as of Dec 5, 1996 or later (optional)
-	memchan 1.0 or higher (optional)
-	zlib-1.0.4  or higher (optional)
-	libdes-3.21 or higher (optional)
+	memchan 1.0  or higher (optional)
+	zlib-1.0.4   or higher (optional)
+	libdes-3.21  or higher (optional)
+	SSLeay-0.6.6 or higher (optional)
     }
 
     comments {

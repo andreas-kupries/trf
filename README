@@ -10,12 +10,11 @@ procedures includes:
 
 *	Data encryption:
 
-	IDEA, Blowfish, RC4
-	DES		(if 'libdes' is available as shared library)
+	IDEA, Blowfish, RC4, RC2, DES
 
 *	Generation of message digests (hash values, checksums)
 
-	MD5, SHA/SHS, HAVAL
+	MD2, MD5, SHA/SHS, SHA-1, HAVAL
 	CRC (polynomial used by PGP)
 	ADLER (based upon zlib)
 
@@ -37,9 +36,10 @@ not required.  The extension requires a patched core. Patch files for 7.6 and
 Nijtmans (nijtmans@nici.kun.nl) contain this patch too .  Supporting (optional)
 packages are:
 
-*	memchan 1.0 or higher
-*	zlib-1.0.4  or higher
-*	libdes 3.21 or higher
+*	memchan 1.0  or higher
+*	zlib-1.0.4   or higher
+*	libdes 3.21  or higher
+*	SSLeay-0.6.6 or higher
 
 
 This distribution contains the source code for Tcl-Trf + documentation
@@ -47,10 +47,15 @@ describing commands (-> latex) and c-level interfaces (-> man-pages).
 
 Primary ftp-site is
 
+	<ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.tar.gz>
+	<ftp://ftp.westend.com/pub/aku/trf@mDosVersion@.zip>
+	<ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.readme>
+
+Secondary ftp-site is
+
 	<ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz>
 	<ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip>
 	<ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme>
-	<ftp://ftp.kisters.de/pub/lang/tcl/ext/memchan1.1.tar.gz>
 
 And for convencience:
 
@@ -80,7 +85,7 @@ or
 
 PLATFORMS
 	tested:
-		Linux 1.2.13	(gcc 2.7.0)	Development sytem
+		Linux 2.0.29	(gcc 2.7.2.1)	Development sytem
 		IRIX 6.2	(cc only)
 		ULTRIX 4.1	(both cc and gcc)
 		ULTRIX 4.4	(cc 3.0)

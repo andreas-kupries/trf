@@ -1,3 +1,42 @@
+Sun May 11 21:36:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* doc/install.tex, man.tex: Adapted to made changes.
+
+	* generic/transformInt.h: Definitions concerning DES moved to
+	'loadman.h'. 
+
+	* win/makefile.vc (TRFOBJS): Added the new files, named below.
+
+	* unix/Makefile.in: Added rules for new files named below.
+
+	* generic/init.c (Trf_Init): Added initializators for algorithms
+	  below. 
+
+	* generic/md2.c, rc2.c, sha1.c: New files. Glue to incorporate
+	  MD2, SHA1 message digests and RC2 block cipher. All are searched
+	  for in SSLeay only. WARNING: RC2 keylength is artificially
+	  limited to a maximum of 1024 bytes.
+
+	* win/makefile.vc (LIBDES): Removed this configuration
+	  variable. See Feb 26 too. Superfluous now, see below.
+
+	* generic/loadman.[ch]: new files, supercede 'libdes.c', which is
+	  removed from the distribution now. This manager allows for
+	  individual loading of functionality from a variety of
+	  libraries. Currently uses 'libcrypto.so' (SSLeay) and
+	  'libdes.so' only.
+
+Sat May 10 21:56:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* first step to change from 'libdes' over to 'SSLeay' ('libcrypto').
+
+	* generic/zlib.c, libdes.c: Changed to use the new functionality
+	  described below.
+
+	* generic/load.c: New file. Used last the 2 functions of
+	  'imgInit.c' (Img library, Jan Nijtmans) to factor out the common
+	  components of loading a shared library.
+
 Mon Mar 17 18:18:05 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* unix/Makefile.in (distclean): removed 'patchlevel.h' from
@@ -37,7 +76,7 @@ Sat Mar  1 15:50:50 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	* PREPARE: see below, generate uncompressed digest files.
 
 	* tests/________: removed '-z', expect uncompressed digest files
-	  (More space, but less dependencies (zlib)).
+	  (More space required, but less dependencies (zlib)).
 
 	* generic/registry.c: Bugfix in 'TrfInput' (-> Feb 14) caused
 	  the system to call read-flush twice. Noted due to doublesized

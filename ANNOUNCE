@@ -9,6 +9,20 @@ enabling you to do
 *	error correcting coding
 *	and data conversion (bin, hex, base64, ...)
 
+Changes from b2 to b3:
+
+*	Reorganized code into generic and os dependent parts.
+
+*	Added Windows port.
+
+*	Some bugfixes.
+
+*	More algorithms: RC2, MD2, SHA-1	(SSLeay required)
+
+*	Commands created use the object-interface of tcl8.0a2 now.
+	Runs with 7.6 nevertheless, BUT NOT with 8.0a1.
+
+
 Changes from b1 to b2:
 
 *	The patches to the core are enhanced to associate channels
@@ -43,7 +57,7 @@ IMPORTANT:
 
 PLATFORMS:
 	tested:
-		Linux 1.2.13	(gcc 2.7.0)	Development sytem
+		Linux 2.0.29	(gcc 2.7.2.1)	Development sytem (yes, I made an upgrade)
 		IRIX 6.2	(cc only)
 		ULTRIX 4.1	(both cc and gcc)
 		ULTRIX 4.4	(cc 3.0)
