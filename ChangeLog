@@ -1,3 +1,16 @@
+Sun Jul 19 22:24:43 1998  Andreas Kupries  <a.kupries@westend.com>
+
+	* tools/mmencode, -decode: Minimum replacements for the named
+	  applications (metamail). Conversion of a bytestream from and to
+	  base64.
+
+	* tools/demo: Visual demonstration application, sent to Jan for
+	  inclusion into his win installation (Consosrtium CD ROM
+	  Project). The logo too.
+
+	* doc/nodes/img/logo-*: Designed a logo for trf, built in various
+	  sizes.
+
 Sat Jul  4 21:29:26 1998  Andreas Kupries  <a.kupries@westend.com>
 
 	* unix/configure.in: Fixed a bug noted by David Herron
