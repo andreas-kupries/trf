@@ -28,7 +28,14 @@ TCL_INCLUDE_DIR		=	@TCL_INCLUDE_DIR@
 TCL_LIB_DIR		=	@TCL_LIB_DIR@
 TCL_LIB			=	@TCL_LIB@
 TCL_SRC_DIR		=	@TCL_SRC_DIR@
-SSL_INSTALL_DIR		=	/usr/local/ssl
+#SSL_INSTALL_DIR		=	/usr/local/ssl
+
+# Directories for zlib / ssl (message digests)
+ZLIB_INCLUDE_DIR	=	@ZLIB_INCLUDE_DIR@
+ZLIB_LIB_DIR		=	@ZLIB_LIB_DIR@
+
+SSL_INCLUDE_DIR		=	@SSL_INCLUDE_DIR@
+SSL_LIB_DIR		=	@SSL_LIB_DIR@
 
 
 # Default top-level directories in which to install architecture-
@@ -164,7 +171,8 @@ CC_SWITCHES	=	$(CFLAGS) $(TRF_SHLIB_CFLAGS) $(CPPFLAGS)	\
 CPPFLAGS	=	$(DEFINES) $(INCLUDES)
 
 INCLUDES	=	-I. -I$(srcdir) -I$(GENERIC_DIR) -I$(TOP_DIR)	\
-			-I$(TCL_INCLUDE_DIR) -I$(SSL_INSTALL_DIR)/include
+			-I$(TCL_INCLUDE_DIR) -I$(SSL_INCLUDE_DIR)	\
+			-I$(ZLIB_INCLUDE_DIR)
 DEFINES		=	$(PROTO_FLAGS) $(MEM_DEBUG_FLAGS) @DEFS@
 
 HEADER		=	$(GENERIC_HDRS)
@@ -315,7 +323,8 @@ check:	test
 
 test:	application
 	TCL_LIBRARY=$(TCL_SRC_DIR)/library; export TCL_LIBRARY; \
-	LD_LIBRARY_PATH="$(srcdir):unix:$(TCL_LIB_DIR):$(SSL_INSTALL_DIR)/lib"; export LD_LIBRARY_PATH; \
+	LD_LIBRARY_PATH="$(srcdir):unix:$(TCL_LIB_DIR):$(ZLIB_LIB_DIR):$(SSL_LIB_DIR)"; export LD_LIBRARY_PATH; \
+	SHLIB_PATH="$LD_LIBRARY_PATH"; export SHLIB_PATH \
 	echo cd $(TOP_DIR)/tests \; source all | $(APP)
 
 # 'unix' is required to have a path for the
