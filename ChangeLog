@@ -1,3 +1,23 @@
+Thu Mar 25 12:40:20 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/sha/fip180-1.pdf: Added description of SHA-1.
+
+	* doc/ToDo: Added: Create stub-table for Trf too, to be
+ 	  used by TrfCrypt and other extensions to this one.
+
+	* doc/nodes/where.node: Added note that the Windows binary
+	  distribution is not usable for Win95/98.
+
+	* PREPARE: Exclusion of 'generic/pkgIndex.tcl.in'.
+
+	* unix/pkgIndex.tcl.in: Moved from 'generic' to this place.
+	  Changed to check the tcl version, allowed version depends
+	  on usage of stubs, analogous to package index of Memchan. 
+
+	* unix/configure.in: Added code to handle stubs, as in
+	  'memchan'. Added code to disallow 'binio' for tcl 8.x and
+	  beyond. The user is refered to 'binary' instead.
+
 Sun Mar 21 16:01:44 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* Generated patches for 8.1b2, fixed a bug in the byteorder

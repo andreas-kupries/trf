@@ -40,7 +40,7 @@ mGenerateANNOUNCE
 
 eval mExclude \
 	mails patches/v8.0a1 patches/v8.0a2 patches/v8.0b1 patches/v8.0b2 \
-	[glob patches/*/*.orig] \
+	[glob patches/*/*.orig] generic/pkgIndex.tcl.in \
 	doc/install.tex doc/man.tex doc/html.sty doc/defs.tex \
 	[glob patches/nijtmans.*] DEPENDS doc/file doc/delete \
 	doc/FUN doc/ascii.man doc/ascii85 doc/scratch-pad \
