@@ -10,6 +10,10 @@ proc url {code text url} {
 
 # -------------------------------------------------
 
+url trf18       "version 1.8" http://www.oche.de/~akupries/soft/trf1.8/
+url trf_bdist18 "Trf 1.8 binary distributions" http://www.oche.de/~akupries/soft/trf1.8/trf_bdist.html
+
+
 url adams_md5 "[lib MD5] package" http://www.cybernetics.demon.co.uk/projects/md5/md5.html
 
 url tcl       [lang tcl]               http://www.scriptics.com/

@@ -8,14 +8,14 @@ node trf_future {
     parent      trf_home
 
     contents {
-	p "Things to be done in future."
+	p "Things waiting to be done in the future."
 
 	bullet_list {
 	    ## li	The tests are incomplete, expand them.
 	    ##	done
 
 	    li "Define a stub table for this extension.
-	    This will happen in version 2.0.
+	    This will happen in version 2.1.
 	    "
 
 	    li	"
@@ -33,12 +33,12 @@ node trf_future {
 	    ##	about the information flowing through it.
 	    ## not needed anymore, use 'transform' instead!
 
-	    li	"A partial implementation of the [cmd bzip] compressor was
-	    donated by [jan]. The decompressor does not work yet."
+	    ##li "A partial implementation of the [cmd bzip] compressor was
+	    ##donated by [jan]. The decompressor does not work yet."
 
 	    li	"
 	    Anybody out there wishing more ? Feel free to send [link meT]
-	    suggestions."
+	    suggestions and/or code for new transformations."
 	}
     }
 }

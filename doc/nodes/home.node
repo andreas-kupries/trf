@@ -31,8 +31,11 @@ node trf_home {
 
 	#  indexing is required
 
-	p "This is the [strong [cem last]] version of Trf supporting Tcl 7.6.
-	"
+	hr
+	p "If you are interested in a version of [strong {Trf usable
+	with Tcl 7.6}], please go and have a look at [trf18], the
+	last one supporting that version of Tcl."
+	hr
 
 	p "
 	[trf] is an extension library to the script language [tcl], as created
