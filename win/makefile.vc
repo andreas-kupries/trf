@@ -231,7 +231,7 @@ bindist:      $(TRFDLL)
 	-@md	$(TRF)
 	-@md	$(TRF)\patches
 	-@md	$(TRF)\patches\v76
-	-@md	$(TRF)\patches\v80b2
+	-@md	$(TRF)\patches\v80
 	-@$(CP)	$(TRFDLL)		$(TRF)\$(TRFDLL)
 	-@$(CP)	$(WINDIR)\pkgIndex.tcl	$(TRF)\pkgIndex.tcl
 	-@$(CP)	$(WINDIR)\README.VC	$(TRF)\README.VC
@@ -240,10 +240,14 @@ bindist:      $(TRFDLL)
 	-@$(CP) $(ROOT)\patches\v7.6\standard.patch	$(TRF)\patches\v76
 	-@$(CP) $(ROOT)\patches\v7.6\tcl.h		$(TRF)\patches\v76
 	-@$(CP) $(ROOT)\patches\v7.6\tclIO.c		$(TRF)\patches\v76
-	-@$(CP) $(ROOT)\patches\v8.0b2\byteorder.patch	$(TRF)\patches\v80b2
-	-@$(CP) $(ROOT)\patches\v8.0b2\standard.patch	$(TRF)\patches\v80b2
-	-@$(CP) $(ROOT)\patches\v8.0b2\tcl.h		$(TRF)\patches\v80b2
-	-@$(CP) $(ROOT)\patches\v8.0b2\tclIO.c		$(TRF)\patches\v80b2
+	-@$(CP) $(ROOT)\patches\v7.6p2\byteorder.patch	$(TRF)\patches\v76p2
+	-@$(CP) $(ROOT)\patches\v7.6p2\standard.patch	$(TRF)\patches\v76p2
+	-@$(CP) $(ROOT)\patches\v7.6p2\tcl.h		$(TRF)\patches\v76p2
+	-@$(CP) $(ROOT)\patches\v7.6p2\tclIO.c		$(TRF)\patches\v76p2
+	-@$(CP) $(ROOT)\patches\v8.0\byteorder.patch	$(TRF)\patches\v80
+	-@$(CP) $(ROOT)\patches\v8.0\standard.patch	$(TRF)\patches\v80
+	-@$(CP) $(ROOT)\patches\v8.0\tcl.h		$(TRF)\patches\v80
+	-@$(CP) $(ROOT)\patches\v8.0\tclIO.c		$(TRF)\patches\v80
 	$(PKZIP) -r $(TRF)bin.zip $(TRF)\*.*
 	-@$(RM)	$(TRF)\$(TRFDLL)
 	-@$(RM)	$(TRF)\pkgIndex.tcl
@@ -254,11 +258,16 @@ bindist:      $(TRFDLL)
 	-@$(RM) $(TRF)\patches\v76\tcl.h
 	-@$(RM) $(TRF)\patches\v76\tclIO.c
 	-@rd	$(TRF)\patches\v76
-	-@$(RM) $(TRF)\patches\v80b2\byteorder.patch
-	-@$(RM) $(TRF)\patches\v80b2\standard.patch
-	-@$(RM) $(TRF)\patches\v80b2\tcl.h
-	-@$(RM) $(TRF)\patches\v80b2\tclIO.c
-	-@rd	$(TRF)\patches\v80b2
+	-@$(RM) $(TRF)\patches\v76p2\byteorder.patch
+	-@$(RM) $(TRF)\patches\v76p2\standard.patch
+	-@$(RM) $(TRF)\patches\v76p2\tcl.h
+	-@$(RM) $(TRF)\patches\v76p2\tclIO.c
+	-@rd	$(TRF)\patches\v76p2
+	-@$(RM) $(TRF)\patches\v80\byteorder.patch
+	-@$(RM) $(TRF)\patches\v80\standard.patch
+	-@$(RM) $(TRF)\patches\v80\tcl.h
+	-@$(RM) $(TRF)\patches\v80\tclIO.c
+	-@rd	$(TRF)\patches\v80
 	-@rd	$(TRF)\patches
 	-@rd	$(TRF)
 
