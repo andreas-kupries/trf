@@ -56,6 +56,4 @@ extension trf {
 	memchan 1.0  or higher (required by testsuite),
 	zlib-1.0.4   or higher (optional, 1.1.2 is current),
     }
-
-    #    comments {}
 }
