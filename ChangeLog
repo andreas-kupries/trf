@@ -1,3 +1,9 @@
+Tue Jul 29 00:18:21 1997  Andreas Kupries  <a.kupries@westend.com>
+
+	* Ready for relase of Tcl 8.0 final now.
+
+	* Distribution running again under 7.6 and 8.x.
+
 Mon Jul 28 20:34:05 1997  Andreas Kupries  <a.kupries@westend.com>
 
 	* doc/man.tex (section {Message digests}): Added explanation of
