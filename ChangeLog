@@ -1588,7 +1588,7 @@ Fri Feb 14 19:15:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 Thu Feb 13 21:40:03 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
-	* - the bunch of messages below resulted from my first try to
+	* -: The bunch of messages below resulted from my first try to
 	  compile trf under windoof. Some other messages, not recorded
 	  here, were due to the usage of an unpatched version of tcl.
 
@@ -1695,7 +1695,7 @@ Thu Feb  6 19:27:41 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 Wed Feb  5 23:35:17 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
-	* Reorganization for multiplatform development and use
+	* : Reorganization for multiplatform development and use
 	  (unix, mac, win). Shuffled all files around. Adapted unix
 	  makefile to changes. Nothing for Mac and Windows yet.
 

@@ -96,6 +96,7 @@ mHandleBinaryDistributions \
 	unix/bdist/libcrypt.so
 
 mGenNews
+mGenChangeLog
 
 # I.b  generate official manual, diverse variants (dvi, ps)
 mLog info generating manual 
