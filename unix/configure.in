@@ -177,7 +177,7 @@ AC_CACHE_CHECK(for tcl library,
         if test -n "$trf_cv_lib_TCL_LIB"; then
             break
         fi
-        for version in 8.1 8.0 7.6 ""; do
+        for version in 8.1 8.0 7.6 81 80 76 ""; do
             if test -n "$trf_cv_lib_TCL_LIB"; then
                 break
             fi
@@ -185,7 +185,7 @@ AC_CACHE_CHECK(for tcl library,
                 if test -n "$trf_cv_lib_TCL_LIB"; then
                     break
                 fi
-                if test -f "$dir/libtcl$version$libsuff"; then
+                if test -f $dir/libtcl$version$libsuff; then
                     trf_cv_lib_TCL_LIB="-L$dir -ltcl$version"
 		    TCL_LIB_DIR="$dir"
                 fi
