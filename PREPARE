@@ -60,8 +60,8 @@ replace_in_file win/makefile.vc @TRF_VERSION@       ${the-version}
 replace_in_file win/makefile.vc @TRF_nodotVERSION@  $nodot_version
 replace_in_file win/makefile.vc @DATE@              $long_date
 
-replace_in_file dox/install.tex @VERSION@ ${the-patchlevel}
-replace_in_file dox/install.tex @DATE@    $long_date
+replace_in_file doc/install.tex @VERSION@ ${the-patchlevel}
+replace_in_file doc/install.tex @DATE@    $long_date
 
 
 # I.   clean documentation
