@@ -68,34 +68,21 @@ TRFOBJS = \
 	$(TMPDIR)\adler.obj \
 	$(TMPDIR)\asc85code.obj \
 	$(TMPDIR)\b64code.obj \
-	$(TMPDIR)\bc_opt.obj \
-	$(TMPDIR)\bc_util.obj \
 	$(TMPDIR)\bincode.obj \
 	$(TMPDIR)\binio.obj \
-	$(TMPDIR)\blockcipher.obj \
-	$(TMPDIR)\blowfish.obj \
-	$(TMPDIR)\c_opt.obj \
-	$(TMPDIR)\c_util.obj \
-	$(TMPDIR)\cipher.obj \
 	$(TMPDIR)\convert.obj \
 	$(TMPDIR)\crc.obj \
 	$(TMPDIR)\crc_zlib.obj \
-	$(TMPDIR)\des.obj \
 	$(TMPDIR)\dig_opt.obj \
 	$(TMPDIR)\digest.obj \
 	$(TMPDIR)\haval.obj \
 	$(TMPDIR)\hexcode.obj \
-	$(TMPDIR)\idea.obj \
 	$(TMPDIR)\init.obj \
 	$(TMPDIR)\load.obj \
 	$(TMPDIR)\loadman.obj \
 	$(TMPDIR)\md5.obj \
 	$(TMPDIR)\md2.obj \
 	$(TMPDIR)\octcode.obj \
-	$(TMPDIR)\rc4.obj \
-	$(TMPDIR)\rc2.obj \
-	$(TMPDIR)\rot.obj \
-	$(TMPDIR)\safer.obj \
 	$(TMPDIR)\registry.obj \
 	$(TMPDIR)\rs_ecc.obj \
 	$(TMPDIR)\sha.obj \
