@@ -33,54 +33,71 @@
  * Declarations of internal procedures.
  */
 
-static Trf_ControlBlock CreateEncoder  _ANSI_ARGS_ ((ClientData writeClientData,
-						     Trf_WriteProc *fun,
-						     Trf_Options optInfo,
-						     Tcl_Interp*   interp,
-						     ClientData clientData));
-static void             DeleteEncoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     ClientData clientData));
-static int              Encode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     unsigned int character,
-						     Tcl_Interp* interp,
-						     ClientData clientData));
-static int              EncodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     unsigned char* buffer,
-						     int bufLen,
-						     Tcl_Interp* interp,
-						     ClientData clientData));
-static int              FlushEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     Tcl_Interp* interp,
-						     ClientData clientData));
-static void             ClearEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     ClientData clientData));
+static Trf_ControlBlock
+CreateEncoder  _ANSI_ARGS_ ((ClientData     writeClientData,
+			     Trf_WriteProc* fun,
+			     Trf_Options    optInfo,
+			     Tcl_Interp*    interp,
+			     ClientData     clientData));
+static void
+DeleteEncoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     ClientData       clientData));
+static int
+Encode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     unsigned int     character,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static int
+EncodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     unsigned char*   buffer,
+			     int              bufLen,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static int
+FlushEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static void
+ClearEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     ClientData clientData));
 
-static Trf_ControlBlock CreateDecoder  _ANSI_ARGS_ ((ClientData writeClientData,
-						     Trf_WriteProc *fun,
-						     Trf_Options optInfo,
-						     Tcl_Interp*   interp,
-						     ClientData clientData));
-static void             DeleteDecoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     ClientData clientData));
-static int              Decode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     unsigned int character,
-						     Tcl_Interp* interp,
-						     ClientData clientData));
-static int              DecodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     unsigned char* buffer,
-						     int bufLen,
-						     Tcl_Interp* interp,
-						     ClientData clientData));
-static int              FlushDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     Tcl_Interp* interp,
-						     ClientData clientData));
-static void             ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     ClientData clientData));
+static Trf_ControlBlock
+CreateDecoder  _ANSI_ARGS_ ((ClientData     writeClientData,
+			     Trf_WriteProc* fun,
+			     Trf_Options    optInfo,
+			     Tcl_Interp*    interp,
+			     ClientData     clientData));
+static void
+DeleteDecoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     ClientData       clientData));
+static int
+Decode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     unsigned int     character,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static int
+DecodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     unsigned char*   buffer,
+			     int              bufLen,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static int
+FlushDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static void
+ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     ClientData       clientData));
 
-static void ZlibError _ANSI_ARGS_ ((Tcl_Interp* interp,
-				    z_streamp   state,
-				    int         errcode,
-				    CONST char* prefix));
+static void
+ZlibError _ANSI_ARGS_ ((Tcl_Interp* interp,
+			z_streamp   state,
+			int         errcode,
+			CONST char* prefix));
+
+static const char*
+ZlibErrorMsg _ANSI_ARGS_ ((z_streamp   state,
+			   int         errcode));
 
 
 /*
@@ -91,7 +108,7 @@ static Trf_TypeDefinition convDefinition =
 {
   "zip",
   NULL, /* client data not used       */
-  NULL, /* filled later (TrfInit_ZIP) */ /* THREADING: serialize initialization */
+  NULL, /* filled later (TrfInit_ZIP), THREADING: serialize initialization */
   {
     CreateEncoder,
     DeleteEncoder,
@@ -130,6 +147,7 @@ typedef struct _EncoderControl_ {
 typedef struct _DecoderControl_ {
   Trf_WriteProc* write;
   ClientData     writeClientData;
+  int            nowrap;
 
   /* add conversion specific items here (ZIP) */
 
@@ -237,6 +255,7 @@ ClientData     clientData;
 			 MAX_MEM_LEVEL, Z_DEFAULT_STRATEGY,
 			 ZLIB_VERSION, sizeof(z_stream));
 
+  IN; PRINTLN (ZlibErrorMsg (&c->state, res)); FL; OT;
 
   if (res != Z_OK) {
     if (interp) {
@@ -284,6 +303,7 @@ ClientData clientData;
   PRINT ("deflateEnd ()\n"); FL;
 
   zf.deflateEnd (&c->state);
+
   Tcl_Free ((char*) c->output_buffer);
   Tcl_Free ((char*) c);
 
@@ -336,6 +356,8 @@ ClientData clientData;
 
     PRINT ("deflate (Z_NO_FLUSH)\n"); FL;
     res = zf.deflate (&c->state, Z_NO_FLUSH);
+
+    IN; PRINTLN (ZlibErrorMsg (&c->state, res)); FL; OT;
 
     if (res < Z_OK) {
       if (interp) {
@@ -413,6 +435,8 @@ ClientData clientData;
     PRINT ("deflate (Z_NO_FLUSH)\n"); FL;
     res = zf.deflate (&c->state, Z_NO_FLUSH);
 
+    IN; PRINTLN (ZlibErrorMsg (&c->state, res)); FL; OT;
+
     if (res < Z_OK) {
       if (interp) {
 	ZlibError (interp, &c->state, res, "compressor");
@@ -485,6 +509,8 @@ ClientData clientData;
 
     PRINT ("deflate (Z_FINISH)\n"); FL;
     res = zf.deflate (&c->state, Z_FINISH);
+
+    IN; PRINTLN (ZlibErrorMsg (&c->state, res)); FL; OT;
 
     if (res < Z_OK) {
       if (interp) {
@@ -584,6 +610,7 @@ ClientData     clientData;
   c = (DecoderControl*) Tcl_Alloc (sizeof (DecoderControl));
   c->write           = fun;
   c->writeClientData = writeClientData;
+  c->nowrap          = o->nowrap;
 
   /* initialize conversion specific items here (ZIP) */
 
@@ -599,7 +626,7 @@ ClientData     clientData;
     return (ClientData) NULL;
   }
 
-  PRINT ("inflateInit (%s)\n", ZLIB_VERSION); FL;
+  PRINT ("inflateInit (%s, nowrap=%d)\n", ZLIB_VERSION, o->nowrap); FL;
 
 #if 0
   res = zf.inflateInit_ (&c->state,
@@ -611,6 +638,8 @@ ClientData     clientData;
 			 -MAX_WBITS :
 			 MAX_WBITS,
 			 ZLIB_VERSION, sizeof (z_stream));
+
+  IN; PRINTLN (ZlibErrorMsg (&c->state, res)); FL; OT;
 
   if (res != Z_OK) {
     if (interp) {
@@ -712,6 +741,8 @@ ClientData clientData;
     PRINT ("inflate (Z_NO_FLUSH)\n"); FL;
     res = zf.inflate (&c->state, Z_NO_FLUSH);
 
+    IN; PRINTLN (ZlibErrorMsg (&c->state, res)); FL; OT;
+
     if (res < Z_OK) {
       if (interp) {
 	ZlibError (interp, &c->state, res, "decompressor");
@@ -787,6 +818,8 @@ ClientData clientData;
     PRINT ("inflate (Z_NO_FLUSH)\n"); FL;
     res = zf.inflate (&c->state, Z_NO_FLUSH);
 
+    IN; PRINTLN (ZlibErrorMsg (&c->state, res)); FL; OT;
+
     if (res < Z_OK) {
       if (interp) {
 	ZlibError (interp, &c->state, res, "decompressor");
@@ -804,11 +837,15 @@ ClientData clientData;
       }
     }
 
-    if (c->state.avail_in > 0)
+    if (c->state.avail_in > 0) {
+      PRINTLN ("More to process");
       continue;
+    }
 
-    if ((c->state.avail_out == 0) && (res == Z_OK))
+    if ((c->state.avail_out == 0) && (res == Z_OK)) {
+      PRINTLN ("Output space exhausted, still ok");
       continue;
+    }
 
     break;
   }
@@ -859,6 +896,22 @@ ClientData clientData;
 
     PRINT ("inflate (Z_FINISH)\n"); FL;
     res = zf.inflate (&c->state, Z_FINISH);
+
+    IN; PRINTLN (ZlibErrorMsg (&c->state, res));
+    FL; OT;
+
+    if (c->nowrap && (res == Z_BUF_ERROR) {
+      /* This here has a hackish flavor to it. In one of the tests the
+       * decompression was done in a single call to 'inflate' which
+       * returned Z_OK. The call here then returned Z_BUF_ERROR
+       * whereas in the corresponding call without nowrap we got the
+       * correct Z_STREAM_END. The resulting decompressed output was
+       * correct though.
+       */
+
+      DONE (ZipFlushDecoder);
+      return TCL_OK;
+    }
 
     if ((res < Z_OK) || (res == Z_NEED_DICT)) {
       if (interp) {
@@ -947,6 +1000,35 @@ z_streamp   state;
 int         errcode;
 CONST char* prefix;
 {
+  Tcl_AppendResult (interp, "zlib error (", (char*) NULL);
+  Tcl_AppendResult (interp, prefix, (char*) NULL);
+  Tcl_AppendResult (interp, "): ", (char*) NULL);
+  Tcl_AppendResult (interp, ZlibErrorMsg (state, errcode), (char*) NULL);
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	ZlibErrorMsg --
+ *
+ *	------------------------------------------------*
+ *	Return the error message from the zlib-state.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static const char*
+ZlibErrorMsg (state, errcode)
+z_streamp   state;
+int         errcode;
+{
   CONST char* msg;
 
   if (state->msg != NULL) {
@@ -981,6 +1063,14 @@ CONST char* prefix;
     case Z_NEED_DICT:
       msg = "dictionary required";
       break;
+
+    case Z_STREAM_END:
+      msg = "stream ends here, flushed out";
+      break;
+
+    case Z_OK:
+      msg = "ok";
+      break;
       
     default:
       msg = "?";
@@ -988,8 +1078,5 @@ CONST char* prefix;
     }
   }
 
-  Tcl_AppendResult (interp, "zlib error (", (char*) NULL);
-  Tcl_AppendResult (interp, prefix, (char*) NULL);
-  Tcl_AppendResult (interp, "): ", (char*) NULL);
-  Tcl_AppendResult (interp, msg, (char*) NULL);
+  return msg;
 }

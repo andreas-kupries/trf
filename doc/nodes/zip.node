@@ -23,11 +23,26 @@ node trf_zip {
 		will automatically use the reverse operation.
 		"
 	    }
-
 	    defrow -level {
 		p "
 		Possible arguments are ``default'' and integer numbers in the
 		range 1 ... 9. It specifies the used compression level."
+	    }
+	    defrow -nowrap {
+		p "Possible arguments are ``default'' and everything accepted
+		by Tcl_GetBoolean(FromObj).
+		"
+		p "Normally the compressed stream is "wrapped" between
+		2 header-bytes (id) and 4 footer-bytes (crc). When using
+		[strong -nowrap], those bytes are stripped off the stream.
+		They are only used for error-checking and not for the actual
+		compression/decompression. Because the ZIP file format
+		has its own error-checking already, there is no need
+		to duplicate it in the stream.
+		"
+		p "Thus using '-nowrap 1' allows a much simpler processing of
+		ZIP files.
+		"
 	    }
 	}
 

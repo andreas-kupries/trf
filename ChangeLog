@@ -1,5 +1,11 @@
 Thu Oct 21 00:25:23 1999  Andreas Kupries  <a.kupries@westend.com>
 
+	* doc/nodes/zip.node: Added documentation -nowrap.
+
+	* generic/zip.c: Traced the problem uncovered by the new tests and
+	  added a workaround to 'FlushDecoder'. Search for 'hackish
+	  flavor'.
+
 	* doc/nodes/home.node: Added Tcl MIME to the list of extensions
  	  using Trf or its core feature.
 

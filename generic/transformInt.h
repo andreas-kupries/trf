@@ -91,10 +91,11 @@ extern int n;
 #define IN n+=4
 #define OT n-=4 ; if (n<0) {n=0;}
 #define FL       fflush (stdout)
-#define START(p) BLNKS; printf ("Start %s...\n",#p); FL; IN
-#define DONE(p)  OT ; BLNKS; printf ("....Done %s\n",#p); FL;
-#define PRINT    BLNKS; printf
-#define NPRINT   printf
+#define START(p)   BLNKS; printf ("Start %s...\n",#p); FL; IN
+#define DONE(p)    OT ; BLNKS; printf ("....Done %s\n",#p); FL;
+#define PRINT      BLNKS; printf
+#define PRINTLN(a) BLNKS; printf ("%s\n", (a))
+#define NPRINT     printf
 #define PRTSTR(fmt,len,bytes) PrintString (fmt,len,bytes)
 extern void PrintString _ANSI_ARGS_ ((char* fmt, int len, char* bytes));
 #else
@@ -106,6 +107,7 @@ extern void PrintString _ANSI_ARGS_ ((char* fmt, int len, char* bytes));
 #define DONE(p)
 #define PRINT  if (0) printf
 #define NPRINT if (0) printf
+#define PRINTLN(a)
 #define PRTSTR(fmt,len,bytes)
 #endif
 
