@@ -1,4 +1,10 @@
-2002-09-27  Andreas Kupries  <andreask@pliers.activestate.com>
+2002-10-01  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
+
+	* configure.in: Readded check for endianess. Moved ltoa,
+	  etc. block just after tea_setup_compiler. Detemrination of flags
+	  for shared build messes up these tests.
+
+2002-09-27  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* compat/tclLoadWin.c: Removed inclusion of windows header
 	  to prevent clashes between winsock and winsock2/

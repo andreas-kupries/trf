@@ -87,6 +87,18 @@ TEA_PREFIX
 TEA_SETUP_COMPILER
 
 #--------------------------------------------------------------------
+# If ltoa is present, use it to convert integer values into strings.
+# If not, sprintf is used, which is slower and requires more code.
+#--------------------------------------------------------------------
+
+AC_C_BIGENDIAN
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(long int)
+AC_CHECK_FUNCS(ltoa)
+AC_CHECK_LIB(crypt, main,         HAS_LIBCRYPT=1,     HAS_LIBCRYPT=0)
+AC_CHECK_LIB(crypt, md5_init_ctx, HAS_LIBCRYPT_MD5=1, HAS_LIBCRYPT_MD5=0)
+
+#--------------------------------------------------------------------
 # __CHANGE__
 # Choose which headers you need.  Extension authors should try very
 # hard to only rely on the Tcl public header files.  Internal headers
@@ -178,17 +190,6 @@ AC_SUBST(SHARED_BUILD)
 #--------------------------------------------------------------------
 
 AC_DEFINE(USE_TCL_STUBS)
-
-#--------------------------------------------------------------------
-# If ltoa is present, use it to convert integer values into strings.
-# If not, sprintf is used, which is slower and requires more code.
-#--------------------------------------------------------------------
-
-AC_CHECK_SIZEOF(int)
-AC_CHECK_SIZEOF(long int)
-AC_CHECK_FUNCS(ltoa)
-AC_CHECK_LIB(crypt, main,         HAS_LIBCRYPT=1,     HAS_LIBCRYPT=0)
-AC_CHECK_LIB(crypt, md5_init_ctx, HAS_LIBCRYPT_MD5=1, HAS_LIBCRYPT_MD5=0)
 
 #--------------------------------------------------------------------
 # This macro generates a line to use when building a library.  It
