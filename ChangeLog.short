@@ -12,6 +12,8 @@ Changes from 1.8 to 2.0
 
 *	Squashed the bug in the 'bzip' (de)compressor.
 
+*	Squashed other bugs reported by Matt Newman <matt@sensus.org>
+
 *	Dropped support for Tcl 7.6.
 
 Changes from 1.7 to 1.8

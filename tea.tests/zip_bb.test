@@ -71,6 +71,8 @@ if {[info tclversion] < 8.0} {
 set data  [info commands]
 set zdata [zip -mode compress $data]
 
+makeFile {} zip
+
 test zip-2.0 {(De)compression while reading/writing from/to a file} {hasZlib} {
     write_zip zip $data
     read_zip  zip
