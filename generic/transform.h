@@ -129,14 +129,14 @@ TRF_EXPORT (int,Trf_SafeInit) _ANSI_ARGS_ ((Tcl_Interp* interp));
  * Check, wether this extension was initialized for the
  * specified interpreter or not.
  */
-/*
+#if 0
 #ifdef __C2MAN__
 int
-Trf_IsInitialized (Tcl_Interp* interp /* interpreter to check for initialization * /);
+Trf_IsInitialized (Tcl_Interp* interp /* interpreter to check for initialization */);
 #else
 TRF_EXPORT (int,Trf_IsInitialized) _ANSI_ARGS_ ((Tcl_Interp* interp));
 #endif
-*/
+#endif
 /*
  * Exported C level facilities.
  */
@@ -541,16 +541,16 @@ typedef struct _Trf_TypeDefinition_ {
  * to the transformation described in 'type'. 'type->name' is used
  * as name of the command.
  */
-/*
+#if 0
 #ifdef __C2MAN__
 int
-Trf_Register (Tcl_Interp*               interp, /* interpreter to register at * /
-	      CONST Trf_TypeDefinition* type    /* transformation to register * /);
+Trf_Register (Tcl_Interp*               interp, /* interpreter to register at */
+	      CONST Trf_TypeDefinition* type    /* transformation to register */);
 #else
 TRF_EXPORT (int,Trf_Register) _ANSI_ARGS_ ((Tcl_Interp* interp,
 					    CONST Trf_TypeDefinition* type));
 #endif
-*/
+#endif
 
 /*
  * Interfaces for easier creation of certain classes of
@@ -706,17 +706,17 @@ typedef struct _Trf_MessageDigestDescription {
  * value is a standard tcl error code. In case of failure an error message
  * should be left in the result area of the given interpreter.
  */
-/*
+#if 0
 #ifdef __C2MAN__
 int
-Trf_RegisterMessageDigest (Tcl_Interp* interp /* interpreter to register the MD algorithm at * /,
+Trf_RegisterMessageDigest (Tcl_Interp* interp /* interpreter to register the MD algorithm at */,
 		   CONST Trf_MessageDigestDescription* md_desc /* description of the MD
-									* algorithm * /);
+									* algorithm */);
 #else
 TRF_EXPORT (int,Trf_RegisterMessageDigest) _ANSI_ARGS_ ((Tcl_Interp* interp,
 				CONST Trf_MessageDigestDescription* md_desc));
 #endif
-*/
+#endif
 
 /*
  * Internal helper procedures worth exporting.
@@ -738,17 +738,17 @@ TRF_EXPORT (void,Trf_LoadFailed) _ANSI_ARGS_ ((VOID** handlePtr));
  * Internally used by the implementation of the
  * various stream modes available to blockciphers.
  */
-/*
+#if 0
 #ifdef __C2MAN__
 void
-Trf_XorBuffer (VOID* buffer, /* buffer to xor the mask with * /
-	       VOID* mask,   /* mask bytes xor'ed into the buffer * /
-	       int length    /* length of mask and buffer (in byte) * /);
+Trf_XorBuffer (VOID* buffer, /* buffer to xor the mask with */
+	       VOID* mask,   /* mask bytes xor'ed into the buffer */
+	       int length    /* length of mask and buffer (in byte) */);
 #else
 TRF_EXPORT (void,Trf_XorBuffer) _ANSI_ARGS_ ((VOID* buffer, VOID* mask,
 					      int length));
 #endif
-*/
+#endif
 
 /*
  * Shift the register.
@@ -756,45 +756,45 @@ TRF_EXPORT (void,Trf_XorBuffer) _ANSI_ARGS_ ((VOID* buffer, VOID* mask,
  * number of bytes from the left of the 2nd register ('in') is
  * inserted at the right of 'buffer' to replace the lost bytes.
  */
-/*
+#if 0
 #ifdef __C2MAN__
 void
-Trf_ShiftRegister (VOID* buffer,       /* data shifted to the left * /
-		   VOID* in,           /* 2nd register shifted into the buffer * /
-		   int   shift,        /* number of bytes to shift out (and in) * /
-		   int   buffer_length /* length of buffer and in (in byte) * /);
+Trf_ShiftRegister (VOID* buffer,       /* data shifted to the left */
+		   VOID* in,           /* 2nd register shifted into the buffer */
+		   int   shift,        /* number of bytes to shift out (and in) */
+		   int   buffer_length /* length of buffer and in (in byte) */);
 #else
 TRF_EXPORT (void,Trf_ShiftRegister) _ANSI_ARGS_ ((VOID* buffer, VOID* in,
 						  int shift,
 						  int buffer_length));
 #endif
-*/
+#endif
 
 /*
  * Swap the bytes of all 2-byte words contained in the buffer.
  */
-/*
+#if 0
 #ifdef __C2MAN__
 void
-Trf_FlipRegisterShort (VOID* buffer, /* data to swap * /
-		       int   length  /* length of buffer (in byte) * /);
+Trf_FlipRegisterShort (VOID* buffer, /* data to swap */
+		       int   length  /* length of buffer (in byte) */);
 #else
 TRF_EXPORT (void,Trf_FlipRegisterShort) _ANSI_ARGS_ ((VOID* buffer,
 						      int length));
 #endif
-*/
+#endif
 /*
  * Swap the bytes of all 4-byte words contained in the buffer.
  */
-/*
+#if 0
 #ifdef __C2MAN__
 void
-Trf_FlipRegisterLong (VOID* buffer, /* data to swap * /
-		      int   length  /* length of buffer (in byte) * /);
+Trf_FlipRegisterLong (VOID* buffer, /* data to swap */
+		      int   length  /* length of buffer (in byte) */);
 #else
 TRF_EXPORT (void,Trf_FlipRegisterLong) _ANSI_ARGS_ ((VOID* buffer, int length));
 #endif
-*/
+#endif
 /*
  * End of exported interface
  */
