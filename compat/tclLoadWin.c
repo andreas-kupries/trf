@@ -111,7 +111,9 @@ dlclose(handle)
     ptr = libraryList; prevPtr = NULL;
     while (ptr != NULL) {
 	if (ptr->handle == (HINSTANCE) handle) {
+#ifndef BUGS_ON_EXIT
 	    FreeLibrary((HINSTANCE) handle);
+#endif
 	    if (prevPtr) {
 		prevPtr->nextPtr = ptr->nextPtr;
 	    } else {

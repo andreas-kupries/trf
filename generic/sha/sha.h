@@ -8,13 +8,15 @@
 
 /* Useful defines & typedefs */
 
-#ifndef BYTE /* can be defined on Windows! */
+#ifndef _WIN32
 typedef unsigned char BYTE;
 #endif
 #ifdef __alpha
 typedef unsigned int  UINT32;
 #else
+#ifndef _WIN32
 typedef unsigned long UINT32;
+#endif
 #endif
 
 

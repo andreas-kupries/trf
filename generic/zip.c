@@ -45,7 +45,8 @@ static int              Encode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 						     Tcl_Interp* interp,
 						     ClientData clientData));
 static int              EncodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     unsigned char* buffer, int bufLen,
+						     unsigned char* buffer,
+						     int bufLen,
 						     Tcl_Interp* interp,
 						     ClientData clientData));
 static int              FlushEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
@@ -66,7 +67,8 @@ static int              Decode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 						     Tcl_Interp* interp,
 						     ClientData clientData));
 static int              DecodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     unsigned char* buffer, int bufLen,
+						     unsigned char* buffer,
+						     int bufLen,
 						     Tcl_Interp* interp,
 						     ClientData clientData));
 static int              FlushDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
@@ -200,6 +202,8 @@ ClientData     clientData;
   TrfZipOptionBlock* o = (TrfZipOptionBlock*) optInfo;
   int res;
 
+  START (ZipCreateEncoder); 
+
   c = (EncoderControl*) Tcl_Alloc (sizeof (EncoderControl));
   c->write           = fun;
   c->writeClientData = writeClientData;
@@ -217,6 +221,7 @@ ClientData     clientData;
     return (ClientData) NULL;
   }
 
+  PRINT ("deflateInit (%d, %s)\n", o->level, ZLIB_VERSION); FL;
   res = zf.deflateInit_ (&c->state, o->level, ZLIB_VERSION, sizeof(z_stream));
 
   if (res != Z_OK) {
@@ -229,6 +234,7 @@ ClientData     clientData;
     return (ClientData) NULL;
   }
 
+  DONE (ZipCreateEncoder); 
   return (ClientData) c;
 }
 
@@ -259,9 +265,14 @@ ClientData clientData;
 
   /* release conversion specific items here (ZIP) */
 
+  START (ZipDeleteEncoder); 
+  PRINT ("deflateEnd ()"); FL;
+
   zf.deflateEnd (&c->state);
   Tcl_Free ((char*) c->output_buffer);
   Tcl_Free ((char*) c);
+
+  DONE (ZipDeleteEncoder); 
 }
 
 /*
@@ -297,6 +308,8 @@ ClientData clientData;
   char in;
   int res;
 
+  START (ZipEncode); 
+
   in = character;
 
   c->state.next_in   = (Bytef*) &in;
@@ -306,12 +319,15 @@ ClientData clientData;
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
+    PRINT ("deflate (Z_NO_FLUSH)\n"); FL;
+
     res = zf.deflate (&c->state, Z_NO_FLUSH);
 
     if (res < Z_OK) {
       if (interp) {
 	ZlibError (interp, &c->state, res, "compressor");
       }
+      DONE (ZipEncode); 
       return TCL_ERROR;
     }
 
@@ -319,6 +335,7 @@ ClientData clientData;
       res = c->write (c->writeClientData, (unsigned char*) c->output_buffer,
 		      OUT_SIZE - c->state.avail_out, interp);
       if (res != TCL_OK) {
+	DONE (ZipEncode); 
 	return res;
       }
     }
@@ -332,6 +349,7 @@ ClientData clientData;
     break;
   }
 
+  DONE (ZipEncode); 
   return TCL_OK;
 }
 
@@ -368,6 +386,9 @@ ClientData clientData;
 
   int res;
 
+  START (ZipEncodebuffer); 
+  PRINT ("Bytes = %d\n", bufLen); FL;
+
   c->state.next_in   = (Bytef*) buffer;
   c->state.avail_in  = bufLen;
 
@@ -375,12 +396,15 @@ ClientData clientData;
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
+    PRINT ("deflate (Z_NO_FLUSH)\n"); FL;
+
     res = zf.deflate (&c->state, Z_NO_FLUSH);
 
     if (res < Z_OK) {
       if (interp) {
 	ZlibError (interp, &c->state, res, "compressor");
       }
+      DONE (ZipEncodeBuffer); 
       return TCL_ERROR;
     }
 
@@ -388,6 +412,7 @@ ClientData clientData;
       res = c->write (c->writeClientData, (unsigned char*) c->output_buffer,
 		      OUT_SIZE - c->state.avail_out, interp);
       if (res != TCL_OK) {
+	DONE (ZipEncodeBuffer); 
 	return res;
       }
     }
@@ -401,6 +426,7 @@ ClientData clientData;
     break;
   }
 
+  DONE (ZipEncodeBuffer); 
   return TCL_OK;
 }
 
@@ -435,6 +461,8 @@ ClientData clientData;
 
   int res;
 
+  START (ZipFlushEncoder); 
+
   c->state.next_in   = (Bytef*) NULL;
   c->state.avail_in  = 0;
 
@@ -442,12 +470,15 @@ ClientData clientData;
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
+    PRINT ("deflate (Z_FINISH)\n"); FL;
+
     res = zf.deflate (&c->state, Z_FINISH);
 
     if (res < Z_OK) {
       if (interp) {
 	ZlibError (interp, &c->state, res, "compressor/flush");
       }
+      DONE (ZipFlushEncoder); 
       return TCL_ERROR;
     }
 
@@ -455,6 +486,7 @@ ClientData clientData;
       res = c->write (c->writeClientData, (unsigned char*) c->output_buffer,
 		      OUT_SIZE - c->state.avail_out, interp);
       if (res != TCL_OK) {
+	DONE (ZipFlushEncoder); 
 	return res;
       }
     }
@@ -465,6 +497,7 @@ ClientData clientData;
     break;
   }
 
+  DONE (ZipFlushEncoder); 
   return TCL_OK;
 }
 
@@ -493,9 +526,14 @@ ClientData clientData;
 {
   EncoderControl* c = (EncoderControl*) ctrlBlock;
 
+  START (ZipClearEncoder); 
+  PRINT ("deflateReset\n"); FL;
+
   /* execute conversion specific code here (ZIP) */
 
   zf.deflateReset (&c->state);
+
+  DONE (ZipClearEncoder); 
 }
 
 /*

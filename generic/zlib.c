@@ -39,13 +39,29 @@ static char* symbols [] = {
  * Global variable containing the vectors into the 'zlib'-library.
  */
 
+#if STATIC_BUILD
+zFunctions zf = {
+  0,
+  deflate,
+  deflateEnd,
+  deflateInit_,
+  deflateReset,
+  inflate,
+  inflateEnd,
+  inflateInit_,
+  inflateReset,
+  adler32,
+  crc32,
+};
+#else
 zFunctions zf = {0}; /* THREADING: serialize initialization */
-
+#endif
 
 int
 TrfLoadZlib (interp)
     Tcl_Interp* interp;
 {
+#if STATIC_BUILD != 1
   int res;
 
   TrfLock; /* THREADING: serialize initialization */
@@ -54,4 +70,7 @@ TrfLoadZlib (interp)
   TrfUnlock;
 
   return res;
+#else
+  return TCL_OK;
+#endif
 }

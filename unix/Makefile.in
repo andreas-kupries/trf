@@ -361,6 +361,8 @@ application:	library $(APP)
 
 #-------------------------------------------------------#
 
+TCLSH_PROG	=	@TCLSH_PROG@
+
 TAGS:
 		etags *.[ch]
 
@@ -374,7 +376,7 @@ test:	application
 	TCL_LIBRARY=$(TCL_SRC_DIR)/library; export TCL_LIBRARY; \
 	LD_LIBRARY_PATH="$(srcdir):./unix:$(TCL_LIB_DIR):$(ZLIB_LIB_DIR):$(SSL_LIB_DIR)"; \
 	export LD_LIBRARY_PATH; SHLIB_PATH="$LD_LIBRARY_PATH"; export SHLIB_PATH ; \
-	echo package require Memchan \; cd $(TOP_DIR)/tests \; source defs \; defConstraints \"$(TRF_TESTS)\" \; source all | $(APP)
+	echo package require Memchan \; load ./$(TRF_LIB_FILE) \; cd $(TOP_DIR)/tests \; source defs \; defConstraints \"$(TRF_TESTS)\" \; source all | $(TCLSH_PROG)
 
 # 'unix' is required to have a path for the
 # recursive call to unix/tclsh in '________.test'.

@@ -166,7 +166,7 @@ guilibs	   = $(libc) $(winlibs)
 
 guilibsdll = $(libcdll) $(winlibs)
 
-TRF_DEFINES	= -D__WIN32__ -DSTATIC_BUILD  ${TRF_SHLIB_CFLAGS} -DTRF_VERSION="\"${VERSION}\"" ${SSL_LIBRARY}
+TRF_DEFINES	= -D__WIN32__ -DSTATIC_BUILD  ${TRF_SHLIB_CFLAGS} -DTRF_VERSION="\"${VERSION}\"" ${SSL_LIBRARY} -DBUGS_ON_EXIT
 
 # $(TCL_CC_SWITCHES)
 INCLUDES	=	-I. -I$(srcdir) -I../generic -I$(TCL_INC_DIR)

@@ -78,6 +78,32 @@ extern "C" {
 # define TCL_STORAGE_CLASS DLLIMPORT
 #endif
 
+/* Debugging definitions.
+ */
+
+#ifdef _WIN32
+#undef TRF_DEBUG
+#endif
+
+#ifdef TRF_DEBUG
+static int n = 0;
+#define BLNKS {int i; for (i=0;i<n;i++) printf (" "); }
+#define IN n+=4
+#define OT n-=4 ; if (n<0) {n=0;}
+#define FL       fflush (stdout)
+#define START(p) BLNKS; printf ("Start %s...\n",#p); FL; IN
+#define DONE(p)  OT ; BLNKS; printf ("....Done %s\n",#p); FL;
+#define PRINT    BLNKS; printf
+#else
+#define BLNKS
+#define IN
+#define OT
+#define FL
+#define START(p)
+#define DONE(p)
+#define PRINT if (0) printf
+#endif
+
 
 /* Define macro which is TRUE for tcl versions >= 8.1
  * Required as there are incompatibilities between 8.0 and 8.1
