@@ -30,7 +30,7 @@ node trf_zip {
 	This transformation uses the freely available [zLib] compression
 	library to accomplish its task. It uses the unpatented
 	``deflate''-algorithm employed by [cmd gzip], [cmd pkzip] and others.
-	The current version is 1.1.2, but [trf] will work with any version
+	The current version is 1.1.3, but [trf] will work with any version
 	from 1.0.4 and upward."
 
 	p "
@@ -71,7 +71,7 @@ node trf_zip {
 
 
 	p "
-	[strong Remark]: The current version of [zLib] (1.1.2) uses
+	[strong Remark]: The current version of [zLib] (1.1.3) uses
 	[cmd configure] from GNU autoconf to configure itself for a variety of
 	unix systems. This includes generation of a shared library too and
 	makes compilation of this library much easier."
