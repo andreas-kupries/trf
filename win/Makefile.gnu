@@ -12,7 +12,7 @@ TCL_VERSION	= 82
 TRF_DLL_FILE	    = ${EXTENSION}@mShortDosVersion@.dll
 TRF_LIB_FILE	    = lib${EXTENSION}@mShortDosVersion@.a
 TRF_STATIC_LIB_FILE = lib${EXTENSION}@mShortDosVersion@s.a
-TRF_STUB_LIB_FILE   = lib${EXTENSION}stub@mShortDosVersion@s.a
+TRF_STUB_LIB_FILE   = lib${EXTENSION}stub@mShortDosVersion@.a
 
 SSL_LIBRARY	= -DSSL_LIB_NAME=\"libeay32.dll\"
 BZ2_LIBRARY	= -DBZ2_LIB_NAME=\"bz2.dll\"
@@ -420,7 +420,7 @@ $(TRF_STUB_LIB_FILE): trfStubLib.o
 	$(AR) cr $@ trfStubLib.o
 
 trf.def: $(OBJECTS)
-	$(DLLTOOL) --export-all --exclude-symbols DllMain@12,DllEntryPoint@0,z  --output-def $@ $(OBJECTS)
+	$(DLLTOOL) --export-all --exclude-symbols DllMain@12  --output-def $@ $(OBJECTS)
 
 trfres.o: trf.rc
 	$(WINDRES) --include . --define VS_VERSION_INFO=1 trf.rc trfres.o
