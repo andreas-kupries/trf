@@ -1,3 +1,12 @@
+Mon Jul  7 18:14:43 1997  Andreas Kupries  <a.kupries@westend.com>
+
+	* doc/man.tex (chapter {Acknowledgements}): Update.
+
+	* generic/digest.c (CreateDecoder): Fixed wrong assignment
+	  to c->writeClientData.
+	  (FlushDecoder): removed superfluous '&'-operators (c->digest_buffer).
+	  Both problems found by Hyoung-Gook Kimn <kiss@sunbee.co.kr>.
+
 Tue Jun 17 19:07:42 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* win/makefile.vc (TRFOBJS): Added reflect.o, ref_opt.o.
