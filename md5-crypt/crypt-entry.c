@@ -25,6 +25,9 @@
 #ifndef EOPNOTSUPP
 #define EOPNOTSUPP 122
 #endif
+#ifndef __set_errno
+# define __set_errno(val) errno = (val)
+#endif
 
 
 # define __crypt_r     crypt_r

@@ -34,6 +34,10 @@
 #define MIN(a,b) ((a) < (b) ? (a) : (b))
 #endif
 
+#ifndef __set_errno
+# define __set_errno(val) errno = (val)
+#endif
+
 
 # define __md5_crypt_r    md5_crypt_r
 # define __md5_crypt      md5_crypt
