@@ -241,8 +241,9 @@ CRYPT_ALG_SRC	=	$(GENERIC_DIR)/idea.c		\
 			$(GENERIC_DIR)/des.c		\
 			$(GENERIC_DIR)/rc4.c		\
 			$(GENERIC_DIR)/rc2.c		\
-			$(GENERIC_DIR)/rot.c
-CRYPT_ALG_OBJ	=	idea.o blowfish.o des.o rc4.o rc2.o rot.o
+			$(GENERIC_DIR)/rot.c		\
+			$(GENERIC_DIR)/safer.c
+CRYPT_ALG_OBJ	=	idea.o blowfish.o des.o rc4.o rc2.o rot.o safer.o
 
 #		error correction
 ECC_SRC		=	$(GENERIC_DIR)/rs_ecc.c
@@ -468,6 +469,9 @@ rc2.o: $(GENERIC_DIR)/rc2.c
 
 rot.o: $(GENERIC_DIR)/rot.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/rot.c -o $@
+
+safer.o: $(GENERIC_DIR)/safer.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/safer.c -o $@
 
 rs_ecc.o: $(GENERIC_DIR)/rs_ecc.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/rs_ecc.c -o $@
