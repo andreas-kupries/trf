@@ -1867,10 +1867,7 @@ Trf_Options        optInfo;
     /* Now write into interpreter result area.
      */
 
-    if (res != TCL_OK) {
-      if (r.buf != NULL)
-	Tcl_Free ((char*) r.buf);
-    } else {
+    if (res == TCL_OK) {
       Tcl_ResetResult (interp);
 
       if (r.buf != NULL) {
@@ -1894,6 +1891,10 @@ Trf_Options        optInfo;
 	Tcl_SetObjResult (interp, o);
 	Tcl_DecrRefCount (o);
 #endif
+      }
+
+      if (r.buf != NULL) {
+	Tcl_Free ((char*) r.buf);
       }
     }
   }

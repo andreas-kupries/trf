@@ -1,3 +1,14 @@
+Tue May 23 20:09:49 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* -- Release 1.8p2 --
+
+	* generic/registry.c (TransformImmediate): Thomas Schwarze
+	  <schwarze@gfai.de> catched a little nasty memory leak. The block
+	  from lines 2512-2526 had a call to 'ResultClear' in one branch,
+	  but not the other, leaking memory the size of the result for
+	  each successful! call to a trf command. Ouch. Fixed. Back ported
+	  from 2.0p6.
+
 Sun Sep 26 19:34:05 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* Updated docs, added compile time time option to allow static
@@ -6,8 +17,8 @@ Sun Sep 26 19:34:05 1999  Andreas Kupries  <a.kupries@westend.com>
 Sat Sep 25 21:04:28 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* Fixes sent in by Matt Newman. Added to maintain
-	  compatibility between 1.8 and 2.0. save for TEA build chain and
-	  dropped support for Tcl 7.6.
+	  compatibility between 1.8 and 2.0. except for TEA build chain
+	  and the dropped support for Tcl 7.6.
 
 Sat Jul 17 18:10:28 1999  Andreas Kupries  <a.kupries@westend.com>
 

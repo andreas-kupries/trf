@@ -1,3 +1,7 @@
+Changes from 1.8p2 to 1.8p2
+
+*	Back ported the memory leak fix in 2.0p6.
+
 Changes from 1.8 to 1.8p1
 
 *	Squashed the bug in the 'bzip' (de)compressor.
