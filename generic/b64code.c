@@ -107,7 +107,8 @@ static Trf_TypeDefinition convDefinition =
     NULL,
     FlushDecoder,
     ClearDecoder
-  }
+  },
+  TRF_RATIO (3, 4)
 };
 
 /*

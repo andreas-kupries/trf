@@ -49,6 +49,10 @@ static int         SetOption     _ANSI_ARGS_ ((Trf_Options options,
 static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
 					       ClientData clientData));
 
+static int         SeekQueryOptions  _ANSI_ARGS_ ((Trf_Options options,
+						   Trf_SeekInformation* seekInfo,
+						   ClientData clientData));
+
 
 /*
  *------------------------------------------------------*
@@ -79,7 +83,8 @@ Trf_ConverterOptions ()
       CheckOptions,
       NULL,      /* no string procedure for 'SetOption' */
       SetOption,
-      QueryOptions
+      QueryOptions,
+      SeekQueryOptions
     };
 
   return &optVec;
@@ -298,4 +303,40 @@ ClientData clientData;
 
   return (o->mode == TRF_ENCODE_MODE ? 1 : 0);
 }
+
+/*
+ *------------------------------------------------------*
+ *
+ *	SeekQueryOptions --
+ *
+ *	------------------------------------------------*
+ *	Modifies the natural seek policy according to the
+ *	configuration of the transformation.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		May modify 'seekInfo'.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
 
+static int
+SeekQueryOptions (options, seekInfo, clientData)
+     Trf_Options options;
+     Trf_SeekInformation* seekInfo;
+     ClientData clientData;
+{
+  Trf_ConverterOptionBlock* o = (Trf_ConverterOptionBlock*) options;
+
+  if (o->mode == TRF_DECODE_MODE) {
+    /* The conversion is backward, swap the seek information.
+     */
+
+    int t                       = seekInfo->numBytesTransform;
+    seekInfo->numBytesTransform = seekInfo->numBytesDown;
+    seekInfo->numBytesDown      = t;
+  }
+}

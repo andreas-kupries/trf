@@ -108,6 +108,11 @@ Tcl_Interp* interp;
     if (res != TCL_OK)
       return res;
 
+    res = TrfInit_Info (interp);
+
+    if (res != TCL_OK)
+      return res;
+
 #ifdef ENABLE_BINIO
     res = TrfInit_Binio (interp);
 

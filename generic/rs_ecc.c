@@ -109,7 +109,8 @@ static Trf_TypeDefinition convDefinition =
     DecodeBuffer,
     FlushDecoder,
     ClearDecoder
-  }
+  },
+  TRF_RATIO (248, 255)
 };
 
 /*

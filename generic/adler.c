@@ -115,9 +115,14 @@ static void
 MD_Start (context)
 VOID* context;
 {
+  START (adler.MD_Start);
+  PRINT ("Context = %p, Zf = %p\n", context, zf);
+
   /* call md specific initialization here */
 
   ADLER = zf.adler32 (0L, Z_NULL, 0);
+
+  DONE (adler.MD_Start);
 }
 
 /*
@@ -239,6 +244,14 @@ static int
 MD_Check (interp)
 Tcl_Interp* interp;
 {
-  return TrfLoadZlib (interp);
+  int res;
+
+  START (adler.MD_Check);
+
+  res = TrfLoadZlib (interp);
+
+  PRINT ("res = %d\n", res);
+  DONE (adler.MD_Check);
+  return res;
 }
 

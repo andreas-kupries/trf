@@ -112,7 +112,8 @@ static Trf_TypeDefinition convDefinition =
     NULL,
     FlushDecoder,
     ClearDecoder
-  }
+  },
+  TRF_UNSEEKABLE
 };
 
 /*

@@ -1,9 +1,122 @@
+Sun Oct  3 01:39:02 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/bincode.c, octcode.c: Same as below.
+
+	* generic/hexcode.c (EncodeBuffer): New procedure to encode whole
+	  blocks. Written out of a desire to shorten the log produced by
+	  the debug facility (-DTRF_DEBUG) while playing with seek.
+
+	* generic/registry.c (TrfGetOption): Added proceudre to allow
+	  retrieval of new options (-seekstate, -seekcfg). Deactivated
+	  'trfinfo' for now.
+
+	* generic/convert.c (SeekQueryOptions): First procedure to change
+	  the natural seek policy based upon options. Used by all
+	  conversions, swaps the in/out-ratio for -mode decode. Everything
+	  else does not use this interface.
+
+	* Added interface to the option vectors to allow them to change
+	  the natural seek policy.
+
+	* ------------------------------------------------------------
+	
+	* Next steps:
+	  1) Add options to set/change/query seek related configuration
+ 	     information (subset of trfinfo).
+
+	  2) Think up test cases for the various possibilities.
+
+	* Such an interface to allow runtime configuration of natural
+ 	  ratio is required by the encryptions in TrfCrypt too. Their seek
+ 	  behaviour is dependent on their actual options.
+
+	* The generic 'transform' stays unseekable for now, until its
+ 	  interface is extended to allow the tcl level to specify the
+ 	  ratio.
+
+	* Ascii85 is conversion, mainly 4->5, but contains irregularities
+ 	  making it nonlinear. So it stays unseekable. Digests and both
+ 	  compressors stays unseekable. Same for quoted-printable and otp
+ 	  coder.
+
+	* Modified conversions (hex, oct, bin, uu, base64) to allow
+	  seeking. Error correcting codec too (ratio 248 -> 255!).
+
+	* Tests ok, no errors. Debug output (seek dumps) look ok too, so
+	  far (all transforms defined as unseekable).
+
+	* generic/registry.c: seek state and configuration placed into
+	  separate structures. result buffer now has reference to the seek
+	  state, possibly NULL. buffer positions are now updated by the
+	  Result... procedures, if possible (state reference !=
+	  NULL). Some other code simplified.
+
+Sat Oct  2 01:10:21 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/registry.c (TrfInput): Added new seek handling code.
+	  (SeekDump): New procedure for debugging the seek handling.
+
+	* generic/init.c (Trf_Init): Added initialization of 'trfinfo'.
+
+	* generic/registry.c (TrfInfoObjCmd): New command, 'trfinfo', to
+	  query a transformation about its internals. F.e. the current
+	  configuration and state of the seek handling (-> tests).
+
+	* generic/unstack.c (TrfUnstackCmd): Objectified 'unstack'.
+
+	* generic/registry.c (TrfSeek): Completely rewritten for new way
+	  of doing this. Handling of SEEK_END not yet.
+	  (SeekClearBuffer): New procedure encapsulating some common code.
+	  (TrfOutput): Added code to handle the new seek state.
+	  (SeekSynchronize): New procedure, used in code above.
+
+	* generic/registry.c (SeekInitialize, SeekCalculatePolicies):
+	  New procedures to compute runtime configuration and initial
+	  state.
+	  (AttachTransform): Initialization of seek added.
+
+Fri Oct  1 22:12:24 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/registry.c: Added runtime configuration and state to the
+	  state structure of a transformation channel.
+
+	* generic/transform.h: Changed the seek specification from a
+	  vector to two integer numbers specifying the ratio of input to
+	  output. Seekable is thus restricted to linear relations between
+	  pre- and post-transformation data. Haven't ever seen higher
+	  polynomials or other functions. Changed all places already using
+	  the vector (initializations).
+
+Thu Sep 30 22:10:39 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/registry.c: Copied the procedures operating on the
+	  result buffer from giot. They made the procedures having to deal
+	  with it before much simpler. And easier to read. Especially
+	  'TrfInput'.
+
+Tue Sep 28 22:39:48 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/registry.c: Added information about chosen/used seek
+	  policy, seek transformations, etc. to transformation instances
+	  (TrfTransformationInstance).
+
+	* Added initialization of new item in typedefinition to all
+	  relevant transformations (or transformation frameworks (=
+	  message digest handling)). See zip.c, uucode.c, rs_ecc.c,
+	  reflect.c, qpcode.c, otpcode.c, octcode.c, hexcode.c, digest.c,
+	  bz2.c, bincode.c, b64code.c, asc85code.c
+	  Initialized with NULL == 'unseekable', for now.
+
 Mon Sep 27 21:15:50 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/transform.h: Added 'Trf_SeekTransformation'
+	  interface. Added vector to 'Trf_TypeDefinition' using it.
 
 	* unix/Makefile.in, unix/configure.in: The introduction of an
 	  exported stub table broke the 'unix' build for 8.0.x. Added more
 	  configure variables etc. to switch of compilation of trfStub*.o
 	  and linkage of libtrfstub.a
+
 	  Reported by Stefan Studer <studer@glue.ch> while trying the
 	  unofficial distribution.
 

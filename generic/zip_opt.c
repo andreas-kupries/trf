@@ -83,7 +83,8 @@ TrfZIPOptions ()
       CheckOptions,
       NULL,      /* no string procedure for 'SetOption' */
       SetOption,
-      QueryOptions
+      QueryOptions,
+      NULL       /* unseekable, unchanged by options */
     };
 
   return &optVec;

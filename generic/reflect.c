@@ -113,7 +113,8 @@ static Trf_TypeDefinition reflectDefinition =
     DecodeBuffer,
     FlushDecoder,
     ClearDecoder
-  }
+  },
+  TRF_UNSEEKABLE
 };
 
 /*

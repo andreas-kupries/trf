@@ -30,8 +30,8 @@
 #include	"transformInt.h"
 
 static int
-TrfUnstackCmd _ANSI_ARGS_ ((ClientData notUsed, Tcl_Interp* interp,
-			    int argc, char** argv));
+TrfUnstackObjCmd _ANSI_ARGS_ ((ClientData notUsed, Tcl_Interp* interp,
+			       int objc, struct Tcl_Obj* CONST * objv));
 
 /*
  *----------------------------------------------------------------------
@@ -51,11 +51,11 @@ TrfUnstackCmd _ANSI_ARGS_ ((ClientData notUsed, Tcl_Interp* interp,
  */
 
 static int
-TrfUnstackCmd (notUsed, interp, argc, argv)
-    ClientData  notUsed;		/* Not used. */
-    Tcl_Interp* interp;			/* Current interpreter. */
-    int         argc;			/* Number of arguments. */
-    char**      argv;			/* Argument strings. */
+TrfUnstackObjCmd (notUsed, interp, objc, objv)
+     ClientData  notUsed;		/* Not used. */
+     Tcl_Interp* interp;		/* Current interpreter. */
+     int                     objc;	/* Number of arguments. */
+     struct Tcl_Obj* CONST * objv;	/* Argument strings. */
 {
   /*
    * unstack <channel>
@@ -65,7 +65,7 @@ TrfUnstackCmd (notUsed, interp, argc, argv)
   int         mode;
 
 #ifdef USE_TCL_STUBS
-  const char* cmd = argv [0];
+  const char* cmd = Tcl_GetStringFromObj (objv [0], NULL);
 
   if (Tcl_UnstackChannel == NULL) {
     Tcl_AppendResult (interp, cmd, " is not available as the required ",
@@ -74,14 +74,15 @@ TrfUnstackCmd (notUsed, interp, argc, argv)
   }
 #endif
 
-  if ((argc < 1) || (argc > 2)) {
+  if ((objc < 1) || (objc > 2)) {
     Tcl_AppendResult (interp,
 		      "wrong # args: should be \"unstack channel\"",
 		      (char*) NULL);
     return TCL_ERROR;
   }
 
-  chan = Tcl_GetChannel (interp, argv[1], &mode);
+  chan = Tcl_GetChannel (interp, Tcl_GetStringFromObj (objv [1], NULL), &mode);
+
   if (chan == (Tcl_Channel) NULL) {
     return TCL_ERROR;
   }
@@ -105,7 +106,7 @@ TrfUnstackCmd (notUsed, interp, argc, argv)
  *	------------------------------------------------*
  *
  *	Sideeffects:
- *		As of 'Tcl_CreateCommand'.
+ *		As of 'Tcl_CreateObjCommand'.
  *
  *	Result:
  *		A standard Tcl error code.
@@ -117,9 +118,9 @@ int
 TrfInit_Unstack (interp)
 Tcl_Interp* interp;
 {
-  Tcl_CreateCommand (interp, "unstack", TrfUnstackCmd,
-		     (ClientData) NULL,
-		     (Tcl_CmdDeleteProc *) NULL);
+  Tcl_CreateObjCommand (interp, "unstack", TrfUnstackObjCmd,
+			(ClientData) NULL,
+			(Tcl_CmdDeleteProc *) NULL);
 
   return TCL_OK;
 }

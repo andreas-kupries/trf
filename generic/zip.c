@@ -106,7 +106,8 @@ static Trf_TypeDefinition convDefinition =
     DecodeBuffer,
     FlushDecoder,
     ClearDecoder
-  }
+  },
+  TRF_UNSEEKABLE
 };
 
 /*

@@ -75,11 +75,73 @@ typedef struct _DirectionInfo_ {
 } DirectionInfo;
 
 
+/*
+ * Definition of the structure containing the information about the
+ * internal input buffer.
+ */
+
+typedef struct _SeekState_ SeekState;
+
 typedef struct _ResultBuffer_ {
-  unsigned char* buf;
-  int            allocated;
-  int            used;
+  unsigned char* buf;       /* Reference to the buffer area */
+  int            allocated; /* Allocated size of the buffer area */
+  int            used;      /* Number of bytes in the buffer, <= allocated */
+
+  SeekState*    seekState;
 } ResultBuffer;
+
+
+typedef struct _SeekConfig_ {
+
+  int          overideAllowed; /* Boolean flag. If set the user may overide the
+				* standard policy with his own choice */
+  Trf_SeekInformation natural; /* Natural seek policy, copied from the
+				* transform definition */
+  Trf_SeekInformation  chosen;  /* Seek policy chosen from natural policy
+				 * and the underlying channels; */
+} SeekConfig;
+
+
+struct _SeekState_ {
+  /* -- Integrity conditions --
+   *
+   * BufStartLoc == BufEndLoc	implies 	ResultLength(&result) == 0.
+   * BufStartLoc == BufEndLoc	implies		UpLoc == BufStart.
+   *
+   * UP_CONVERT (DownLoc - AheadOffset) == BufEndLoc
+   *
+   * UpXLoc % seekState.used.numBytesTransform == 0
+   * <=> Transform may seek only in multiples of its input tuples.
+   *
+   * (DownLoc - AheadOffset) % seekState.used.numBytesDown == 0
+   * <=> Downstream channel operates in multiples of the transformation
+   *     output tuples, except for possible offsets because of read ahead.
+   *
+   * UP_CONVERT (DownZero) == 0
+   *
+   * -- Integrity conditions --
+   */
+
+  Trf_SeekInformation    used;  /* Seek policy currently in effect, might
+				 * be chosen by user */
+  int                 allowed;  /* Flag. Set for seekable transforms. Derived
+				 * from the contents of 'used'. */
+
+  int upLoc;         /* Current location of file pointer in the
+		      * transformed stream. */
+  int upBufStartLoc; /* Same as above, for start of read buffer (result) */
+  int upBufEndLoc;   /* See above, for the character after the end of the
+		      * buffer. */
+  int downLoc;       /* Current location of the file pointer in the channel
+		      * downstream. */
+  int downZero;      /* location downstream equivalent to UpLoc == 0 */
+  int aheadOffset;   /* #Bytes DownLoc is after the down location of
+		      * BufEnd. Values > 0 indicate incomplete data in the
+		      * transform buffer itself. */
+  int identity;      /* Flag, set if 'identity' is forced */
+  int changed;       /* Flag, set if seeking occured with 'identity' set */
+};
+
 
 /** XXX change definition for 8.2, at compile time */
 
@@ -87,6 +149,7 @@ typedef struct _TrfTransformationInstance_ {
   int patchIntegrated; /* Boolean flag, see transformInt.h, Trf_Registry */
 
   /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com> */
+
   Tcl_Channel self;   /* Our own Channel handle */
   Tcl_Channel parent; /* The channel superceded by this one. Only if the
 		       * patch is not integrated (see above).
@@ -95,6 +158,7 @@ typedef struct _TrfTransformationInstance_ {
   int readIsFlushed; /* flag to note wether in.flushProc was called or not */
 
   /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com> */
+
   int flags;         /* currently CHANNEL_ASYNC or zero */
   int watchMask;     /* current TrfWatch mask */
   
@@ -117,17 +181,54 @@ typedef struct _TrfTransformationInstance_ {
 
   ResultBuffer result;
 
+  /* Number of bytes written during a down transformation.
+   */
+
+  int lastWritten;
+
+  /* Number of bytes stored during an up transformation
+   */
+
+  int lastStored;
+
+
   /* Timer for automatic push out of information sitting in various channel
    * buffers. Used by the fileevent support. See 'ChannelHandler'.
    */
 
   Tcl_TimerToken timer;
 
-} TrfTransformationInstance;
+  /* Information about the chosen and used seek policy and wether the user
+   * is allowed to change it. Runtime configuration.
+   */
 
+  SeekConfig seekCfg;
+
+  /* More seek information, runtime state.
+   */
+
+  SeekState seekState;
+
+} TrfTransformationInstance;
 
 #define INCREMENT (512)
 #define READ_CHUNK_SIZE 4096
+
+
+#define TRF_UP_CONVERT(trans,k) \
+     (((k) / trans->seekState.used.numBytesDown) * trans->seekState.used.numBytesTransform)
+
+#define TRF_DOWN_CONVERT(trans,k) \
+     (((k) / trans->seekState.used.numBytesTransform) * trans->seekState.used.numBytesDown)
+
+#define TRF_IS_UNSEEKABLE(si) \
+     (((si).numBytesTransform == 0) || ((si).numBytesDown == 0))
+
+#define TRF_SET_UNSEEKABLE(si) \
+     {(si).numBytesTransform = 0 ; (si).numBytesDown = 0;}
+
+#define TRF_TELL(c) Tcl_Seek ((c), 0, SEEK_CUR)
+
 
 /*
  * forward declarations of all internally used procedures.
@@ -135,7 +236,7 @@ typedef struct _TrfTransformationInstance_ {
 
 static int
 TrfUnregister _ANSI_ARGS_ ((Tcl_Interp*       interp,
-			    Trf_RegistryEntry* entry));
+                            Trf_RegistryEntry* entry));
 
 static void
 TrfDeleteRegistry _ANSI_ARGS_ ((ClientData clientData, Tcl_Interp *interp));
@@ -146,6 +247,10 @@ TrfExecuteObjCmd _ANSI_ARGS_((ClientData clientData, Tcl_Interp* interp,
 
 static void
 TrfDeleteCmd _ANSI_ARGS_((ClientData clientData));
+
+static int
+TrfInfoObjCmd _ANSI_ARGS_((ClientData clientData, Tcl_Interp* interp,
+			   int objc, struct Tcl_Obj* CONST objv []));
 
 /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
  */
@@ -176,6 +281,10 @@ TrfGetFile _ANSI_ARGS_ ((ClientData instanceData, int direction,
 			 ClientData* handlePtr));
 
 static int
+TrfGetOption _ANSI_ARGS_ ((ClientData instanceData, Tcl_Interp *interp,
+			   char *optionName, Tcl_DString *dsPtr));
+
+static int
 TransformImmediate _ANSI_ARGS_ ((Tcl_Interp* interp, Trf_RegistryEntry* entry,
 				 Tcl_Channel source, Tcl_Channel destination,
 				 struct Tcl_Obj* CONST in,
@@ -189,8 +298,8 @@ AttachTransform _ANSI_ARGS_ ((Trf_RegistryEntry* entry,
 
 static int
 PutDestination _ANSI_ARGS_ ((ClientData clientData,
-			     unsigned char* outString, int outLen,
-			     Tcl_Interp* interp));
+                             unsigned char* outString, int outLen,
+                             Tcl_Interp* interp));
 
 static int
 PutTrans _ANSI_ARGS_ ((ClientData clientData,
@@ -214,6 +323,58 @@ static Tcl_Channel
 DownChannel _ANSI_ARGS_ ((TrfTransformationInstance* ctrl));
 #endif
 
+/* Convenience macro for allocation
+ * of new transformation instances.
+ */
+
+#define NEW_TRANSFORM \
+(TrfTransformationInstance*) Tcl_Alloc (sizeof (TrfTransformationInstance));
+
+/* Procedures to handle the internal read buffer.
+ */
+
+static void             ResultClear  _ANSI_ARGS_ ((ResultBuffer* r));
+static void             ResultInit   _ANSI_ARGS_ ((ResultBuffer* r));
+static int              ResultLength _ANSI_ARGS_ ((ResultBuffer* r));
+static int              ResultCopy   _ANSI_ARGS_ ((ResultBuffer* r,
+			    unsigned char* buf, int toRead));
+static void             ResultDiscardAtStart _ANSI_ARGS_ ((ResultBuffer* r,
+							   int n));
+static void             ResultAdd    _ANSI_ARGS_ ((ResultBuffer* r,
+                            unsigned char* buf, int toWrite));
+
+/*
+ * Procedures to handle seeking information.
+ */
+
+static void
+SeekCalculatePolicies _ANSI_ARGS_ ((TrfTransformationInstance* trans));
+
+static void
+SeekInitialize _ANSI_ARGS_ ((TrfTransformationInstance* trans));
+
+static void
+SeekClearBuffer _ANSI_ARGS_ ((TrfTransformationInstance* trans, int which));
+
+static void
+SeekSynchronize _ANSI_ARGS_ ((TrfTransformationInstance* trans,
+			      Tcl_Channel parent));
+
+static Tcl_Obj*
+SeekStateGet _ANSI_ARGS_ ((Tcl_Interp* interp, SeekState* state));
+
+static Tcl_Obj*
+SeekConfigGet _ANSI_ARGS_ ((Tcl_Interp* interp, SeekConfig* cfg));
+
+
+#ifdef TRF_DEBUG
+static void
+SeekDump _ANSI_ARGS_ ((TrfTransformationInstance* trans, CONST char* place));
+
+#define SEEK_DUMP(str) SeekDump (trans, #str)
+#else
+#define SEEK_DUMP(str)
+#endif
 
 /*
  *------------------------------------------------------*
@@ -402,7 +563,7 @@ CONST Trf_TypeDefinition* type;
   entry->transType->outputProc       = TrfOutput;
   entry->transType->seekProc         = TrfSeek;
   entry->transType->setOptionProc    = NULL;
-  entry->transType->getOptionProc    = NULL;
+  entry->transType->getOptionProc    = TrfGetOption;
   entry->transType->watchProc        = TrfWatch;
   entry->transType->getHandleProc    = TrfGetFile;
 
@@ -541,10 +702,10 @@ Tcl_Interp* interp;
 
 static int
 TrfExecuteObjCmd (clientData, interp, objc, objv)
-ClientData       clientData;
-Tcl_Interp*      interp;
-int              objc;
-struct Tcl_Obj* CONST * objv;
+     ClientData              clientData;
+     Tcl_Interp*             interp;
+     int                     objc;
+     struct Tcl_Obj* CONST * objv;
 {
   /* (readable) shortcuts for calling the option processing vectors.
    * as defined in 'TrfExecuteCmd'.
@@ -604,6 +765,7 @@ struct Tcl_Obj* CONST * objv;
     if (objc < 2) {
       /* option, but without argument */
       Tcl_AppendResult (interp, cmd, ": wrong # args", (char*) NULL);
+      OT;
       goto cleanup_after_error;      
     }
 
@@ -626,8 +788,10 @@ struct Tcl_Obj* CONST * objv;
 	baseOpt.attach = Tcl_GetChannel (interp,
 					 Tcl_GetStringFromObj (optarg, NULL),
 					 &baseOpt.attach_mode);
-	if (baseOpt.attach == (Tcl_Channel) NULL)
+	if (baseOpt.attach == (Tcl_Channel) NULL) {
+	  OT;
 	  goto cleanup_after_error;
+	}
 	break;
 
       case 'i':
@@ -644,6 +808,7 @@ struct Tcl_Obj* CONST * objv;
 	  Tcl_AppendResult (interp, cmd,
 			    ": source-channel not readable",
 			    (char*) NULL);
+	  OT;
 	  goto cleanup_after_error;
 	}
 	break;
@@ -810,6 +975,147 @@ ClientData clientData;
   DONE (TrfDeleteCmd);
 }
 
+/*
+ *----------------------------------------------------------------------
+ *
+ * TrfInfoObjCmd --
+ *
+ *	This procedure is invoked to process the "trfinfo" Tcl command.
+ *	See the user documentation for details on what it does.
+ *
+ * Results:
+ *	A standard Tcl result.
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int
+TrfInfoObjCmd (notUsed, interp, objc, objv)
+     ClientData              notUsed;	/* Not used. */
+     Tcl_Interp*             interp;	/* Current interpreter. */
+     int                     objc;
+     struct Tcl_Obj* CONST * objv;
+{
+  /*
+   * trfinfo <channel>
+   */
+
+  static char* subcmd [] = {
+    "seekstate", "seekcfg", NULL
+  };
+  enum subcmd {
+    TRFINFO_SEEKSTATE, TRFINFO_SEEKCFG
+  };	  
+
+  Tcl_Channel                chan;
+  int                        mode, pindex;
+  char*                      chanName;
+  TrfTransformationInstance* trans;
+
+
+  if ((objc < 2) || (objc > 3)) {
+    Tcl_AppendResult (interp,
+		      "wrong # args: should be \"trfinfo cmd channel\"",
+		      (char*) NULL);
+    return TCL_ERROR;
+  }
+
+  chanName = Tcl_GetStringFromObj (objv [2], NULL);
+  chan     = Tcl_GetChannel (interp, chanName, &mode);
+
+  if (chan == (Tcl_Channel) NULL) {
+    return TCL_ERROR;
+  }
+
+  if (Tcl_GetChannelType (chan)->seekProc != TrfSeek) {
+    /* No trf transformation, info not applicable.
+     */
+
+    Tcl_AppendResult (interp,
+		      "channel \"", chanName,
+		      "\" is no transformation from trf",
+		      (char*) NULL);
+    return TCL_ERROR;
+  }
+
+  /* Peek into the instance structure and return the requested
+   * information.
+   */
+
+  if (Tcl_GetIndexFromObj(interp, objv [1], subcmd, "subcommand", 0,
+			  &pindex) != TCL_OK) {
+    return TCL_ERROR;
+  }
+
+  trans = (TrfTransformationInstance*) Tcl_GetChannelInstanceData (chan);
+
+  switch (pindex) {
+  case TRFINFO_SEEKSTATE:
+    {
+      Tcl_Obj* state = SeekStateGet (interp, &trans->seekState);
+
+      if (state == NULL)
+	return TCL_ERROR;
+
+      Tcl_SetObjResult (interp, state);
+      return TCL_OK;
+    }
+    break;
+
+  case TRFINFO_SEEKCFG:
+    {
+      Tcl_Obj* cfg = SeekConfigGet (interp, &trans->seekCfg);
+
+      if (cfg == NULL)
+	return TCL_ERROR;
+
+      Tcl_SetObjResult (interp, cfg);
+      return TCL_OK;
+    }
+    break;
+
+  default:
+    /* impossible */
+    return TCL_ERROR;
+  }
+
+  /* We should not come to this place */
+  return TCL_ERROR;
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	TrfInit_Info --
+ *
+ *	------------------------------------------------*
+ *	Register the 'info' command.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		As of 'Tcl_CreateObjCommand'.
+ *
+ *	Result:
+ *		A standard Tcl error code.
+ *
+ *------------------------------------------------------*
+ */
+
+int
+TrfInit_Info (interp)
+Tcl_Interp* interp;
+{
+#if 0
+  Tcl_CreateObjCommand (interp, "trfinfo", TrfInfoObjCmd,
+			(ClientData) NULL,
+			(Tcl_CmdDeleteProc *) NULL);
+#endif
+  return TCL_OK;
+}
+
 /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
  */
 /*
@@ -965,9 +1271,7 @@ Tcl_Interp* interp;
     trans->in.vectors->deleteProc  (trans->in.control,  trans->clientData);
   }
 
-  if (trans->result.allocated) {
-    Tcl_Free ((char*) trans->result.buf);
-  }
+  ResultClear (&trans->result);
 
   DONE (TrfClose);
   return TCL_OK;
@@ -999,10 +1303,11 @@ int        toRead;
 int*       errorCodePtr;
 {
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
-  int gotBytes, read, i, res;
+  int       gotBytes, read, i, res, copied;
   Tcl_Channel parent;
 
   START (TrfInput);
+  PRINT ("trans = %p, toRead = %d\n", trans, toRead); FL;
 
 #ifdef USE_TCL_STUBS
   parent = (trans->patchIntegrated ?
@@ -1016,66 +1321,102 @@ int*       errorCodePtr;
 
   gotBytes = 0;
 
+  SEEK_DUMP (TrfInput; Start);
+
   while (toRead > 0) {
-    if (trans->result.used > 0) {
-      /*
-       * First: copy as much possible from the result buffer.
-       */
-
-      if (trans->result.used >= toRead) {
-	/*
-	 * More than enough, take data from the internal buffer, then return.
-	 * Don't forget to shift the remaining parts down.
-	 */
-
-	memcpy ((VOID*) buf, (VOID*) trans->result.buf, toRead);
-	if (trans->result.used > toRead) {
-	  memmove ((VOID*) trans->result.buf,
-		   (VOID*) (trans->result.buf + toRead),
-		   trans->result.used - toRead);
-	}
-
-	trans->result.used -= toRead;
-	gotBytes    += toRead;
-	toRead = 0;
-
-	PRINT ("gotBytes = %d\n", gotBytes); FL; DONE (TrfInput);
-	return gotBytes;
-
-      } else {
-	/*
-	 * Not enough in buffer to satisfy the caller, take all, then try to
-	 * read more.
-	 */
-
-	memcpy ((VOID*) buf, (VOID*) trans->result.buf, trans->result.used);
-
-	buf      += trans->result.used;
-	toRead   -= trans->result.used;
-	gotBytes += trans->result.used;
-	trans->result.used = 0;
-      }
-    }
-
-    /*
-     * trans->result.used == 0, toRead > 0 here 
-     * Use 'buf'! as target to store the intermediary
-     * information read from the parent channel.
+    /* Loop until the request is satisfied
+     * (or no data available from below, possibly EOF).
      */
 
-    PRINT ("Get more...\n"); FL; IN;
+    SEEK_DUMP (TrfInput; Loop_);
+
+    /* The position may be inside the buffer, and not at its start.
+     * Remove the superfluous data now. There was no need to do it
+     * earlier, as intervening seeks and writes could have discarded
+     * the buffer completely, seeked back to an earlier point in it, etc.
+     * We can be sure that the location is not behind its end!
+     * And for an empty buffer location and buffer start are identical,
+     * bypassing this code. See integrity constraints listed in the
+     * description of Trf_TransformationInstance.
+     */
+
+    if (trans->seekState.upLoc > trans->seekState.upBufStartLoc) {
+      ResultDiscardAtStart (&trans->result,
+			    trans->seekState.upLoc - trans->seekState.upBufStartLoc);
+    }
+
+    /* Assertion: UpLoc == UpBufStartLoc now. */
+
+    SEEK_DUMP (TrfInput; Disc<);
+
+    copied    = ResultCopy (&trans->result, (unsigned char*) buf, toRead);
+    toRead   -= copied;
+    buf      += copied;
+    gotBytes += copied;
+    trans->seekState.upLoc += copied;
+
+    SEEK_DUMP (TrfInput; Copy<);
+
+    if (toRead == 0) {
+      PRINT ("Got %d, satisfied from result buffer\n", gotBytes); FL;
+      DONE  (TrfInput);
+      return gotBytes;
+    }
+
+    /* The buffer is exhausted, but the caller wants even more. We now have
+     * to go to the underlying channel, get more bytes and then transform
+     * them for delivery. We may not get that we want (full EOF or temporary
+     * out of data). This part has to manipulate the various seek locations
+     * in a more complicated way to keep everything in sync.
+     */
+
+    /* Assertion:    UpLoc == UpBufEndLoc now (and == UpBufStartLoc).
+     * Additionally: UP_CONVERT (DownLoc - AheadOffset) == BufEndLoc
+     */
+
+    /*
+     * Length (trans->result) == 0, toRead > 0 here  Use 'buf'! as target
+     * to store the intermediary information read from the parent channel.
+     *
+     * Ask the transsform how much data it allows us to read from
+     * the underlying channel. This feature allows the transform to
+     * signal EOF upstream although there is none downstream. Useful
+     * to control an unbounded 'fcopy', either through counting bytes,
+     * or by pattern matching.
+     */
+
+#if 0
+    if (ctrl->maxRead >= 0) {
+      if (ctrl->maxRead < toRead) {
+	toRead = ctrl->maxRead;
+      }
+    } /* else: 'maxRead < 0' == Accept the current value of toRead */
+
+    if (toRead <= 0) {
+      PRINT ("Got %d, constrained by script\n", gotBytes); FL;
+      DONE  (TrfInput);
+      return gotBytes;
+    }
+#endif
+
+    PRINT ("Read from parent %p\n", parent);
+    IN; IN;
 
     read = Tcl_Read (parent, buf, toRead);
 
-    OT; PRINT ("Got %d\n", read); FL;
+    OT; OT;
+    PRINT  ("................\n");
+    PRTSTR ("Retrieved = {%d, \"%s\"}\n", read, buf);
 
     if (read < 0) {
       /* Report errors to caller.
+       * The state of the seek system is unchanged!
        */
 
       *errorCodePtr = Tcl_GetErrno ();
 
-      PRINT ("error %d\n", Tcl_GetErrno ()); FL; DONE (TrfInput);
+      PRINT ("Got %d, read < 0, report error %d\n", gotBytes, *errorCodePtr);
+      FL; DONE (TrfInput);
       return -1;      
     }
 
@@ -1094,37 +1435,69 @@ int*       errorCodePtr;
       /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
        */
       if (! Tcl_Eof (parent)) {
+	/* The state of the seek system is unchanged! */
+
 	if (gotBytes == 0 && trans->flags & CHANNEL_ASYNC) {
 	  *errorCodePtr = EWOULDBLOCK;
-	  PRINT ("error EWOULDBLOCK\n"); FL; DONE (TrfInput);
+
+	  PRINT ("Got %d, report EWOULDBLOCK\n", gotBytes); FL;
+	  DONE (TrfInput);
 	  return -1;
 	} else {
-	  PRINT ("gotBytes = %d\n", gotBytes); FL; DONE (TrfInput);
+	  PRINT ("(Got = %d || not async)\n", gotBytes); FL;
+	  DONE (TrfInput);
 	  return gotBytes;
 	}
       } else {
+	PRINT ("EOF in downstream channel\n"); FL;
 	if (trans->readIsFlushed) {
+	  /* The state of the seek system is unchanged! */
 	  /* already flushed, nothing to do anymore */
+	  PRINT ("Got %d, !read flushed\n", gotBytes); FL;
 	  DONE (TrfInput);
 	  return gotBytes;
 	}
 
+	/* Now this is a bit different. The partial data waiting is converted
+	 * and returned. So the 'AheadOffset' changes despite the location
+	 * downstream not changing at all. It is now the negative of its
+	 * additive inverse modulo 'numBytesDown':
+	 *	 -((-k)%n) == -((n-1)-k) == k+1-n.
+	 */
+
 	PRINT ("in_.flushproc\n"); FL;
 
 	trans->readIsFlushed = 1;
+	trans->lastStored    = 0;
+
 	res = trans->in.vectors->flushProc (trans->in.control,
 					    (Tcl_Interp*) NULL,
 					    trans->clientData);
-	if (trans->result.used == 0) {
+	if (trans->seekState.allowed &&
+	    trans->seekState.used.numBytesDown > 1) {
+	  trans->seekState.aheadOffset += -trans->seekState.used.numBytesDown;
+	}
+
+	SEEK_DUMP (TrfInput; AhdC<);
+
+	if (ResultLength (&trans->result) == 0) {
 	  /* we had nothing to flush */
-	  PRINT ("gotBytes = %d\n", gotBytes); FL; DONE (TrfInput);
+	  PRINT ("Got %d, read flushed / no result\n", gotBytes); FL;
+	  DONE (TrfInput);
 	  return gotBytes;
 	}
 	continue; /* at: while (toRead > 0) */
       }
-    }
+    } /* read == 0 */
 
-    /* transform the read chunk */
+    /* Transform the read chunk, which was not empty.
+     * The transformation processes 'read + aheadOffset' bytes.
+     * So UP_CONVERT (read+ahead) == #bytes produced == ResultLength!
+     * And  (read+ahead) % #down == #bytes now waiting == new ahead.
+     */
+
+    SEEK_DUMP (TrfInput; Read<);
+    trans->lastStored = 0;
 
     if (trans->in.vectors->convertBufProc){ 
       PRINT ("in_.convertbufproc\n"); FL;
@@ -1149,12 +1522,26 @@ int*       errorCodePtr;
 
     if (res != TCL_OK) {
       *errorCodePtr = EINVAL;
-      PRINT ("error EINVAL\n"); FL; DONE (TrfInput);
+      PRINT ("Got %d, report error in transform (EINVAL)\n", gotBytes); FL;
+      DONE (TrfInput);
       return -1;
     }
+
+    /* Assert: UP_CONVERT (read+ahead) == ResultLength! */
+
+    trans->seekState.downLoc += read;
+
+    if (trans->seekState.allowed) {
+      trans->seekState.aheadOffset += (read % trans->seekState.used.numBytesDown);
+      trans->seekState.aheadOffset %= trans->seekState.used.numBytesDown;
+    }
+
   } /* while toRead > 0 */
 
-  PRINT ("gotBytes = %d\n", gotBytes); FL; DONE (TrfInput);
+  SEEK_DUMP (TrfInput; Loop<);
+
+  PRINT ("Got %d, after loop\n", gotBytes); FL;
+  DONE (TrfInput);
   return gotBytes;
 }
 
@@ -1186,8 +1573,17 @@ int*       errorCodePtr;
 {
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
   int i, res;
+  Tcl_Channel parent;
 
   START (TrfOutput);
+
+#ifdef USE_TCL_STUBS
+  parent = (trans->patchIntegrated ?
+	    DownChannel (trans)    :
+	    trans->parent);
+#else
+  parent = trans->parent;
+#endif
 
   /* should assert (trans->mode & TCL_WRITABLE) */
 
@@ -1205,6 +1601,17 @@ int*       errorCodePtr;
     return 0;
   }
 
+  SEEK_DUMP (TrfOutput; Start);
+
+  /* toWrite / seekState.used.numBytesTransform = #tuples converted.
+   * toWrite % seekState.used.numBytesTransform = #Bytes waiting in the transform.
+   */
+
+  SeekSynchronize (trans, parent);
+
+  SEEK_DUMP (TrfOutput; Syncd);
+
+  trans->lastWritten = 0;
 
   if (trans->out.vectors->convertBufProc){ 
     PRINT ("out.convertbufproc\n"); FL;
@@ -1232,6 +1639,22 @@ int*       errorCodePtr;
     PRINT ("error EINVAL\n"); FL; DONE (TrfInput);
     return -1;
   }
+
+  /* Update seek state to new location
+   * Assert: lastWritten == TRF_DOWN_CONVERT (trans, toWrite)
+   */
+
+  trans->seekState.upLoc        += toWrite;
+  trans->seekState.upBufStartLoc = trans->seekState.upLoc;
+  trans->seekState.upBufEndLoc   = trans->seekState.upLoc;
+  trans->seekState.downLoc      += trans->lastWritten;
+  trans->lastWritten       = 0;
+
+  SEEK_DUMP (TrfOutput; Done_);
+
+  /* In the last statement above the integer division automatically
+   * strips off the #bytes waiting in the transform.
+   */
 
   PRINT ("Written: %d\n", toWrite); FL; DONE (TrfOutput);
   return toWrite;
@@ -1269,9 +1692,10 @@ long       offset;		/* Size of movement. */
 int        mode;		/* How to move */
 int*       errorCodePtr;	/* Location of error flag. */
 {
-  int result;
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
+  int         result;
   Tcl_Channel parent;
+  int         newLoc;
 
   START (TrfSeek);
   PRINT ("(Mode = %d, Offset = %ld)\n", mode, offset); FL;
@@ -1285,27 +1709,137 @@ int*       errorCodePtr;	/* Location of error flag. */
 #endif
 
   /*
-   * Flush data waiting for output, discard everything in the input buffers.
+   * Several things to look at before deciding what to do.
+   * Is it a tell request ?
+   * Is the channel unseekable ?
+   * If not, are we in pass-down mode ?
+   * If not, check buffer boundaries, etc. before discarding buffers, etc.
    */
 
-  if (trans->mode & TCL_WRITABLE) {
-    PRINT ("out.flushproc\n"); FL;
-    trans->out.vectors->flushProc (trans->out.control,
-				   (Tcl_Interp*) NULL,
-				   trans->clientData);
+  if ((offset == 0) && (mode == SEEK_CUR)) {
+    /* Tell location.
+     */
+
+    PRINT ("[Tell], Location = %d\n", trans->seekState.upLoc); FL; DONE (TrfSeek);
+    return trans->seekState.upLoc;
   }
 
-  if (trans->mode & TCL_READABLE) {
-    PRINT ("out.clearproc\n"); FL;
-    trans->in.vectors->clearProc  (trans->in.control, trans->clientData);
-    trans->readIsFlushed = 0;
+  if (!trans->seekState.allowed) {
+    *errorCodePtr = EINVAL;
+
+    PRINT ("[Unseekable]\n"); FL; DONE (TrfSeek);
+    return -1;
   }
 
-  result = Tcl_Seek (parent, offset, mode);
-  *errorCodePtr = (result == -1) ? Tcl_GetErrno () : 0;
+  /* Assert: seekState.allowed, numBytesDown > 0, numBytesTransform > 0 */
 
+  if (trans->seekState.identity) {
+    /* Pass down mode. Pass request and record the change. This is used after
+     * restoration of constrained seek to force usage of a new zero-point.
+     */
+
+    PRINT ("[Passing down]\n"); FL;
+
+    SeekClearBuffer (trans, TCL_WRITABLE | TCL_READABLE);
+
+    trans->seekState.changed = 1;
+
+    result = Tcl_Seek (parent, offset, mode);
+    *errorCodePtr = (result == -1) ? Tcl_GetErrno () : 0;
+
+    SEEK_DUMP (TrfSeek; Pass<);
+    DONE (TrfSeek);
+    return result;
+  }
+
+  /* Constrained seeking, as specified by the transformation.
+   */
+
+  if (mode == SEEK_SET) {
+    /* Convert and handle absolute from start as relative to current
+     * location.
+     */
+
+    PRINT ("[Seek from start] => Seek relative\n"); FL;
+    result = TrfSeek (trans, offset - trans->seekState.upLoc, SEEK_CUR,
+		      errorCodePtr);
+    DONE (TrfSeek);
+    return result;
+  }
+
+  if (mode == SEEK_END) {
+    /* Can't do that right now! TODO */
+    *errorCodePtr = EINVAL;
+
+    PRINT ("[Seek from end not available]"); FL; DONE (TrfSeek);
+    return -1;
+  }
+
+  /* Seeking relative to the current location.
+   */
+
+  if (offset % trans->seekState.used.numBytesTransform) {
+    /* Seek allowed only for multiples of the input tuples. */
+
+    *errorCodePtr = EINVAL;
+
+    PRINT ("Seek constrained to multiples of input tuples\n"); FL;
+    DONE (TrfSeek);
+    return -1;
+  }
+
+  newLoc = trans->seekState.upLoc + offset;
+
+  if (newLoc < 0) {
+    *errorCodePtr = EINVAL;
+
+    PRINT ("[Seek relative], cannot seek before start of stream\n"); FL;
+    DONE (TrfSeek);
+    return -1;
+  }
+
+  if ((newLoc < trans->seekState.upBufStartLoc) ||
+      (trans->seekState.upBufEndLoc <= newLoc)) {
+    /* We are seeking out of the read buffer.
+     * Discard it, adjust our position and seek the channel below to the
+     * equivalent position.
+     */
+
+    int offsetDown, newDownLoc;
+
+    PRINT ("[Seek relative], beyond read buffer\n"); FL;
+
+    newDownLoc = trans->seekState.downZero + TRF_DOWN_CONVERT (trans, newLoc);
+    offsetDown = newDownLoc - trans->seekState.downLoc;
+
+    SeekClearBuffer (trans, TCL_WRITABLE | TCL_READABLE);
+
+    if (offsetDown != 0) {
+      result = Tcl_Seek (parent, offsetDown, SEEK_CUR);
+      *errorCodePtr = (result == -1) ? Tcl_GetErrno () : 0;
+    }
+
+    trans->seekState.downLoc      += offsetDown;
+    trans->seekState.upLoc         = newLoc;
+    trans->seekState.upBufStartLoc = newLoc;
+    trans->seekState.upBufEndLoc   = newLoc;
+
+    SEEK_DUMP (TrfSeek; NoBuf);
+    DONE (TrfSeek);
+    return newLoc;
+  }
+
+  /* We are still inside the buffer, adjust the position
+   * and clear out incomplete data waiting in the write
+   * buffers, they are now invalid.
+   */
+
+  SeekClearBuffer (trans, TCL_WRITABLE);
+  trans->seekState.upLoc = newLoc;
+
+  SEEK_DUMP (TrfSeek; Base_);
   DONE (TrfSeek);
-  return result;
+  return newLoc;
 }
 
 /*
@@ -1440,6 +1974,82 @@ ClientData* handlePtr;		/* Place to store the handle into */
 /*
  *------------------------------------------------------*
  *
+ *	TrfGetFile --
+ *
+ *	------------------------------------------------*
+ *	Called from Tcl_GetChannelHandle to retrieve
+ *	OS specific file handle from inside this channel.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		None.
+ *
+ *	Result:
+ *		The appropriate Tcl_File or NULL if not
+ *		present. 
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+TrfGetOption (instanceData, interp, optionName, dsPtr)
+ClientData   instanceData;
+Tcl_Interp*  interp;
+char*        optionName;
+Tcl_DString* dsPtr;
+{
+  /* Recognized options:
+   *
+   * -seekcfg
+   * -seekstate
+   */
+
+  TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
+
+  if (optionName == (char*) NULL) {
+    /* A list of options and their values was requested,
+     */
+
+    Tcl_Obj* tmp;
+
+    Tcl_DStringAppendElement (dsPtr, "-seekcfg");
+    tmp = SeekConfigGet (interp, &trans->seekCfg);
+    Tcl_DStringAppendElement (dsPtr, Tcl_GetStringFromObj (tmp, NULL));
+    Tcl_DecrRefCount (tmp);
+
+    Tcl_DStringAppendElement (dsPtr, "-seekstate");
+    tmp = SeekStateGet (interp, &trans->seekState);
+    Tcl_DStringAppendElement (dsPtr, Tcl_GetStringFromObj (tmp, NULL));
+    Tcl_DecrRefCount (tmp);
+
+    return TCL_OK;
+  } else if (0 == strcmp (optionName, "-seekcfg")) {
+    Tcl_Obj* tmp;
+
+    Tcl_DStringAppendElement (dsPtr, "-seekcfg");
+    tmp = SeekConfigGet (interp, &trans->seekCfg);
+    Tcl_DStringAppendElement (dsPtr, Tcl_GetStringFromObj (tmp, NULL));
+    Tcl_DecrRefCount (tmp);
+
+    return TCL_OK;
+  } else if (0 == strcmp (optionName, "-seekstate")) {
+    Tcl_Obj* tmp;
+
+    Tcl_DStringAppendElement (dsPtr, "-seekstate");
+    tmp = SeekStateGet (interp, &trans->seekState);
+    Tcl_DStringAppendElement (dsPtr, Tcl_GetStringFromObj (tmp, NULL));
+    Tcl_DecrRefCount (tmp);
+
+    return TCL_OK;
+  } else {
+    Tcl_SetErrno (EINVAL);
+    return Tcl_BadChannelOption (interp, optionName, "seekcfg seekstate");
+  }
+}
+
+/*
+ *------------------------------------------------------*
+ *
  *	TransformImmediate --
  *
  *	------------------------------------------------*
@@ -1484,9 +2094,7 @@ Trf_Options        optInfo;
    */
 
   if (destination == (Tcl_Channel) NULL) {
-    r.buf       = (unsigned char*) NULL;
-    r.used      = 0;
-    r.allocated = 0;
+    ResultInit (&r);
 
     PRINT ("___.createproc\n"); FL;
     control = v->createProc ((ClientData) &r, PutInterpResult,
@@ -1611,8 +2219,7 @@ Trf_Options        optInfo;
      */
 
     if (res != TCL_OK) {
-      if (r.buf != NULL)
-	Tcl_Free ((char*) r.buf);
+      ResultClear (&r);
     } else {
       Tcl_ResetResult (interp);
 
@@ -1662,7 +2269,7 @@ Tcl_Interp*        interp;
 {
   TrfTransformationInstance* trans;
 
-  trans = (TrfTransformationInstance*) Tcl_Alloc (sizeof (TrfTransformationInstance));
+  trans = NEW_TRANSFORM;
 
   START (AttachTransform);
 
@@ -1741,9 +2348,8 @@ Tcl_Interp*        interp;
     }
   }
 
-  trans->result.buf       = (unsigned char*) NULL;
-  trans->result.allocated = 0;
-  trans->result.used      = 0;
+  ResultInit (&trans->result);
+  trans->result.seekState = &trans->seekState;
 
   /*
    * Build channel from converter definition and stack it upon the one we
@@ -1786,6 +2392,23 @@ Tcl_Interp*        interp;
     return TCL_ERROR;
   }
 
+  /* Initialize the seek subsystem.
+   */
+
+  trans->seekCfg.natural.numBytesTransform = entry->trfType->naturalSeek.numBytesTransform;
+  trans->seekCfg.natural.numBytesDown      = entry->trfType->naturalSeek.numBytesDown;
+
+  if (optInfo && (*OPT->seekQueryProc != (Trf_SeekQueryOptions*) NULL)) {
+    (*OPT->seekQueryProc) (optInfo, &trans->seekCfg.natural, CLT);
+  }
+
+  /* -- todo -- allow runtime reconfiguration of natural ratio --
+   * -- encryptions f.e., but 'transform' too ...
+   */
+
+  SeekCalculatePolicies (trans);
+  SeekInitialize        (trans);
+
   /*  Tcl_RegisterChannel (interp, new); */
   Tcl_AppendResult (interp, Tcl_GetChannelName (trans->self), (char*) NULL);
 
@@ -1823,8 +2446,8 @@ Tcl_Interp*    interp;
   int         res;
   Tcl_Channel parent;
 
-  START (PutDestination);
-  PRINT ("Data = {%d, \"%s\"}\n", outLen, outString);
+  START  (PutDestination);
+  PRTSTR ("Data = {%d, \"%s\"}\n", outLen, outString);
 
 #ifdef USE_TCL_STUBS
   parent = (trans->patchIntegrated ?
@@ -1833,6 +2456,8 @@ Tcl_Interp*    interp;
 #else
   parent = trans->parent;
 #endif
+
+  trans->lastWritten += outLen;
 
   res = Tcl_Write (parent, (char*) outString, outLen);
 
@@ -1880,27 +2505,12 @@ Tcl_Interp*    interp;
 {
   TrfTransformationInstance* trans = (TrfTransformationInstance*) clientData;
 
-  START (PutTrans);
-  PRINT ("Data = {%d, \"%s\"}\n", outLen, outString);
+  START  (PutTrans);
+  PRTSTR ("Data = {%d, \"%s\"}\n", outLen, outString);
 
-  if ((outLen + trans->result.used) > trans->result.allocated) {
-    /*
-     * Extension of internal buffer required.
-     */
+  trans->lastStored += outLen;
 
-    if (trans->result.allocated == 0) {
-      trans->result.allocated = outLen + INCREMENT;
-      trans->result.buf = (unsigned char*) Tcl_Alloc (trans->result.allocated);
-    } else {
-      trans->result.allocated += outLen + INCREMENT;
-      trans->result.buf = (unsigned char*)Tcl_Realloc((char*)trans->result.buf,
-						      trans->result.allocated);
-    }
-  }
-
-  /* now copy data */
-  memcpy (trans->result.buf + trans->result.used, outString, outLen);
-  trans->result.used += outLen;
+  ResultAdd (&trans->result, outString, outLen);
 
   DONE (PutTrans);
   return TCL_OK;
@@ -1935,27 +2545,10 @@ Tcl_Interp*    interp;
 {
   ResultBuffer* r = (ResultBuffer*) clientData;
 
-  START (PutInterpResult);
-  PRINT ("Data = {%d, \"%s\"}\n", outLen, outString);
+  START  (PutInterpResult);
+  PRTSTR ("Data = {%d, \"%s\"}\n", outLen, outString);
 
-  if ((outLen+1 + r->used) > r->allocated) {
-    /*
-     * Extension of internal buffer required.
-     */
-
-    if (r->allocated == 0) {
-      r->allocated = outLen + INCREMENT;
-      r->buf    = (unsigned char*) Tcl_Alloc (r->allocated);
-    } else {
-      r->allocated += outLen + INCREMENT;
-      r->buf     = (unsigned char*) Tcl_Realloc ((char*) r->buf, r->allocated);
-    }
-  }
-
-  /* now copy data */
-
-  memcpy (r->buf + r->used, outString, outLen);
-  r->used += outLen;
+  ResultAdd (r, outString, outLen);
 
   DONE (PutInterpResult);
   return TCL_OK;
@@ -2019,13 +2612,13 @@ int            mask;
    */
 
   if (trans->patchIntegrated) {
-    if ((mask & TCL_READABLE) && (trans->result.used > 0)) {
+    if ((mask & TCL_READABLE) && (ResultLength (&trans->result) > 0)) {
       trans->timer = Tcl_CreateTimerHandler (DELAY, ChannelHandlerTimer,
 					     (ClientData) trans);
     }
   } else {
     if ((mask & TCL_READABLE) &&
-	((trans->result.used > 0) ||
+	((ResultLength (&trans->result) > 0) ||
 	 (Tcl_InputBuffered (trans->self) > 0))) {
       trans->timer = Tcl_CreateTimerHandler (DELAY, ChannelHandlerTimer,
 					     (ClientData) trans);
@@ -2127,3 +2720,809 @@ DownChannel (ctrl)
   return Tcl_GetStackedChannel (self);
 }
 #endif 
+
+/*
+ *------------------------------------------------------*
+ *
+ *	ResultClear --
+ *
+ *	Deallocates any memory allocated by 'ResultAdd'.
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static void
+ResultClear (r)
+     ResultBuffer* r; /* Reference to the buffer to clear out */
+{
+  r->used = 0;
+
+  if (r->allocated) {
+    Tcl_Free ((char*) r->buf);
+    r->buf       = (unsigned char*) NULL;
+    r->allocated = 0;
+  }
+
+  if (r->seekState != (SeekState*) NULL) {
+    r->seekState->upBufStartLoc  = r->seekState->upLoc;
+    r->seekState->upBufEndLoc    = r->seekState->upLoc;
+  }
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	ResultInit --
+ *
+ *	Initializes the specified buffer structure. The
+ *	structure will contain valid information for an
+ *	emtpy buffer.
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static void
+ResultInit (r)
+    ResultBuffer* r; /* Reference to the structure to initialize */
+{
+    r->used      = 0;
+    r->allocated = 0;
+    r->buf       = (unsigned char*) NULL;
+    r->seekState = (SeekState*) NULL;
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	ResultLength --
+ *
+ *	Returns the number of bytes stored in the buffer.
+ *
+ *	Sideeffects:
+ *		None.
+ *
+ *	Result:
+ *		An integer, see above too.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+ResultLength (r)
+    ResultBuffer* r; /* The structure to query */
+{
+    return r->used;
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	ResultCopy --
+ *
+ *	Copies the requested number of bytes from the
+ *	buffer into the specified array and removes them
+ *	from the buffer afterward. Copies less if there
+ *	is not enough data in the buffer.
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		The number of actually copied bytes,
+ *		possibly less than 'toRead'.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+ResultCopy (r, buf, toRead)
+     ResultBuffer*  r;      /* The buffer to read from */
+     unsigned char* buf;    /* The buffer to copy into */
+     int            toRead; /* Number of requested bytes */
+{
+  int copied;
+
+  START (ResultCopy);
+  PRINT ("request = %d, have = %d\n", toRead, r->used); FL;
+
+  if (r->used == 0) {
+    /* Nothing to copy in the case of an empty buffer.
+     */
+
+    copied = 0;
+    goto done;
+  }
+
+  if (r->used == toRead) {
+    /* We have just enough. Copy everything to the caller.
+     */
+
+    memcpy ((VOID*) buf, (VOID*) r->buf, toRead);
+    r->used = 0;
+
+    copied = toRead;
+    goto done;
+  }
+
+  if (r->used > toRead) {
+    /* The internal buffer contains more than requested.
+     * Copy the requested subset to the caller, and shift
+     * the remaining bytes down.
+     */
+
+    memcpy  ((VOID*) buf,    (VOID*) r->buf,            toRead);
+    memmove ((VOID*) r->buf, (VOID*) (r->buf + toRead), r->used - toRead);
+
+    r->used -= toRead;
+
+    copied = toRead;
+    goto done;
+  }
+
+  /* There is not enough in the buffer to satisfy the caller, so
+   * take everything.
+   */
+
+  memcpy ((VOID*) buf, (VOID*) r->buf, r->used);
+  toRead  = r->used;
+  r->used = 0;
+  copied  = toRead;
+
+  /* -- common postwork code ------- */
+
+done:
+  if ((copied > 0) &&
+      (r->seekState != (SeekState*) NULL)) {
+    r->seekState->upBufStartLoc += copied;
+  }
+
+  DONE (ResultCopy);
+  return copied;
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	ResultDiscardAtStart --
+ *
+ *	Removes the n bytes at the beginning of the buffer
+ *	from it. Clears the buffer if n is greater than
+ *	its length.
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static void
+ResultDiscardAtStart (r, n)
+     ResultBuffer*  r; /* The buffer to manipulate  */
+     int            n; /* Number of bytes to remove */
+{
+  START (ResultDiscardAtStart);
+  PRINT ("n = %d, have = %d\n", n, r->used); FL;
+
+  if (r->used == 0) {
+    /* Nothing to remove in the case of an empty buffer.
+     */
+
+    DONE (ResultDiscardAtStart);
+    return;
+  }
+
+  if (n > r->used) {
+    ResultClear (r);
+    DONE (ResultDiscardAtStart);
+    return;
+  }
+
+  /* Shift remaining information down */
+
+  memmove ((VOID*) r->buf, (VOID*) (r->buf + n), r->used - n);
+  r->used -= n;
+
+  if (r->seekState != (SeekState*) NULL) {
+    r->seekState->upBufStartLoc += n;
+  }
+
+  DONE (ResultCopy);
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	ResultAdd --
+ *
+ *	Adds the bytes in the specified array to the
+ *	buffer, by appending it.
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static void
+ResultAdd (r, buf, toWrite)
+    ResultBuffer*  r;       /* The buffer to extend */
+    unsigned char* buf;     /* The buffer to read from */
+    int            toWrite; /* The number of bytes in 'buf' */
+{
+  START (ResultAdd);
+  PRINT ("have %d, adding %d\n", r->used, toWrite); FL;
+
+  if ((r->used + toWrite + 1) > r->allocated) {
+    /* Extension of the internal buffer is required.
+     */
+
+    if (r->allocated == 0) {
+      r->allocated = toWrite + INCREMENT;
+      r->buf       = (unsigned char*) Tcl_Alloc (r->allocated);
+    } else {
+      r->allocated += toWrite + INCREMENT;
+      r->buf        = (unsigned char*) Tcl_Realloc((char*) r->buf,
+						   r->allocated);
+    }
+  }
+
+  /* now copy data */
+  memcpy (r->buf + r->used, buf, toWrite);
+  r->used += toWrite;
+
+  if (r->seekState != (SeekState*) NULL) {
+    r->seekState->upBufEndLoc += toWrite;
+  }
+
+  DONE (ResultAdd);
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	SeekCalculatePolicies --
+ *
+ *	Computes standard and used policy from the natural
+ *	policy of the transformation, all transformations
+ *	below and its base channel.
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static void
+SeekCalculatePolicies (trans)
+     TrfTransformationInstance* trans;
+{
+  /* Define seek related runtime configuration.
+   * seekCfg.overideAllowed, seekCfg.chosen, seekState.used
+   *
+   * i.   some transformation below unseekable ? not-overidable unseekable
+   * ii.  base channel unseekable ?              see above
+   * iii. naturally unseekable ?                 overidable unseekable.
+   */
+  
+  Tcl_Channel self = trans->self;
+  Tcl_Channel next;
+
+  int stopped = 0;
+
+  while (self != (Tcl_Channel) NULL) {
+    next = Tcl_GetStackedChannel (self);
+
+    if (next == (Tcl_Channel) NULL) {
+      /* self points to base channel (ii).
+       */
+
+      if (Tcl_GetChannelType (self)->seekProc == (Tcl_DriverSeekProc*) NULL) {
+	/* Base is unseekable.
+	 */
+
+	TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
+	trans->seekCfg.overideAllowed = 0;
+	stopped = 1;
+	break;
+      }
+    } else if (Tcl_GetStackedChannel (next) != (Tcl_Channel) NULL) {
+      /* next points to a transformation below the top (i).
+       * Assume unseekable for a non-trf transformation, else peek directly
+       * into the relevant structure
+       */
+
+      if (Tcl_GetChannelType (next)->seekProc != TrfSeek) {
+	TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
+	trans->seekCfg.overideAllowed = 0;
+	stopped = 1;
+      } else {
+	TrfTransformationInstance* down = 
+	  (TrfTransformationInstance*) Tcl_GetChannelInstanceData (next);
+
+	if (!down->seekState.allowed) {
+	  TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
+	  trans->seekCfg.overideAllowed = 0;
+	  stopped = 1;
+	}
+      }
+    }
+
+    self = next;
+  }
+
+  if (!stopped) {
+    if (TRF_IS_UNSEEKABLE (trans->seekCfg.chosen)) {
+      /* Naturally unseekable (iii)
+       */
+
+      TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
+      trans->seekCfg.overideAllowed = 1;
+    } else {
+      /* Take the natural ratio.
+       */
+
+      trans->seekCfg.chosen.numBytesTransform = trans->seekCfg.natural.numBytesTransform;
+      trans->seekCfg.chosen.numBytesDown      = trans->seekCfg.natural.numBytesDown;
+      trans->seekCfg.overideAllowed = 1;
+    }
+  }
+
+  trans->seekState.used.numBytesTransform = trans->seekCfg.chosen.numBytesTransform;
+  trans->seekState.used.numBytesDown      = trans->seekCfg.chosen.numBytesDown;
+  trans->seekState.allowed                = !TRF_IS_UNSEEKABLE (trans->seekState.used);
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	SeekInitialize --
+ *
+ *	Initialize the runtime state of the seek mechanisms
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static void
+SeekInitialize (trans)
+     TrfTransformationInstance* trans;
+{
+  Tcl_Channel parent;
+
+#ifdef USE_TCL_STUBS
+  parent = (trans->patchIntegrated ?
+	    DownChannel (trans)    :
+	    trans->parent);
+#else
+  parent = trans->parent;
+#endif
+
+  trans->seekState.upLoc         = 0;
+  trans->seekState.upBufStartLoc = 0;
+  trans->seekState.upBufEndLoc   = 0;
+
+  if (trans->seekState.allowed) {
+    trans->seekState.downLoc     = TRF_TELL (parent);
+    trans->seekState.downZero    = trans->seekState.downLoc;
+    trans->seekState.aheadOffset = 0;
+  } else {
+    trans->seekState.downLoc     = 0;
+    trans->seekState.downZero    = 0;
+    trans->seekState.aheadOffset = 0;
+  }
+
+  trans->seekState.identity = 0;
+  trans->seekState.changed  = 0;
+
+  SEEK_DUMP (Seek Initialized);
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	SeekClearBuffer --
+ *
+ *	Clear read / write buffers of the transformation,
+ *	as specified by the second argument.
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static void
+SeekClearBuffer (trans, which)
+     TrfTransformationInstance* trans;
+     int                        which;
+{
+  /*
+   * Discard everything in the input and output buffers, both
+   * in the transformation and in the generic layer of Trf.
+   */
+
+  if (trans->mode & which & TCL_WRITABLE) {
+    PRINT ("out.clearproc\n"); FL;
+
+    trans->out.vectors->clearProc (trans->out.control, trans->clientData);
+  }
+
+  if (trans->mode & which & TCL_READABLE) {
+    PRINT ("in.clearproc\n"); FL;
+
+    trans->in.vectors->clearProc  (trans->in.control, trans->clientData);
+    trans->readIsFlushed = 0;
+    ResultClear (&trans->result);
+  }
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	SeekSynchronize --
+ *
+ *	Discard an existing read buffer and annulate the
+ *	read ahead in the downstream channel.
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static void
+SeekSynchronize (trans, parent)
+     TrfTransformationInstance* trans;
+     Tcl_Channel                parent;
+{
+  int offsetDown;
+
+  if (!trans->seekState.allowed) {
+    /* No synchronisation required for an unseekable transform */
+    return;
+  }
+
+  if ((trans->seekState.upLoc == trans->seekState.upBufEndLoc) &&
+      (trans->seekState.aheadOffset == 0)) {
+    /* Up and down locations are in sync, nothing to do. */
+    return;
+  }
+
+  PRINT ("in.clearproc\n"); FL;
+
+  trans->in.vectors->clearProc  (trans->in.control, trans->clientData);
+  trans->readIsFlushed = 0;
+
+  offsetDown  = TRF_DOWN_CONVERT (trans,
+				  trans->seekState.upLoc - trans->seekState.upBufEndLoc);
+  offsetDown -= trans->seekState.aheadOffset; /* !! */
+
+  ResultClear (&trans->result);
+
+  if (offsetDown != 0) {
+    Tcl_Seek (parent, offsetDown, SEEK_CUR);
+  }
+
+  trans->seekState.downLoc += offsetDown;
+}
+
+
+/*
+ *------------------------------------------------------*
+ *
+ *	SeekConfig --
+ *
+ *	Generates a list containing the current configuration
+ *	of the seek system in a readable manner.
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		An Tcl_Obj, or NULL.
+ *
+ *------------------------------------------------------*
+ */
+
+static Tcl_Obj*
+SeekConfigGet (interp, cfg)
+     Tcl_Interp* interp;
+     SeekConfig* cfg;
+{
+  int      res;
+  Tcl_Obj* list = (Tcl_Obj*) NULL;
+  Tcl_Obj* sub1 = (Tcl_Obj*) NULL;
+  Tcl_Obj* sub2 = (Tcl_Obj*) NULL;
+
+  list = Tcl_NewListObj (0, NULL);
+
+  if (list == (Tcl_Obj*) NULL) {
+    goto error;
+  }
+
+  LIST_ADDSTR (error, list, "ratioNatural");
+  sub1 = Tcl_NewListObj (0, NULL);
+
+  if (sub1 == (Tcl_Obj*) NULL) {
+    goto error;
+  }
+
+  LIST_ADDINT (error, sub1, cfg->natural.numBytesTransform);
+  LIST_ADDINT (error, sub1, cfg->natural.numBytesDown);
+  LIST_ADDOBJ (error, list, sub1);
+
+
+  LIST_ADDSTR (error, list, "ratioChosen");
+  sub2 = Tcl_NewListObj (0, NULL);
+
+  if (sub2 == (Tcl_Obj*) NULL) {
+    goto error;
+  }
+
+  LIST_ADDINT (error, sub2, cfg->chosen.numBytesTransform);
+  LIST_ADDINT (error, sub2, cfg->chosen.numBytesDown);
+  LIST_ADDOBJ (error, list, sub2);
+
+  LIST_ADDSTR (error, list, "overideAllowed");
+  LIST_ADDINT (error, list, cfg->overideAllowed);
+
+  return list;
+
+error:
+  /* Cleanup any remnants of errors above */
+
+  if (list != (Tcl_Obj*) NULL) {
+    Tcl_DecrRefCount (list);
+  }
+
+  if (sub1 != (Tcl_Obj*) NULL) {
+    Tcl_DecrRefCount (sub1);
+  }
+
+  if (sub2 != (Tcl_Obj*) NULL) {
+    Tcl_DecrRefCount (sub2);
+  }
+
+  return NULL;
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	SeekState --
+ *
+ *	Generates a list containing the current state of
+ *	the seek system in a readable manner.
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		An Tcl_Obj, or NULL.
+ *
+ *------------------------------------------------------*
+ */
+
+static Tcl_Obj*
+SeekStateGet (interp, state)
+     Tcl_Interp* interp;
+     SeekState* state;
+{
+  int      res;
+  Tcl_Obj* list = (Tcl_Obj*) NULL;
+  Tcl_Obj* sub  = (Tcl_Obj*) NULL;
+
+  list = Tcl_NewListObj (0, NULL);
+
+  if (list == (Tcl_Obj*) NULL) {
+    goto error;
+  }
+
+  LIST_ADDSTR (error, list, "seekable");
+  LIST_ADDINT (error, list, state->allowed);
+
+  LIST_ADDSTR (error, list, "ratio");
+
+  sub  = Tcl_NewListObj (0, NULL);
+  if (sub == (Tcl_Obj*) NULL) {
+    goto error;
+  }
+
+  LIST_ADDINT (error, sub, state->used.numBytesTransform);
+  LIST_ADDINT (error, sub, state->used.numBytesDown);
+  LIST_ADDOBJ (error, list, sub);
+
+  LIST_ADDSTR (error, list, "up");
+  LIST_ADDINT (error, list, state->upLoc);
+
+  LIST_ADDSTR (error, list, "upBufStart");
+  LIST_ADDINT (error, list, state->upBufStartLoc);
+
+  LIST_ADDSTR (error, list, "upBufEnd");
+  LIST_ADDINT (error, list, state->upBufEndLoc);
+
+  LIST_ADDSTR (error, list, "down");
+  LIST_ADDINT (error, list, state->downLoc);
+
+  LIST_ADDSTR (error, list, "downBase");
+  LIST_ADDINT (error, list, state->downZero);
+
+  LIST_ADDSTR (error, list, "downAhead");
+  LIST_ADDINT (error, list, state->aheadOffset);
+
+  LIST_ADDSTR (error, list, "identityForced");
+  LIST_ADDINT (error, list, state->identity);
+
+  LIST_ADDSTR (error, list, "changed");
+  LIST_ADDINT (error, list, state->changed);
+
+  return list;
+
+error:
+  /* Cleanup any remnants of errors above */
+
+  if (list != (Tcl_Obj*) NULL) {
+    Tcl_DecrRefCount (list);
+  }
+
+  if (sub != (Tcl_Obj*) NULL) {
+    Tcl_DecrRefCount (sub);
+  }
+
+  return NULL;
+}
+
+#ifdef TRF_DEBUG
+/*
+ *------------------------------------------------------*
+ *
+ *	PrintString --
+ *
+ *	Defined only in debug mode, enforces correct
+ *	printing of strings by adding a \0 after its value.
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+void
+PrintString (fmt,len,bytes)
+     char* fmt;
+     int   len;
+     char* bytes;
+{
+  char* tmp = (char*) Tcl_Alloc (len+1);
+  memcpy (tmp, bytes, len);
+  tmp [len] = '\0';
+
+  PRINT (fmt, len, tmp);
+
+  Tcl_Free (tmp);
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	SeekDump --
+ *
+ *	Defined only in debug mode, dumps the complete
+ *	state of all seek variables.
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static void
+SeekDump (trans, place)
+     TrfTransformationInstance* trans;
+     CONST char*                place;
+{
+  Tcl_Channel parent;
+
+#ifdef USE_TCL_STUBS
+  parent = (trans->patchIntegrated ?
+	    DownChannel (trans)    :
+	    trans->parent);
+#else
+  parent = trans->parent;
+#endif
+
+#if 0
+  PRINT ("SeekDump (%s) {\n", place); FL; IN;
+
+  PRINT ("ratio up:down    %d : %d\n",
+	 trans->seekState.used.numBytesTransform,
+	 trans->seekState.used.numBytesDown); FL;
+  PRINT ("seekable         %d\n",
+	 trans->seekState.allowed); FL;
+  PRINT ("up               %d [%d .. %d]\n",
+	 trans->seekState.upLoc,
+	 trans->seekState.upBufStartLoc,
+	 trans->seekState.upBufEndLoc); FL;
+  PRINT ("down             %d [%d] | %d\n",
+	 trans->seekState.downLoc,
+	 trans->seekState.aheadOffset,
+	 TRF_TELL (parent)); FL;
+  PRINT ("base             %d\n",
+	 trans->seekState.downZero); FL;
+  PRINT ("identity force   %d\n",
+	 trans->seekState.identity); FL;
+  PRINT ("seek while ident %d\n",
+	 trans->seekState.changed); FL;
+  PRINT ("read buffer      %d\n",
+	 ResultLength (&trans->result)); FL;
+
+  OT ; PRINT ("}\n"); FL;
+#else
+  PRINT ("SkDmp (%s) ", place); FL;
+
+#if 0
+  NPRINT ("(%2d : %2d) | ",
+	  trans->seekCfg.natural.numBytesTransform,
+	  trans->seekCfg.natural.numBytesDown); FL;
+  NPRINT ("(%2d : %2d) | ",
+	  trans->seekCfg.chosen.numBytesTransform,
+	  trans->seekCfg.chosen.numBytesDown); FL;
+#endif
+  NPRINT ("%2d:%2d /%1d |r %5d |u %5d [%5d..%5d] |d %5d [%2d] %5d | %5d | %1d %1d",
+	  trans->seekState.used.numBytesTransform,
+	  trans->seekState.used.numBytesDown,
+	  trans->seekState.allowed,
+	  ResultLength (&trans->result),
+	  trans->seekState.upLoc,
+	  trans->seekState.upBufStartLoc,
+	  trans->seekState.upBufEndLoc,
+	  trans->seekState.downLoc,
+	  trans->seekState.aheadOffset,
+	  TRF_TELL (parent),
+	  trans->seekState.downZero,
+	  trans->seekState.identity,
+	  trans->seekState.changed
+	  ); FL;
+
+  NPRINT ("\n"); FL;
+#endif
+}
+#endif

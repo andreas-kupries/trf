@@ -101,7 +101,8 @@ static Trf_TypeDefinition mdDefinition = /* THREADING: constant, read-only => sa
     DecodeBuffer,
     FlushDecoder,
     ClearDecoder
-  }
+  },
+  TRF_UNSEEKABLE
 };
 
 /*
@@ -195,6 +196,9 @@ Tcl_Interp*                         interp;
 CONST Trf_MessageDigestDescription* md_desc;
 {
   Trf_TypeDefinition* md;
+  int                res;
+
+  START (Trf_RegisterMessageDigest);
 
   /* THREADING: read-only access => safe */
   md = (Trf_TypeDefinition*) Tcl_Alloc (sizeof (Trf_TypeDefinition));
@@ -205,10 +209,27 @@ CONST Trf_MessageDigestDescription* md_desc;
   md->clientData = (ClientData) md_desc;
   md->options    = TrfMDOptions ();
 
-  return Trf_Register (interp, md);
+  PRINT ("MD_Desc %p\n", md_desc); FL; IN;
+
+  PRINT ("Name:      %s\n", md_desc->name);
+  PRINT ("Context:   %d\n", md_desc->context_size);
+  PRINT ("Digest:    %d\n", md_desc->digest_size);
+  PRINT ("Start:     %p\n", md_desc->startProc);
+  PRINT ("Update:    %p\n", md_desc->updateProc);
+  PRINT ("UpdateBuf: %p\n", md_desc->updateBufProc);
+  PRINT ("Final      %p\n", md_desc->finalProc);
+  PRINT ("Check:     %p\n", md_desc->checkProc);
+
+  OT;
+
+
+  res = Trf_Register (interp, md);
 
   /* 'md' is a memory leak, it will never be released.
    */
+
+  DONE (Trf_RegisterMessageDigest);
+  return res;
 }
 
 /*
@@ -242,9 +263,14 @@ ClientData    clientData;
   TrfMDOptionBlock*              o = (TrfMDOptionBlock*) optInfo;
   Trf_MessageDigestDescription* md = (Trf_MessageDigestDescription*) clientData;
 
+  START (digest.CreateEncoder);
+  PRINT ("%p: %s\n", md, md->name);
+
   c = (EncoderControl*) Tcl_Alloc (sizeof (EncoderControl));
   c->write           = fun;
   c->writeClientData = writeClientData;
+
+  PRINT ("Setting up state\n"); FL;
 
   if ((o->behaviour == TRF_IMMEDIATE) || (o->mode == TRF_ABSORB_HASH)) {
     c->operation_mode = (o->behaviour == TRF_IMMEDIATE) ? IMMEDIATE : ATTACH_ABSORB;
@@ -274,8 +300,12 @@ ClientData    clientData;
    * Create and initialize the context.
    */
 
+  PRINT ("Setting up context (%d bytes)\n", md->context_size); FL;
+
   c->context = (VOID*) Tcl_Alloc (md->context_size);
   (*md->startProc) (c->context);
+
+  DONE (digest.CreateEncoder);
 
   return (ClientData) c;
 }

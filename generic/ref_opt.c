@@ -81,7 +81,8 @@ TrfTransformOptions ()
       CheckOptions,
       NULL,      /* no string procedure for 'SetOption' */
       SetOption,
-      QueryOptions
+      QueryOptions,
+      NULL       /* unseekable, unchanged by options FOR NOW - TODO - */
     };
 
   return &optVec;

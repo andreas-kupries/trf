@@ -129,11 +129,12 @@ TRF_EXPORT (int,Trf_SafeInit) _ANSI_ARGS_ ((Tcl_Interp* interp));
  * Check, wether this extension was initialized for the
  * specified interpreter or not.
  */
-#if 0
+
 #ifdef __C2MAN__
 int
 Trf_IsInitialized (Tcl_Interp* interp /* interpreter to check for initialization */);
 #else
+#ifndef TRF_USE_STUBS
 TRF_EXPORT (int,Trf_IsInitialized) _ANSI_ARGS_ ((Tcl_Interp* interp));
 #endif
 #endif
@@ -317,19 +318,44 @@ typedef int Trf_QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
 					    ClientData  clientData));
 #endif
 
+
+typedef struct _Trf_SeekInformation_ Trf_SeekInformation;
+
 /*
- * Structure to hold all vectors describing the processing of a specific option set.
- * The 5 vectors are used to create and delete containers, to check them for errors,
- * to set option values and to query them for usage of encoder or decoder vectors.
+ * Interface to procedures to query an option container.
+ * The procedure is allowed to change the natural seek policy defined for the
+ * transformation according to the current configuration.
+ *
+ * Returns:
+ * Nothing.
+ */
+
+#ifdef __C2MAN__
+typedef void Trf_SeekQueryOptions  (Trf_Options options,   /* option container to query */
+				    Trf_SeekInformation* seekInfo, /* The policy to modify */
+				    ClientData  clientData /* arbitrary information, as defined in
+							    * Trf_TypeDefinition.clientData */);
+#else
+typedef int Trf_SeekQueryOptions  _ANSI_ARGS_ ((Trf_Options options,
+						Trf_SeekInformation* seekInfo,
+						ClientData  clientData));
+#endif
+
+/*
+ * Structure to hold all vectors describing the processing of a specific
+ * option set. The 5 vectors are used to create and delete containers, to
+ * check them for errors, to set option values and to query them for usage
+ * of encoder or decoder vectors.
  */
 
 typedef struct _Trf_OptionVectors_ {
-  Trf_CreateOptions*  createProc; /* create container for option information */
-  Trf_DeleteOptions*  deleteProc; /* delete option container */
-  Trf_CheckOptions*   checkProc;  /* check defined options for consistency, errors, ... */
-  Trf_SetOption*      setProc;    /* define an option value */
-  Trf_SetObjOption*   setObjProc; /* define an option value via Tcl_Obj (Tcl 8.x) */
-  Trf_QueryOptions*   queryProc;  /* query, wether encode (1) / decode (0) requested by options */
+  Trf_CreateOptions*    createProc;    /* create container for option information */
+  Trf_DeleteOptions*    deleteProc;    /* delete option container */
+  Trf_CheckOptions*     checkProc;     /* check defined options for consistency, errors, ... */
+  Trf_SetOption*        setProc;       /* define an option value */
+  Trf_SetObjOption*     setObjProc;    /* define an option value via Tcl_Obj (Tcl 8.x) */
+  Trf_QueryOptions*     queryProc;     /* query, wether encode (1) / decode (0) requested by options */
+  Trf_SeekQueryOptions* seekQueryProc; /* query options about changes to the natural seek policy */
 } Trf_OptionVectors;
 
 
@@ -399,7 +425,7 @@ typedef Trf_ControlBlock Trf_CreateCtrlBlock _ANSI_ARGS_ ((ClientData    writeCl
 /*
  * Interface to procedure for destruction of encoder/decoder control structures.
  * It is the responsibility of the procedure to clear and release all memory
- * associated to the sspecified control structure (which must have been created
+ * associated to the specified control structure (which must have been created
  * by the appropriate procedure of type 'Trf_CreateCtrlBlock').
  */
 
@@ -518,21 +544,41 @@ typedef struct _Trf_Vectors_ {
 
 
 /*
+ * Information about a seek policy. Just the ratio of input to output, if
+ * attached with encode on write. If either one of the values is
+ * zero, the transformation is considered to be unseekable.
+ */
+
+struct _Trf_SeekInformation_ {
+  int numBytesTransform; /* #Bytes used by the transformation as input */
+  int numBytesDown;      /* #Bytes produced for every 'numBytesTransform' */
+};
+
+
+/*
  * Structure describing a complete transformation.
  * Consists of option processor and vectors for encoder, decoder.
  */
 
 typedef struct _Trf_TypeDefinition_ {
-  CONST char*        name;       /* name of transformation, also name of
-				  * created command */
-  ClientData         clientData; /* reference to arbitrary information.
-				  * This information is given to all vectors
-				  * mentioned below. */
-  Trf_OptionVectors* options;    /* reference to option description, can be
-				  * shared between transformation descriptions */
-  Trf_Vectors        encoder;    /* description of encoder */
-  Trf_Vectors        decoder;    /* description of decoder */
+  CONST char*         name;       /* name of transformation, also name of
+				   * created command */
+  ClientData          clientData; /* reference to arbitrary information.
+				   * This information is given to all vectors
+				   * mentioned below. */
+  Trf_OptionVectors*  options;    /* reference to option description, can be
+				   * shared between transformation descriptions
+				   */
+  Trf_Vectors         encoder;    /* description of encoder */
+  Trf_Vectors         decoder;    /* description of decoder */
+
+  Trf_SeekInformation naturalSeek; /* Information about the natural seek
+				    * policy. Compile time configuration. */
 } Trf_TypeDefinition;
+
+
+#define TRF_UNSEEKABLE    {0,  0}
+#define TRF_RATIO(in,out) {in, out}
 
 
 /*
@@ -541,12 +587,13 @@ typedef struct _Trf_TypeDefinition_ {
  * to the transformation described in 'type'. 'type->name' is used
  * as name of the command.
  */
-#if 0
+
 #ifdef __C2MAN__
 int
 Trf_Register (Tcl_Interp*               interp, /* interpreter to register at */
 	      CONST Trf_TypeDefinition* type    /* transformation to register */);
 #else
+#ifndef TRF_USE_STUBS
 TRF_EXPORT (int,Trf_Register) _ANSI_ARGS_ ((Tcl_Interp* interp,
 					    CONST Trf_TypeDefinition* type));
 #endif
@@ -706,13 +753,14 @@ typedef struct _Trf_MessageDigestDescription {
  * value is a standard tcl error code. In case of failure an error message
  * should be left in the result area of the given interpreter.
  */
-#if 0
+
 #ifdef __C2MAN__
 int
 Trf_RegisterMessageDigest (Tcl_Interp* interp /* interpreter to register the MD algorithm at */,
 		   CONST Trf_MessageDigestDescription* md_desc /* description of the MD
 									* algorithm */);
 #else
+#ifndef TRF_USE_STUBS
 TRF_EXPORT (int,Trf_RegisterMessageDigest) _ANSI_ARGS_ ((Tcl_Interp* interp,
 				CONST Trf_MessageDigestDescription* md_desc));
 #endif
@@ -726,25 +774,28 @@ TRF_EXPORT (int,Trf_RegisterMessageDigest) _ANSI_ARGS_ ((Tcl_Interp* interp,
  * General purpose library loader functionality.
  * Used by -> TrfLoadZlib, -> TrfLoadLibdes.
  */
-/*
+
+#ifndef TRF_USE_STUBS
 TRF_EXPORT (int,Trf_LoadLibrary) _ANSI_ARGS_ ((Tcl_Interp* interp,
 					       CONST char* libName,
 			    VOID** handlePtr, char** symbols, int num));
 
 TRF_EXPORT (void,Trf_LoadFailed) _ANSI_ARGS_ ((VOID** handlePtr));
-*/
+#endif
+
 /*
  * XOR the bytes in a buffer with a mask.
  * Internally used by the implementation of the
  * various stream modes available to blockciphers.
  */
-#if 0
+
 #ifdef __C2MAN__
 void
 Trf_XorBuffer (VOID* buffer, /* buffer to xor the mask with */
 	       VOID* mask,   /* mask bytes xor'ed into the buffer */
 	       int length    /* length of mask and buffer (in byte) */);
 #else
+#ifndef TRF_USE_STUBS
 TRF_EXPORT (void,Trf_XorBuffer) _ANSI_ARGS_ ((VOID* buffer, VOID* mask,
 					      int length));
 #endif
@@ -756,7 +807,7 @@ TRF_EXPORT (void,Trf_XorBuffer) _ANSI_ARGS_ ((VOID* buffer, VOID* mask,
  * number of bytes from the left of the 2nd register ('in') is
  * inserted at the right of 'buffer' to replace the lost bytes.
  */
-#if 0
+
 #ifdef __C2MAN__
 void
 Trf_ShiftRegister (VOID* buffer,       /* data shifted to the left */
@@ -764,6 +815,7 @@ Trf_ShiftRegister (VOID* buffer,       /* data shifted to the left */
 		   int   shift,        /* number of bytes to shift out (and in) */
 		   int   buffer_length /* length of buffer and in (in byte) */);
 #else
+#ifndef TRF_USE_STUBS
 TRF_EXPORT (void,Trf_ShiftRegister) _ANSI_ARGS_ ((VOID* buffer, VOID* in,
 						  int shift,
 						  int buffer_length));
@@ -773,25 +825,28 @@ TRF_EXPORT (void,Trf_ShiftRegister) _ANSI_ARGS_ ((VOID* buffer, VOID* in,
 /*
  * Swap the bytes of all 2-byte words contained in the buffer.
  */
-#if 0
+
 #ifdef __C2MAN__
 void
 Trf_FlipRegisterShort (VOID* buffer, /* data to swap */
 		       int   length  /* length of buffer (in byte) */);
 #else
+#ifndef TRF_USE_STUBS
 TRF_EXPORT (void,Trf_FlipRegisterShort) _ANSI_ARGS_ ((VOID* buffer,
 						      int length));
 #endif
 #endif
+
 /*
  * Swap the bytes of all 4-byte words contained in the buffer.
  */
-#if 0
+
 #ifdef __C2MAN__
 void
 Trf_FlipRegisterLong (VOID* buffer, /* data to swap */
 		      int   length  /* length of buffer (in byte) */);
 #else
+#ifndef TRF_USE_STUBS
 TRF_EXPORT (void,Trf_FlipRegisterLong) _ANSI_ARGS_ ((VOID* buffer, int length));
 #endif
 #endif
@@ -799,7 +854,11 @@ TRF_EXPORT (void,Trf_FlipRegisterLong) _ANSI_ARGS_ ((VOID* buffer, int length));
  * End of exported interface
  */
 
+#ifndef __C2MAN__
+#ifndef TRF_USE_STUBS
 #include "trfDecls.h"
+#endif
+#endif
 
 /*
  * Convenience declaration of Trf_InitStubs.

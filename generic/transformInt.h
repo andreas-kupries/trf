@@ -94,6 +94,9 @@ extern int n;
 #define START(p) BLNKS; printf ("Start %s...\n",#p); FL; IN
 #define DONE(p)  OT ; BLNKS; printf ("....Done %s\n",#p); FL;
 #define PRINT    BLNKS; printf
+#define NPRINT   printf
+#define PRTSTR(fmt,len,bytes) PrintString (fmt,len,bytes)
+extern void PrintString _ANSI_ARGS_ ((char* fmt, int len, char* bytes));
 #else
 #define BLNKS
 #define IN
@@ -101,9 +104,30 @@ extern int n;
 #define FL
 #define START(p)
 #define DONE(p)
-#define PRINT if (0) printf
+#define PRINT  if (0) printf
+#define NPRINT if (0) printf
+#define PRTSTR(fmt,len,bytes)
 #endif
 
+
+/* Convenience macros
+ * - construction of (nested) lists
+ */
+
+#define LIST_ADDOBJ(errlabel,list,o) \
+  res = Tcl_ListObjAppendElement (interp, list, o); \
+  if (res != TCL_OK) {                              \
+    goto errlabel;                               \
+  }
+
+#define LIST_ADDSTR(el, list, str) \
+  LIST_ADDOBJ (el, list, Tcl_NewStringObj (str, -1))
+
+#define LIST_ADDFSTR(el, list, str, len) \
+    LIST_ADDOBJ (el, list, Tcl_NewStringObj (str, len))
+
+#define LIST_ADDINT(el, list, i) \
+    LIST_ADDOBJ (el, list, Tcl_NewIntObj (i))
 
 /* Define macro which is TRUE for tcl versions >= 8.1
  * Required as there are incompatibilities between 8.0 and 8.1
@@ -151,9 +175,11 @@ typedef struct _Trf_RegistryEntry_ {
   Trf_Registry*       registry;   /* Backpointer to the registry */
 
   Trf_TypeDefinition* trfType;    /* reference to transformer specification */
-  Tcl_ChannelType*    transType;  /* reference to derived channel type specification */
+  Tcl_ChannelType*    transType;  /* reference to derived channel type
+				   * specification */
   Tcl_Command         trfCommand; /* command associated to the transformer */
-  Tcl_Interp*         interp;     /* interpreter the command is registered in */
+  Tcl_Interp*         interp;     /* interpreter the command is registered
+				   * in. */
 } Trf_RegistryEntry;
 
 
@@ -452,6 +478,7 @@ EXTERN int TrfInit_RS_ECC    _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_ZIP       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_BZ2       _ANSI_ARGS_ ((Tcl_Interp* interp));
 
+EXTERN int TrfInit_Info      _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_Unstack   _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_Binio     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
