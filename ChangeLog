@@ -1,3 +1,12 @@
+Mon Sep 27 21:15:50 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* unix/Makefile.in, unix/configure.in: The introduction of an
+	  exported stub table broke the 'unix' build for 8.0.x. Added more
+	  configure variables etc. to switch of compilation of trfStub*.o
+	  and linkage of libtrfstub.a
+	  Reported by Stefan Studer <studer@glue.ch> while trying the
+	  unofficial distribution.
+
 Sat Sep 25 20:24:12 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* doc/nodes/: Upgraded the documentation a bit.

@@ -676,18 +676,24 @@ TCL_SHARED_LIBS=""
 
 # Use stubs <=> (((major == 8) && (minor > 0)) || (major > 8)) && 'trf as shared library'
 
+# no stubs => don't try to export stubs.
+
 AC_MSG_CHECKING(for stubs)
 
 if test \( \( $TCL_MAJOR_VERSION -eq 8 -a $TCL_MINOR_VERSION -gt 0 \) -o $TCL_MAJOR_VERSION -gt 8 \) -a "x$ok" = "xyes"
 then
     AC_MSG_RESULT(yes)
     TRF_USING_STUBS=1
+    STUB_OBJS=trfStubInit.o
+    STUB_LIBOBJS=trfStubLib.o
     # Stubs
     TCL_DEFS="$TCL_DEFS -DUSE_TCL_STUBS"
     TCL_SHARED_LIBS="${TCL_STUB_LIB_SPEC}"
 else
     AC_MSG_RESULT(no)
     TRF_USING_STUBS=0
+    STUB_OBJS=
+    STUB_LIBOBJS=
     # No stubs
     case "$SHLIB_LD" in
 	*ldAix*)
@@ -738,6 +744,14 @@ else
 
     install_other='install-bin'
 fi
+
+if test $TRF_USING_STUBS -gt 0
+then
+    eval "TRF_STUB_LIB_FILE=libtrfstub${TCL_UNSHARED_LIB_SUFFIX}"
+else
+    TRF_STUB_LIB_FILE=
+fi
+
 
 # Note:  in the following variable, it's important to use the absolute
 # path name of the Tcl directory rather than "..":  this is because
@@ -860,7 +874,8 @@ if test "x${TCLSH_PROG}" = "x:" ; then
 fi
 AC_SUBST(TCLSH_PROG)
 
-
+AC_SUBST(STUB_OBJS)
+AC_SUBST(STUB_LIBOBJS)
 AC_SUBST(SHARED_LIBS)
 AC_SUBST(CC)
 AC_SUBST(DL_LIBS)
@@ -900,6 +915,7 @@ AC_SUBST(ZLIB_LIB_FILE)
 
 AC_SUBST(MAKE_LIBDES)
 AC_SUBST(LIBDES_LIB_FILE)
+AC_SUBST(TRF_STUB_LIB_FILE)
 
 dnl for GCC activate -Wall
 if test ! -z "$GCC"; then

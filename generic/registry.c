@@ -1274,7 +1274,7 @@ int*       errorCodePtr;	/* Location of error flag. */
   Tcl_Channel parent;
 
   START (TrfSeek);
-  PRINT ("(Mode = %d, Offsset = %d)\n", mode, offset); FL;
+  PRINT ("(Mode = %ld, Offset = %d)\n", mode, offset); FL;
 
 #ifdef USE_TCL_STUBS
   parent = (trans->patchIntegrated ?

@@ -146,7 +146,7 @@ LIBS = @TRF_LD_SEARCH_FLAGS@ @SHARED_LIBS@
 
 TRF_TESTS	=	@TRF_TESTS@
 TRF_LIB_FILE	=	@TRF_LIB_FILE@
-TRF_STUB_LIB_FILE=	lib$(LOW_EXTENSION)stub$(VERSION).a
+TRF_STUB_LIB_FILE=	@TRF_STUB_LIB_FILE@
 
 ZLIB_LIB_FILE	=	@ZLIB_LIB_FILE@
 LIBDES_LIB_FILE	=	@LIBDES_LIB_FILE@
@@ -214,7 +214,7 @@ BASE_SRC	=	$(GENERIC_DIR)/zlib.c		\
 
 BASE_OBJ	=	bz2lib.o zlib.o loadman.o init.o	\
 			registry.o unstack.o binio.o load.o	\
-			@DL_OBJS@ trfStubInit.o
+			@DL_OBJS@ @STUB_OBJS@
 
 #		conversions, base & algorithms
 CVT_SRC		=	$(CVT_BASE_SRC) $(CVT_ALG_SRC)
@@ -291,7 +291,7 @@ APP		=	$(srcdir)/tclsh
 LDFLAGS		=	@LD_FLAGS@
 LOADLIBES	=	@TRF_BUILD_LIB_SPEC@ $(ALL_LIBS)
 
-STUB_OBJ	=	trfStubLib.o
+STUB_OBJ	=	@STUB_LIBOBJS@
 
 #-------------------------------------------------------#
 
@@ -538,8 +538,8 @@ _eprintf.o:	$(TOP_DIR)/compat/_eprintf.c
 
 #-------------------------------------------------------#
 
-$(TRF_STUB_LIB_FILE):	trfStubLib.o
-	$(AR) cr $@ trfStubLib.o
+$(TRF_STUB_LIB_FILE):	$(STUB_OBJ)
+	$(AR) cr $@ $(STUB_OBJ)
 
 $(TRF_LIB_FILE):	$(OBJECTS)
 	rm -f		$(TRF_LIB_FILE)
