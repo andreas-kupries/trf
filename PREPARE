@@ -23,10 +23,10 @@ mInsertInfo \
 	unix/README unix/configure.in unix/Makefile.in
 
 set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mShortDosVersion@).dll"
-mInsertInfo \
+eval mInsertInfo \
 	win/README      win/pkgIndex.tcl \
 	win/makefile.vc win/makefile.vc5 \
-	win/trf.rc
+	win/trf.rc [glob win/trf*.README]
 
 mGetDescription
 mExpandUrls
