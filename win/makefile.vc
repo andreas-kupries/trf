@@ -245,5 +245,4 @@ clean:
 	-@del *.lib 
 	-@del *.dll 
 	-@del *.pch
-	-@del *.pdb
         -@del $(TMPDIR)\*.obj
