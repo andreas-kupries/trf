@@ -2,7 +2,7 @@
 # commands for logical markup
 
 proc strong {text} {return [cgi_bold $text]}
-proc lang   {name} {return [cgi_typewriter $text]}
+proc cem    {text} {return [font color=red $text]}
 
 proc lang   {text} {return [cgi_typewriter $text]}
 proc afile  {text} {return [cgi_typewriter $text]}

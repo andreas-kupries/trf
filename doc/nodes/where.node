@@ -46,7 +46,7 @@ node trf_where {
 	    table_row bgcolor=#ffffcc {
 		table_data {
 		    cgi_puts [link trf_win32bin]
-		    cgi_puts "<br>[cem Note:] This distribution was compiled
+		    cgi_puts "<br>[cem [strong Note:]] This distribution was compiled
 		    with VC++ 5.0, on Win NT 4sp3. It is not usable for
 		    Win95/98."
 		}
