@@ -1,3 +1,13 @@
+Wed Dec 15 19:27:01 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* -- Release 2.0p3 --
+
+	* unix/configure.in: Changed to use SHARED_LIBS instead of LIBS to
+	  add -lcrypt to the link options of libtrf.so This finally solved
+	  the RH problem. My thanks to Mick Lester <mick@kbkids.com> who
+	  provided the configure and Make logs which allowed me to track
+	  this in detail.
+
 Mon Dec 13 20:08:07 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* -- Release 2.0p2 --

@@ -913,7 +913,7 @@ else
 		# (3)
 		MD5_LIB_FILE=libmd5crypt$SHLIB_SUFFIX
 		TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=\\\"libmd5crypt$SHLIB_SUFFIX\\\""
-		LIBS="-lcrypt $LIBS"
+		SHARED_LIBS="-lcrypt $SHARED_LIBS"
 	fi
 fi
 
