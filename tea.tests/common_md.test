@@ -36,7 +36,7 @@ test common.md-2.0 "common md, argument errors" {
 test common.md-2.0 "common md, argument errors" {
     catch {crc -attach stdout -mode XXX} msg
     set msg
-} {unknown mode 'XXX'}
+} {unknown mode 'XXX', should be 'absorb', 'write' or 'transparent'}
 
 test common.md-2.1 "common md, argument errors" {
     catch {crc -attach stdin -mode absorb} msg

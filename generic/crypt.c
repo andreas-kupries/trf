@@ -64,6 +64,10 @@ TrfCryptObjCmd (notUsed, interp, objc, objv)
    * crypt <passwd> <salt>
    */
 
+#ifdef __WIN32__
+  Tcl_SetObjResult (interp, Tcl_NewStringObj ("crypt is not available under Windows", -1));
+  return TCL_ERROR;
+#else
   const char* passwd;
   const char* salt;
   Tcl_Obj*    res;
@@ -87,6 +91,7 @@ TrfCryptObjCmd (notUsed, interp, objc, objv)
 
   Tcl_SetObjResult (interp, res);
   return TCL_OK;
+#endif
 }
 
 /*

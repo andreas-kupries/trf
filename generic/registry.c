@@ -780,6 +780,7 @@ TrfExecuteObjCmd (clientData, interp, objc, objv)
   Trf_BaseOptions    baseOpt;
   int                mode;
   int                wrong_mod2;
+  int                wrong_number;
 
   START (TrfExecuteObjCmd);
 #ifdef TRF_DEBUG
@@ -821,12 +822,7 @@ TrfExecuteObjCmd (clientData, interp, objc, objv)
       break;
     }
 
-    if (objc < 2) {
-      /* option, but without argument */
-      Tcl_AppendResult (interp, cmd, ": wrong # args", (char*) NULL);
-      OT;
-      goto cleanup_after_error;      
-    }
+    wrong_number = (objc < 2); /* option, but without argument */
 
     optarg = objv [1];
 
@@ -844,6 +840,12 @@ TrfExecuteObjCmd (clientData, interp, objc, objv)
 	if (0 != strncmp (option, "-attach", len))
 	  goto check_for_trans_option;
 
+	if (wrong_number) {
+	  Tcl_AppendResult (interp, cmd, ": wrong # args, option \"", option, "\" requires an argument", (char*) NULL);
+	  OT;
+	  goto cleanup_after_error;      
+	}
+
 	baseOpt.attach = Tcl_GetChannel (interp,
 					 Tcl_GetStringFromObj (optarg, NULL),
 					 &baseOpt.attach_mode);
@@ -856,6 +858,12 @@ TrfExecuteObjCmd (clientData, interp, objc, objv)
       case 'i':
 	if (0 != strncmp (option, "-in", len))
 	  goto check_for_trans_option;
+
+	if (wrong_number) {
+	  Tcl_AppendResult (interp, cmd, ": wrong # args, option \"", option, "\" requires an argument", (char*) NULL);
+	  OT;
+	  goto cleanup_after_error;      
+	}
 
 	baseOpt.source = Tcl_GetChannel (interp,
 					 Tcl_GetStringFromObj (optarg, NULL),
@@ -875,6 +883,12 @@ TrfExecuteObjCmd (clientData, interp, objc, objv)
       case 'o':
 	if (0 != strncmp (option, "-out", len))
 	  goto check_for_trans_option;
+
+	if (wrong_number) {
+	  Tcl_AppendResult (interp, cmd, ": wrong # args, option \"", option, "\" requires an argument", (char*) NULL);
+	  OT;
+	  goto cleanup_after_error;      
+	}
 
 	baseOpt.destination = Tcl_GetChannel (interp,
 					      Tcl_GetStringFromObj (optarg,
@@ -899,12 +913,24 @@ TrfExecuteObjCmd (clientData, interp, objc, objv)
 	if (0 != strncmp (option, "-seekpolicy", len))
 	  goto check_for_trans_option;
 
+	if (wrong_number) {
+	  Tcl_AppendResult (interp, cmd, ": wrong # args, option \"", option, "\" requires an argument", (char*) NULL);
+	  OT;
+	  goto cleanup_after_error;      
+	}
+
 	baseOpt.policy = optarg;
 	Tcl_IncrRefCount (optarg);
 	break;
 
       default:
       check_for_trans_option:
+	if (wrong_number) {
+	  Tcl_AppendResult (interp, cmd, ": wrong # args, all options require an argument", (char*) NULL);
+	  OT;
+	  goto cleanup_after_error;      
+	}
+
 	if ((*OPT->setObjProc) == NULL) {
 	  res = SET_OPTION     (option, Tcl_GetStringFromObj (optarg, NULL));
 	} else {
@@ -1015,7 +1041,7 @@ TrfExecuteObjCmd (clientData, interp, objc, objv)
 unknown_option:
   PRINT ("Unknown option \"%s\"\n", option); FL; OT;
 
-  Tcl_AppendResult (interp, cmd, ": unknown option '", option, "'",
+  Tcl_AppendResult (interp, cmd, ": unknown option '", option, "', should be '-attach/in/out' or '-seekpolicy'",
 		    (char*) NULL);
   /* fall through to cleanup */
 

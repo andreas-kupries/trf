@@ -195,7 +195,7 @@ ClientData             clientData;
 
   if (baseOptions->attach == (Tcl_Channel) NULL) /* IMMEDIATE? */ {
     if (o->mode == TRF_UNKNOWN_MODE) {
-      Tcl_AppendResult (interp, "mode not defined", (char*) NULL);
+      Tcl_AppendResult (interp, "-mode option not set", (char*) NULL);
       return TCL_ERROR;
     }
   } else /* ATTACH */ {
@@ -304,7 +304,7 @@ ClientData  clientData;
     unknown_mode:
       Tcl_AppendResult (interp, "unknown mode '", (char*) NULL);
       Tcl_AppendResult (interp, value, (char*) NULL);
-      Tcl_AppendResult (interp, "'", (char*) NULL);
+      Tcl_AppendResult (interp, "', should be 'compress' or 'decompress'", (char*) NULL);
       return TCL_ERROR;
       break;
     } /* switch optvalue */
@@ -320,7 +320,7 @@ ClientData  clientData;
  unknown_option:
   Tcl_AppendResult (interp, "unknown option '", (char*) NULL);
   Tcl_AppendResult (interp, optname, (char*) NULL);
-  Tcl_AppendResult (interp, "'", (char*) NULL);
+  Tcl_AppendResult (interp, "', should be '-level' or '-mode'", (char*) NULL);
   return TCL_ERROR;
 }
 

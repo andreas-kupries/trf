@@ -34,52 +34,52 @@ test common.md-2.0 "common md, argument errors" {
     set msg
 } {attach: -mode not defined}
 
-test common.md-2.0 "common md, argument errors" {
+test common.md-2.1 "common md, argument errors" {
     catch {crc -attach stdout -mode XXX} msg
     set msg
-} {unknown mode 'XXX'}
+} {unknown mode 'XXX', should be 'absorb', 'write' or 'transparent'}
 
-test common.md-2.1 "common md, argument errors" {
+test common.md-2.2 "common md, argument errors" {
     catch {crc -attach stdin -mode absorb} msg
     set msg
 } {attach: -matchflag not defined}
 
-test common.md-2.2 "common md, argument errors" {
+test common.md-2.3 "common md, argument errors" {
     catch {crc -attach stdout -mode write -matchflag XX} msg
     set msg
 } {attach: -matchflag not allowed}
 
-test common.md-2.3 "common md, argument errors" {
+test common.md-2.4 "common md, argument errors" {
     catch {crc -attach stdout -mode write} msg
     set msg
 } {attach, external: -write-destination missing}
 
-test common.md-2.4 "common md, argument errors" {
+test common.md-2.5 "common md, argument errors" {
     catch {crc -attach stdin -mode write} msg
     set msg
 } {attach, external: -read-destination missing}
 
-test common.md-2.5 "common md, argument errors" {
+test common.md-2.6 "common md, argument errors" {
     catch {crc -attach stdout -mode write -write-type XX} msg
     set msg
 } {unknown target-type 'XX'}
 
-test common.md-2.6 "common md, argument errors" {
+test common.md-2.7 "common md, argument errors" {
     catch {crc -attach stdout -mode write -write-type channel -write-destination stdin} msg
     set msg
 } {write destination channel 'stdin' not opened for writing}
 
-test common.md-2.7 "common md, argument errors" {
+test common.md-2.8 "common md, argument errors" {
     catch {crc -attach stdin -mode write -read-type channel -read-destination stdin} msg
     set msg
 } {read destination channel 'stdin' not opened for writing}
 
-test common.md-2.8 "common md, argument errors" {
+test common.md-2.9 "common md, argument errors" {
     catch {crc -attach stdout -mode write -write-type channel -write-destination XXX} msg
     set msg
 } {can not find channel named "XXX"}
 
-test common.md-2.9 "common md, argument errors" {
+test common.md-2.10 "common md, argument errors" {
     catch {crc -attach stdin -mode write -read-type channel -read-destination XXX} msg
     set msg
 } {can not find channel named "XXX"}

@@ -21,7 +21,7 @@ test common-1.0 {common behaviour, error checking} {
 
 test common-1.1 {common behaviour, error checking} {
     catch {bin -in} msg; set msg
-} {bin: wrong # args}
+} {bin: wrong # args, option "-in" requires an argument}
 
 test common-1.2 {common behaviour, error checking} {
     catch {bin -in stdout} msg; set msg

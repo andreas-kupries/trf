@@ -1,3 +1,25 @@
+Sat Nov 18 17:55:01 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* tea.tests/common_all.test: 
+	* tea.tests/common_conv.test: 
+	* tea.tests/common_md.test: Adapted tests to the patch below.
+
+	* tests/common.all.test: 
+	* tests/common.conv.test: 
+	* tests/common.md.test: Adapted tests to the patch below.
+
+	* generic/ref_opt.c:
+	* ./generic/ref_opt.c:
+	* ./generic/zip_opt.c:
+	* ./generic/dig_opt.c:
+	* ./generic/convert.c:
+	* ./generic/registry.c:
+	* ./generic/bz2_opt.c: Patch by Dave Bodenstab <imdave@mcs.net>
+	  for better error messages.
+
+	* generic/crypt.c (TrfCryptObjCmd): Added #ifdef to deactivate
+	  crypt when compiled on or for Windows.
+
 Sat Nov 11 13:14:05 2000  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/zip.c: Added 'MaxRead' vector to restrict the number of

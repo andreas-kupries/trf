@@ -425,7 +425,8 @@ ClientData  clientData;
   return TCL_OK;
 
  unknown_option:
-  Tcl_AppendResult (interp, "unknown option '", optname, "'", (char*) NULL);
+  Tcl_AppendResult (interp, "unknown option '", optname, "', should be '-mode', '-matchflag', '-write-destination', '-write-type', '-read-destination' or '-read-type'", (char*) NULL);
+   
   return TCL_ERROR;
 }
 
@@ -565,7 +566,7 @@ int*        mode;
 
   default:
   unknown_mode:
-    Tcl_AppendResult (interp, "unknown mode '", modeString, "'", (char*) NULL);
+    Tcl_AppendResult (interp, "unknown mode '", modeString, "', should be 'absorb', 'write' or 'transparent'", (char*) NULL);
     return TCL_ERROR;
   }
 

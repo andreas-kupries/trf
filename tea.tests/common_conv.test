@@ -25,19 +25,19 @@ foreach c {
 } {
     test $c-1.0 "$c, argument errors" {
 	catch {$c XXX} msg;    set msg
-    } {mode not defined}
+    } {-mode option not set}
 
     test $c-1.1 "$c, argument errors" {
 	catch {$c -mode} msg;    set msg
-    } "$c: wrong # args"
+    } "$c: wrong # args, all options require an argument"
 
     test $c-1.2 "$c, argument errors" {
 	catch {$c -x x} msg;    set msg
-    } {unknown option '-x'}
+    } {unknown option '-x', should be '-mode'}
 
     test $c-1.3 "$c, argument errors" {
 	catch {$c -m x} msg;    set msg
-    } {unknown mode 'x'}
+    } {unknown mode 'x', should be 'encode' or 'decode'}
 }
 
 
