@@ -334,7 +334,7 @@ ClientData clientData;
   ReflectControl* c = (ReflectControl*) ctrlBlock;
 
   RefExecuteCallback (c, (Tcl_Interp*) NULL,
-		      (unsigned char*) "clear_write",
+		      (unsigned char*) "clear/write",
 		      NULL, 0, TRANSMIT_DONT, 0);
 }
 
@@ -520,7 +520,7 @@ ClientData clientData;
   ReflectControl* c = (ReflectControl*) ctrlBlock;
 
   RefExecuteCallback (c, (Tcl_Interp*) NULL,
-		      (unsigned char*) "clear_read",
+		      (unsigned char*) "clear/read",
 		      NULL, 0, TRANSMIT_DONT, 0);
 }
 

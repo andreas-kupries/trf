@@ -1,3 +1,10 @@
+Wed Mar 15 22:57:48 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/reflect.c (Clear(En/De)coder): Darren New
+	  <dnew@san.rr.com> pointed out that ClearEncoder and -Decoder use
+	  strings which do not match the docs (clear_read instead of
+	  clear/write). Fixed that.
+
 Sat Mar 11 13:24:33 2000  Andreas Kupries  <a.kupries@westend.com>
 
 	* doc/nodes/md.node: Added reference to 'TclAH', another extension
