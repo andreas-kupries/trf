@@ -130,7 +130,7 @@ typedef struct _TrfTransformationInstance_ {
  */
 
 static int
-TrfUnregister _ANSI_ARGS_ ((Tcl_Interp*       interp;
+TrfUnregister _ANSI_ARGS_ ((Tcl_Interp*       interp,
 			   Trf_RegistryEntry* entry));
 
 static void
