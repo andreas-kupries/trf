@@ -1,32 +1,44 @@
 # -*- tcl -*-
 extension trf {
+    description {
+	A loadable extension providing commands for data conversion,
+	encryption, message digests, zlib based compression,
+	error-correction, channel-based manipulation of binary data.
+
+	Trf extends the language at the C-level with so-called
+	``transformer''-procedures. With the help of some patches to the
+	core the package is able to intercept all read/write operations
+	on designated channels, thus giving it the ability to transform
+	the buffer contents as desired. This allows things like
+	transparent encryption, compression, charset recoding,
+	etc. Build upon this framework (and as proof of concept) a
+	collection of tcl-level commands was implemented, most of them
+	related to cryptography. Additionally some binary data support
+	is put in as well.
+    }
+
+    keywords {
+	tcl, conversion, encryption, message digests,
+	data compression, error-correction, binary io,
+	des, idea, blowfish, rc4, rc2, crc, md2, md5,
+	sha, sha-1, haval, adler, ripemd-160, dual,
+	hexadecimal, octal, uuencode, base64, ascii85,
+	reed-solomon, zlib
+    }
+
     author       {Andreas Kupries (a.kupries@westend.com)}
     maintenance  {Andreas Kupries (a.kupries@westend.com)}
 
-    version	   1.0b3
+    version	   1.0
     copying-policy {BSD-Style, see 'tcl'-license}
     date           {@mDate@}
 
-    description {
-	Collection of transformation procedures
-	* Encryption      (des, idea, blowfish, rc4, rc2)
-	* Message digests (crc (pgp), md2, md5, sha, sha-1, haval, crc32, adler32 (both zlib), ripemd-160)
-	* Data conversion (dual, hexadecimal, octal, uu, base64, ascii85)
-	* Error correcting coding (reed-solomon coder)
-	* Compression (zlib based).
-	* (un)pack binary data (as in perl)
-    }
-
     primary-urls {
-	Sources:                  ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.tar.gz (~800 K)
-	Same, different archiver: ftp://ftp.westend.com/pub/aku/trf@mDosVersion@.zip     (~800 K)
-	Short documentation:      ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.README (~2 K)
+	ftp://ftp.westend.com/pub/aku/<ARCH>
     }
 
     secondary-urls {
-	ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz
-	ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip
-	ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme
+	ftp://ftp.kisters.de/pub/lang/tcl/ext/<ARCH>
     }
 
     development-platform {Linux 2.0.29, gcc 2.7.2.1}

@@ -15,35 +15,36 @@ set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mShortDosVersion@).dll"
 file copy generic/pkgIndex.tcl.in win/pkgIndex.tcl
 
 mInsertInfo \
-	ANNOUNCE README LSM DESCRIPTION PORTING \
-	doc/install.tex doc/man.tex \
-	generic/transform.h generic/patchlevel.h \
-	mac/README \
+	README DESCRIPTION PORTING                 \
+	doc/install.tex doc/man.tex                 \
+	generic/transform.h generic/patchlevel.h     \
+	mac/README                                    \
 	unix/README unix/configure.in unix/Makefile.in \
-	win/README win/pkgIndex.tcl win/makefile.vc
+	win/README  win/pkgIndex.tcl  win/makefile.vc
 
+mGetDescription
+mExpandUrls
+mGenerateLSM
+mGenerateANNOUNCE
 
 
 
 # I.   clean documentation
 # I.a  remove inofficial documents
 
-eval mExclude mails patches/v8.0a1 patches/v8.0a2 patches/v8.0b1 [glob patches/nijtmans.*] DEPENDS
-
-cd doc/speed
-exec /bin/ln -s		../../tests/sha.test.vec f1000000
-cd ..
-
-# pwd = doc
-mExclude \
-	file delete FUN ascii.man ascii85 scratch-pad \
-	code34 Notes ToDo trf.def hash.operation \
-	INSTALL INSTALL.optional ROADMAP
+eval mExclude \
+	mails patches/v8.0a1 patches/v8.0a2 patches/v8.0b1 \
+	[glob patches/nijtmans.*] DEPENDS doc/file doc/delete \
+	doc/FUN doc/ascii.man doc/ascii85 doc/scratch-pad \
+	doc/code34 doc/Notes doc/ToDo doc/trf.def \
+	doc/hash.operation doc/INSTALL doc/INSTALL.optional \
+	doc/ROADMAP doc/speed
 
 # I.b  generate official manual, diverse variants (dvi, ps)
 mLog log info generating manual variants (dvi, ps)
 
-# pwd = doc
+
+cd doc
 file mkdir man html html/install html/man html/capi
 
 catch {exec latex man}
