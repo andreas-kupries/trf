@@ -16,15 +16,15 @@ node trf_misc {
     contents {
 	p "
 	5 more commands are available, not fitting into the categories
-	encryption, message digests or conversion:"
+	of message digests or conversion:"
 
 	table {
-	    defrow [cmd [link trf_transform]] {
+	    defrow [anchor_name transform][cmd [link trf_transform]] {
 		p "
 		implements a general transformation. The underlying
 		functionality is made available to the script level."
 	    }
-	    defrow rs_ecc {
+	    defrow [anchor_name rsecc]rs_ecc {
 		p "
 		A reed-solomon error correcting coder is available under the
 		name [cmd rs_ecc]. The one and only option understood is
@@ -34,11 +34,11 @@ node trf_misc {
 		characters."
 	    }
 
-	    defrow [cmd [link trf_zip]] {
+	    defrow [anchor_name zip][cmd [link trf_zip]] {
 		p "A compressor based upon the [zlib]-library."
 	    }
 
-	    defrow [cmd unstack] {
+	    defrow [anchor_name unstack][cmd unstack] {
 		p "
 		This command must be used to remove a conversion channel. The
 		underlying channel is uncovered and accessible again afterward.
@@ -47,7 +47,7 @@ node trf_misc {
 		to [cmd close]."
 	    }
 
-	    defrow [cmd [link trf_binio]] {
+	    defrow [anchor_name binio][cmd [link trf_binio]] {
 		p "
 		This command is excluded by default, as [tcl] 8.0 now provides
 		equivalent functionality (See commands [cmd binary] and

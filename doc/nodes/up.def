@@ -1,4 +1,4 @@
 # -*- tcl -*-
 # up link from trf documentation into my site
 
-link trf_up Tcl/Tk ../../tcltk.html
+link tcltk Tcl/Tk ../../tcltk.html

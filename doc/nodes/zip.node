@@ -3,7 +3,7 @@
 
 node trf_zip {
     title       "Trf: The zip command"
-    shortTitle  "Zip"
+    shortTitle  "zip"
     description "Trf commands: zip"
     parent      trf_misc
 

@@ -15,16 +15,6 @@ node trf_future {
 	    ##	done
 
 	    li	"
-	    Add more ciphers ([PGP]!). Take a look at [pgplib]
-	    by [tage]."
-
-	    #	\strong {Hm, better make a separate package. This is
-	    #	primarily a transformer package, not a crypto toolkit}.
-
-	    ##li	Transparent mode for digests.
-	    ##	Mixture of 'absorb' and 'write'.
-
-	    li	"
 	    Channel doing special framing after a fixed (but
 	    user-defined) number of characters"
 
@@ -33,7 +23,7 @@ node trf_future {
 	    transformation!)."
 	    #	\strong {Better place it with memchan}.
 
-	    ##li	Identity-transformation with ability to gather statistics
+	    ##li Identity-transformation with ability to gather statistics
 	    ##	about the information flowing through it.
 	    ## not needed anymore, use 'transform' instead!
 

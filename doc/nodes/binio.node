@@ -3,7 +3,7 @@
 
 node trf_binio {
     title       "Trf: The bibio command"
-    shortTitle  "BinIO"
+    shortTitle  "binio"
     description "Trf commands: binio"
     parent      trf_misc
 

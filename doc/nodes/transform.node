@@ -3,7 +3,7 @@
 
 node trf_transform {
     title       "Trf: The transform command"
-    shortTitle  "Transform"
+    shortTitle  "transform"
     description "Trf commands: transform"
     parent      trf_misc
 

@@ -10,8 +10,8 @@ node trf_home {
     # environment dependent action:
     # link to my site, or produce stand alone docs
 
-    if {[info exists ::_cgi_link_url(trf_up)]} {
-	parent trf_up
+    if {[info exists ::_cgi_link_url(tcltk)]} {
+	parent tcltk
     }
 
     menu {

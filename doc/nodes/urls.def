@@ -60,7 +60,7 @@ link trf_win32bin "binary distribution" \
 
 # -------------------------------------------------
 
-url SSLeay    [lib SSLeay] trf_libdes.html
+url SSLeay    [lib SSLeay] trf_ssleay.html
 
 url libz      [lib libz] trf_zip.html#zlib
 url zlib      [lib zlib] trf_zip.html#zlib
@@ -73,3 +73,11 @@ link memchan    Memchan            http://www.westend.com/~kupries/tcltk.html
 link patch      {separate chapter} trf_patch.html
 link patch_next {next section}     trf_compile.html
 
+link trfcrypt   TrfCrypt \
+	http://www.westend.com/~kupries/doc/trfcrypt/index.html
+
+link zipT       zip       trf_misc.html#zip
+link transformT transform trf_misc.html#transform
+link rsEccT     rs_ecc    trf_misc.html#rsecc
+link binioT     binio     trf_misc.html#binio
+link unstackT   unstack   trf_misc.html#unstack

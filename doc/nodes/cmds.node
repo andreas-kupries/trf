@@ -8,7 +8,7 @@ node trf_cmds {
     parent      trf_home
 
     menu {
-	trf_conv trf_md trf_crypto trf_misc
+	trf_conv trf_md trf_misc
     }
 
     contents {
@@ -80,39 +80,55 @@ node trf_cmds {
 	algorithm."
 
 	table {
-	    tr [list Command	Type			Location]
-	    thline 3
-	    tr [list ascii85	[cv]			[trf]]
-	    tr [list base64	[cv]			[trf]]
-	    tr [list bin	[cv]			[trf]]
-	    tr [list hex	[cv]			[trf]]
-	    tr [list oct	[cv]			[trf]]
-	    tr [list uuencode	[cv]			[trf]]
-	    thline 3
-	    tr [list adler	[md]			[zlib]]
-	    tr [list crc	[md]			[trf]]
-	    tr [list crc-zlib	[md]			[zlib]]
-	    tr [list haval	[md]			[trf]]
-	    tr [list md2	[md]			[SSLeay]]
-	    tr [list md5	[md]			[trf]]
-	    tr [list ripemd160	[md]			[trf]]
-	    tr [list ripemd128	[md]			[trf]]
-	    tr [list sha	[md]			[trf]]
-	    tr [list sha1	[md]			[SSLeay]]
-	    thline 3
-	    tr [list binio	{Binary I/O}		[trf]]
-	    tr [list rs_ecc	{Error correcting coder} [trf]]
-	    tr [list transform	{General transformation} [trf]]
-	    tr [list unstack	-			[trf]]
-	    tr [list zip	{Data compression}	[zlib]]
-	    thline 3
-	    tr [list blowfish	[bc]			[trf]]
-	    tr [list des	[bc]			[SSLeay]]
-	    tr [list idea	[bc]			[trf]]
-	    tr [list rc2	[bc]			[SSLeay]]
-	    tr [list rc4	[sc]			[trf]]
-	    tr [list rot	[sc]			[trf]]
-	    tr [list safer	[bc]			[trf]]
+	    table_row valign=top {
+		table_data {
+		    table {
+			tr valign=top [list Command Type Location]
+			thline 3
+			tr valign=top [list ascii85 [cv]		[trf]]
+			tr valign=top [list base64  [cv]		[trf]]
+			tr valign=top [list bin	  [cv]			[trf]]
+			tr valign=top [list hex	  [cv]			[trf]]
+			tr valign=top [list oct	  [cv]			[trf]]
+			tr valign=top [list uuencode [cv]		[trf]]
+			thline 3
+			tr valign=top [list [link binioT] {Binary I/O} [trf]]
+			tr valign=top [list [link rsEccT] {Error correcting coder} [trf]]
+			tr valign=top [list [link transformT] {General transformation} [trf]]
+			tr valign=top [list [link unstackT] -		[trf]]
+			tr valign=top [list [link zipT] {Data compression} [zlib]]
+			thline 3
+		    }
+		}
+		table_data {
+		    table {
+			tr valign=top [list Command Type Location]
+			thline 3
+			tr valign=top [list adler     [md]	[zlib]]
+			tr valign=top [list crc	      [md]	[trf]]
+			tr valign=top [list crc-zlib  [md]	[zlib]]
+			tr valign=top [list haval     [md]	[trf]]
+			tr valign=top [list md2	      [md]	[SSLeay]]
+			tr valign=top [list md5	      [md]	[trf]]
+			tr valign=top [list ripemd160 [md]	[trf]]
+			tr valign=top [list ripemd128 [md]	[trf]]
+			tr valign=top [list sha	      [md]	[trf]]
+			tr valign=top [list sha1      [md]	[SSLeay]]
+			thline 3
+		    }
+		}
+	    }
 	}
+
+	p "
+	Transformers doing encryption are [strong not] available as part of
+	this package, to avoid problems with the US export regulation. Please
+	don't ask me to explain them."
+
+	p "
+	Having said this I would like to mention the [link trfcrypt] package,
+	which is an add-on to this extension providing the desired
+	functionality.
+	"
     }
 }
