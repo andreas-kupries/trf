@@ -49,7 +49,7 @@ replace_in_file unix/README          @VERSION@ ${the-patchlevel}
 # I.a  remove inofficial documents
 verbose {remove inofficial documents}
 
-eval file delete --force mails [glob patches/nijtmans.*]
+eval file delete -force mails [glob patches/nijtmans.*]
 
 cd doc/speed
 exec /bin/ln -s		../../tests/sha.test.vec f1000000
