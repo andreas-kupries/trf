@@ -2484,7 +2484,7 @@ Trf_Options        optInfo;
 
       if (r.buf != NULL) {
 #if GT81
- 	Tcl_Obj* o = Tcl_NewByteArrayObj ((char*) r.buf, r.used);
+ 	Tcl_Obj* o = Tcl_NewByteArrayObj (r.buf, r.used);
 #else
 	Tcl_Obj* o = Tcl_NewStringObj ((char*) r.buf, r.used);
 #endif

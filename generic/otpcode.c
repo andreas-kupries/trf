@@ -2352,7 +2352,7 @@ ClientData clientData;
     int    i = FlushEncoder (ctrlBlock, interp, clientData);
 
     if (i == TCL_OK)
-      i = c -> write (c -> writeClientData, "\n", 1, interp);
+      i = c -> write (c -> writeClientData, (unsigned char*) "\n", 1, interp);
 
     if (i != TCL_OK)
       return i;
@@ -2471,9 +2471,10 @@ ClientData clientData;
       buf[i] = *w++;
     }
 
-    i = c -> write (c -> writeClientData, buf, strlen (buf), interp);
+    i = c -> write (c -> writeClientData, (unsigned char*) buf, strlen (buf),
+		    interp);
     if ((i == TCL_OK) && (p != 55))
-      i = c -> write (c -> writeClientData, " ", 1, interp);
+      i = c -> write (c -> writeClientData, (unsigned char*) " ", 1, interp);
     if (i != TCL_OK)
       return i;
   }
@@ -2810,7 +2811,7 @@ ClientData clientData;
     return TCL_ERROR;
   }
 
-  i = c -> write (c -> writeClientData, b, 8, interp);
+  i = c -> write (c -> writeClientData, (unsigned char*) b, 8, interp);
   if (i != TCL_OK)
     return i;
 

@@ -650,7 +650,7 @@ int             preserve; /* Preserve result of transformation interp ? y/n */
    */
 
 #if GT81
-  temp = Tcl_NewByteArrayObj ((char*) buf, bufLen);
+  temp = Tcl_NewByteArrayObj (buf, bufLen);
 #else
   temp = Tcl_NewStringObj    ((char*) buf, bufLen);
 #endif

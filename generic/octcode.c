@@ -366,7 +366,7 @@ Tcl_Interp* interp;
 ClientData clientData;
 {
   EncoderControl* c   = (EncoderControl*) ctrlBlock;
-  char*  out = (unsigned char*) Tcl_Alloc (3*bufLen+1);
+  char*  out = (char*) Tcl_Alloc (3*bufLen+1);
   int    res, i, j;
   CONST char*  ch;
 
@@ -608,7 +608,7 @@ ClientData       clientData;
 #define IN_RANGE(low,x,high) (((low) <= (x)) && ((x) <= (high)))
 
   DecoderControl* c      = (DecoderControl*) ctrlBlock;
-  char*  out             = (unsigned char*) Tcl_Alloc (2+bufLen/3);
+  char*  out             = (char*) Tcl_Alloc (2+bufLen/3);
   int    res, i, j;
   unsigned char character;
 
@@ -652,7 +652,7 @@ ClientData       clientData;
     }
   }
 
-  res = c->write (c->writeClientData, out, j, interp);
+  res = c->write (c->writeClientData, (unsigned char*) out, j, interp);
   return res;
 
 #undef IN_RANGE

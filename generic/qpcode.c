@@ -317,14 +317,14 @@ ClientData clientData;
   switch (c -> charCount) {
     case 1:
       if (c -> buf[0] == '.') {
-        (void) sprintf (c -> buf, "=%02X", '.');
+        (void) sprintf ((char*) c -> buf, "=%02X", '.');
         c -> charCount = 3;
       }
       break;
 
     case 5:
-      if (!strcmp (c -> buf, "From ")) {
-        (void) sprintf (c -> buf, "=%02Xrom ", 'F');
+      if (!strcmp ((char*) c -> buf, "From ")) {
+        (void) sprintf ((char*) c -> buf, "=%02Xrom ", 'F');
         c -> charCount = 7;
       }
       break;
@@ -349,7 +349,8 @@ ClientData clientData;
       }
       /* else fall... */
     case '=':
-      (void) sprintf (c -> buf + c -> charCount, "=%02X", (unsigned char) x);
+      (void) sprintf ((char*) c -> buf + c -> charCount,
+		      "=%02X", (unsigned char) x);
       c -> charCount += 3;
       break;
   }
@@ -441,7 +442,7 @@ ClientData clientData;
       switch (c -> buf[c -> charCount - 2]) {
         case ' ':
         case '\t':
-          (void) strcpy (c -> buf + c -> charCount - 1, "=\n\n");
+          (void) strcpy ((char*) c -> buf + c -> charCount - 1, "=\n\n");
           c -> charCount += 2;
           break;
 
@@ -449,7 +450,7 @@ ClientData clientData;
           break;
       }
   } else {
-    (void) strcpy (c -> buf + c -> charCount, "=\n");
+    (void) strcpy ((char*) c -> buf + c -> charCount, "=\n");
     c -> charCount += 2;
   }
   
@@ -606,7 +607,8 @@ ClientData clientData;
         case ' ':
         case '\t':
         case '\n':
-          i = c -> write (c -> writeClientData, &x, 1, interp);
+          i = c -> write (c -> writeClientData, (unsigned char*) &x, 1,
+			  interp);
           break;
 
 	case '\r':

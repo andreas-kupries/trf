@@ -374,7 +374,7 @@ ClientData clientData;
       return i;
     if (++c->quads >= QPERLIN) {
       c->quads = 0;
-      return c->write (c->writeClientData, "\n", 1, interp);
+      return c->write (c->writeClientData, (unsigned char*) "\n", 1, interp);
     }
   }
 
@@ -425,7 +425,7 @@ ClientData clientData;
   }
 
   c->quads = 0;
-  return c->write (c->writeClientData, "\n", 1, interp);
+  return c->write (c->writeClientData, (unsigned char*) "\n", 1, interp);
 }
 
 /*

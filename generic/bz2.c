@@ -304,11 +304,11 @@ ClientData clientData;
 
   in = character;
 
-  c->state.next_in   = (Bytef*) &in;
+  c->state.next_in   = (unsigned char*) (Bytef*) &in;
   c->state.avail_in  = 1;
 
   for (;;) {
-    c->state.next_out  = (Bytef*) c->output_buffer;
+    c->state.next_out  = (unsigned char*) (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
     res = bz.compress (&c->state, BZ_RUN);
@@ -372,11 +372,11 @@ ClientData clientData;
   /* execute conversion specific code here (BZ2) */
   int res;
 
-  c->state.next_in   = (Bytef*) buffer;
+  c->state.next_in   = (unsigned char*) (Bytef*) buffer;
   c->state.avail_in  = bufLen;
 
   for (;;) {
-    c->state.next_out  = (Bytef*) c->output_buffer;
+    c->state.next_out  = (unsigned char*) (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
     res = bz.compress (&c->state, BZ_RUN);
@@ -438,11 +438,11 @@ ClientData clientData;
   /* execute conversion specific code here (BZ2) */
   int res;
 
-  c->state.next_in   = (Bytef*) NULL;
+  c->state.next_in   = (unsigned char*) (Bytef*) NULL;
   c->state.avail_in  = 0;
 
   for (;;) {
-    c->state.next_out  = (Bytef*) c->output_buffer;
+    c->state.next_out  = (unsigned char*) (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
     res = bz.compress (&c->state, BZ_FINISH);
@@ -632,11 +632,11 @@ ClientData clientData;
 
   in = character;
 
-  c->state.next_in   = (Bytef*) &in;
+  c->state.next_in   = (unsigned char*) (Bytef*) &in;
   c->state.avail_in  = 1;
 
   for (;;) {
-    c->state.next_out  = (Bytef*) c->output_buffer;
+    c->state.next_out  = (unsigned char*) (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
     res = bz.decompress (&c->state);
@@ -701,11 +701,11 @@ ClientData clientData;
   /* execute conversion specific code here (BZ2) */
   int res;
 
-  c->state.next_in   = (Bytef*) buffer;
+  c->state.next_in   = (unsigned char*) (Bytef*) buffer;
   c->state.avail_in  = bufLen;
 
   for (;;) {
-    c->state.next_out  = (Bytef*) c->output_buffer;
+    c->state.next_out  = (unsigned char*) (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
     res = bz.decompress (&c->state);
@@ -773,11 +773,13 @@ ClientData clientData;
     return TCL_OK;
   }
 
-  c->state.next_in  = (Bytef*) c->output_buffer; /* fake out 'inflate' */
+  c->state.next_in  = (unsigned char*) (Bytef*) c->output_buffer; /* fake out
+								   * 'inflate'
+								   */
   c->state.avail_in = 0;
 
   for (;;) {
-    c->state.next_out  = (Bytef*) c->output_buffer;
+    c->state.next_out  = (unsigned char*) (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
     res = bz.decompress (&c->state);

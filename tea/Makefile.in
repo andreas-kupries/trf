@@ -431,15 +431,16 @@ install-doc: doc
 
 check:	test
 test:
-	LD_LIBRARY_PATH="$(srcdir):../tea/";	\
-	export LD_LIBRARY_PATH; SHLIB_PATH="$LD_LIBRARY_PATH"; export SHLIB_PATH ;	\
+	LD_LIBRARY_PATH="$(srcdir):../tea/:$(ZLIB_LIB_DIR):$(SSL_LIB_DIR)"; \
+	export LD_LIBRARY_PATH; \
+	SHLIB_PATH="$LD_LIBRARY_PATH"; export SHLIB_PATH ;	\
 	echo load ./$(Trf_LIB_FILE) \; cd $(TRF_TESTDIR) \; source defs \; defConstraints \"$(TRF_TESTS)\" \; source all | $(TCLSH_PROG)
 
 testshell	=	$(TCLSH_PROG) $(srcdir)/testshell
 
 tcheck:
 ttest:
-	LD_LIBRARY_PATH="$(srcdir)";	\
+	LD_LIBRARY_PATH="$(srcdir):$(ZLIB_LIB_DIR):$(SSL_LIB_DIR)";	\
 	export LD_LIBRARY_PATH; SHLIB_PATH="$LD_LIBRARY_PATH"; export SHLIB_PATH ;	\
 	$(testshell)	\
 		-constraints '$(TRF_TESTS)'	\

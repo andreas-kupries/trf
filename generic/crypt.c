@@ -83,7 +83,7 @@ TrfCryptObjCmd (notUsed, interp, objc, objv)
    */
 
   TrfLock;
-  res = Tcl_NewStringObj (crypt (passwd, salt), -1);
+  res = Tcl_NewStringObj ((char*) crypt (passwd, salt), -1);
   TrfUnlock;
 
   Tcl_SetObjResult (interp, res);
