@@ -120,11 +120,12 @@ dnl
 dnl verify success of search
 dnl
 
-ZLIB_INCLUDE_DIR="\"`${CYGPATH} $trf_cv_path_ZLIB_INCLUDE_DIR`\""
-
-if test -z "$ZLIB_INCLUDE_DIR" ; then
+if test -z "$trf_cv_path_ZLIB_INCLUDE_DIR" ; then
     AC_MSG_ERROR(not found; falling back to compat/ headers; use --with-zlib=DIR or --with-zlib-include-dir=DIR)
+    ZLIB_INCLUDE_DIR="\".\""
 else
+    ZLIB_INCLUDE_DIR="\"`${CYGPATH} $trf_cv_path_ZLIB_INCLUDE_DIR`\""
+
     eval AC_DEFINE_UNQUOTED(HAVE_ZLIB_H, 1)
     TRF_TESTS="$TRF_TESTS hasZlib"
 fi
@@ -169,9 +170,11 @@ AC_CACHE_CHECK(for libz library,
         done
     done])
 
-ZLIB_LIB_DIR="`${CYGPATH} $trf_cv_lib_ZLIB_LIB_DIR`"
-if test -z "$ZLIB_LIB_DIR" ; then
+if test -z "$trf_cv_lib_ZLIB_LIB_DIR" ; then
     AC_MSG_WARN(not found; use --with-zlib-lib-dir=path)
+    ZLIB_LIB_DIR="\".\""
+else
+    ZLIB_LIB_DIR="`${CYGPATH} $trf_cv_lib_ZLIB_LIB_DIR`"
 fi
 
 AC_SUBST(ZLIB_LIB_DIR)
@@ -225,11 +228,12 @@ dnl
 dnl verify success of search
 dnl
 
-SSL_INCLUDE_DIR="\"`${CYGPATH} $trf_cv_path_SSL_INCLUDE_DIR`\""
-
-if test -z "$SSL_INCLUDE_DIR" ; then
+if test -z "$trf_cv_path_SSL_INCLUDE_DIR" ; then
     AC_MSG_WARN(not found; falling back compat/ headers; use --with-ssl=DIR or --with-ssl-include-dir=DIR)
+    SSL_INCLUDE_DIR="\".\""
 else
+    SSL_INCLUDE_DIR="\"`${CYGPATH} $trf_cv_path_SSL_INCLUDE_DIR`\""
+
     if test "${TEA_PLATFORM}" = "windows" ; then
 	AC_MSG_WARN([Squashing SSL / Windows])
 	SSL_INCLUDE_DIR="\".\""
@@ -284,11 +288,12 @@ AC_CACHE_CHECK(for ssl libcrypto library (for message digests),
         done
     done])
 
-SSL_LIB_DIR="`${CYGPATH} $trf_cv_lib_SSL_LIB_DIR`"
-if test -z "$SSL_LIB_DIR" ; then
+if test -z "$trf_cv_lib_SSL_LIB_DIR" ; then
     AC_MSG_WARN(not found; use --with-ssl-lib-dir=path)
+    SSL_LIB_DIR="\".\""
+else
+    SSL_LIB_DIR="`${CYGPATH} $trf_cv_lib_SSL_LIB_DIR`"
 fi
-
 
 AC_SUBST(SSL_LIB_DIR)
 AC_CACHE_VAL(trf_cv_SSL_LIB_DIR, [trf_cv_SSL_LIB_DIR="$SSL_LIB_DIR"])
@@ -333,13 +338,13 @@ AC_CACHE_CHECK(for bz2 compressor library,
         done
     done])
 
-BZ2_LIB_DIR="`${CYGPATH} $trf_cv_lib_BZ2_LIB_DIR`"
-if test -z "$BZ2_LIB_DIR" ; then
+if test -z "$trf_cv_lib_BZ2_LIB_DIR" ; then
     AC_MSG_WARN(not found; use --with-bz2-lib-dir=path)
+    BZ2_LIB_DIR=.
 else
     TRF_TESTS="$TRF_TESTS hasBz"
+    BZ2_LIB_DIR="`${CYGPATH} $trf_cv_lib_BZ2_LIB_DIR`"
 fi
-
 
 AC_SUBST(BZ2_LIB_DIR)
 AC_CACHE_VAL(trf_cv_BZ2_LIB_DIR, [trf_cv_BZ2_LIB_DIR="$BZ2_LIB_DIR"])

@@ -1,5 +1,13 @@
 2002-10-01  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
+	* compat/tclLoadShl.c (dlopen): mode is 'unsigned int'.
+
+	* trf.m4: Moved the calls to CYGPATH behind the corresponding
+	  'test -z' conditions as the result of that call generates a
+	  non-empty string from an empty string on some platforms. Missing
+	  paths are set to '.' so that they do not disturb the
+	  interpretation of -I / -L options by the compiler.
+
 	* configure.in: Readded check for endianess. Moved ltoa,
 	  etc. block just after tea_setup_compiler. Detemrination of flags
 	  for shared build messes up these tests.

@@ -4802,11 +4802,12 @@ fi
 
 echo "$ac_t""$trf_cv_path_ZLIB_INCLUDE_DIR" 1>&6
 
-ZLIB_INCLUDE_DIR="\"`${CYGPATH} $trf_cv_path_ZLIB_INCLUDE_DIR`\""
-
-if test -z "$ZLIB_INCLUDE_DIR" ; then
+if test -z "$trf_cv_path_ZLIB_INCLUDE_DIR" ; then
     { echo "configure: error: not found; falling back to compat/ headers; use --with-zlib=DIR or --with-zlib-include-dir=DIR" 1>&2; exit 1; }
+    ZLIB_INCLUDE_DIR="\".\""
 else
+    ZLIB_INCLUDE_DIR="\"`${CYGPATH} $trf_cv_path_ZLIB_INCLUDE_DIR`\""
+
     eval cat >> confdefs.h <<EOF
 #define HAVE_ZLIB_H 1
 EOF
@@ -4818,7 +4819,7 @@ fi
 
 
 echo $ac_n "checking for libz library""... $ac_c" 1>&6
-echo "configure:4822: checking for libz library" >&5
+echo "configure:4823: checking for libz library" >&5
 if eval "test \"`echo '$''{'trf_cv_lib_ZLIB_LIB_DIR'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4848,9 +4849,11 @@ fi
 
 echo "$ac_t""$trf_cv_lib_ZLIB_LIB_DIR" 1>&6
 
-ZLIB_LIB_DIR="`${CYGPATH} $trf_cv_lib_ZLIB_LIB_DIR`"
-if test -z "$ZLIB_LIB_DIR" ; then
+if test -z "$trf_cv_lib_ZLIB_LIB_DIR" ; then
     echo "configure: warning: not found; use --with-zlib-lib-dir=path" 1>&2
+    ZLIB_LIB_DIR="\".\""
+else
+    ZLIB_LIB_DIR="`${CYGPATH} $trf_cv_lib_ZLIB_LIB_DIR`"
 fi
 
 
@@ -4863,7 +4866,7 @@ fi
 
 
 echo $ac_n "checking for directory with ssl.h""... $ac_c" 1>&6
-echo "configure:4867: checking for directory with ssl.h" >&5
+echo "configure:4870: checking for directory with ssl.h" >&5
 if eval "test \"`echo '$''{'trf_cv_path_SSL_INCLUDE_DIR'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4906,11 +4909,12 @@ fi
 
 echo "$ac_t""$trf_cv_path_SSL_INCLUDE_DIR" 1>&6
 
-SSL_INCLUDE_DIR="\"`${CYGPATH} $trf_cv_path_SSL_INCLUDE_DIR`\""
-
-if test -z "$SSL_INCLUDE_DIR" ; then
+if test -z "$trf_cv_path_SSL_INCLUDE_DIR" ; then
     echo "configure: warning: not found; falling back compat/ headers; use --with-ssl=DIR or --with-ssl-include-dir=DIR" 1>&2
+    SSL_INCLUDE_DIR="\".\""
 else
+    SSL_INCLUDE_DIR="\"`${CYGPATH} $trf_cv_path_SSL_INCLUDE_DIR`\""
+
     if test "${TEA_PLATFORM}" = "windows" ; then
 	echo "configure: warning: Squashing SSL / Windows" 1>&2
 	SSL_INCLUDE_DIR="\".\""
@@ -4936,7 +4940,7 @@ fi
 
 
 echo $ac_n "checking for ssl libcrypto library (for message digests)""... $ac_c" 1>&6
-echo "configure:4940: checking for ssl libcrypto library (for message digests)" >&5
+echo "configure:4944: checking for ssl libcrypto library (for message digests)" >&5
 if eval "test \"`echo '$''{'trf_cv_lib_SSL_LIB_DIR'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4967,11 +4971,12 @@ fi
 
 echo "$ac_t""$trf_cv_lib_SSL_LIB_DIR" 1>&6
 
-SSL_LIB_DIR="`${CYGPATH} $trf_cv_lib_SSL_LIB_DIR`"
-if test -z "$SSL_LIB_DIR" ; then
+if test -z "$trf_cv_lib_SSL_LIB_DIR" ; then
     echo "configure: warning: not found; use --with-ssl-lib-dir=path" 1>&2
+    SSL_LIB_DIR="\".\""
+else
+    SSL_LIB_DIR="`${CYGPATH} $trf_cv_lib_SSL_LIB_DIR`"
 fi
-
 
 
 if eval "test \"`echo '$''{'trf_cv_SSL_LIB_DIR'+set}'`\" = set"; then
@@ -4983,7 +4988,7 @@ fi
 
 
 echo $ac_n "checking for bz2 compressor library""... $ac_c" 1>&6
-echo "configure:4987: checking for bz2 compressor library" >&5
+echo "configure:4992: checking for bz2 compressor library" >&5
 if eval "test \"`echo '$''{'trf_cv_lib_BZ2_LIB_DIR'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -5015,13 +5020,13 @@ fi
 
 echo "$ac_t""$trf_cv_lib_BZ2_LIB_DIR" 1>&6
 
-BZ2_LIB_DIR="`${CYGPATH} $trf_cv_lib_BZ2_LIB_DIR`"
-if test -z "$BZ2_LIB_DIR" ; then
+if test -z "$trf_cv_lib_BZ2_LIB_DIR" ; then
     echo "configure: warning: not found; use --with-bz2-lib-dir=path" 1>&2
+    BZ2_LIB_DIR=.
 else
     TRF_TESTS="$TRF_TESTS hasBz"
+    BZ2_LIB_DIR="`${CYGPATH} $trf_cv_lib_BZ2_LIB_DIR`"
 fi
-
 
 
 if eval "test \"`echo '$''{'trf_cv_BZ2_LIB_DIR'+set}'`\" = set"; then
@@ -5079,17 +5084,17 @@ for ac_hdr in dlfcn.h stdlib.h features.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:5083: checking for $ac_hdr" >&5
+echo "configure:5088: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 5088 "configure"
+#line 5093 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:5093: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:5098: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*

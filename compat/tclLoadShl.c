@@ -31,7 +31,7 @@
 
 VOID *dlopen(path, mode)
     CONST char *path;
-    int mode;
+    unsigned int mode;
 {
     int flags, length;
 
