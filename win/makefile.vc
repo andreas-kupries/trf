@@ -230,44 +230,44 @@ $(TRFDLL): $(TRFOBJS)
 bindist:      $(TRFDLL)
 	-@md	$(TRF)
 	-@md	$(TRF)\patches
-	-@md	$(TRF)\patches\v76
-	-@md	$(TRF)\patches\v80
+	-@md	$(TRF)\patches\v7.6
+	-@md	$(TRF)\patches\v8.0
 	-@$(CP)	$(TRFDLL)		$(TRF)\$(TRFDLL)
 	-@$(CP)	$(WINDIR)\pkgIndex.tcl	$(TRF)\pkgIndex.tcl
 	-@$(CP)	$(WINDIR)\README.VC	$(TRF)\README.VC
 	-@$(CP) $(MSVCRT_SYS)		$(TRF)\$(MSVCRT)
-	-@$(CP) $(ROOT)\patches\v7.6\byteorder.patch	$(TRF)\patches\v76
-	-@$(CP) $(ROOT)\patches\v7.6\standard.patch	$(TRF)\patches\v76
-	-@$(CP) $(ROOT)\patches\v7.6\tcl.h		$(TRF)\patches\v76
-	-@$(CP) $(ROOT)\patches\v7.6\tclIO.c		$(TRF)\patches\v76
-	-@$(CP) $(ROOT)\patches\v7.6p2\byteorder.patch	$(TRF)\patches\v76p2
-	-@$(CP) $(ROOT)\patches\v7.6p2\standard.patch	$(TRF)\patches\v76p2
-	-@$(CP) $(ROOT)\patches\v7.6p2\tcl.h		$(TRF)\patches\v76p2
-	-@$(CP) $(ROOT)\patches\v7.6p2\tclIO.c		$(TRF)\patches\v76p2
-	-@$(CP) $(ROOT)\patches\v8.0\byteorder.patch	$(TRF)\patches\v80
-	-@$(CP) $(ROOT)\patches\v8.0\standard.patch	$(TRF)\patches\v80
-	-@$(CP) $(ROOT)\patches\v8.0\tcl.h		$(TRF)\patches\v80
-	-@$(CP) $(ROOT)\patches\v8.0\tclIO.c		$(TRF)\patches\v80
-	$(PKZIP) -r $(TRF)bin.zip $(TRF)\*.*
+	-@$(CP) $(ROOT)\patches\v7.6\byteorder.patch	$(TRF)\patches\v7.6
+	-@$(CP) $(ROOT)\patches\v7.6\standard.patch	$(TRF)\patches\v7.6
+	-@$(CP) $(ROOT)\patches\v7.6\tcl.h		$(TRF)\patches\v7.6
+	-@$(CP) $(ROOT)\patches\v7.6\tclIO.c		$(TRF)\patches\v7.6
+	-@$(CP) $(ROOT)\patches\v7.6p2\byteorder.patch	$(TRF)\patches\v7.6p2
+	-@$(CP) $(ROOT)\patches\v7.6p2\standard.patch	$(TRF)\patches\v7.6p2
+	-@$(CP) $(ROOT)\patches\v7.6p2\tcl.h		$(TRF)\patches\v7.6p2
+	-@$(CP) $(ROOT)\patches\v7.6p2\tclIO.c		$(TRF)\patches\v7.6p2
+	-@$(CP) $(ROOT)\patches\v8.0\byteorder.patch	$(TRF)\patches\v8.0
+	-@$(CP) $(ROOT)\patches\v8.0\standard.patch	$(TRF)\patches\v8.0
+	-@$(CP) $(ROOT)\patches\v8.0\tcl.h		$(TRF)\patches\v8.0
+	-@$(CP) $(ROOT)\patches\v8.0\tclIO.c		$(TRF)\patches\v8.0
+	$(PKZIP) -r $(TRF)-win32.zip $(TRF)\*.*
 	-@$(RM)	$(TRF)\$(TRFDLL)
 	-@$(RM)	$(TRF)\pkgIndex.tcl
 	-@$(RM)	$(TRF)\README.VC
 	-@$(RM) $(TRF)\$(MSVCRT)
-	-@$(RM) $(TRF)\patches\v76\byteorder.patch
-	-@$(RM) $(TRF)\patches\v76\standard.patch
-	-@$(RM) $(TRF)\patches\v76\tcl.h
-	-@$(RM) $(TRF)\patches\v76\tclIO.c
-	-@rd	$(TRF)\patches\v76
-	-@$(RM) $(TRF)\patches\v76p2\byteorder.patch
-	-@$(RM) $(TRF)\patches\v76p2\standard.patch
-	-@$(RM) $(TRF)\patches\v76p2\tcl.h
-	-@$(RM) $(TRF)\patches\v76p2\tclIO.c
-	-@rd	$(TRF)\patches\v76p2
-	-@$(RM) $(TRF)\patches\v80\byteorder.patch
-	-@$(RM) $(TRF)\patches\v80\standard.patch
-	-@$(RM) $(TRF)\patches\v80\tcl.h
-	-@$(RM) $(TRF)\patches\v80\tclIO.c
-	-@rd	$(TRF)\patches\v80
+	-@$(RM) $(TRF)\patches\v7.6\byteorder.patch
+	-@$(RM) $(TRF)\patches\v7.6\standard.patch
+	-@$(RM) $(TRF)\patches\v7.6\tcl.h
+	-@$(RM) $(TRF)\patches\v7.6\tclIO.c
+	-@rd	$(TRF)\patches\v7.6
+	-@$(RM) $(TRF)\patches\v7.6p2\byteorder.patch
+	-@$(RM) $(TRF)\patches\v7.6p2\standard.patch
+	-@$(RM) $(TRF)\patches\v7.6p2\tcl.h
+	-@$(RM) $(TRF)\patches\v7.6p2\tclIO.c
+	-@rd	$(TRF)\patches\v7.6p2
+	-@$(RM) $(TRF)\patches\v8.0\byteorder.patch
+	-@$(RM) $(TRF)\patches\v8.0\standard.patch
+	-@$(RM) $(TRF)\patches\v8.0\tcl.h
+	-@$(RM) $(TRF)\patches\v8.0\tclIO.c
+	-@rd	$(TRF)\patches\v8.0
 	-@rd	$(TRF)\patches
 	-@rd	$(TRF)
 
