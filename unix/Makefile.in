@@ -281,7 +281,7 @@ clean:
 
 distclean:	clean
 	rm -f config.status config.cache config.log Makefile \
-	$(GENERIC_DIR)/pkgIndex.tcl
+	$(srcdir)/pkgIndex.tcl
 
 install:	install-lib install-header @install_other@ install-tools
 
@@ -291,7 +291,7 @@ install-lib: $(TRF_LIB_FILE)
 	@echo "Installing $(TRF_LIB_FILE)"
 	@$(INSTALL_DATA) $(TRF_LIB_FILE) $(LIB_INSTALL_DIR)
 	@$(RANLIB) $(LIB_INSTALL_DIR)/$(TRF_LIB_FILE)
-	@$(INSTALL_DATA) $(GENERIC_DIR)/pkgIndex.tcl $(LIB_INSTALL_DIR)/pkgIndex.tcl
+	@$(INSTALL_DATA) $(srcdir)/pkgIndex.tcl $(LIB_INSTALL_DIR)/pkgIndex.tcl
 
 
 install-header:
@@ -309,7 +309,7 @@ install-tools:
 	@echo "Installing tools"
 	for i in $(TOOLS);		\
 	do 					\
-		@$(INSTALL_PROGRAM) $(tool)/$$i $(BIN_INSTALL_DIR); \
+		$(INSTALL_PROGRAM) $(tool)/$$i $(BIN_INSTALL_DIR); \
 		tclsh $(tool)/fixhbline $(TCLSH_PATH) $(WISH_PATH) $(BIN_INSTALL_DIR)/$$i; \
 	done
 
