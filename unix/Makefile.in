@@ -290,7 +290,7 @@ TAGS:
 		etags *.[ch]
 
 check-package:
-	@tclsh $(top_tool)/check_manifest $(TOP_DIR)/MANIFEST
+	@cd .. ; tclsh $(top_tool)/check_manifest MANIFEST
 
 
 check:	test
