@@ -834,7 +834,7 @@ Tcl_Interp* interp;
 
 #ifdef USE_TCL_STUBS
   Tcl_Channel parent = (trans->patchIntegrated ?
-			DownChannel (trans)    :
+			trans->self : /* 'self' already refers to our parent */
 			trans->parent);
 #else
   Tcl_Channel parent = trans->parent;
@@ -1921,9 +1921,24 @@ DownChannel (ctrl)
    */
 
   Tcl_Channel self = ctrl->self;
+  Tcl_Channel next;
 
   while ((ClientData) ctrl != Tcl_GetChannelInstanceData (self)) {
-    self = Tcl_GetStackedChannel (self);
+    next = Tcl_GetStackedChannel (self);
+    if (next == (Tcl_Channel) NULL) {
+      /* 09/24/1999 Unstacking bug, found by Matt Newman <matt@sensus.org>.
+       *
+       * We were unable to find the channel structure for this
+       * transformation in the chain of stacked channel. This
+       * means that we are currently in the process of unstacking
+       * it *and* there were some bytes waiting which are now
+       * flushed. In this situation the pointer to the channel
+       * itself already refers to the parent channel we have to
+       * write the bytes into, so we return that.
+       */
+      return ctrl->self;
+    }
+    self = next;
   }
 
   return Tcl_GetStackedChannel (self);
