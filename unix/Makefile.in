@@ -189,8 +189,10 @@ CVT_SRC		=	$(CVT_BASE_SRC) $(CVT_ALG_SRC)
 CVT_OBJ		=	$(CVT_BASE_OBJ) $(CVT_ALG_OBJ)
 
 #		utilities for conversions
-CVT_BASE_SRC	=	$(GENERIC_DIR)/convert.c $(GENERIC_DIR)/util.c
-CVT_BASE_OBJ	=	convert.o util.o
+CVT_BASE_SRC	=	$(GENERIC_DIR)/convert.c	\
+			$(GENERIC_DIR)/util.c		\
+			$(GENERIC_DIR)/ref_opt.c
+CVT_BASE_OBJ	=	convert.o util.o ref_opt.o
 
 #		conversion algorithms
 CVT_ALG_SRC	=	$(GENERIC_DIR)/bincode.c	\
@@ -198,8 +200,9 @@ CVT_ALG_SRC	=	$(GENERIC_DIR)/bincode.c	\
 			$(GENERIC_DIR)/octcode.c	\
 			$(GENERIC_DIR)/uucode.c		\
 			$(GENERIC_DIR)/b64code.c	\
-			$(GENERIC_DIR)/asc85code.c
-CVT_ALG_OBJ	=	bincode.o hexcode.o octcode.o uucode.o b64code.o asc85code.o
+			$(GENERIC_DIR)/asc85code.c	\
+			$(GENERIC_DIR)/reflect.c
+CVT_ALG_OBJ	=	bincode.o hexcode.o octcode.o uucode.o b64code.o asc85code.o reflect.o
 
 
 #		message digests, base & algorithms
@@ -466,6 +469,12 @@ zip_opt.o: $(GENERIC_DIR)/zip_opt.c
 
 zip.o: $(GENERIC_DIR)/zip.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/zip.c -o $@
+
+reflect.o: $(GENERIC_DIR)/reflect.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/reflect.c -o $@
+
+ref_opt.o: $(GENERIC_DIR)/ref_opt.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/ref_opt.c -o $@
 
 
 #-------------------------------------------------------#
