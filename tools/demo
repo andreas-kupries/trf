@@ -215,7 +215,7 @@ proc startAnimation {} {
     set    input ""
 
     animate 300 \
-	    "Hello world, this is an demonstration \
+	    "Hello world, this is a demonstration \
 of the Trf extension to tcl, a package for transforming \
 data in various ways, as can be seen below"
 }
