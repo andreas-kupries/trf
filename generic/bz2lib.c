@@ -12,7 +12,7 @@
 #include "transformInt.h"
 
 #ifdef __WIN32__
-#define BZ2_LIB_NAME "bz2.dll"
+#define BZ2_LIB_NAME "libbz2.dll"
 #endif
 
 #ifndef BZ2_LIB_NAME
