@@ -45,12 +45,10 @@ foreach {index string fullencode encode} {
 }
 
 
-
 test base64-7.1 {base64, partial conversion for attachments} {
     puts -nonewline [set ma [memchan]] aGVsbA
     seek $ma 0
     base64 -mode encode -attach $ma
-
     set data [read $ma]
     close $ma
     list [string length $data] $data
@@ -62,7 +60,6 @@ test base64-7.2 {base64, partial conversion for attachments} {
     seek $ma 0
 
     base64 -mode decode -attach $ma
-
     set data [read $ma]
     close $ma
     list [string length $data] $data

@@ -35,6 +35,14 @@
 
 #define ASSOC "binTrf"
 
+/* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
+ * Normally defined in tcl*Port.h
+ */
+
+#ifndef EWOULDBLOCK
+#define EWOULDBLOCK EAGAIN
+#endif
+
 #ifdef TRF_DEBUG
 int n = 0;
 #endif
@@ -139,16 +147,14 @@ struct _SeekState_ {
 /** XXX change definition for 8.2, at compile time */
 
 typedef struct _TrfTransformationInstance_ {
-#ifdef USE_TCL_STUBS
-  int patchVariant; /* See transformInt.h, Trf_Registry */
-#endif
+  int patchIntegrated; /* Boolean flag, see transformInt.h, Trf_Registry */
 
   /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com> */
 
-  Tcl_Channel self;   /* Our own channel handle */
-  Tcl_Channel parent; /* The channel we are stacked upon. Relevant
-		       * only for values PATCH_ORIG and PATCH_832 of
-		       * 'patchVariant', see above. */
+  Tcl_Channel self;   /* Our own Channel handle */
+  Tcl_Channel parent; /* The channel superceded by this one. Only if the
+		       * patch is not integrated (see above).
+		       */
 
   int readIsFlushed; /* flag to note wether in.flushProc was called or not */
 
@@ -237,18 +243,13 @@ typedef struct _TrfTransformationInstance_ {
 #define TRF_SET_UNSEEKABLE(si) \
      {(si).numBytesTransform = 0 ; (si).numBytesDown = 0;}
 
+/*#define TRF_TELL(c) Tcl_Seek ((c), 0, SEEK_CUR)*/
+/*#define TRF_TELL(c) Tcl_Seek ((c), 0, SEEK_CUR)*/
 
 
 /*
  * forward declarations of all internally used procedures.
  */
-
-static Tcl_ChannelType*
-AllocChannelType _ANSI_ARGS_ ((int* sizePtr));
-
-static Tcl_ChannelType*
-InitializeChannelType _ANSI_ARGS_ ((CONST char* name, int patchVariant));
-
 
 static int
 TrfUnregister _ANSI_ARGS_ ((Tcl_Interp*       interp,
@@ -304,10 +305,6 @@ TrfGetOption _ANSI_ARGS_ ((ClientData instanceData, Tcl_Interp* interp,
 static int
 TrfSetOption _ANSI_ARGS_((ClientData instanceData, Tcl_Interp* interp,
 			  char* optionName, char* value));
-#ifdef USE_TCL_STUBS
-static int
-TrfNotify _ANSI_ARGS_((ClientData instanceData, int interestMask));
-#endif
 
 static int
 TransformImmediate _ANSI_ARGS_ ((Tcl_Interp* interp, Trf_RegistryEntry* entry,
@@ -348,42 +345,9 @@ static void
 ChannelHandlerTimer _ANSI_ARGS_ ((ClientData clientData));
 
 #ifdef USE_TCL_STUBS
-static Tcl_Channel
-DownChannel _ANSI_ARGS_ ((TrfTransformationInstance* ctrl));
-
-static int
-DownSeek _ANSI_ARGS_ ((TrfTransformationInstance* ctrl, int offset, int mode));
-
-static int
-DownRead _ANSI_ARGS_ ((TrfTransformationInstance* ctrl,
-		       char* buf, int toRead));
-static int
-DownWrite _ANSI_ARGS_ ((TrfTransformationInstance* ctrl,
-		       char* buf, int toWrite));
-static int
-DownSOpt _ANSI_ARGS_ ((Tcl_Interp* interp,
-		       TrfTransformationInstance* ctrl,
-		       char* optionName, char* value));
-static int
-DownGOpt _ANSI_ARGS_ ((Tcl_Interp* interp,
-		       TrfTransformationInstance* ctrl,
-		       char* optionName, Tcl_DString* dsPtr));
-
-#define DOWNC(trans)             (DownChannel (trans))
-#define TELL(trans)              (SEEK (trans, 0, SEEK_CUR))
-#define SEEK(trans,off,mode)     (DownSeek  ((trans), (off), (mode)))
-#define READ(trans,buf,toRead)   (DownRead  ((trans), (buf), (toRead)))
-#define WRITE(trans,buf,toWrite) (DownWrite ((trans), (buf), (toWrite)))
-#define SETOPT(i,trans,opt,val)  (DownSOpt  ((i), (trans), (opt), (val)))
-#define GETOPT(i,trans,opt,ds)   (DownGOpt  ((i), (trans), (opt), (ds)))
-#else
-#define DOWNC(trans)             ((trans)->parent)
-#define TELL(trans)              (SEEK (trans, 0, SEEK_CUR))
-#define SEEK(trans,off,mode)     (Tcl_Seek  ((trans)->parent, (off), (mode)))
-#define READ(trans,buf,toRead)   (Tcl_Read  ((trans)->parent, (buf), (toRead)))
-#define WRITE(trans,buf,toWrite) (Tcl_Write ((trans)->parent, (buf), (toWrite)))
-#define SETOPT(i,trans,opt,val)  (Tcl_SetChannelOption ((i), (trans)->parent, (opt), (val)))
-#define GETOPT(i,trans,opt,ds)   (Tcl_GetChannelOption ((i), (trans)->parent, (opt), (ds)))
+/*static Tcl_Channel
+DownChannel _ANSI_ARGS_ ((TrfTransformationInstance* ctrl));*/
+#define DownChannel(t) ((t)->parent)
 #endif
 
 /* Convenience macro for allocation
@@ -392,20 +356,6 @@ DownGOpt _ANSI_ARGS_ ((Tcl_Interp* interp,
 
 #define NEW_TRANSFORM \
 (TrfTransformationInstance*) Tcl_Alloc (sizeof (TrfTransformationInstance));
-
-/* Procedures to handle the internal timer.
- */
-
-static void
-TimerKill _ANSI_ARGS_ ((TrfTransformationInstance* trans));
-
-static void
-TimerSetup _ANSI_ARGS_ ((TrfTransformationInstance* trans));
-
-static void
-ChannelHandlerKS _ANSI_ARGS_ ((TrfTransformationInstance* trans, int mask));
-
-
 
 /* Procedures to handle the internal read buffer.
  */
@@ -617,20 +567,43 @@ CONST Trf_TypeDefinition* type;
    * filters.
    */
 
-  entry          = (Trf_RegistryEntry*) Tcl_Alloc (sizeof (Trf_RegistryEntry));
+  entry             = (Trf_RegistryEntry*)Tcl_Alloc (sizeof(Trf_RegistryEntry));
   entry->registry   = registry;
-
+  entry->transType  = (Tcl_ChannelType*)  Tcl_Alloc (sizeof(Tcl_ChannelType));
   entry->trfType    = (Trf_TypeDefinition*) type;
   entry->interp     = interp;
-#ifndef USE_TCL_STUBS
-  entry->transType  = InitializeChannelType (type->name, -1);
-#else
-  entry->transType  = InitializeChannelType (type->name,
-					     registry->patchVariant);
-#endif
   entry->trfCommand = Tcl_CreateObjCommand (interp, (char*) type->name,
 					    TrfExecuteObjCmd,
 					    (ClientData) entry, TrfDeleteCmd);
+
+  /*
+   * Set up channel type.
+   * The name is the only component changing from transform to transform.
+   * The procedures to call stay the same for all of them.
+   */
+
+  entry->transType->typeName         = (char*) type->name;
+
+  /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
+   */
+  /*entry->transType->blockModeProc    = TrfBlock;*/
+  entry->transType->version    = (Tcl_ChannelVersion) TrfBlock;
+
+  entry->transType->closeProc        = TrfClose;
+  entry->transType->inputProc        = TrfInput;
+  entry->transType->outputProc       = TrfOutput;
+  entry->transType->seekProc         = TrfSeek;
+  entry->transType->setOptionProc    = TrfSetOption;
+  entry->transType->getOptionProc    = TrfGetOption;
+  entry->transType->watchProc        = TrfWatch;
+  entry->transType->getHandleProc    = TrfGetFile;
+
+#if GT81
+  /* No additional close procedure. It is not possible to partially close a
+   * transformation channel.
+   */
+  entry->transType->close2Proc = NULL;
+#endif
 
   /*
    * Add entry to internal registry.
@@ -1236,7 +1209,13 @@ int mode;
   START (TrfBlock);
   PRINT ("Mode = %d\n", mode); FL;
 
-  parent = DOWNC (trans);
+#ifdef USE_TCL_STUBS
+  parent = (trans->patchIntegrated ?
+	    DownChannel (trans)    :
+	    trans->parent);
+#else
+  parent = trans->parent;
+#endif
 
   if (mode == TCL_MODE_NONBLOCKING) {
     trans->flags |= CHANNEL_ASYNC;
@@ -1246,21 +1225,9 @@ int mode;
     block [0] = '1';
   }
 
-#ifndef USE_TCL_STUBS
+  /*
   Tcl_SetChannelOption (NULL, parent, "-blocking", block);
-#else
-  if ((trans->patchVariant == PATCH_ORIG) ||
-      (trans->patchVariant == PATCH_82)) {
-    /*
-     * Both old-style patch and first integrated version of the patch
-     * require the transformation to pass the blocking mode to the
-     * channel downstream. The newest implementation (PATCH_832)
-     * handles this in the core.
-     */
-
-    Tcl_SetChannelOption (NULL, parent, "-blocking", block);
-  }
-#endif
+  */
 
   DONE (TrfBlock);
   return 0;
@@ -1301,9 +1268,13 @@ Tcl_Interp* interp;
 
   START (TrfClose);
 
-#ifndef USE_TCL_STUBS
-  if ((trans  == (TrfTransformationInstance*) NULL) ||
-      (interp == (Tcl_Interp*) NULL)) {
+#ifdef USE_TCL_STUBS
+  parent = (trans->patchIntegrated ?
+	    trans->self            : /* 'self' already refers to our parent */
+	    trans->parent);
+#else
+  if ((instanceData == NULL) ||
+      (interp == NULL)) {
     /* Hack, prevent 8.0 from crashing upon exit if channels
      * with transformations were left open during exit
      *
@@ -1313,35 +1284,35 @@ Tcl_Interp* interp;
     DONE (TrfClose);
     return TCL_OK;
   }
-#endif
 
-  parent = DOWNC (trans);
+  parent = trans->parent;
+#endif
 
   /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
    * Remove event handler to underlying channel, this could
    * be because we are closing for real, or being "unstacked".
    */
 
-#ifndef USE_TCL_STUBS
   Tcl_DeleteChannelHandler (parent, ChannelHandler, (ClientData) trans);
-#else
-  if ((trans->patchVariant == PATCH_ORIG) ||
-      (trans->patchVariant == PATCH_82)) {
-    Tcl_DeleteChannelHandler (parent, ChannelHandler, (ClientData) trans);
-  }
-  /*
-   * PATCH_832 doesn't use channelhandlers for communication of events
-   * between the channels of stack anymore.
-   */
-#endif
 
-  TimerKill (trans);
+
+  if (trans->timer != (Tcl_TimerToken) NULL) {
+    /* Delete an existing flush-out timer,
+     * prevent it from firing on removed channel.
+     */
+
+    Tcl_DeleteTimerHandler (trans->timer);
+    trans->timer = (Tcl_TimerToken) NULL;
+
+    PRINT ("Timer deleted ..."); FL;
+  }
 
   /*
    * Flush data waiting in transformation buffers to output.
    * Flush input too, maybe there are side effects other
    * parts do rely on (-> message digests).
    */
+
 
   if (trans->mode & TCL_WRITABLE) {
     PRINT ("out.flushproc\n"); FL;
@@ -1410,7 +1381,13 @@ int*       errorCodePtr;
   START (TrfInput);
   PRINT ("trans = %p, toRead = %d\n", trans, toRead); FL;
 
-  parent = DOWNC (trans);
+#ifdef USE_TCL_STUBS
+  parent = (trans->patchIntegrated ?
+	    DownChannel (trans)    :
+	    trans->parent);
+#else
+  parent = trans->parent;
+#endif
 
   /* should assert (trans->mode & TCL_READABLE) */
 
@@ -1501,7 +1478,7 @@ int*       errorCodePtr;
     PRINT ("Read from parent %p\n", parent);
     IN; IN;
 
-    read = READ (trans, buf, toRead);
+    read = Tcl_ReadRaw (parent, buf, toRead);
 
     OT; OT;
     PRINT  ("................\n");
@@ -1522,7 +1499,7 @@ int*       errorCodePtr;
 	   * before we report that instead of the request to re-try.
 	   */
 
-	  PRINT ("Got %d, read < 0, <EAGAIN>\n", gotBytes);
+	  PRINT ("Got %d, read < 0, <EAGAIN>\n", gotBytes, *errorCodePtr);
 	  FL; DONE (TrfInput);
 	  return gotBytes;
       }
@@ -1691,7 +1668,13 @@ int*       errorCodePtr;
 
   START (TrfOutput);
 
-  parent = DOWNC (trans);
+#ifdef USE_TCL_STUBS
+  parent = (trans->patchIntegrated ?
+	    DownChannel (trans)    :
+	    trans->parent);
+#else
+  parent = trans->parent;
+#endif
 
   /* should assert (trans->mode & TCL_WRITABLE) */
 
@@ -1808,7 +1791,13 @@ int*       errorCodePtr;	/* Location of error flag. */
   START (TrfSeek);
   PRINT ("(Mode = %d, Offset = %ld)\n", mode, offset); FL;
 
-  parent = DOWNC (trans);
+#ifdef USE_TCL_STUBS
+  parent = (trans->patchIntegrated ?
+	    DownChannel (trans)    :
+	    trans->parent);
+#else
+  parent = trans->parent;
+#endif
 
   /*
    * Several things to look at before deciding what to do.
@@ -1841,14 +1830,20 @@ int*       errorCodePtr;	/* Location of error flag. */
      * restoration of constrained seek to force the usage of a new zero-point.
      */
 
+    Tcl_ChannelType*    parentType     = Tcl_GetChannelType  (parent);
+    Tcl_DriverSeekProc *parentSeekProc = Tcl_ChannelSeekProc (parentType);
+
     PRINT ("[Passing down]\n"); FL;
 
     SeekClearBuffer (trans, TCL_WRITABLE | TCL_READABLE);
 
     trans->seekState.changed = 1;
 
-    result = SEEK (trans, offset, mode);
-    *errorCodePtr = (result == -1) ? Tcl_GetErrno () : 0;
+    /*result = Tcl_Seek (parent, offset, mode);*/
+
+    result = (*parentSeekProc) (Tcl_GetChannelInstanceData (parent), offset, mode, errorCodePtr);
+
+    /* *errorCodePtr = (result == -1) ? Tcl_GetErrno () : 0;*/
 
     SEEK_DUMP (TrfSeek; Pass<);
     DONE (TrfSeek);
@@ -1919,8 +1914,13 @@ int*       errorCodePtr;	/* Location of error flag. */
     SeekClearBuffer (trans, TCL_WRITABLE | TCL_READABLE);
 
     if (offsetDown != 0) {
-      result = SEEK (trans, offsetDown, SEEK_CUR);
-      *errorCodePtr = (result == -1) ? Tcl_GetErrno () : 0;
+      Tcl_ChannelType* parentType        = Tcl_GetChannelType  (parent);
+      Tcl_DriverSeekProc *parentSeekProc = Tcl_ChannelSeekProc (parentType);
+
+      result = (*parentSeekProc) (Tcl_GetChannelInstanceData (parent), offsetDown, SEEK_CUR, errorCodePtr);
+
+      /* result = Tcl_Seek (parent, offsetDown, SEEK_CUR);
+      *errorCodePtr = (result == -1) ? Tcl_GetErrno () : 0; */
     }
 
     trans->seekState.downLoc      += offsetDown;
@@ -1971,12 +1971,9 @@ TrfWatch (instanceData, mask)
 ClientData instanceData;	/* Channel to watch */
 int        mask;		/* Events of interest */
 {
-  /*
-   * 08/01/2000 - Completely rewritten to support as many versions of
-   * the core and their different implementation s of stacked channels.
-   */
   /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
-   * Added the comments.  */
+   * Added the comments.
+   */
   /* The caller expressed interest in events occuring for this
    * channel. Instead of forwarding the call to the underlying
    * channel we now express our interest in events on that
@@ -1992,11 +1989,9 @@ int        mask;		/* Events of interest */
    */
 
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
+  Tcl_Channel               parent;
 
   START (TrfWatch);
-
-#ifndef USE_TCL_STUBS
-  /* 8.0.x. Original patch. */
 
   if (mask == trans->watchMask) {
     /* No changes in the expressed interest, skip this call.
@@ -2005,66 +2000,29 @@ int        mask;		/* Events of interest */
     return;
   }
 
-  ChannelHandlerKS (trans, mask);
+#ifdef USE_TCL_STUBS
+  parent = (trans->patchIntegrated ?
+	    DownChannel (trans)    :
+	    trans->parent);
 #else
-  /* 8.1. and up */
-
-  if ((trans->patchVariant == PATCH_ORIG) ||
-      (trans->patchVariant == PATCH_82)) {
-
-    if (mask == trans->watchMask) {
-      /* No changes in the expressed interest, skip this call.
-       */
-      DONE (TrfWatch);
-      return;
-    }
-
-    ChannelHandlerKS (trans, mask);
-
-  } else if (trans->patchVariant == PATCH_832) {
-    /* 8.3.2 and up */
-
-    Tcl_DriverWatchProc* watchProc;
-    Tcl_Channel          parent;
-
-    trans->watchMask = mask;
-
-    /* No channel handlers any more. We will be notified automatically
-     * about events on the channel below via a call to our
-     * 'TransformNotifyProc'. But we have to pass the interest down now.
-     * We are allowed to add additional 'interest' to the mask if we want
-     * to. But this transformation has no such interest. It just passes
-     * the request down, unchanged.
-     */
-
-    parent    = DOWNC (trans);
-    watchProc = Tcl_ChannelWatchProc (Tcl_GetChannelType (parent));
-
-    (*watchProc) (Tcl_GetChannelInstanceData(parent), mask);
-
-  } else {
-    Tcl_Panic ("Illegal value for 'patchVariant'");
-  }
+  parent = trans->parent;
 #endif
 
-  /*
-   * Management of the internal timer.
-   */
-
-  if (!(mask & TCL_READABLE) || (ResultLength(&trans->result) == 0)) {
-    /* A pending timer may exist, but either is there no (more)
-     * interest in the events it generates or nothing is available
-     * for reading. Remove it, if existing.
+  if (trans->watchMask) {
+    /*
+     * Remove event handler to underlying channel, this could
+     * be because we are closing for real, or being "unstacked".
      */
+    Tcl_DeleteChannelHandler (parent, ChannelHandler,
+			      (ClientData) trans);
+  }
 
-    TimerKill (trans);
-  } else {
-    /* There might be no pending timer, but there is interest in
-     * readable events and we actually have data waiting, so
-     * generate a timer to flush that if it does not exist.
-     */
+  trans->watchMask = mask;
 
-    TimerSetup (trans);
+  if (trans->watchMask) {
+    /* Setup active monitor for events on underlying Channel */
+    Tcl_CreateChannelHandler (parent, trans->watchMask,
+			      ChannelHandler, (ClientData) trans);
   }
 
   DONE (TrfWatch);
@@ -2105,7 +2063,13 @@ ClientData* handlePtr;		/* Place to store the handle into */
 
   START (TrfGetFile);
 
-  parent = DOWNC (trans);
+#ifdef USE_TCL_STUBS
+  parent = (trans->patchIntegrated ?
+	    DownChannel (trans)    :
+	    trans->parent);
+#else
+  parent = trans->parent;
+#endif
 
   DONE (TrfGetFile);
   return Tcl_GetChannelHandle (parent, direction, handlePtr);
@@ -2222,15 +2186,32 @@ TrfSetOption (instanceData, interp, optionName, value)
 	 * upper location.
 	 */
 
-	Tcl_Channel parent = DOWNC (trans);
-	SeekSynchronize (trans, parent);
-	trans->seekState.downLoc     = TELL (trans);
+	Tcl_Channel parent;
+	Tcl_ChannelType*    parentType;
+	Tcl_DriverSeekProc *parentSeekProc;
+	int errorCode;
 
 #ifdef USE_TCL_STUBS
-	if (trans->patchVariant == PATCH_832) {
-	  trans->seekState.downLoc  -= Tcl_ChannelBuffered (parent);
-	}
+	parent = (trans->patchIntegrated ?
+		  DownChannel (trans)    :
+		  trans->parent);
+#else
+	parent = trans->parent;
 #endif
+	SeekSynchronize (trans, parent);
+
+	parentType     = Tcl_GetChannelType  (parent);
+	parentSeekProc = Tcl_ChannelSeekProc (parentType);
+
+	trans->seekState.downLoc = (*parentSeekProc) (Tcl_GetChannelInstanceData (parent),
+						      0, SEEK_CUR, &errorCode);
+
+	/*trans->seekState.downLoc     = TRF_TELL (parent);*/
+	/* Correct down location, take the push back area of the channel
+	 * below into account
+	 */
+
+	trans->seekState.downLoc    -= Tcl_ChannelBuffered (parent);
 	trans->seekState.downZero    = trans->seekState.downLoc;
 	trans->seekState.aheadOffset = 0;
 
@@ -2252,8 +2233,29 @@ TrfSetOption (instanceData, interp, optionName, value)
     }
 
   } else {
+    Tcl_Channel parent;
     int res;
-    res = SETOPT (interp, trans, optionName, value);
+    Tcl_DriverSetOptionProc *setOptionProc;
+
+#ifdef USE_TCL_STUBS
+    parent = (trans->patchIntegrated ?
+	      DownChannel (trans)    :
+	      trans->parent);
+#else
+    parent = trans->parent;
+#endif
+
+    setOptionProc = Tcl_ChannelSetOptionProc(Tcl_GetChannelType(parent));
+    if (setOptionProc != NULL) {
+	res = (*setOptionProc)(Tcl_GetChannelInstanceData(parent),
+		interp, optionName, value);
+    } else {
+        res = TCL_ERROR;
+    }
+
+#if 0
+    res = Tcl_SetChannelOption (interp, parent, optionName, value);
+#endif
     DONE (TrfSetOption);
     return res;
   }
@@ -2307,6 +2309,17 @@ TrfGetOption (instanceData, interp, optionName, dsPtr)
     Tcl_Obj* tmp;
     char policy [20];
 
+    Tcl_Channel parent;
+    Tcl_DriverGetOptionProc *getOptionProc;
+
+#ifdef USE_TCL_STUBS
+    parent = (trans->patchIntegrated ?
+	      DownChannel (trans)    :
+	      trans->parent);
+#else
+    parent = trans->parent;
+#endif
+
     SeekPolicyGet (trans, policy);
     Tcl_DStringAppendElement (dsPtr, "-seekpolicy");
     Tcl_DStringAppendElement (dsPtr, policy);
@@ -2325,7 +2338,16 @@ TrfGetOption (instanceData, interp, optionName, dsPtr)
      * state.
      */
 
-    return GETOPT (interp, trans, optionName, dsPtr);
+    getOptionProc = Tcl_ChannelGetOptionProc(Tcl_GetChannelType(parent));
+
+    if (getOptionProc != NULL) {
+	return (*getOptionProc)(Tcl_GetChannelInstanceData(parent),
+		interp, optionName, dsPtr);
+    }
+    /*
+     * Request is query for all options, this is ok.
+     */
+    return TCL_OK;
 
   } else if (0 == strcmp (optionName, "-seekpolicy")) {
     /* Deduce the policy in effect, use chosen/used
@@ -2356,59 +2378,38 @@ TrfGetOption (instanceData, interp, optionName, dsPtr)
 
     return TCL_OK;
   } else {
-    /* Unknown option. Pass it down to the channels below, maybe one
-     * of them is able to handle this request.
+    /* Unknown option. Pass it down to the channels below, maybe one of
+     * them is able to handle this request.
      */
 
-    return GETOPT (interp, trans, optionName, dsPtr);
+    Tcl_Channel parent;
+    Tcl_DriverGetOptionProc *getOptionProc;
+
+#ifdef USE_TCL_STUBS
+    parent = (trans->patchIntegrated ?
+	      DownChannel (trans)    :
+	      trans->parent);
+#else
+    parent = trans->parent;
+#endif
+
+    getOptionProc = Tcl_ChannelGetOptionProc(Tcl_GetChannelType(parent));
+    if (getOptionProc != NULL) {
+	return (*getOptionProc)(Tcl_GetChannelInstanceData(parent),
+		interp, optionName, dsPtr);
+    }
+    /*
+     * Request for a specific unknown option has to fail.
+     */
+    return TCL_ERROR;
+
 #if 0
+    return Tcl_GetChannelOption (interp, parent, optionName, dsPtr);
     Tcl_SetErrno (EINVAL);
     return Tcl_BadChannelOption (interp, optionName, "seekcfg seekstate");
 #endif
   }
 }
-
-#ifdef USE_TCL_STUBS
-/*
- *------------------------------------------------------*
- *
- *	TrfNotify --
- *
- *	------------------------------------------------*
- *	Called by the generic layer of 8.3.2 and higher
- *	to handle events coming from below. We simply pass
- *	them upward.
- *	------------------------------------------------*
- *
- *	Sideeffects:
- *		None.
- *
- *	Result:
- *		The unchanged interest mask.
- *
- *------------------------------------------------------*
- */
-static int
-TrfNotify (instanceData, interestMask)
-     ClientData instanceData;
-     int        interestMask;
-{
-  /*
-   * An event occured in the underlying channel.  This transformation
-   * doesn't process such events thus returns the incoming mask
-   * unchanged.
-   *
-   * We do delete an existing timer. It was not fired, yet we are
-   * here, so the channel below generated such an event and we don't
-   * have to. The renewal of the interest after the execution of
-   * channel handlers will eventually cause us to recreate the timer
-   * (in TrfWatch).
-   */
-
-  TimerKill ((TrfTransformationInstance*) instanceData);
-  return interestMask;
-}
-#endif
 
 /*
  *------------------------------------------------------*
@@ -2427,7 +2428,8 @@ TrfNotify (instanceData, interestMask)
  *	Result:
  *		A standard Tcl error code.
  *
- *------------------------------------------------------* */
+ *------------------------------------------------------*
+ */
 
 static int
 TransformImmediate (interp, entry, source, destination, in, optInfo)
@@ -2485,7 +2487,13 @@ Trf_Options        optInfo;
     int            length;
     unsigned char* buf;
 
-    buf = GET_DATA (in, &length);
+    /* 8.x, argument 'in' is arbitrary object, its string rep. may contain \0.
+     */
+#if GT81
+    buf = (unsigned char*) Tcl_GetByteArrayFromObj (in, &length);
+#else
+    buf = (unsigned char*) Tcl_GetStringFromObj (in, &length);
+#endif
     if (v->convertBufProc) {
       /* play it safe, use a copy, avoid clobbering the input. */
       unsigned char* tmp;
@@ -2578,7 +2586,11 @@ Trf_Options        optInfo;
       Tcl_ResetResult (interp);
 
       if (r.buf != NULL) {
-	Tcl_Obj* o = NEW_DATA (r);
+#if GT81
+ 	Tcl_Obj* o = Tcl_NewByteArrayObj (r.buf, r.used);
+#else
+	Tcl_Obj* o = Tcl_NewStringObj ((char*) r.buf, r.used);
+#endif
 	Tcl_IncrRefCount (o);
 	Tcl_SetObjResult (interp, o);
 	Tcl_DecrRefCount (o);
@@ -2629,9 +2641,9 @@ Tcl_Interp*        interp;
   trans->outCounter = 0;
   trans->name       = (char*) entry->trfType->name;
 #endif
-#ifdef USE_TCL_STUBS
-  trans->patchVariant = entry->registry->patchVariant;
-#endif
+
+  trans->patchIntegrated = entry->registry->patchIntegrated;
+
 
   /* trans->standard.typePtr = entry->transType; */
   trans->clientData       = entry->trfType->clientData;
@@ -2722,28 +2734,27 @@ Tcl_Interp*        interp;
    * thrashing far away memory)).
    */
 
-#ifndef USE_TCL_STUBS
-  trans->self   = Tcl_StackChannel (interp, entry->transType,
-				    (ClientData) trans, trans->mode,
-				    trans->parent);
-#else
-  if ((trans->patchVariant == PATCH_ORIG) ||
-      (trans->patchVariant == PATCH_832)) {
+  if (trans->patchIntegrated) {
+    trans->parent = NULL;
+  }
+
+#ifdef USE_TCL_STUBS
+  if (trans->patchIntegrated) {
+    /*trans->self = baseOpt->attach;*/
 
     trans->self = Tcl_StackChannel (interp, entry->transType,
-				    (ClientData) trans, trans->mode,
-				    trans->parent);
-
-  } else if (trans->patchVariant == PATCH_82) {
-    trans->parent = NULL;
-    trans->self   = baseOpt->attach;
-
-    Tcl_StackChannel (interp, entry->transType,
 		      (ClientData) trans, trans->mode,
-		      trans->self);
+		      baseOpt->attach);
+    trans->parent = baseOpt->attach;
   } else {
-    Tcl_Panic ("Illegal value for 'patchVariant'");
+    trans->self = Tcl_StackChannel (interp, entry->transType,
+				    (ClientData) trans, trans->mode,
+				    baseOpt->attach);
   }
+#else
+  trans->self = Tcl_ReplaceChannel (interp, entry->transType,
+				    (ClientData) trans, trans->mode,
+				    baseOpt->attach);
 #endif
 
   if (trans->self == (Tcl_Channel) NULL) {
@@ -2768,14 +2779,19 @@ Tcl_Interp*        interp;
 
   if (optInfo && (*OPT->seekQueryProc != (Trf_SeekQueryOptions*) NULL)) {
     PRINTLN ("Query seekQueryProc");
+
     (*OPT->seekQueryProc) (interp, optInfo, &trans->seekCfg.natural, CLT);
   }
 
   PRINTLN ("Determine Policy");
+
   SeekCalculatePolicies (trans);
 
   PRINTLN ("    Initialize");
+
   SeekInitialize        (trans);
+
+  PRINTLN ("    Policy options ?");
 
   /* Check for options overiding the policy. If they do despite being not
    * allowed to do so we have to remove the transformation and break it down.
@@ -2783,25 +2799,27 @@ Tcl_Interp*        interp;
    * us.
    */
 
-  PRINTLN ("    Policy options ?");
   if (baseOpt->policy != (Tcl_Obj*) NULL) {
     if (TCL_OK != TrfSetOption ((ClientData) trans, interp, "-seekpolicy",
 				Tcl_GetStringFromObj (baseOpt->policy,
 						      NULL))) {
 
-      /* An error prevented setting a policy. Save the resulting error
+      /* an error prevented setting a policy. Save the resulting error
        * message across the necessary unstacking of the now faulty
        * transformation.
        */
 
 #if GT81
       Tcl_SavedResult ciSave;
-
-      Tcl_SaveResult     (interp, &ciSave);
+      Tcl_SaveResult (interp, &ciSave);
+#endif
+#ifdef USE_TCL_STUBS
       Tcl_UnstackChannel (interp, trans->self);
-      Tcl_RestoreResult  (interp, &ciSave);
 #else
-      Tcl_UnstackChannel (interp, trans->self);
+      Tcl_UndoReplaceChannel (interp, trans->self); /* Tcl 8.0.x or below */
+#endif
+#if GT81
+      Tcl_RestoreResult (interp, &ciSave);
 #endif
       DONE (AttachTransform);
       return TCL_ERROR;
@@ -2809,8 +2827,8 @@ Tcl_Interp*        interp;
   }
 
   /*  Tcl_RegisterChannel (interp, new); */
-  Tcl_AppendResult (interp, Tcl_GetChannelName (trans->self),
-		    (char*) NULL);
+  Tcl_AppendResult (interp, Tcl_GetChannelName (trans->self), (char*) NULL);
+
   DONE (AttachTransform);
   return TCL_OK;
 }
@@ -2850,11 +2868,18 @@ Tcl_Interp*    interp;
   DUMP  (outLen, outString);
   PRINT ("}\n");
 
-  parent = DOWNC (trans);
+#ifdef USE_TCL_STUBS
+  parent = (trans->patchIntegrated ?
+	    DownChannel (trans)    :
+	    trans->parent);
+#else
+  parent = trans->parent;
+#endif
 
   trans->lastWritten += outLen;
 
-  res = WRITE (trans, (char*) outString, outLen);
+  PRINT ("WriteRaw %p %s\n", parent, Tcl_GetChannelType (parent)->typeName);
+  res = Tcl_WriteRaw (parent, (char*) outString, outLen);
 
   if (res < 0) {
     if (interp) {
@@ -2863,8 +2888,7 @@ Tcl_Interp*    interp;
 			"\": ", Tcl_PosixError (interp),
 			(char*) NULL);
     }
-    PRINT ("ERROR /written = %d, errno = %d, (%d) %s\n",
-	   res, Tcl_GetErrno (), EACCES, strerror (Tcl_GetErrno ()));
+    PRINT ("ERROR /written = %d, errno = %d, (%d) %s\n",res, Tcl_GetErrno (), EACCES, strerror (Tcl_GetErrno ()));
     DONE (PutDestination);
     return TCL_ERROR;
   }
@@ -3038,70 +3062,48 @@ ChannelHandler (clientData, mask)
 ClientData     clientData;
 int            mask;
 {
-  /*
-   * An event occured in the underlying channel. Forward it to
-   * ourself. This will either execute an attached event script
-   * (fileevent) or an intermediate handler like this one propagating
-   * the event further upward.
-   *
-   * This procedure is called only for the original and the 8.2
-   * patch. The 8.2.3 patch uses a new vector in the driver to get and
-   * handle events coming from below.
+  /* An event occured in the underlying channel. Forward it
+   * to ourself. This will either execute an attached event
+   * script (fileevent) or an intermediate handler like this
+   * one propagating the event further upward.
    */
 
   TrfTransformationInstance* trans = (TrfTransformationInstance*) clientData;
 
-#ifndef USE_TCL_STUBS
-  /*
-   * Core 8.0.x. Forward the event to ourselves.
-   */
-
-  Tcl_NotifyChannel (trans->self, mask);
-#else
-  /*
-   * Check for the correct variants first. Forwarding the event is not
-   * required for the 8.2 patch. For that variant the core,
-   * i.e. Tcl_NotifyChannel loops over all channels in the stack by
-   * itself.
-   */
-
-  if (trans->patchVariant == PATCH_832) {
-    Tcl_Panic ("Illegal value for 'patchVariant' in ChannelHandler");
-  }
-  if (trans->patchVariant == PATCH_ORIG) {
+  if (!trans->patchIntegrated) {
     Tcl_NotifyChannel (trans->self, mask);
   }
-#endif
 
-  /*
-   * Check the I/O-Buffers of this channel for waiting information.
+  /* Check the I/O-Buffers of this channel for waiting information.
    * Setup a timer generating an artificial event for us if we have
-   * such. We could call Tcl_NotifyChannel directly, but this would
-   * starve other event sources, so a timer is used to prevent that.
+   * such. A timer is used to prevent starvation of other event sources.
    */
 
-  TimerKill (trans);
+  if (trans->timer != (Tcl_TimerToken) NULL) {
+    /* First delete an existing timer. It was not fired, yet we are
+     * here, so the bottom-most channel generated such an event.
+     */
+
+    Tcl_DeleteTimerHandler (trans->timer);
+    trans->timer = (Tcl_TimerToken) NULL;
+  }
 
   /* Check for waiting data, flush it out with a timer.
    */
 
-#ifndef USE_TCL_STUBS
-  if ((mask & TCL_READABLE) && ((ResultLength (&trans->result) > 0) ||
-				(Tcl_InputBuffered (trans->self) > 0))) {
-    TimerSetup (trans);
-  }
-#else
-  if (trans->patchVariant != PATCH_ORIG) {
+  if (trans->patchIntegrated) {
     if ((mask & TCL_READABLE) && (ResultLength (&trans->result) > 0)) {
-      TimerSetup (trans);
+      trans->timer = Tcl_CreateTimerHandler (DELAY, ChannelHandlerTimer,
+					     (ClientData) trans);
     }
   } else {
-    if ((mask & TCL_READABLE) && ((ResultLength (&trans->result) > 0) ||
-				  (Tcl_InputBuffered (trans->self) > 0))) {
-      TimerSetup (trans);
+    if ((mask & TCL_READABLE) &&
+	((ResultLength (&trans->result) > 0) ||
+	 (Tcl_InputBuffered (trans->self) > 0))) {
+      trans->timer = Tcl_CreateTimerHandler (DELAY, ChannelHandlerTimer,
+					     (ClientData) trans);
     }
   }
-#endif
 }
 
 /*
@@ -3131,260 +3133,14 @@ ClientData clientData; /* Transformation to query */
 
   trans->timer = (Tcl_TimerToken) NULL;
 
-#ifndef USE_TCL_STUBS
-  /* 8.0.x.
-   * Use the channel handler itself to do the necessary actions
-   */
-
-  ChannelHandler (clientData, trans->watchMask);
-#else
-  if (trans->patchVariant == PATCH_82) {
-    /*
-     * Use the standard notification mechanism to invoke all channel
-     * handlers.
-     */
+  if (trans->patchIntegrated) {
     Tcl_NotifyChannel (trans->self, TCL_READABLE);
   } else {
-    /* PATCH_ORIG, seee 8.0.x
-     */
-
     ChannelHandler (clientData, trans->watchMask);
   }
-#endif
 }
 
 #ifdef USE_TCL_STUBS
-/*
- *------------------------------------------------------*
- *
- *	DownSOpt --
- *
- *	Helper procedure. Writes an option to the downstream channel.
- *
- *	Sideeffects:
- *		As of Tcl_SetChannelOption
- *
- *	Result:
- *		A standard tcl error code.
- *
- *------------------------------------------------------*
- */
-
-static int
-DownSOpt (interp, ctrl, optionName, value)
-     Tcl_Interp*                interp;
-     TrfTransformationInstance* ctrl;
-     char*                      optionName;
-     char*                      value;
-{
-  Tcl_Channel parent = DOWNC (ctrl);
-
-  if (ctrl->patchVariant == PATCH_832) {
-    /*
-     * The newly written patch forces direct use of the driver.
-     */
-
-    Tcl_DriverSetOptionProc *setOptionProc = 
-      Tcl_ChannelSetOptionProc (Tcl_GetChannelType (parent));
-
-    if (setOptionProc != NULL) {
-      return (*setOptionProc) (Tcl_GetChannelInstanceData (parent),
-			       interp, optionName, value);
-    } else {
-      return TCL_ERROR;
-    }
-
-  } else {
-    return Tcl_SetChannelOption (interp, parent, optionName, value);
-  }
-}
-
-/*
- *------------------------------------------------------*
- *
- *	DownGOpt --
- *
- *	Helper procedure. Reads options from the downstream channel.
- *
- *	Sideeffects:
- *		As of Tcl_GetChannelOption
- *
- *	Result:
- *		A standard tcl error code.
- *
- *------------------------------------------------------*
- */
-
-static int
-DownGOpt (interp, ctrl, optionName, dsPtr)
-     Tcl_Interp*                interp;
-     TrfTransformationInstance* ctrl;
-     char*                      optionName;
-     Tcl_DString*               dsPtr;
-{
-  Tcl_Channel parent = DOWNC (ctrl);
-
-  if (ctrl->patchVariant == PATCH_832) {
-    /*
-     * The newly written patch forces direct use of the driver.
-     */
-
-    Tcl_DriverGetOptionProc *getOptionProc =
-      Tcl_ChannelGetOptionProc (Tcl_GetChannelType (parent));
-
-    if (getOptionProc != NULL) {
-	return (*getOptionProc) (Tcl_GetChannelInstanceData (parent),
-				 interp, optionName, dsPtr);
-    }
-
-    /*
-     * Downstream channel has no driver to get options. Fall back on
-     * some default behaviour. A query for all options is ok. A
-     * request for a specific unknown option OTOH has to fail.
-     */
-
-    if (optionName == (char*) NULL) {
-      return TCL_OK;
-    } else {
-      return TCL_ERROR;
-    }
-  } else {
-    return Tcl_GetChannelOption (interp, parent, optionName, dsPtr);
-  }
-}
-
-/*
- *------------------------------------------------------*
- *
- *	DownWrite --
- *
- *	Helper procedure. Writes to the downstream channel.
- *
- *	Sideeffects:
- *		As of TclWrite / Tcl_WriteRaw
- *
- *	Result:
- *		The number of bytes written.
- *
- *------------------------------------------------------*
- */
-
-static int
-DownWrite (ctrl, buf, toWrite)
-     TrfTransformationInstance* ctrl;
-     char*                      buf;
-     int                        toWrite;
-{
-  Tcl_Channel parent = DOWNC (ctrl);
-
-  if (ctrl->patchVariant == PATCH_832) {
-    /*
-     * The newly written patch forces use of the new raw-API.
-     */
-
-    PRINT ("WriteRaw %p %s\n", parent, Tcl_GetChannelType (parent)->typeName);
-    return Tcl_WriteRaw (parent, buf, toWrite);
-  } else {
-    return Tcl_Write (parent, buf, toWrite);
-  }
-  return TCL_OK;
-}
-
-/*
- *------------------------------------------------------*
- *
- *	DownRead --
- *
- *	Helper procedure. Reads from the downstream channel.
- *
- *	Sideeffects:
- *		As of TclRead / Tcl_ReadRaw
- *
- *	Result:
- *		The number of bytes read.
- *
- *------------------------------------------------------*
- */
-
-static int
-DownRead (ctrl, buf, toRead)
-     TrfTransformationInstance* ctrl;
-     char*                      buf;
-     int                        toRead;
-{
-  Tcl_Channel parent = DOWNC (ctrl);
-
-  if (ctrl->patchVariant == PATCH_832) {
-    /*
-     * The newly written patch forces use of the new raw-API.
-     */
-
-    return Tcl_ReadRaw (parent, buf, toRead);
-  } else {
-    return Tcl_Read (parent, buf, toRead);
-  }
-  return TCL_OK;
-}
-
-/*
- *------------------------------------------------------*
- *
- *	DownSeek --
- *
- *	Helper procedure. Asks the downstream channel
- *	to seek, or for its current location.
- *
- *	Sideeffects:
- *		None.
- *
- *	Result:
- *		The location in the downstream channel
- *
- *------------------------------------------------------*
- */
-
-static int
-DownSeek (ctrl, offset, mode)
-    TrfTransformationInstance* ctrl;
-    int                        offset;
-    int                        mode;
-{
-  Tcl_Channel parent = DOWNC (ctrl);
-
-  if (ctrl->patchVariant == PATCH_832) {
-    /*
-     * The newly rewritten patch forces the transformation into
-     * directly using the seek-proc of the downstream driver. Tcl_Seek
-     * would compensate for the stack and cause and infinite recursion
-     * blowing the stack.
-     */
-
-    Tcl_ChannelType*    parentType     = Tcl_GetChannelType  (parent);
-    Tcl_DriverSeekProc* parentSeekProc = Tcl_ChannelSeekProc (parentType);
-    int                 errorCode;
-
-    if (parentSeekProc == (Tcl_DriverSeekProc*) NULL) {
-      return -1;
-    }
-
-    return (*parentSeekProc) (Tcl_GetChannelInstanceData (parent),
-			      offset, mode, &errorCode);
-  }
-
-  /*
-   * (ctrl->patchVariant == PATCH_ORIG)
-   * (ctrl->patchVariant == PATCH_82)
-   *
-   * Both the original patch for stacked channels and rewritten
-   * implementation for 8.2. have the same simple semantics for
-   * getting at the location of the downstream channel.
-   *
-   * Just use the standard 'Tcl_Seek'.
-   */
-
-    return Tcl_Seek (parent, offset, mode);
-}
-
 /*
  *------------------------------------------------------*
  *
@@ -3400,32 +3156,11 @@ DownSeek (ctrl, offset, mode)
  *
  *------------------------------------------------------*
  */
-
+#undef DownChannel
 static Tcl_Channel
 DownChannel (ctrl)
     TrfTransformationInstance* ctrl;
 {
-  Tcl_Channel self;
-  Tcl_Channel next;
-
-  if ((ctrl->patchVariant == PATCH_ORIG) ||
-      (ctrl->patchVariant == PATCH_832)) {
-    /*
-     * Both the original patch for stacked channels and rewritten
-     * implementation for 8.3.2. have simple semantics for getting at
-     * the parent of a channel.
-     */
-
-    return ctrl->parent;
-  }
-
-  /*
-   * The first rewrite of the stacked channel patch initially included
-   * in 8.2. requires that a transformation searches it's channel in
-   * the whole stack. Only for the versions of the core using this
-   * implementation, 8.2 till 8.3.1, the comments below apply.
-   */
-
   /* The reason for the existence of this procedure is
    * the fact that stacking a transform over another
    * transform will leave our internal pointer unchanged,
@@ -3441,7 +3176,8 @@ DownChannel (ctrl)
    * and then returns the superceding channel to that.
    */
 
-  self = ctrl->self;
+  Tcl_Channel self = ctrl->self;
+  Tcl_Channel next;
 
   while ((ClientData) ctrl != Tcl_GetChannelInstanceData (self)) {
     next = Tcl_GetStackedChannel (self);
@@ -3773,22 +3509,17 @@ SeekCalculatePolicies (trans)
    * stack of transformations.
    */
 
-#ifndef USE_TCL_STUBS
-  START (SeekCalculatePolicies);
-  PRINTLN ("8.0., no Tcl_GetStackedChannel, unseekable, no overide");
-
-  TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
-  trans->seekCfg.overideAllowed = 0;
-
-#else
+#ifdef USE_TCL_STUBS
   Tcl_Channel self = trans->self;
   Tcl_Channel next;
 
   int stopped = 0;
+#endif
 
   START (SeekCalculatePolicies);
 
-  if (trans->patchVariant == PATCH_ORIG) {
+#ifdef USE_TCL_STUBS
+  if (!trans->patchIntegrated) {
     PRINTLN ("8.1., no Tcl_GetStackedChannel, unseekable, no overide");
 
     TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
@@ -3838,6 +3569,8 @@ SeekCalculatePolicies (trans)
 	TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
 	trans->seekCfg.overideAllowed = 0;
 	stopped = 1;
+
+	PRINTLN ("stop/break");
 	break;
       }
     } else {
@@ -3884,7 +3617,7 @@ SeekCalculatePolicies (trans)
     }
 
     self = next;
-  }
+  } /* while */
 
   PRINTLN ("Looping done");
 
@@ -3914,6 +3647,12 @@ SeekCalculatePolicies (trans)
       trans->seekCfg.overideAllowed = 1;
     }
   }
+
+#else
+  PRINTLN ("8.0., no Tcl_GetStackedChannel, unseekable, no overide");
+
+  TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
+  trans->seekCfg.overideAllowed = 0;
 #endif
 
   PRINTLN ("Copy ratio chosen :- used");
@@ -3953,17 +3692,35 @@ static void
 SeekInitialize (trans)
      TrfTransformationInstance* trans;
 {
+  Tcl_Channel parent;
+
+#ifdef USE_TCL_STUBS
+  parent = (trans->patchIntegrated ?
+	    DownChannel (trans)    :
+	    trans->parent);
+#else
+  parent = trans->parent;
+#endif
+
   trans->seekState.upLoc         = 0;
   trans->seekState.upBufStartLoc = 0;
   trans->seekState.upBufEndLoc   = 0;
 
   if (trans->seekState.allowed) {
-    trans->seekState.downLoc     = TELL (trans);
-#ifdef USE_TCL_STUBS
-    if (trans->patchVariant == PATCH_832) {
-      trans->seekState.downLoc  -= Tcl_ChannelBuffered (DOWNC (trans));
-    }
-#endif
+    Tcl_ChannelType*    parentType     = Tcl_GetChannelType  (parent);
+    Tcl_DriverSeekProc *parentSeekProc = Tcl_ChannelSeekProc (parentType);
+    int errorCode;
+
+    /*trans->seekState.downLoc     = TRF_TELL (parent);*/
+    trans->seekState.downLoc     =  (*parentSeekProc) (Tcl_GetChannelInstanceData (parent),
+						       0, SEEK_CUR, &errorCode);
+
+    /* Correct down location, take the push back area of the channel
+     * below into account
+     */
+
+    trans->seekState.downLoc    -= Tcl_ChannelBuffered (parent);
+
     trans->seekState.downZero    = trans->seekState.downLoc;
     trans->seekState.aheadOffset = 0;
   } else {
@@ -4067,7 +3824,13 @@ SeekSynchronize (trans, parent)
   ResultClear (&trans->result);
 
   if (offsetDown != 0) {
-    SEEK (trans, offsetDown, SEEK_CUR);
+    Tcl_ChannelType*    parentType     = Tcl_GetChannelType  (parent);
+    Tcl_DriverSeekProc *parentSeekProc = Tcl_ChannelSeekProc (parentType);
+    int errorCodePtr;
+
+    (*parentSeekProc) (Tcl_GetChannelInstanceData (parent), offsetDown, SEEK_CUR, &errorCodePtr);
+
+    /*Tcl_Seek (parent, offsetDown, SEEK_CUR);*/
   }
 
   trans->seekState.downLoc += offsetDown;
@@ -4382,10 +4145,27 @@ SeekDump (trans, place)
      TrfTransformationInstance* trans;
      CONST char*                place;
 {
+  Tcl_Channel parent;
   int         loc;
-  Tcl_Channel parent = DOWNC (trans);
 
-  loc = TELL (trans);
+  Tcl_ChannelType*    parentType;
+  Tcl_DriverSeekProc *parentSeekProc;
+  int errorCode;
+
+#ifdef USE_TCL_STUBS
+  parent = (trans->patchIntegrated ?
+	    DownChannel (trans)    :
+	    trans->parent);
+#else
+  parent = trans->parent;
+#endif
+
+  parentType     = Tcl_GetChannelType  (parent);
+  parentSeekProc = Tcl_ChannelSeekProc (parentType);
+
+  loc = (*parentSeekProc) (Tcl_GetChannelInstanceData (parent), 0, SEEK_CUR, &errorCode);
+
+  /*loc = TRF_TELL (parent);*/
 
 #if 0
   PRINT ("SeekDump (%s) {\n", place); FL; IN;
@@ -4444,318 +4224,3 @@ SeekDump (trans, place)
 #endif
 }
 #endif
-
-/*
- *------------------------------------------------------*
- *
- *	AllocChannelType --
- *
- *	Allocates a new ChannelType structure.
- *	
- *
- *	Sideeffects:
- *		See above.
- *
- *	Result:
- *		A reference to the new structure.
- *
- *------------------------------------------------------*
- */
-
-static Tcl_ChannelType*
-AllocChannelType (sizePtr)
-     int* sizePtr;
-{
-  /*
-   * Allocation of a new channeltype structure is not easy, because of
-   * the various verson of the core and subsequent changes to the
-   * structure. The main challenge is to allocate enough memory for
-   * odern versions even if this extyension is compiled against one
-   * of the older variant!
-   *
-   * (1) Versions before stubs (8.0.x) are simple, because they are
-   *     supported only if the extension is compiled against exactly
-   *     that version of the core.
-   *
-   * (2) With stubs we just determine the difference between the older
-   *     and modern variant and overallocate accordingly if compiled
-   *     against an older variant.
-   */
-
-  int size = sizeof(Tcl_ChannelType); /* Base size */
-
-#ifdef USE_TCL_STUBS
-  /*
-   * Size of a procedure pointer. We assume that all procedure
-   * pointers are of the same size, regardless of exact type
-   * (arguments and return values).
-   *
-   * 8.1.   First version containing close2proc. Baseline.
-   * 8.3.2  Three additional vectors. Moved blockMode, new flush- and
-   *        handlerProc's.
-   *
-   * => Compilation against earlier version has to overallocate three
-   *    procedure pointers.
-   */
-
-#if !(GT832)
-  size += 3 * procPtrSize;
-#endif
-#endif
-
-  if (sizePtr != (int*) NULL) {
-    *sizePtr = size;
-  }
-  return (Tcl_ChannelType*) Tcl_Alloc (size);
-}
-
-/*
- *------------------------------------------------------*
- *
- *	InitializeChannelType --
- *
- *	Initializes a new ChannelType structure.
- *	
- *
- *	Sideeffects:
- *		See above.
- *
- *	Result:
- *		None.
- *
- *------------------------------------------------------*
- */
-
-static Tcl_ChannelType*
-InitializeChannelType (name, patchVariant)
-     CONST char*      name;
-     int              patchVariant;
-{
-  Tcl_ChannelType* tct;
-  int              size;
-
-  /*
-   * Initialization of a new channeltype structure is not easy,
-   * because of the various verson of the core and subsequent changes
-   * to the structure. The main problem is if compiled against an
-   * older version how to access the elements of the structure not
-   * known in that version. It is made a bit easier because the
-   * allocation routine returns the allocated size. This allows us to
-   * clear out the entire structure. So we just have to deal with the
-   * elements to set and not the ones left alone.
-   */
-
-  tct           = AllocChannelType (&size);
-  tct->typeName = (char*) name;
-
-  memset ((VOID*) tct, '\0', size);
-
-  /*
-   * Common elements of the structure (no changes in location or name)
-   */
-
-  tct->closeProc        = TrfClose;
-  tct->inputProc        = TrfInput;
-  tct->outputProc       = TrfOutput;
-  tct->seekProc         = TrfSeek;
-  tct->setOptionProc    = TrfSetOption;
-  tct->getOptionProc    = TrfGetOption;
-  tct->watchProc        = TrfWatch;
-  tct->getHandleProc    = TrfGetFile;
-
-  /*
-   * No need to handle close2Proc. Already cleared with the 'memset'
-   * above.
-   */
-
-  /*
-   * blockModeProc is a twister. For 8.0.x we can access it
-   * immediately. For the higher versions we have to make some
-   * runtime-choices, and their implementation depends on the version
-   * we compile against.
-   */
-
-#ifndef USE_TCL_STUBS
-  /* 8.0.x */
-  tct->blockModeProc    = TrfBlock;
-#else
-#if GT832
-  /* 8.3.2. and higher. Direct access to all elements possible. Use
-   *'patchVariant' information to select the values to use.
-   */
-
-  if ((patchVariant == PATCH_ORIG) ||
-      (patchVariant == PATCH_82)) {
-    /* The 'version' element of 8.3.2 is in the the place of the
-     * blockModeProc. For the original patch in 8.1.x and the firstly
-     * included (8.2) we have to set our blockModeProc into this
-     * place.
-     */
-    tct->version = (Tcl_ChannelTypeVersion) TrfBlock;
-  } else /* patchVariant == PATCH_832 */ {
-    /* For the 8.3.2 core we present ourselves as a version 2
-     * driver. This means a speciial value in version (ex
-     * blockModeProc), blockModeProc in a different place and of
-     * course usage of the handlerProc.
-     */
-
-    tct->version       = TCL_CHANNEL_VERSION_2;
-    tct->blockModeProc = TrfBlock;
-    tct->handlerProc   = TrfNotify;
-  }
-#else
-  /* Same as above, but as we are compiling against an older core we
-   * have to create some definitions for the new elements as the compiler
-   * does not know them by name.
-   */
-
-  if ((patchVariant == PATCH_ORIG) ||
-      (patchVariant == PATCH_82)) {
-    /* The 'version' element of 8.3.2 is in the the place of the
-     * blockModeProc. For the original patch in 8.1.x and the firstly
-     * included (8.2) we have to set our blockModeProc into this
-     * place.
-     */
-    tct->blockModeProc = TrfBlock;
-  } else /* patchVariant == PATCH_832 */ {
-    /* For the 8.3.2 core we present ourselves as a version 2
-     * driver. This means a special value in version (ex
-     * blockModeProc), blockModeProc in a different place and of
-     * course usage of the handlerProc.
-     */
-
-#define TRF_CHANNEL_VERSION_2	((TrfChannelTypeVersion) 0x2)
-
-#define BMP (*((Tcl_DriverBlockModeProc**) (&(tct->close2Proc) + 1)))
-#define HP  (*((TrfDriverHandlerProc**)    (&(tct->close2Proc) + 3)))
-
-    typedef struct TrfChannelTypeVersion_* TrfChannelTypeVersion;
-    typedef int	(TrfDriverHandlerProc) _ANSI_ARGS_((ClientData instanceData,
-						    int interestMask));
-
-    tct->blockModeProc = (Tcl_DriverBlockModeProc*) TRF_CHANNEL_VERSION_2;
-
-    BMP = TrfBlock;
-    HP  = TrfNotify;
-
-#undef BMP
-#undef HP
-#undef TRF_CHANNEL_VERSION_2
-  }
-#endif
-#endif
-
-  return tct;
-}
-
-/*
- *------------------------------------------------------*
- *
- *	TimerKill --
- *
- *	Timer management. Removes the internal timer
- *	if it exists.
- *
- *	Sideeffects:
- *		See above.
- *
- *	Result:
- *		None.
- *
- *------------------------------------------------------*
- */
-
-static void
-TimerKill (trans)
-     TrfTransformationInstance* trans;
-{
-  if (trans->timer != (Tcl_TimerToken) NULL) {
-    /* Delete an existing flush-out timer,
-     * prevent it from firing on removed channel.
-     */
-
-    Tcl_DeleteTimerHandler (trans->timer);
-    trans->timer = (Tcl_TimerToken) NULL;
-
-    PRINT ("Timer deleted ..."); FL;
-  }
-}
-
-/*
- *------------------------------------------------------*
- *
- *	TimerSetup --
- *
- *	Timer management. Creates the internal timer
- *	if it does not exist.
- *
- *	Sideeffects:
- *		See above.
- *
- *	Result:
- *		None.
- *
- *------------------------------------------------------*
- */
-
-static void
-TimerSetup (trans)
-     TrfTransformationInstance* trans;
-{
-  if (trans->timer == (Tcl_TimerToken) NULL) {
-    trans->timer = Tcl_CreateTimerHandler (DELAY, ChannelHandlerTimer,
-					   (ClientData) trans);
-  }
-}
-
-/*
- *------------------------------------------------------*
- *
- *	ChannelHandlerKS --
- *
- *	Management of channel handlers. Deletes/Recreates
- *	as required by the specified mask.
- *
- *	Sideeffects:
- *		See above.
- *
- *	Result:
- *		None.
- *
- *------------------------------------------------------*
- */
-
-static void
-ChannelHandlerKS (trans, mask)
-     TrfTransformationInstance* trans;
-     int                        mask;
-{
-  /*
-   * This procedure is called only for the original and the 8.2
-   * patch. The new 8.2.3 patch does not use channel handlers but a
-   * separate NotifyHandler in the driver.
-   */
-
-  Tcl_Channel parent = DOWNC (trans);
-
-  if (trans->watchMask) {
-    /*
-     * Remove event handler to underlying channel, this could
-     * be because we are closing for real, or being "unstacked".
-     */
-
-    Tcl_DeleteChannelHandler (parent, ChannelHandler,
-			      (ClientData) trans);
-  }
-
-  trans->watchMask = mask;
-
-  if (trans->watchMask) {
-    /*
-     * Setup active monitor for events on underlying Channel
-     */
-
-    Tcl_CreateChannelHandler (parent, trans->watchMask,
-			      ChannelHandler, (ClientData) trans);
-  }
-}

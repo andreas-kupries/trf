@@ -13,7 +13,6 @@
 #
 # $Id$
 
-
 test common-1.0 {common behaviour, error checking} {
     catch {bin} msg; set msg
 } {bin: wrong # args}
