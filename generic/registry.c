@@ -1920,9 +1920,17 @@ Tcl_Interp*        interp;
   }
 
 #ifdef USE_TCL_STUBS
-  trans->self = Tcl_StackChannel (interp, entry->transType,
-				  (ClientData) trans, trans->mode,
-				  attach);
+  if (trans->patchIntegrated) {
+    trans->self = attach;
+
+    Tcl_StackChannel (interp, entry->transType,
+		      (ClientData) trans, trans->mode,
+		      attach);
+  } else {
+    trans->self = Tcl_StackChannel (interp, entry->transType,
+				    (ClientData) trans, trans->mode,
+				    attach);
+  }
 #else
   trans->self = Tcl_ReplaceChannel (interp, entry->transType,
 				    (ClientData) trans, trans->mode,
