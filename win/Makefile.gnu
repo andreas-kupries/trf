@@ -6,13 +6,12 @@
 
 EXTENSION	= Trf
 VERSION		= @mFullVersion@
-#TCL_VERSION	= 81
-TCL_VERSION	= 82
+TCL_VERSION	= 81
 
 TRF_DLL_FILE	    = ${EXTENSION}@mShortDosVersion@.dll
 TRF_LIB_FILE	    = lib${EXTENSION}@mShortDosVersion@.a
 TRF_STATIC_LIB_FILE = lib${EXTENSION}@mShortDosVersion@s.a
-TRF_STUB_LIB_FILE   = lib${EXTENSION}stub@mShortDosVersion@.a
+
 
 SSL_LIBRARY	= -DSSL_LIB_NAME=\"libeay32.dll\"
 BZ2_LIBRARY	= -DBZ2_LIB_NAME=\"bz2.dll\"
@@ -32,7 +31,7 @@ TMPDIR		=	.
 # Directories in which the Tcl core can be found
 TCL_INC_DIR	= /progra~1/tcl/include
 TCL_LIB_DIR	= /progra~1/tcl/lib
-TCL_LIB_SPEC	= /progra~1/tcl/lib/libtclstub$(TCL_VERSION).a
+TCL_LIB_SPEC	= /progra~1/tcl/lib/libtclstub81.a
 
 # Libraries to be included with trf.dll
 TCL_SHARED_LIBS		=
@@ -79,7 +78,7 @@ MAN_INSTALL_DIR =	$(INSTALL_ROOT)$(prefix)/man
 
 # To change the compiler switches, for example to change from -O
 # to -g, change the following line:
-CFLAGS		=	-O2 -mno-cygwin -DNDEBUG -DUSE_TCL_STUBS -D__WIN32__ -DTCL_THREADS -DHAVE_STDLIB_H
+CFLAGS		=	-O2 -mno-cygwin -DNDEBUG -D__WIN32__ -DTCL_THREADS -DHAVE_STDLIB_H
 
 # To disable ANSI-C procedure prototypes reverse the comment characters
 # on the following lines:
@@ -158,7 +157,7 @@ DLLWRAP = dllwrap -mnocygwin
 WINDRES = windres
 
 DLL_LDFLAGS = -mwindows -Wl,-e,_DllMain@12
-DLL_LDLIBS = -L/progra~1/tcl/lib -ltclstub$(TCL_VERSION)
+DLL_LDLIBS = -L/progra~1/tcl/lib -ltclstub81
 
 baselibs   = -lkernel32 $(optlibs) -ladvapi32
 winlibs    = $(baselibs) -luser32 -lgdi32 -lcomdlg32 -lwinspool
@@ -215,7 +214,6 @@ SOURCES	=	../generic/adler.c \
 	../generic/qpcode.c \
 	../generic/reflect.c \
 	../generic/ref_opt.c \
-	../generic/trfStubInit.c \
 	../compat/tclLoadWin.c
 
 
@@ -255,15 +253,13 @@ OBJECTS	=	adler.o \
 	bz2.o \
 	bz2_opt.o \
 	bz2lib.o \
-	qpcode.o \
 	reflect.o \
 	ref_opt.o \
-	trfStubInit.o \
 	tclLoadWin.o
 
 #-------------------------------------------------------#
 
-default:	$(TRF_DLL_FILE) $(TRF_LIB_FILE) $(TRF_STUB_LIB_FILE)
+default:	$(TRF_DLL_FILE) $(TRF_LIB_FILE)
 
 all:	default
 
@@ -272,12 +268,6 @@ test:	$(TRF_DLL_FILE)
 
 
 #-------------------------------------------------------#
-
-trfStubLib.o:	../generic/trfStubLib.c
-	$(CC) -c $(CC_SWITCHES) ../generic/trfStubLib.c -o $@
-
-trfStubInit.o:	../generic/trfStubInit.c
-	$(CC) -c $(CC_SWITCHES) ../generic/trfStubInit.c -o $@
 
 adler.o:	../generic/adler.c
 	$(CC) -c $(CC_SWITCHES) ../generic/adler.c -o $@
@@ -387,9 +377,6 @@ bz2_opt.o:	../generic/zip_opt.c
 bz2lib.o:	../generic/zlib.c
 	$(CC) -c $(CC_SWITCHES) ../generic/bz2lib.c -o $@
 
-qpcode.o:	../generic/qpcode.c
-	$(CC) -c $(CC_SWITCHES) ../generic/qpcode.c -o $@
-
 reflect.o:	../generic/reflect.c
 	$(CC) -c $(CC_SWITCHES) ../generic/reflect.c -o $@
 
@@ -416,11 +403,9 @@ $(TRF_LIB_FILE): trf.def $(TRF_DLL_FILE)
 $(TRF_STATIC_LIB_FILE): $(OBJECTS)
 	$(AR) cr $@ $(OBJECTS)
 
-$(TRF_STUB_LIB_FILE): trfStubLib.o
-	$(AR) cr $@ trfStubLib.o
 
 trf.def: $(OBJECTS)
-	$(DLLTOOL) --export-all --exclude-symbols DllMain@12  --output-def $@ $(OBJECTS)
+	$(DLLTOOL) --export-all --exclude-symbols DllMain@12,DllEntryPoint@0,z  --output-def $@ $(OBJECTS)
 
 trfres.o: trf.rc
 	$(WINDRES) --include . --define VS_VERSION_INFO=1 trf.rc trfres.o

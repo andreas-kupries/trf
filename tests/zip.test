@@ -69,6 +69,7 @@ if {[info tclversion] < 8.0} {
 }
 
 
+
 set data  [info commands]
 set zdata [zip -mode compress $data]
 

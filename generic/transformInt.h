@@ -104,7 +104,6 @@ extern int n;
 #define PRINT if (0) printf
 #endif
 
-
 /* Define macro which is TRUE for tcl versions >= 8.1
  * Required as there are incompatibilities between 8.0 and 8.1
  */
@@ -474,7 +473,6 @@ EXTERN void TrfUnlockIt _ANSI_ARGS_ ((void));
 #define TrfUnlock
 #endif
 
-#include "trfIntDecls.h"
 
 #undef TCL_STORAGE_CLASS
 #define TCL_STORAGE_CLASS DLLIMPORT

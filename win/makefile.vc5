@@ -16,8 +16,6 @@
 #
 # **************************************************************************
 
-VERSION = "@mFullVersion@"
-
 # =======================================================================
 # Specify the root directory of the source distribution of this extension
 # Don't modify this.
@@ -48,9 +46,9 @@ MSVCRT_SYS	= c:\winnt\system32\msvcrt.dll
 # VC 5.x it is split over two directories :-(.
 #
 
-TOOLS32		= c:\progra~1\devstudio\vc
-TOOLS32_rc	= c:\progra~1\devstudio\sharedIDE
-MS_LIBPATH	= c:\progra~1\devstudio\vc\lib
+TOOLS32		= c:\programs\devstudio\vc
+TOOLS32_rc	= c:\programs\devstudio\sharedIDE
+MS_LIBPATH	= c:\programs\devstudio\vc\lib
 
 # For a german installation use
 #
@@ -80,14 +78,14 @@ PKZIP		= pkzip.exe
 # Specify the version of tcl you are using, remove all dots from the
 # number  (8.0.3 => 803)
 
-TCL_SHORTVERS	= 82
+TCL_SHORTVERS	= 80
 
 
 # =======================================================================
 # Path to the installed include files (or the part of the source
 # distribution containing them.
 
-TCL_INCLUDES	= c:\progra~1\tcl\include
+TCL_INCLUDES	= c:\programs\tcl\include
 #TCL_INCLUDES	= c:\programme\tcl\include
 
 
@@ -101,7 +99,7 @@ TCL_INCLUDES	= c:\progra~1\tcl\include
 # The installation path should differ from the above only if a source
 # distribution of tcl is used as the base of the compilation.
 
-TCL_LIBRARIES		= c:\progra~1\tcl\lib
+TCL_LIBRARIES		= c:\programs\tcl\lib
 #TCL_LIBRARIES		= c:\programme\tcl\lib
 
 PKG_INSTALLBASEDIR	= $(TCL_LIBRARIES)
@@ -111,7 +109,7 @@ PKG_INSTALLBASEDIR	= $(TCL_LIBRARIES)
 # Path to the installed interpreters or the part of the source
 # distribution containing them (*after* its compilation).
 
-TCL_BINARIES	= c:\progra~1\tcl\bin
+TCL_BINARIES	= c:\programs\tcl\bin
 #TCL_BINARIES	= c:\programme\tcl\bin
 
 
@@ -134,11 +132,6 @@ NODEBUG=1
 #BINIO=-DENABLE_BINIO
 
 # =======================================================================
-# uncomment the following line if you want to
-# compile with stub support.
-STUBS_FLAG=-DUSE_TCL_STUBS
-
-# =======================================================================
 
 ######################################################################
 # Do not modify below this line
@@ -147,21 +140,17 @@ STUBS_FLAG=-DUSE_TCL_STUBS
 # The interpreters.
 
 TCLSH		= $(TCL_BINARIES)\tclsh$(TCL_SHORTVERS).exe
-TCLLIB		= $(TCL_LIBRARIES)\tclstub$(TCL_SHORTVERS).lib
+TCLLIB		= $(TCL_LIBRARIES)\tcl$(TCL_SHORTVERS).lib
 
 # Base name of the generated library, full names for DLL and its stub,
 # and complete installation directory for the package.
 
 TRF		=	trf@mShortDosVersion@
 TRFLIB		=	$(TRF)$(TCL_SHORTVERS).lib
-TRF_STUB_LIB_FILE=	$(TRF)stub$(TCL_SHORTVERS).lib
-TRFDLL		=	$(TRF).dll
+TRFDLL		=	$(TRF)$(TCL_SHORTVERS).dll
 INSTALLDIR	=	$(PKG_INSTALLBASEDIR)\$(TRF)
 
 # List of the object files to generate and link.
-
-TRFSTUBOBJS	=	\
-	$(TMPDIR)\trfStubLib.obj
 
 TRFOBJS = \
 	$(TMPDIR)\dllEntry.obj \
@@ -204,7 +193,6 @@ TRFOBJS = \
 	$(TMPDIR)\qpcode.obj \
 	$(TMPDIR)\reflect.obj \
 	$(TMPDIR)\ref_opt.obj \
-	$(TMPDIR)\trfStubInit.obj \
 	$(TMPDIR)\tclLoadWin.obj
 
 
@@ -216,7 +204,6 @@ cc32		= $(TOOLS32)\bin\cl.exe
 link32		= $(TOOLS32)\bin\link.exe
 rc32		= $(TOOLS32_rc)\bin\rc.exe
 include32	= -I$(TOOLS32)\include
-lib32		= "$(TOOLS32)\bin\lib.exe"
 CP      	= copy
 RM      	= del
 
@@ -232,7 +219,7 @@ GENERICDIR	= $(ROOT)\generic
 # ... and the compiler flags
 
 TRF_INCLUDES	= -I$(WINDIR) -I$(GENERICDIR) -I$(ROOT) -I$(TCL_INCLUDES)
-TRF_DEFINES	= -nologo -D__WIN32__ -DHAVE_STDLIB_H $(BINIO) $(STUBS_FLAG) $(SSL_LIBRARY) -DBUILD_trf -DBUGS_ON_EXIT
+TRF_DEFINES	= -nologo -D__WIN32__ -DHAVE_STDLIB_H $(BINIO) $(SSL_LIBRARY) -DBUILD_trf -DBUGS_ON_EXIT
 
 
 TRF_CFLAGS	=	$(cdebug) $(cflags) $(cvarsdll) $(include32) \
@@ -295,7 +282,7 @@ cdebug = -Z7 -Od -WX
 !ENDIF
 
 # declarations common to all compiler options
-ccommon = -c -W3 -nologo -YX
+ccommon = -c -W3 -nologo -YX -Dtry=__try -Dexcept=__except
 
 !IF "$(MACHINE)" == "IX86"
 cflags = $(ccommon) -D_X86_=1
@@ -321,8 +308,9 @@ cvarsdll   = $(cvarsmt) -D_DLL
 # Project specific targets	(finally :-)
 ######################################################################
 
-release:    $(TRFDLL) $(TRF_STUB_LIB_FILE)
-all:	    $(TRFDLL) $(TRF_STUB_LIB_FILE)
+release:    $(TRFDLL)
+
+all:	    $(TRFDLL)
 
 test:	    $(TRFDLL)
 	$(TCLSH) <<
@@ -336,8 +324,6 @@ install:	$(TRFDLL)
 	$(CP) $(TRFDLL)              $(INSTALLDIR)\$(TRFDLL)
 	$(CP) $(WINDIR)\pkgIndex.tcl $(INSTALLDIR)\pkgIndex.tcl
 
-$(TRF_STUB_LIB_FILE):  $(TRFSTUBOBJS)
-	$(lib32) /out:$@ $(TRFSTUBOBJS)
 
 $(TRFDLL): $(TRFOBJS) $(TMPDIR)\trf.res
 	$(link32)	$(ldebug) $(dlllflags)	\

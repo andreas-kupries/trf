@@ -8,8 +8,6 @@
 # $Id$
 
 EXTENSION	=	Trf
-LOW_EXTENSION	=	trf
-
 VERSION		=	@mVersion@
 
 #----------------------------------------------------------------
@@ -30,7 +28,6 @@ TCL_INCLUDE_DIR		=	@TCL_INCLUDE_DIR@
 TCL_LIB_DIR		=	@TCL_LIB_DIR@
 TCL_LIB			=	@TCL_LIB@
 TCL_SRC_DIR		=	@TCL_SRC_DIR@
-TCL_VERSION		=	@TCL_VERSION@
 #SSL_INSTALL_DIR		=	/usr/local/ssl
 
 # Directories for zlib / ssl (message digests)
@@ -146,8 +143,6 @@ LIBS = @TRF_LD_SEARCH_FLAGS@ @SHARED_LIBS@
 
 TRF_TESTS	=	@TRF_TESTS@
 TRF_LIB_FILE	=	@TRF_LIB_FILE@
-TRF_STUB_LIB_FILE=	lib$(LOW_EXTENSION)stub$(VERSION).a
-
 ZLIB_LIB_FILE	=	@ZLIB_LIB_FILE@
 LIBDES_LIB_FILE	=	@LIBDES_LIB_FILE@
 
@@ -182,7 +177,6 @@ CC		=	@CC@
 CC_SWITCHES	=	$(CFLAGS) $(TRF_SHLIB_CFLAGS) $(CPPFLAGS)	\
 			-DZ_LIB_NAME=\"$(ZLIB_LIB_FILE)\"		\
 			-DLIBDES_LIB_NAME=\"$(LIBDES_LIB_FILE)\"	\
-			-DTRF_VERSION=\"$(VERSION)\"			\
 			$(LIBDES_OPTS) @TCL_DEFS@ @TRF_DEFS@
 # $(TCL_CC_SWITCHES)
 CPPFLAGS	=	$(DEFINES) $(INCLUDES)
@@ -194,9 +188,7 @@ DEFINES		=	$(PROTO_FLAGS) $(MEM_DEBUG_FLAGS)		\
 			@DEFS@ @TCL_DEFS@ @TRF_DEFS@
 
 HEADER		=	$(GENERIC_HDRS)
-GENERIC_HDRS	=	$(GENERIC_DIR)/transform.h	\
-			$(GENERIC_DIR)/transformInt.h	\
-			$(GENERIC_DIR)/crc.h
+GENERIC_HDRS	=	$(GENERIC_DIR)/transform.h $(GENERIC_DIR)/transformInt.h $(GENERIC_DIR)/crc.h
 
 SOURCES		=	$(BASE_SRC) $(CVT_SRC) $(MD_SRC) $(ECC_SRC) $(COMPRESS_SRC)
 OBJECTS		=	$(BASE_OBJ) $(CVT_OBJ) $(MD_OBJ) $(ECC_OBJ) $(COMPRESS_OBJ)
@@ -209,12 +201,11 @@ BASE_SRC	=	$(GENERIC_DIR)/zlib.c		\
 			$(GENERIC_DIR)/registry.c	\
 			$(GENERIC_DIR)/unstack.c	\
 			$(GENERIC_DIR)/binio.c		\
-			$(GENERIC_DIR)/trfStubInit.c	\
 			$(GENERIC_DIR)/load.c
 
 BASE_OBJ	=	bz2lib.o zlib.o loadman.o init.o	\
 			registry.o unstack.o binio.o load.o	\
-			@DL_OBJS@ trfStubInit.o
+			@DL_OBJS@
 
 #		conversions, base & algorithms
 CVT_SRC		=	$(CVT_BASE_SRC) $(CVT_ALG_SRC)
@@ -291,14 +282,13 @@ APP		=	$(srcdir)/tclsh
 LDFLAGS		=	@LD_FLAGS@
 LOADLIBES	=	@TRF_BUILD_LIB_SPEC@ $(ALL_LIBS)
 
-STUB_OBJ	=	trfStubLib.o
 
 #-------------------------------------------------------#
 
 all:	check-package library
 
 clean:
-	rm -f $(OBJECTS) $(TRF_LIB_FILE) $(TRF_STUB_LIB_FILE) $(APP) $(TCLSH_OBJS) $(DOCTEMP) $(STUB_OBJ)
+	rm -f $(OBJECTS) $(TRF_LIB_FILE) $(APP) $(TCLSH_OBJS) $(DOCTEMP)
 	rm -f TAGS *~ */*~ core*
 
 distclean:	clean
@@ -308,11 +298,10 @@ distclean:	clean
 install:	install-lib install-header @install_other@ install-tools
 
 
-install-lib: $(TRF_LIB_FILE) $(TRF_STUB_LIB_FILE)
+install-lib: $(TRF_LIB_FILE)
 	$(tool)/mkinstalldirs $(LIB_INSTALL_DIR)
 	@echo "Installing $(TRF_LIB_FILE)"
 	@$(INSTALL_DATA) $(TRF_LIB_FILE) $(LIB_INSTALL_DIR)
-	@$(INSTALL_DATA) $(TRF_STUB_LIB_FILE) $(LIB_INSTALL_DIR)
 	@$(RANLIB) $(LIB_INSTALL_DIR)/$(TRF_LIB_FILE)
 	@$(INSTALL_DATA) $(UNIX_DIR)/pkgIndex.tcl $(LIB_INSTALL_DIR)/pkgIndex.tcl
 
@@ -347,7 +336,7 @@ install-tools:
 
 lib:	library
 
-library:	$(TRF_LIB_FILE) $(TRF_STUB_LIB_FILE)
+library:	$(TRF_LIB_FILE)
 	@echo ... done
 
 app:	application
@@ -360,7 +349,6 @@ application:	library $(APP)
 #	touch depend
 
 #-------------------------------------------------------#
-
 TCLSH_PROG	=	@TCLSH_PROG@
 
 TAGS:
@@ -390,12 +378,6 @@ test:	application
 
 #-------------------------------------------------------#
 # generic files
-
-trfStubLib.o:	$(GENERIC_DIR)/trfStubLib.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/trfStubLib.c -o $@
-
-trfStubInit.o:	$(GENERIC_DIR)/trfStubInit.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/trfStubInit.c -o $@
 
 load.o: $(GENERIC_DIR)/load.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/load.c -o $@
@@ -538,9 +520,6 @@ _eprintf.o:	$(TOP_DIR)/compat/_eprintf.c
 
 #-------------------------------------------------------#
 
-$(TRF_STUB_LIB_FILE):	trfStubLib.o
-	$(AR) cr $@ trfStubLib.o
-
 $(TRF_LIB_FILE):	$(OBJECTS)
 	rm -f		$(TRF_LIB_FILE)
 	@MAKE_LIB@
@@ -610,38 +589,7 @@ $(LIBDES_LIB_FILE):	$(LIBDES_OBJ)
 	@MAKE_LIBDES@
 	$(RANLIB)	$(LIBDES_LIB_FILE)
 
-#-------------------------------------------------------#
-#
-# Target to regenerate header files and stub files from the *.decls tables.
-#
 
-TRF_DECLS = \
-	$(GENERIC_DIR)/trf.decls \
-	$(GENERIC_DIR)/trfInt.decls
-
-
-trfDecls.h trfIntDecls.h : genstubs
-
-genstubs: $(GENERIC_DIR)/trf.decls $(GENERIC_DIR)/trfInt.decls
-	tclsh $(tools)/genStubs.tcl $(GENERIC_DIR) \
-		$(GENERIC_DIR)/trf.decls $(GENERIC_DIR)/trfInt.decls
-
-#
-# Target to check that all exported functions have an entry in the stubs
-# tables.
-#
-
-checkstubs:
-	-@for i in `nm -p $(TRF_LIB_FILE) | awk '$$2 ~ /T/ { print $$3 }' \
-		| sort -n`; do \
-		match=0; \
-		for j in $(TRF_DECLS); do \
-		    if [ `grep -c $$i $$j` -gt 0 ]; then \
-			match=1; \
-		    fi; \
-		done; \
-		if [ $$match -eq 0 ]; then echo $$i; fi \
-	done
 
 #-------------------------------------------------------#
 # DO NOT DELETE THIS LINE -- make depend depends on it.

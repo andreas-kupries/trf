@@ -97,7 +97,7 @@ typedef struct _TrfTransformationInstance_ {
   /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com> */
   int flags;         /* currently CHANNEL_ASYNC or zero */
   int watchMask;     /* current TrfWatch mask */
-  
+
   int mode;          /* mode of parent channel,
 		      * OR'ed combination of
 		      * TCL_READABLE, TCL_WRITABLE */
@@ -117,11 +117,13 @@ typedef struct _TrfTransformationInstance_ {
 
   ResultBuffer result;
 
+#if (TCL_MAJOR_VERSION >= 8)
   /* Timer for automatic push out of information sitting in various channel
    * buffers. Used by the fileevent support. See 'ChannelHandler'.
    */
 
   Tcl_TimerToken timer;
+#endif
 
 } TrfTransformationInstance;
 
@@ -133,16 +135,18 @@ typedef struct _TrfTransformationInstance_ {
  * forward declarations of all internally used procedures.
  */
 
-static int
-TrfUnregister _ANSI_ARGS_ ((Tcl_Interp*       interp,
-			    Trf_RegistryEntry* entry));
-
 static void
 TrfDeleteRegistry _ANSI_ARGS_ ((ClientData clientData, Tcl_Interp *interp));
 
+#if (TCL_MAJOR_VERSION >= 8)
 static int
 TrfExecuteObjCmd _ANSI_ARGS_((ClientData clientData, Tcl_Interp* interp,
 			      int objc, struct Tcl_Obj* CONST objv []));
+#else
+static int
+TrfExecuteCmd _ANSI_ARGS_((ClientData clientData, Tcl_Interp* interp,
+			   int argc, char** argv));
+#endif
 
 static void
 TrfDeleteCmd _ANSI_ARGS_((ClientData clientData));
@@ -171,6 +175,20 @@ TrfSeek _ANSI_ARGS_ ((ClientData instanceData, long offset,
 static void
 TrfWatch _ANSI_ARGS_ ((ClientData instanceData, int mask));
 
+#if (TCL_MAJOR_VERSION < 8)
+static int
+TrfReady _ANSI_ARGS_ ((ClientData instanceData, int mask));
+
+static Tcl_File
+TrfGetFile _ANSI_ARGS_ ((ClientData instanceData, int mask));
+
+static int
+TransformImmediate _ANSI_ARGS_ ((Tcl_Interp* interp, Trf_RegistryEntry* entry,
+				 Tcl_Channel source, Tcl_Channel destination,
+				 CONST char* in,
+				 Trf_Options optInfo));
+
+#else
 static int
 TrfGetFile _ANSI_ARGS_ ((ClientData instanceData, int direction,
 			 ClientData* handlePtr));
@@ -180,6 +198,8 @@ TransformImmediate _ANSI_ARGS_ ((Tcl_Interp* interp, Trf_RegistryEntry* entry,
 				 Tcl_Channel source, Tcl_Channel destination,
 				 struct Tcl_Obj* CONST in,
 				 Trf_Options optInfo));
+
+#endif
 
 static int
 AttachTransform _ANSI_ARGS_ ((Trf_RegistryEntry* entry,
@@ -376,14 +396,20 @@ CONST Trf_TypeDefinition* type;
    * filters.
    */
 
-  entry             = (Trf_RegistryEntry*)Tcl_Alloc (sizeof(Trf_RegistryEntry));
-  entry->registry   = registry;
-  entry->transType  = (Tcl_ChannelType*)  Tcl_Alloc (sizeof(Tcl_ChannelType));
-  entry->trfType    = (Trf_TypeDefinition*) type;
-  entry->interp     = interp;
+  entry            = (Trf_RegistryEntry*)Tcl_Alloc (sizeof(Trf_RegistryEntry));
+  entry->registry  = registry;
+  entry->transType = (Tcl_ChannelType*)  Tcl_Alloc (sizeof(Tcl_ChannelType));
+  entry->trfType   = (Trf_TypeDefinition*) type;
+  entry->interp    = interp;
+#if (TCL_MAJOR_VERSION >= 8)
   entry->trfCommand = Tcl_CreateObjCommand (interp, (char*) type->name,
 					    TrfExecuteObjCmd,
 					    (ClientData) entry, TrfDeleteCmd);
+#else
+  entry->trfCommand = Tcl_CreateCommand (interp, (char*) type->name,
+					 TrfExecuteCmd, (ClientData) entry,
+					 TrfDeleteCmd);
+#endif
 
   /*
    * Set up channel type
@@ -401,8 +427,14 @@ CONST Trf_TypeDefinition* type;
   entry->transType->seekProc         = TrfSeek;
   entry->transType->setOptionProc    = NULL;
   entry->transType->getOptionProc    = NULL;
+#if (TCL_MAJOR_VERSION < 8)
+  entry->transType->watchChannelProc = TrfWatch;
+  entry->transType->channelReadyProc = TrfReady;
+  entry->transType->getFileProc      = TrfGetFile;
+#else
   entry->transType->watchProc        = TrfWatch;
   entry->transType->getHandleProc    = TrfGetFile;
+#endif
 
 #if GT81
   /* No additional close procedure. It is not possible to partially close a
@@ -440,8 +472,8 @@ CONST Trf_TypeDefinition* type;
  *------------------------------------------------------*
  */
 
-static int
-TrfUnregister (interp, entry)
+int
+Trf_Unregister (interp, entry)
 Tcl_Interp*        interp;
 Trf_RegistryEntry* entry;
 {
@@ -512,11 +544,210 @@ Tcl_Interp* interp;
 #define DELETE_OPTINFO         if (optInfo) (*OPT->deleteProc) (optInfo, CLT)
 #define CHECK_OPTINFO(baseOpt) (optInfo ? (*OPT->checkProc) (optInfo, interp, &baseOpt, CLT) : TCL_OK)
 #define SET_OPTION(opt,optval) (optInfo ? (*OPT->setProc) (optInfo, interp, opt, optval, CLT) : TCL_ERROR)
-
-#define SET_OPTION_OBJ(opt,optval) (optInfo ? (*OPT->setObjProc) (optInfo, interp, opt, optval, CLT) : TCL_ERROR)
-
 #define ENCODE_REQUEST(entry,optInfo) (optInfo ? (*OPT->queryProc) (optInfo, CLT) : 1)
 
+#if (TCL_MAJOR_VERSION < 8)
+/*
+ *------------------------------------------------------*
+ *
+ *	TrfExecuteCmd --
+ *
+ *	------------------------------------------------*
+ *	Implementation procedure for all transformations.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		Mostly as defined by 'Transform' or
+ *		'AttachTransform'. Leaves a message in
+ *		the interpreter result area in case of
+ *		an error.
+ *
+ *	Result:
+ *		A standard TCL error code.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+TrfExecuteCmd (clientData, interp, argc, argv)
+ClientData  clientData;
+Tcl_Interp* interp;
+int         argc;
+char**      argv;
+{
+  int                res, len;
+  /*  Tcl_Channel        source, destination; */
+  /*  int                src_mode, dst_mode;  */
+  const char*        cmd;
+  const char*        option;
+  const char*        optarg;
+  Trf_RegistryEntry* entry;
+  Trf_Options        optInfo;
+  Trf_BaseOptions    baseOpt;
+  int                mode;
+  int                wrong_mod2;
+
+  baseOpt.attach      = (Tcl_Channel) NULL;
+  baseOpt.attach_mode = 0;
+  baseOpt.source      = (Tcl_Channel) NULL;
+  baseOpt.destination = (Tcl_Channel) NULL;
+
+  entry = (Trf_RegistryEntry*) clientData;
+  cmd   = argv [0];
+
+  argc --;
+  argv ++;
+
+  optInfo = CREATE_OPTINFO;
+
+  while ((argc > 0) && (argv [0][0] == '-')) {
+    /*
+     * Process options, as long as they are found
+     */
+
+    if (0 == strcmp (argv[0], "--")) {
+      /* end of option list */
+      argc--, argv++;
+      break;
+    }
+
+    if (argc < 2) {
+      /* option, but without argument */
+
+      Tcl_AppendResult (interp, cmd, ": wrong # args", (char*) NULL);
+      goto cleanup_after_error;      
+    }
+
+    option = argv [0];
+    optarg = argv [1];
+
+    argc -= 2;
+    argv += 2;
+
+    len = strlen (option);
+    
+    if (len < 2)
+      goto unknown_option;
+
+    switch (option [1])
+      {
+      case 'a':
+	if (0 != strncmp (option, "-attach", len))
+	  goto check_for_trans_option;
+
+	baseOpt.attach = Tcl_GetChannel (interp, (char*) optarg,
+					 &baseOpt.attach_mode);
+	if (baseOpt.attach == (Tcl_Channel) NULL)
+	  goto cleanup_after_error;
+	break;
+
+      case 'i':
+	if (0 != strncmp (option, "-in", len))
+	  goto check_for_trans_option;
+
+	baseOpt.source = Tcl_GetChannel (interp, (char*) optarg, &mode);
+	if (baseOpt.source == (Tcl_Channel) NULL)
+	  goto cleanup_after_error;
+
+	if (! (mode & TCL_READABLE)) {
+	  Tcl_AppendResult (interp, cmd, ": source-channel not readable",
+			    (char*) NULL);
+	  goto cleanup_after_error;
+	}
+	break;
+
+      case 'o':
+	if (0 != strncmp (option, "-out", len))
+	  goto check_for_trans_option;
+
+	baseOpt.destination = Tcl_GetChannel (interp, (char*) optarg, &mode);
+	if (baseOpt.destination == (Tcl_Channel) NULL)
+	  goto cleanup_after_error;
+
+	if (! (mode & TCL_WRITABLE)) {
+	  Tcl_AppendResult (interp, cmd, ": destination-channel not writable",
+			    (char*) NULL);
+	  goto cleanup_after_error;
+	}
+	break;
+
+      default:
+      check_for_trans_option:
+	res = SET_OPTION (option, optarg);
+	if (res != TCL_OK)
+	  goto cleanup_after_error;
+	break;
+      } /* switch option */
+  } /* while options */
+
+  /*
+   * Check argument restrictions, insert defaults if necessary,
+   * execute the required operation.
+   *
+   * -attach => -in, -out not allowed, and reverse.
+   */
+
+  if ((baseOpt.attach != (Tcl_Channel) NULL) &&
+      ((baseOpt.source      != (Tcl_Channel) NULL) ||
+       (baseOpt.destination != (Tcl_Channel) NULL))) {
+    Tcl_AppendResult (interp, cmd,
+	      ": inconsistent options, -in/-out not allowed with -attach",
+		      (char*) NULL);
+    goto cleanup_after_error;
+  }
+
+  if ((baseOpt.source == (Tcl_Channel) NULL) &&
+      (baseOpt.attach == (Tcl_Channel) NULL))
+    wrong_mod2 = 0;
+  else
+    wrong_mod2 = 1;
+
+  if (wrong_mod2 == (argc % 2)) {
+      Tcl_AppendResult (interp, cmd, ": wrong # args", (char*) NULL);
+      goto cleanup_after_error;
+  }
+
+  res = CHECK_OPTINFO (baseOpt);
+  if (res != TCL_OK)
+    goto cleanup_after_error;
+
+  if (baseOpt.attach == (Tcl_Channel) NULL) /* TRF_IMMEDIATE */ {
+    /*
+     * Immediate execution of transformation requested.
+     *
+     * 4 possible cases:
+     * % argv [0] -> result
+     * % argv [0] -> channel	(-out)
+     * % channel  -> result	(-in)
+     * % channel  -> channel	(-in, -out)
+     */
+
+    res = TransformImmediate (interp, entry,
+			      baseOpt.source, baseOpt.destination,
+			      argv [0], optInfo);
+  } else /* TRF_ATTACH */ {
+    /*
+     * User requested attachment of transformation procedure to a channel.
+     */
+
+    res = AttachTransform (entry, baseOpt.attach, optInfo, interp);
+  }
+
+  DELETE_OPTINFO;
+  return res;
+
+
+unknown_option:
+  Tcl_AppendResult (interp, cmd, ": unknown option '", option, "'",
+		    (char*) NULL);
+  /* fall through to cleanup */
+
+cleanup_after_error:
+  DELETE_OPTINFO;
+  return TCL_ERROR;
+}
+
+#else /* -> TCL_MAJOR_VERSION >= 8 */
 /*
  *------------------------------------------------------*
  *
@@ -548,6 +779,8 @@ struct Tcl_Obj* CONST * objv;
    * as defined in 'TrfExecuteCmd'.
    */
 
+#define SET_OPTION_OBJ(opt,optval) (optInfo ? (*OPT->setObjProc) (optInfo, interp, opt, optval, CLT) : TCL_ERROR)
+
   int                res, len;
   /*  Tcl_Channel        source, destination;*/
   /*  int                src_mode, dst_mode;*/
@@ -560,13 +793,14 @@ struct Tcl_Obj* CONST * objv;
   int                mode;
   int                wrong_mod2;
 
+
   START (TrfExecuteObjCmd);
 #ifdef TRF_DEBUG
   {
     int i;
     for (i = 0; i < objc; i++) {
       PRINT ("Argument [%03d] = \"%s\"\n",
-	     i, Tcl_GetStringFromObj (objv [i], NULL)); FL;
+ 	     i, Tcl_GetStringFromObj (objv [i], NULL)); FL;
     }
   }
 #endif
@@ -624,8 +858,10 @@ struct Tcl_Obj* CONST * objv;
 	baseOpt.attach = Tcl_GetChannel (interp,
 					 Tcl_GetStringFromObj (optarg, NULL),
 					 &baseOpt.attach_mode);
-	if (baseOpt.attach == (Tcl_Channel) NULL)
+	if (baseOpt.attach == (Tcl_Channel) NULL) {
+	  OT;
 	  goto cleanup_after_error;
+	}
 	break;
 
       case 'i':
@@ -635,13 +871,16 @@ struct Tcl_Obj* CONST * objv;
 	baseOpt.source = Tcl_GetChannel (interp,
 					 Tcl_GetStringFromObj (optarg, NULL),
 					 &mode);
-	if (baseOpt.source == (Tcl_Channel) NULL)
+	if (baseOpt.source == (Tcl_Channel) NULL) {
+	  OT;
 	  goto cleanup_after_error;
+	}
 
 	if (! (mode & TCL_READABLE)) {
 	  Tcl_AppendResult (interp, cmd,
 			    ": source-channel not readable",
 			    (char*) NULL);
+	  OT;
 	  goto cleanup_after_error;
 	}
 	break;
@@ -654,7 +893,6 @@ struct Tcl_Obj* CONST * objv;
 					      Tcl_GetStringFromObj (optarg,
 								    NULL),
 					      &mode);
-
 	if (baseOpt.destination == (Tcl_Channel) NULL) {
 	  OT;
 	  goto cleanup_after_error;
@@ -763,7 +1001,6 @@ struct Tcl_Obj* CONST * objv;
 
 unknown_option:
   PRINT ("Unknown option \"%s\"\n", option); FL; OT;
-
   Tcl_AppendResult (interp, cmd, ": unknown option '", option, "'",
 		    (char*) NULL);
   /* fall through to cleanup */
@@ -773,6 +1010,7 @@ cleanup_after_error:
   DONE (TrfExecuteObjCmd);
   return TCL_ERROR;
 }
+#endif /* TCL_MAJOR_VERSION < 8 */
 
 /*
  *------------------------------------------------------*
@@ -801,10 +1039,9 @@ ClientData clientData;
   Trf_RegistryEntry* entry;
 
   START (TrfDeleteCmd);
-
   entry = (Trf_RegistryEntry*) clientData;
 
-  TrfUnregister (entry->interp, entry);
+  Trf_Unregister (entry->interp, entry);
   DONE (TrfDeleteCmd);
 }
 
@@ -838,14 +1075,14 @@ int mode;
 {
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
   char                   block [2] = {0,0};
-  Tcl_Channel            parent;
+  Tcl_Channel parent;
 
   START (TrfBlock);
   PRINT ("Mode = %d\n", mode); FL;
 
 #ifdef USE_TCL_STUBS
   parent = (trans->patchIntegrated ?
-	    DownChannel (trans)    :
+	    trans->self : /* 'self' already refers to our parent */
 	    trans->parent);
 #else
   parent = trans->parent;
@@ -860,7 +1097,6 @@ int mode;
   }
 
   Tcl_SetChannelOption (NULL, parent, "-blocking", block);
-
   DONE (TrfBlock);
   return 0;
 }
@@ -896,13 +1132,13 @@ Tcl_Interp* interp;
    */
 
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
-  Tcl_Channel               parent;
+  Tcl_Channel parent;
 
   START (TrfClose);
 
 #ifdef USE_TCL_STUBS
   parent = (trans->patchIntegrated ?
-	    trans->self            : /* 'self' already refers to our parent */
+	    DownChannel (trans)    :
 	    trans->parent);
 #else
   parent = trans->parent;
@@ -923,7 +1159,6 @@ Tcl_Interp* interp;
 
     Tcl_DeleteTimerHandler (trans->timer);
     trans->timer = (Tcl_TimerToken) NULL;
-
     PRINT ("Timer deleted ..."); FL;
   }
 
@@ -944,8 +1179,6 @@ Tcl_Interp* interp;
 
   if (trans->mode & TCL_READABLE) {
     if (!trans->readIsFlushed) {
-      PRINT ("in_.flushproc\n"); FL;
-
       trans->readIsFlushed = 1;
       trans->in.vectors->flushProc (trans->in.control,
 				    (Tcl_Interp*) NULL,
@@ -954,20 +1187,16 @@ Tcl_Interp* interp;
   }
 
   if (trans->mode & TCL_WRITABLE) {
-    PRINT ("out.deleteproc\n"); FL;
     trans->out.vectors->deleteProc (trans->out.control, trans->clientData);
   }
 
   if (trans->mode & TCL_READABLE) {
-    PRINT ("in_.deleteproc\n"); FL;
     trans->in.vectors->deleteProc  (trans->in.control,  trans->clientData);
   }
 
-  if (trans->result.allocated) {
+  if (trans->result.allocated)
     Tcl_Free ((char*) trans->result.buf);
-  }
 
-  DONE (TrfClose);
   return TCL_OK;
 }
 
@@ -998,16 +1227,13 @@ int*       errorCodePtr;
 {
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
   int gotBytes, read, i, res;
-  Tcl_Channel parent;
-
-  START (TrfInput);
 
 #ifdef USE_TCL_STUBS
-  parent = (trans->patchIntegrated ?
-	    DownChannel (trans)    :
-	    trans->parent);
+  Tcl_Channel parent = (trans->patchIntegrated ?
+			DownChannel (trans)    :
+			trans->parent);
 #else
-  parent = trans->parent;
+  Tcl_Channel parent = trans->parent;
 #endif
 
   /* should assert (trans->mode & TCL_READABLE) */
@@ -1037,7 +1263,6 @@ int*       errorCodePtr;
 	gotBytes    += toRead;
 	toRead = 0;
 
-	PRINT ("gotBytes = %d\n", gotBytes); FL; DONE (TrfInput);
 	return gotBytes;
 
       } else {
@@ -1061,19 +1286,13 @@ int*       errorCodePtr;
      * information read from the parent channel.
      */
 
-    PRINT ("Get more...\n"); FL; IN;
-
     read = Tcl_Read (parent, buf, toRead);
-
-    OT; PRINT ("Got %d\n", read); FL;
 
     if (read < 0) {
       /* Report errors to caller.
        */
 
       *errorCodePtr = Tcl_GetErrno ();
-
-      PRINT ("error %d\n", Tcl_GetErrno ()); FL; DONE (TrfInput);
       return -1;      
     }
 
@@ -1094,20 +1313,15 @@ int*       errorCodePtr;
       if (! Tcl_Eof (parent)) {
 	if (gotBytes == 0 && trans->flags & CHANNEL_ASYNC) {
 	  *errorCodePtr = EWOULDBLOCK;
-	  PRINT ("error EWOULDBLOCK\n"); FL; DONE (TrfInput);
 	  return -1;
 	} else {
-	  PRINT ("gotBytes = %d\n", gotBytes); FL; DONE (TrfInput);
 	  return gotBytes;
 	}
       } else {
 	if (trans->readIsFlushed) {
 	  /* already flushed, nothing to do anymore */
-	  DONE (TrfInput);
 	  return gotBytes;
 	}
-
-	PRINT ("in_.flushproc\n"); FL;
 
 	trans->readIsFlushed = 1;
 	res = trans->in.vectors->flushProc (trans->in.control,
@@ -1115,7 +1329,6 @@ int*       errorCodePtr;
 					    trans->clientData);
 	if (trans->result.used == 0) {
 	  /* we had nothing to flush */
-	  PRINT ("gotBytes = %d\n", gotBytes); FL; DONE (TrfInput);
 	  return gotBytes;
 	}
 	continue; /* at: while (toRead > 0) */
@@ -1125,15 +1338,11 @@ int*       errorCodePtr;
     /* transform the read chunk */
 
     if (trans->in.vectors->convertBufProc){ 
-      PRINT ("in_.convertbufproc\n"); FL;
-
       res = trans->in.vectors->convertBufProc (trans->in.control,
 					       (unsigned char*) buf, read,
 					       (Tcl_Interp*) NULL,
 					       trans->clientData);
     } else {
-      PRINT ("in_.convertproc\n"); FL;
-
       res = TCL_OK;
       for (i=0; i < read; i++) {
 	res = trans->in.vectors->convertProc (trans->in.control, buf [i],
@@ -1147,12 +1356,10 @@ int*       errorCodePtr;
 
     if (res != TCL_OK) {
       *errorCodePtr = EINVAL;
-      PRINT ("error EINVAL\n"); FL; DONE (TrfInput);
       return -1;
     }
   } /* while toRead > 0 */
 
-  PRINT ("gotBytes = %d\n", gotBytes); FL; DONE (TrfInput);
   return gotBytes;
 }
 
@@ -1185,8 +1392,6 @@ int*       errorCodePtr;
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
   int i, res;
 
-  START (TrfOutput);
-
   /* should assert (trans->mode & TCL_WRITABLE) */
 
   /*
@@ -1198,22 +1403,16 @@ int*       errorCodePtr;
   if (toWrite == 0) {
     /* Nothing came in to write, ignore the call
      */
-
-    PRINT ("Nothing to write\n"); FL; DONE (TrfOutput);
     return 0;
   }
 
 
   if (trans->out.vectors->convertBufProc){ 
-    PRINT ("out.convertbufproc\n"); FL;
-
     res = trans->out.vectors->convertBufProc (trans->out.control,
 					      (unsigned char*) buf, toWrite,
 					      (Tcl_Interp*) NULL,
 					      trans->clientData);
   } else {
-    PRINT ("out.convertproc\n"); FL;
-
     res = TCL_OK;
     for (i=0; i < toWrite; i++) {
       res = trans->out.vectors->convertProc (trans->out.control, buf [i],
@@ -1227,11 +1426,9 @@ int*       errorCodePtr;
 
   if (res != TCL_OK) {
     *errorCodePtr = EINVAL;
-    PRINT ("error EINVAL\n"); FL; DONE (TrfInput);
     return -1;
   }
 
-  PRINT ("Written: %d\n", toWrite); FL; DONE (TrfOutput);
   return toWrite;
 }
 
@@ -1269,17 +1466,13 @@ int*       errorCodePtr;	/* Location of error flag. */
 {
   int result;
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
-  Tcl_Channel parent;
-
-  START (TrfSeek);
-  PRINT ("(Mode = %d, Offsset = %d)\n", mode, offset); FL;
 
 #ifdef USE_TCL_STUBS
-  parent = (trans->patchIntegrated ?
-	    DownChannel (trans)    :
-	    trans->parent);
+  Tcl_Channel parent = (trans->patchIntegrated ?
+			DownChannel (trans)    :
+			trans->parent);
 #else
-  parent = trans->parent;
+  Tcl_Channel parent = trans->parent;
 #endif
 
   /*
@@ -1287,22 +1480,18 @@ int*       errorCodePtr;	/* Location of error flag. */
    */
 
   if (trans->mode & TCL_WRITABLE) {
-    PRINT ("out.flushproc\n"); FL;
     trans->out.vectors->flushProc (trans->out.control,
 				   (Tcl_Interp*) NULL,
 				   trans->clientData);
   }
 
   if (trans->mode & TCL_READABLE) {
-    PRINT ("out.clearproc\n"); FL;
     trans->in.vectors->clearProc  (trans->in.control, trans->clientData);
     trans->readIsFlushed = 0;
   }
 
   result = Tcl_Seek (parent, offset, mode);
-  *errorCodePtr = (result == -1) ? Tcl_GetErrno () : 0;
-
-  DONE (TrfSeek);
+  *errorCodePtr = (result == -1) ? Tcl_GetErrno ():0;
   return result;
 }
 
@@ -1351,19 +1540,14 @@ int        mask;		/* Events of interest */
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
   Tcl_Channel               parent;
 
-  START (TrfWatch);
-
   if (mask == trans->watchMask) {
     /* No changes in the expressed interest, skip this call.
      */
-    DONE (TrfWatch);
     return;
   }
 
 #ifdef USE_TCL_STUBS
-  parent = (trans->patchIntegrated ?
-	    DownChannel (trans)    :
-	    trans->parent);
+  parent = (trans->patchIntegrated ? DownChannel (trans) : trans->parent);
 #else
   parent = trans->parent;
 #endif
@@ -1384,10 +1568,82 @@ int        mask;		/* Events of interest */
     Tcl_CreateChannelHandler (parent, trans->watchMask,
 			      ChannelHandler, (ClientData) trans);
   }
-
-  DONE (TrfWatch);
 }
 
+#if (TCL_MAJOR_VERSION < 8)
+/*
+ *------------------------------------------------------*
+ *
+ *	TrfReady --
+ *
+ *	------------------------------------------------*
+ *	Called by the notifier to check whether events
+ *	of interest are present on the channel.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		None.
+ *
+ *	Result:
+ *		Returns OR-ed combination of TCL_READABLE,
+ *		TCL_WRITABLE and TCL_EXCEPTION to indicate
+ *		which events of interest are present.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+TrfReady (instanceData, mask)
+ClientData instanceData;	/* Channel to query */
+int        mask;		/* Mask of queried events */
+{
+  /*
+   * Forward request to channel we are stacked upon.
+   */
+
+  TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
+  Tcl_ChannelType*         p_type = Tcl_GetChannelType         (trans->parent);
+  ClientData           p_instance = Tcl_GetChannelInstanceData (trans->parent);
+
+  return p_type->channelReadyProc (p_instance, mask);
+}
+#endif /* (TCL_MAJOR_VERSION < 8) */
+
+#if (TCL_MAJOR_VERSION < 8)
+/*
+ *------------------------------------------------------*
+ *
+ *	TrfGetFile --
+ *
+ *	------------------------------------------------*
+ *	Called from Tcl_GetChannelFile to retrieve
+ *	Tcl_Files from inside this channel.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		None.
+ *
+ *	Result:
+ *		The appropriate Tcl_File or NULL if not
+ *		present. 
+ *
+ *------------------------------------------------------*
+ */
+	/* ARGSUSED */
+static Tcl_File
+TrfGetFile (instanceData, mask)
+ClientData instanceData;	/* Channel to query */
+int        mask;		/* Direction of interest */
+{
+  /*
+   * return file belonging to parent channel
+   */
+
+  TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
+
+  return Tcl_GetChannelFile (trans->parent, mask);
+}
+#else
 /*
  *------------------------------------------------------*
  *
@@ -1407,7 +1663,6 @@ int        mask;		/* Events of interest */
  *
  *------------------------------------------------------*
  */
-
 static int
 TrfGetFile (instanceData, direction, handlePtr)
 ClientData  instanceData;	/* Channel to query */
@@ -1419,21 +1674,18 @@ ClientData* handlePtr;		/* Place to store the handle into */
    */
 
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
-  Tcl_Channel parent;
-
-  START (TrfGetFile);
 
 #ifdef USE_TCL_STUBS
-  parent = (trans->patchIntegrated ?
-	    DownChannel (trans)    :
-	    trans->parent);
+  Tcl_Channel parent = (trans->patchIntegrated ?
+			DownChannel (trans)    :
+			trans->parent);
 #else
-  parent = trans->parent;
+  Tcl_Channel parent = trans->parent;
 #endif
 
-  DONE (TrfGetFile);
   return Tcl_GetChannelHandle (parent, direction, handlePtr);
 }
+#endif
 
 /*
  *------------------------------------------------------*
@@ -1461,7 +1713,11 @@ Tcl_Interp*        interp;
 Trf_RegistryEntry* entry;
 Tcl_Channel        source;
 Tcl_Channel        destination;
+#if (TCL_MAJOR_VERSION < 8)
+CONST char*        in;
+#else
 struct Tcl_Obj* CONST in;
+#endif
 Trf_Options        optInfo;
 {
   Trf_Vectors*     v;
@@ -1470,13 +1726,10 @@ Trf_Options        optInfo;
 
   ResultBuffer r;
 
-  START (TransformImmediate);
-
-  if (ENCODE_REQUEST (entry, optInfo)) {
+  if (ENCODE_REQUEST (entry, optInfo))
     v = &(entry->trfType->encoder);
-  } else {
+  else
     v = &(entry->trfType->decoder);
-  }
 
   /* Take care of output (channel vs. interpreter result area).
    */
@@ -1513,6 +1766,12 @@ Trf_Options        optInfo;
     int            length;
     unsigned char* buf;
 
+#if (TCL_MAJOR_VERSION < 8)
+    /* 7.6, argument 'in' is a string.
+     */
+    length = strlen (in);
+    buf    = (unsigned char*) in;
+#else
     /* 8.x, argument 'in' is arbitrary object, its string rep. may contain \0.
      */
 #if GT81
@@ -1520,6 +1779,8 @@ Trf_Options        optInfo;
 #else
     buf = (unsigned char*) Tcl_GetStringFromObj (in, &length);
 #endif
+#endif
+
     if (v->convertBufProc) {
       /* play it safe, use a copy, avoid clobbering the input. */
       unsigned char* tmp;
@@ -1534,7 +1795,7 @@ Trf_Options        optInfo;
       Tcl_Free ((char*) tmp);
     } else {
       unsigned int i, c;
-      
+
       PRINT ("___.convertproc\n"); FL;
 
       for (i=0; i < ((unsigned int) length); i++) {
@@ -1549,7 +1810,6 @@ Trf_Options        optInfo;
 
     if (res == TCL_OK) {
       PRINT ("___.flushproc\n"); FL;
-
       res = v->flushProc (control, interp, entry->trfType->clientData);
     }
   } else {
@@ -1572,7 +1832,6 @@ Trf_Options        optInfo;
 
       if (v->convertBufProc) {
 	PRINT ("___.convertbufproc\n"); FL;
-
 	res = v->convertBufProc (control, buf, actuallyRead, interp,
 				 entry->trfType->clientData);
       } else {
@@ -1615,14 +1874,26 @@ Trf_Options        optInfo;
       Tcl_ResetResult (interp);
 
       if (r.buf != NULL) {
+#if (TCL_MAJOR_VERSION < 8)
+	/*
+	 * r.buf is always overallocated, see 'PutInterpResult'.
+	 * No danger in simply writing the '\0'. Do this to
+	 * prevent setting a string longer than given as result.
+	 */
+ 
+	r.buf [r.used] = '\0';
+	Tcl_AppendResult (interp, r.buf, (char*) NULL);
+#else
 #if GT81
- 	Tcl_Obj* o = Tcl_NewByteArrayObj ((char*) r.buf, r.used);
+	Tcl_Obj* o = Tcl_NewByteArrayObj ((char*) r.buf, r.used);
 #else
 	Tcl_Obj* o = Tcl_NewStringObj ((char*) r.buf, r.used);
 #endif
+
 	Tcl_IncrRefCount (o);
 	Tcl_SetObjResult (interp, o);
 	Tcl_DecrRefCount (o);
+#endif
       }
     }
   }
@@ -1660,9 +1931,9 @@ Tcl_Interp*        interp;
 {
   TrfTransformationInstance* trans;
 
-  trans = (TrfTransformationInstance*) Tcl_Alloc (sizeof (TrfTransformationInstance));
-
   START (AttachTransform);
+
+  trans = (TrfTransformationInstance*) Tcl_Alloc (sizeof (TrfTransformationInstance));
 
   trans->patchIntegrated = entry->registry->patchIntegrated;
 
@@ -1710,8 +1981,6 @@ Tcl_Interp*        interp;
    */
 
   if (trans->mode & TCL_WRITABLE) {
-    PRINT ("out.createproc\n"); FL;
-
     trans->out.control = trans->out.vectors->createProc ((ClientData) trans,
 							 PutDestination,
 							 optInfo, interp,
@@ -1725,8 +1994,6 @@ Tcl_Interp*        interp;
   }
 
   if (trans->mode & TCL_READABLE) {
-    PRINT ("in_.createproc\n"); FL;
-
     trans->in.control  = trans->in.vectors->createProc  ((ClientData) trans,
 							 PutTrans,
 							 optInfo, interp,
@@ -1819,17 +2086,13 @@ Tcl_Interp*    interp;
 {
   TrfTransformationInstance* trans = (TrfTransformationInstance*) clientData;
   int         res;
-  Tcl_Channel parent;
-
-  START (PutDestination);
-  PRINT ("Data = {%d, \"%s\"}\n", outLen, outString);
 
 #ifdef USE_TCL_STUBS
-  parent = (trans->patchIntegrated ?
-	    DownChannel (trans)    :
-	    trans->parent);
+  Tcl_Channel parent = (trans->patchIntegrated ?
+			DownChannel (trans)    :
+			trans->parent);
 #else
-  parent = trans->parent;
+  Tcl_Channel parent = trans->parent;
 #endif
 
   res = Tcl_Write (parent, (char*) outString, outLen);
@@ -1841,11 +2104,9 @@ Tcl_Interp*    interp;
       Tcl_AppendResult (interp, "\": ",                      (char*) NULL);
       Tcl_AppendResult (interp, Tcl_PosixError (interp),     (char*) NULL);
     }
-    DONE (PutDestination);
     return TCL_ERROR;
   }
 
-  DONE (PutDestination);
   return TCL_OK;
 }
 
@@ -1878,9 +2139,6 @@ Tcl_Interp*    interp;
 {
   TrfTransformationInstance* trans = (TrfTransformationInstance*) clientData;
 
-  START (PutTrans);
-  PRINT ("Data = {%d, \"%s\"}\n", outLen, outString);
-
   if ((outLen + trans->result.used) > trans->result.allocated) {
     /*
      * Extension of internal buffer required.
@@ -1900,7 +2158,6 @@ Tcl_Interp*    interp;
   memcpy (trans->result.buf + trans->result.used, outString, outLen);
   trans->result.used += outLen;
 
-  DONE (PutTrans);
   return TCL_OK;
 }
 
@@ -1933,8 +2190,10 @@ Tcl_Interp*    interp;
 {
   ResultBuffer* r = (ResultBuffer*) clientData;
 
-  START (PutInterpResult);
-  PRINT ("Data = {%d, \"%s\"}\n", outLen, outString);
+#if 0
+  printf ("-- %d '%s'\n", outLen, outString);
+  fflush (stdout);
+#endif
 
   if ((outLen+1 + r->used) > r->allocated) {
     /*
@@ -1955,7 +2214,6 @@ Tcl_Interp*    interp;
   memcpy (r->buf + r->used, outString, outLen);
   r->used += outLen;
 
-  DONE (PutInterpResult);
   return TCL_OK;
 }
 
@@ -1999,6 +2257,7 @@ int            mask;
     Tcl_NotifyChannel (trans->self, mask);
   }
 
+#if (TCL_MAJOR_VERSION >= 8)
   /* Check the I/O-Buffers of this channel for waiting information.
    * Setup a timer generating an artificial event for us if we have
    * such. A timer is used to prevent starvation of other event sources.
@@ -2029,6 +2288,7 @@ int            mask;
 					     (ClientData) trans);
     }
   }
+#endif
 }
 
 /*

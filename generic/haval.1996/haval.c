@@ -65,7 +65,7 @@
 #include "havalapp.h"
 #include "haval.h"
 
-#undef  VERSION 
+#undef  VERSION
 #define VERSION    1                         /* current version number */
 
 void haval_string _ANSI_ARGS_((char *, unsigned char *)); /* hash a string */
@@ -280,8 +280,6 @@ int haval_file (file_name, fingerprint)
  }
 }
 
-#ifndef __WIN32__
-
 /* hash input from stdin */
 void haval_stdin ()
 {
@@ -301,8 +299,6 @@ void haval_stdin ()
     putchar(fingerprint[i]);
   }
 }
-
-#endif
 
 /* initialization */
 void haval_start (state)

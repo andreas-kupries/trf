@@ -21,8 +21,6 @@ if {[info tclversion] < 8.0} {
     package require Memchan
 }
 
-package require Trf
-
 if {![info exists VERBOSE]} {
     set VERBOSE 0
 }
@@ -599,6 +597,7 @@ proc defConstraints {args} {
 	set testConfig($k) 1
     }
 }
+
 
 
 
