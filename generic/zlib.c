@@ -1,4 +1,4 @@
-*
+/*
  * zlib.c --
  *
  *	Loader for 'zlib' compression library.
