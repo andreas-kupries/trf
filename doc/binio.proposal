@@ -246,8 +246,8 @@ seed. The following procedure implements this:
 
 proc hash {chan seed} {
     set hash 0
-    while {[expr [binio unpack $chan "%d" l] > 0]} {
-	set hash [expr $hash + ($l ^ $seed)]
+    while {[expr {[binio unpack $chan "%d" l] > 0}]} {
+	set hash [expr {$hash + ($l ^ $seed)}]
     }
     return $hash
 }
