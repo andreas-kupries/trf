@@ -900,7 +900,7 @@ ClientData clientData;
     IN; PRINTLN (ZlibErrorMsg (&c->state, res));
     FL; OT;
 
-    if (c->nowrap && (res == Z_BUF_ERROR) {
+    if (c->nowrap && (res == Z_BUF_ERROR)) {
       /* This here has a hackish flavor to it. In one of the tests the
        * decompression was done in a single call to 'inflate' which
        * returned Z_OK. The call here then returned Z_BUF_ERROR
