@@ -2225,6 +2225,16 @@ TrfGetOption (instanceData, interp, optionName, dsPtr)
     Tcl_Obj* tmp;
     char policy [20];
 
+    Tcl_Channel parent;
+
+#ifdef USE_TCL_STUBS
+    parent = (trans->patchIntegrated ?
+	      DownChannel (trans)    :
+	      trans->parent);
+#else
+    parent = trans->parent;
+#endif
+
     SeekPolicyGet (trans, policy);
     Tcl_DStringAppendElement (dsPtr, "-seekpolicy");
     Tcl_DStringAppendElement (dsPtr, policy);
@@ -2243,8 +2253,7 @@ TrfGetOption (instanceData, interp, optionName, dsPtr)
      * state.
      */
 
-    return Tcl_GetChannelOption (interp, DownChannel (trans),
-				 optionName, dsPtr);
+    return Tcl_GetChannelOption (interp, parent, optionName, dsPtr);
 
   } else if (0 == strcmp (optionName, "-seekpolicy")) {
     /* Deduce the policy in effect, use chosen/used
@@ -2279,8 +2288,17 @@ TrfGetOption (instanceData, interp, optionName, dsPtr)
      * them isable to handle this request.
      */
 
-    return Tcl_GetChannelOption (interp, DownChannel (trans),
-				 optionName, dsPtr);
+    Tcl_Channel parent;
+
+#ifdef USE_TCL_STUBS
+    parent = (trans->patchIntegrated ?
+	      DownChannel (trans)    :
+	      trans->parent);
+#else
+    parent = trans->parent;
+#endif
+
+    return Tcl_GetChannelOption (interp, parent, optionName, dsPtr);
 #if 0
     Tcl_SetErrno (EINVAL);
     return Tcl_BadChannelOption (interp, optionName, "seekcfg seekstate");

@@ -154,7 +154,7 @@ TrfMd5CryptObjCmd (notUsed, interp, objc, objv)
    */
 
   TrfLock;
-  res = Tcl_NewStringObj (md5f.crypt (passwd, salt_b) + 3, -1);
+  res = Tcl_NewStringObj ((char*) md5f.crypt (passwd, salt_b) + 3, -1);
   TrfUnlock;
 
   Tcl_SetObjResult (interp, res);
