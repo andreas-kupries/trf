@@ -161,6 +161,16 @@ RANLIB =		@RANLIB@
 # either.
 #----------------------------------------------------------------
 
+# locations of 'tclsh' and 'wish', via $PATH
+# I'm not sure wether the 'which' command is portable or not.
+# So I wrote it myself
+
+TCLSH_PATH	=	`tclsh $(tool)/findinpath tclsh`
+WISH_PATH	=	`tclsh $(tool)/findinpath wish`
+
+TOOLS		=	md
+
+
 CC		=	@CC@
 
 CC_SWITCHES	=	$(CFLAGS) $(TRF_SHLIB_CFLAGS) $(CPPFLAGS)	\
@@ -273,7 +283,7 @@ distclean:	clean
 	rm -f config.status config.cache config.log Makefile \
 	$(GENERIC_DIR)/pkgIndex.tcl
 
-install:	install-lib install-header @install_other@
+install:	install-lib install-header @install_other@ install-tools
 
 
 install-lib: $(TRF_LIB_FILE)
@@ -293,6 +303,21 @@ install-bin:	application
 	$(tool)/mkinstalldirs  $(BIN_INSTALL_DIR)
 	@echo "Installing tclsh"
 	@$(INSTALL_PROGRAM) $(APP) $(BIN_INSTALL_DIR)
+
+install-tools: fix-hashbang-line
+	$(tool)/mkinstalldirs  $(BIN_INSTALL_DIR)
+	@echo "Installing tools"
+	for i in $(TOOLS);		\
+	do 					\
+		@$(INSTALL_PROGRAM) $(TOOL)/$$i $(BIN_INSTALL_DIR); \
+	done
+
+fix-hashbang-line:
+	for i in $(TOOLS);		\
+	do 					\
+		tclsh $(tool)/fixhbline $(TCLSH_PATH) $(WISH_PATH) $(tool)/$$i; \
+	done
+
 
 #-------------------------------------------------------#
 
@@ -323,9 +348,9 @@ check:	test
 
 test:	application
 	TCL_LIBRARY=$(TCL_SRC_DIR)/library; export TCL_LIBRARY; \
-	LD_LIBRARY_PATH="$(srcdir):unix:$(TCL_LIB_DIR):$(ZLIB_LIB_DIR):$(SSL_LIB_DIR)"; \
+	LD_LIBRARY_PATH="$(srcdir):./unix:$(TCL_LIB_DIR):$(ZLIB_LIB_DIR):$(SSL_LIB_DIR)"; \
 	export LD_LIBRARY_PATH; SHLIB_PATH="$LD_LIBRARY_PATH"; export SHLIB_PATH ; \
-	echo cd $(TOP_DIR)/tests \; source all | $(APP)
+	echo package require Memchan ; cd $(TOP_DIR)/tests \; source all | $(APP)
 
 # 'unix' is required to have a path for the
 # recursive call to unix/tclsh in '________.test'.
