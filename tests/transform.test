@@ -29,36 +29,35 @@ test transform-1.0 {transform behaviour, immediate write} {
     set     tracevar ""
     lappend tracevar [transform -mode write -command identity foobarflabbergast]
     set     tracevar
-} {}
+} {create/write-0 write-17 flush_write-0 delete/write-0 foobarflabbergast}
 
 
 test transform-1.1 {transform behaviour, immediate read} {
     set     tracevar ""
-    lappend tracevar [transform -mode write -command identity foobarflabbergast]
+    lappend tracevar [transform -mode read -command identity foobarflabbergast]
     set     tracevar
-} {}
+} {create/read-0 read-17 flush_read-0 delete/read-0 foobarflabbergast}
 
 
 test transform-2.0 {transform behaviour, attached write} {
     set tracevar ""
     set                out [memchan]
     transform -attach $out -command identity
-    puts              $out foobarflabbergast
+    puts -nonewline   $out foobarflabbergast
     close             $out
 
     set tracevar
-} {}
+} {create/write-0 create/read-0 write-17 flush/write-0 flush/read-0 delete/write-0 delete/read-0}
 
 
 test transform-2.1 {transform behaviour, attached read} {
     set tracevar ""
-    set                out [memchan]
-    puts              $out foobarflabbergast
-    seek              $out 0
-
-    transform -attach $out -command identity
-    read              $out
-    close             $out
+    set                in [memchan]
+    puts -nonewline   $in foobarflabbergast
+    seek              $in 0
+    transform -attach $in -command identity
+    read              $in
+    close             $in
 
     set tracevar
-} {}
+} {create/write-0 create/read-0 read-17 flush/read-0 flush/write-0 delete/write-0 delete/read-0}
