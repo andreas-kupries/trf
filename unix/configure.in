@@ -21,7 +21,7 @@ if test "${exec_prefix}" = "NONE"; then
 fi
 
 AC_PROG_CC
-AC_PATH_PROG(MAKEDEPEND,makedepend,:)
+dnl AC_PATH_PROG(MAKEDEPEND,makedepend,:)
 AC_HAVE_HEADERS(dlfcn.h zlib.h stdlib.h des.h)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long int)
@@ -201,21 +201,21 @@ dnl The makefile uses 'makedepend' to generate the dependency rules
 dnl this tool know about all standard include directories, but as it
 dnl is not of GNU, standard means 'standard', NOT 'standard + gnu paths'
 dnl 
-AC_CACHE_CHECK(wether 'makedepend' must be told about GCC include paths,
-	trf_cv_conf_makedepend_iext,
-	[if test ! -z "$GCC"; then
-		trf_cv_conf_makedepend_iext=yes
-	else
-		trf_cv_conf_makedepend_iext=no
-	fi])
-
-AC_CACHE_VAL(trf_cv_conf_makedepend_flags, [
-	aku_i=`$CC -v 2>&1 | grep specs | awk '{print $4}'`
-	aku_i=`expr "$aku_i" : '\(.*\)/specs'`
-	trf_cv_conf_makedepend_flags="-I$aku_i/include"])
-
-MKDEP_FLAGS="$trf_cv_conf_makedepend_flags"
-AC_SUBST(MKDEP_FLAGS)
+dnl AC_CACHE_CHECK(wether 'makedepend' must be told about GCC include paths,
+dnl	trf_cv_conf_makedepend_iext,
+dnl	[if test ! -z "$GCC"; then
+dnl		trf_cv_conf_makedepend_iext=yes
+dnl	else
+dnl		trf_cv_conf_makedepend_iext=no
+dnl	fi])
+dnl
+dnl AC_CACHE_VAL(trf_cv_conf_makedepend_flags, [
+dnl	aku_i=`$CC -v 2>&1 | grep specs | awk '{print $4}'`
+dnl	aku_i=`expr "$aku_i" : '\(.*\)/specs'`
+dnl	trf_cv_conf_makedepend_flags="-I$aku_i/include"])
+dnl
+dnl MKDEP_FLAGS="$trf_cv_conf_makedepend_flags"
+dnl AC_SUBST(MKDEP_FLAGS)
 dnl
 dnl ----------------------------------------------------------------
 dnl
