@@ -1,3 +1,9 @@
+Mon Jun 28 23:17:35 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* unix/configure.in, Makefile.in: Matt Newman <matt@novadigm.com>
+	  sent in some changes to built the extension on HPUX (Basically
+	  check for .sl extension too).
+
 Tue Jun 15 00:00:36 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* tests/*.test: The tests for all commands dependent on external

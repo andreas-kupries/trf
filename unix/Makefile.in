@@ -152,7 +152,7 @@ LIBDES_LIB_FILE	=	@LIBDES_LIB_FILE@
 # modify any of this stuff by hand.
 #----------------------------------------------------------------
 
-INSTALL_PROGRAM =	$(INSTALL) -m 744
+INSTALL_PROGRAM =	$(INSTALL) -m 755
 INSTALL_DATA =		$(INSTALL) -m 644
 RANLIB =		@RANLIB@
 

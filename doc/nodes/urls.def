@@ -52,8 +52,8 @@ url zlib_win \
 
 url zLib [lib zlib] http://www.cdrom.com/pub/infozip/zlib/
 
-url tls        [lib TLS]    http://www.sensus.org/tcl/tls.htm
-url tls_source "TLS source" http://www.sensus.org/tcl/tls11.tgz
+url tls        [lib TLS]    http://www.sensus.org/tcl/
+#url tls_source "TLS source" http://www.sensus.org/tcl/tls11.tgz
 
 # -------------------------------------------------
 

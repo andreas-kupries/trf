@@ -56,7 +56,6 @@ node trf_home {
 
 	    li "[tls], an SSL/TLS implementation,
 	    by Matt Newman <matt@novadigm.com>.
-	    [tls_source].
 	    "
 	}
     }
