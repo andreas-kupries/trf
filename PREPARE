@@ -38,12 +38,12 @@ mGenerateANNOUNCE
 eval mExclude \
 	mails patches/v8.0a1 patches/v8.0a2 patches/v8.0b1 patches/v8.0b2 \
 	[glob patches/v8.0/*.orig] \
-	doc/install.text doc/man.tex doc/html.sty doc/defs.tex \
+	doc/install.tex doc/man.tex doc/html.sty doc/defs.tex \
 	[glob patches/nijtmans.*] DEPENDS doc/file doc/delete \
 	doc/FUN doc/ascii.man doc/ascii85 doc/scratch-pad \
 	doc/code34 doc/Notes doc/ToDo doc/trf.def \
 	doc/hash.operation doc/INSTALL doc/INSTALL.optional \
-	doc/ROADMAP doc/speed
+	doc/ROADMAP doc/speed doc/trf.xpm
 
 # I.b  generate official manual, diverse variants (dvi, ps)
 mLog info generating manual 
@@ -98,10 +98,14 @@ exec ./capibase > nodes/capi.node
 # It resides at '~kupries/doc/trf/index.html'
 # The tcltk page is '~kupries/tcltk.html'
 
+mLog info generating documentation tree
 
 exec nodeCompile westend html nodes 
 
+cd ..
 mDocTGZArchive doc/html
+cd doc
+
 eval file delete -force [glob html/*.html]
 
 
@@ -110,7 +114,7 @@ exec nodeCompile     plain html          nodes
 exec nodeMakeSitemap plain html trf_home nodes
 
 
-mExclude nodes
+mExclude nodes capibase
 
 cd ..
 # pwd = root of distribution
