@@ -290,10 +290,7 @@ TAGS:
 		etags *.[ch]
 
 check-package:
-	@mv $(TOP_DIR)/MANIFEST /tmp/MANIFEST
-	@cd $(TOP_DIR) ; $(top_tool)/get-manifest $(EXTENSION)
-	@-diff /tmp/MANIFEST $(TOP_DIR)/MANIFEST | sed -e 's/</missing:/' -e 's/>/added:  /' | $(tool)/skip-trash Makefile pkgIndex.tcl "config.*"
-	@mv /tmp/MANIFEST $(TOP_DIR)/MANIFEST
+	@tclsh $(top_tool)/check_manifest $(TOP_DIR)/MANIFEST
 
 
 check:	test
