@@ -5,5 +5,5 @@
 package ifneeded Trf @TRF_VERSION@ [list tclPkgSetup $dir Trf @TRF_VERSION@ {
 {@TRF_LIB_FILE@ load {adler ascii85 base64 bin blowfish crc crc-zlib des
 haval hex idea md5 oct rc4 rs_ecc sha uuencode zip binio md2 rc2 sha1
-ripemd128 ripemd160}}
+ripemd128 ripemd160 rot transform}}
 }]

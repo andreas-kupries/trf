@@ -1429,7 +1429,7 @@ Trf_Options        optInfo;
     /* 7.6, argument 'in' is a string.
      */
     length = strlen (in);
-    buf    = in;
+    buf    = (char*) in;
 #else
     /* 8.x, argument 'in' is arbitrary object, its string rep. may contain \0.
      */
@@ -1517,6 +1517,14 @@ Trf_Options        optInfo;
     } else {
 #if (TCL_MAJOR_VERSION < 8)
       Tcl_ResetResult (interp);
+
+      /*
+       * r.buf is always overallocated, see 'PutInterpResult'.
+       * No danger in simply writing the '\0'. Do this to
+       * prevent setting a string longer than given as result.
+       */      
+
+      r.buf [r.used] = '\0';
       Tcl_AppendResult (interp, r.buf, (char*) NULL);
 #else
       Tcl_Obj* o = Tcl_NewStringObj (r.buf, r.used);
@@ -1766,7 +1774,7 @@ Tcl_Interp*    interp;
   fflush (stdout);
 #endif
 
-  if ((outLen + r->used) > r->allocated) {
+  if ((outLen+1 + r->used) > r->allocated) {
     /*
      * Extension of internal buffer required.
      */
