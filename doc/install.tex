@@ -14,7 +14,7 @@
 \def\man#1{{\tt #1}}
 \def\lib#1{{\tt #1}}
 \def\url#1{{\tt #1}}
-\def\tm{$^{\mbox{(tm)}}$}
+\def\tm{$^{\mbox{{\tiny (tm)}}}$}
 \def\ra{$\rightarrow$}
 \def\eq{$\equiv$}
 \def\dos{{\tt DOS}}
@@ -178,13 +178,14 @@ part of \cmd {SSLeay}, Erics implementation of the \strong{S}ecure
 The official FAQ page is \url
 {http://www.psy.uq.edu.au:8080/~ftp/Crypto/}. 
 
-Master locations are
-\begin {tabular} {l|l}\hline
+Master locations are\vspace {1em}
+
+{\small \begin {tabular} {|l|l|}\hline
      ftp://ftp.psy.uq.oz.au/pub/Crypto/SSL & SSLeay source \\
      ftp://ftp.psy.uq.oz.au/pub/Crypto/SSLapps & SSL applications \\
-     ftp://ftp.psy.uq.oz.au/pub/Crypto/SSLapps/PORT4-5 & porting notes \\ \hline
-     http://www.psy.uq.oz.au/~ftp/Crypto/ssl.html & SSLeay Programmer Reference \\
-\end {tabular}
+     ftp://ftp.psy.uq.oz.au/pub/Crypto/SSLapps/PORT4-5 & porting notes \\
+     http://www.psy.uq.oz.au/~ftp/Crypto/ssl.html & Programmer Reference \\ \hline
+\end {tabular}}\vspace {1em}
 
 The list of mirror sites is too long to be included here, the FAQ
 contains them all.
@@ -273,12 +274,12 @@ you.
 
 	\begin {enumerate}
 	\item	\$(TCL\_INCLUDE\_DIR)
-	\item	\file {../tcl8.0/generic}
-	\item	\file {../tcl8.0b*/generic}
-	\item	\file {../tcl8.0a2/generic}
-	\item	\file {../tcl7.6/generic}
-	\item	\file {../tcl/generic}
-	\item	\file {../tcl}
+	\item	\file {../../tcl8.0/generic}
+	\item	\file {../../tcl8.0b*/generic}
+	\item	\file {../../tcl8.0a2/generic}
+	\item	\file {../../tcl7.6/generic}
+	\item	\file {../../tcl/generic}
+	\item	\file {../../tcl}
 	\item	\$(prefix)
 	\item	\file {/usr/local/include}
 	\item	\file {/usr/include}
@@ -301,12 +302,12 @@ you.
 
 	\begin {enumerate}
 	\item	\$(TCL\_LIB\_DIR)
-	\item	\file {../tcl8.0/unix}
-	\item	\file {../tcl8.0b*/unix}
-	\item	\file {../tcl8.0a2/unix}
-	\item	\file {../tcl7.6/unix}
-	\item	\file {../tcl/unix}
-	\item	\file {../tcl}
+	\item	\file {../../tcl8.0/unix}
+	\item	\file {../../tcl8.0b*/unix}
+	\item	\file {../../tcl8.0a2/unix}
+	\item	\file {../../tcl7.6/unix}
+	\item	\file {../../tcl/unix}
+	\item	\file {../../tcl}
 	\item	\$(exec\_prefix)
 	\item	\file {/usr/local/include}
 	\item	\file {/usr/include}
