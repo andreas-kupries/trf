@@ -1,5 +1,7 @@
 Thu Mar 25 12:40:20 1999  Andreas Kupries  <a.kupries@westend.com>
 
+	* --------------- Ready to release 1.4 --------------------
+
 	* generic/init.c: Added initialization of stubs, for 8.1.
 
 	* generic/digest.c: Restored usage of 'Tcl_SetObjVar2'. Change

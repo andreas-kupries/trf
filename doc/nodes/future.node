@@ -14,6 +14,9 @@ node trf_future {
 	    ## li	The tests are incomplete, expand them.
 	    ##	done
 
+	    li "Define a stub table for this extension. This will happen in version 2.0.
+	    "
+
 	    li	"
 	    Channel doing special framing after a fixed (but
 	    user-defined) number of characters"
