@@ -38,9 +38,9 @@
  * Declarations of internal procedures.
  */
 
-static void C_Schedule _ANSI_ARGS_ ((VOID*  key, int key_length, int direction,
-				      VOID** e_schedule,
-				      VOID** d_schedule));
+static void C_Schedule _ANSI_ARGS_ ((VOID*  key, int key_length,
+				     Trf_Options cOptions, int direction,
+				     VOID** e_schedule, VOID** d_schedule));
 static void C_Encrypt  _ANSI_ARGS_ ((unsigned char* inout, VOID* key /* schedule */));
 static void C_Decrypt  _ANSI_ARGS_ ((unsigned char* inout, VOID* key /* schedule */));
 
@@ -56,6 +56,7 @@ static Trf_CipherDescription cDescription = {
   C_Schedule,
   C_Encrypt,
   C_Decrypt,
+  NULL,
   NULL
 };
 
@@ -104,9 +105,10 @@ Tcl_Interp* interp;
  */
 
 static void
-C_Schedule (key, key_length, direction, e_schedule, d_schedule)
+C_Schedule (key, key_length, cOptions, direction, e_schedule, d_schedule)
 VOID*  key;
 int    key_length;
+Trf_Options cOptions;
 int    direction;
 VOID** e_schedule;
 VOID** d_schedule;
