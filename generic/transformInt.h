@@ -406,13 +406,12 @@ EXTERN int TrfInit_Binio     _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_Transform _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 
-/*
- * Define general result generation, dependent on major tcl version.
- * 05/29/1997: not anymore, 8.0b1 smooths this out again. But leave
- * definitions in to avoid immediate conversion of all affected files!
+/* Define macro which is TRUE for tcl versions >= 8.1
+ * Required as there are incompatibilities between 8.0 and 8.1
  */
 
-#define ADD_RES(interp, text) Tcl_AppendResult (interp, text, (char*) NULL);
-#define RESET_RES(interp)     Tcl_ResetResult  (interp);
+#define GT81 ((TCL_MAJOR_VERSION > 8) || \
+	      ((TCL_MAJOR_VERSION == 8) && \
+	       (TCL_MINOR_VERSION >= 1)))
 
 #endif /* TRF_INT_H */

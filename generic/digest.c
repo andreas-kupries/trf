@@ -1002,22 +1002,35 @@ Trf_MessageDigestDescription* md;
       return TCL_ERROR;
     }
 #else
-    Tcl_Obj* varName   = Tcl_NewStringObj (destHandle, strlen (destHandle));
+
     Tcl_Obj* digestObj = Tcl_NewStringObj (digest, md->digest_size);
+    Tcl_Obj* result;
+
+#if GT81
+    /* 8.1 and beyond */
+    Tcl_IncrRefCount(digestObj);
+
+    result = Tcl_SetObjVar2 (interp, destHandle, (char*) NULL, digestObj,
+			     TCL_LEAVE_ERR_MSG | TCL_GLOBAL_ONLY);
+#else
+    /* 8.0 section */
+    Tcl_Obj* varName = Tcl_NewStringObj (destHandle, strlen (destHandle));
 
     Tcl_IncrRefCount(varName);
     Tcl_IncrRefCount(digestObj);
 
-    if (Tcl_ObjSetVar2 (interp, varName, (Tcl_Obj*) NULL, digestObj,
-			TCL_LEAVE_ERR_MSG | TCL_GLOBAL_ONLY) == (Tcl_Obj*) NULL) {
-      Tcl_DecrRefCount(varName);
-      Tcl_DecrRefCount(digestObj);
+    result = Tcl_ObjSetVar2 (interp, varName, (Tcl_Obj*) NULL, digestObj,
+			     TCL_LEAVE_ERR_MSG | TCL_GLOBAL_ONLY);
+    Tcl_DecrRefCount(varName);
+#endif /* GT81 */
+
+    Tcl_DecrRefCount(digestObj);
+
+    if (result == (Tcl_Obj*) NULL) {
       return TCL_ERROR;
     }
 
-    Tcl_DecrRefCount(varName);
-    Tcl_DecrRefCount(digestObj);
-#endif
+#endif /* (TCL_MAJOR_VERSION < 8) */
   } else if (dest != (Tcl_Channel) NULL) {
     int res = Tcl_Write (dest, digest, md->digest_size);
 

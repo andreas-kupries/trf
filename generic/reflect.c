@@ -216,6 +216,7 @@ ClientData clientData;
 {
   EncoderControl*          c;
   TrfTransformOptionBlock* o = (TrfTransformOptionBlock*) optInfo;
+  int                    res;
 
   c = (EncoderControl*) Tcl_Alloc (sizeof (EncoderControl));
   c->write           = fun;
@@ -231,7 +232,9 @@ ClientData clientData;
     c->command = strcpy (Tcl_Alloc (1+strlen (o->command)), o->command);
 #endif
 
-    if (TCL_OK != Execute (c, interp, "create/write", NULL, 0, 0)) {
+    res = Execute (c, interp, "create/write", NULL, 0, 0);
+
+    if (res != TCL_OK) {
 #if (TCL_MAJOR_VERSION >= 8)
       Tcl_DecrRefCount (c->command);
 #else
@@ -596,20 +599,27 @@ int             transmit;
   Tcl_Obj* command;
 
   command = Tcl_DuplicateObj (c->command);
+  Tcl_IncrRefCount (command);
 
   if (command == (Tcl_Obj*) NULL) {
     return TCL_ERROR;
   }
 
-  res = Tcl_ListObjAppendElement (interp, command, Tcl_NewStringObj (op, strlen (op)));
+  res = Tcl_ListObjAppendElement (interp, command,
+				  Tcl_NewStringObj (op, strlen (op)));
   if (res != TCL_OK)
     goto cleanup;
 
-  res = Tcl_ListObjAppendElement (interp, command, Tcl_NewStringObj (buf, bufLen));
+  res = Tcl_ListObjAppendElement (interp, command,
+				  Tcl_NewStringObj (buf, bufLen));
   if (res != TCL_OK)
     goto cleanup;
 
+#if GT81
+  res = Tcl_EvalObj (c->interp, command, TCL_EVAL_GLOBAL);
+#else
   res = Tcl_GlobalEvalObj (c->interp, command);
+#endif
 
   Tcl_DecrRefCount (command);
 

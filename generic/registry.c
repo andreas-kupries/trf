@@ -347,6 +347,13 @@ CONST Trf_TypeDefinition* type;
   entry->transType->getHandleProc    = TrfGetFile;
 #endif
 
+#if GT81
+  /* No additional close procedure. It is not possible to partially close a
+   * transformation channel.
+   */
+  entry->transType->close2Proc = NULL;
+#endif
+
   /*
    * Add entry to internal registry.
    */
@@ -1614,7 +1621,8 @@ Tcl_Interp*        interp;
   }
 
   if (trans->mode & TCL_READABLE) {
-    trans->in.control  = trans->in.vectors->createProc  ((ClientData) trans, PutTrans,
+    trans->in.control  = trans->in.vectors->createProc  ((ClientData) trans,
+							 PutTrans,
 							 optInfo, interp,
 							 trans->clientData);
 

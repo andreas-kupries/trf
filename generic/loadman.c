@@ -143,7 +143,7 @@ TrfLoadDes (interp)
     return TCL_OK;
   }
 
-  RESET_RES (interp);
+  Tcl_ResetResult  (interp);
   res = TrfLoadLibrary (interp, LIBDES_LIB_NAME, (VOID**) &ld, ld_symbols, 2);
 
   if ((res == TCL_OK) &&
