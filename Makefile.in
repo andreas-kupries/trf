@@ -144,7 +144,7 @@ ZLIB_LIB_DIR		=	@ZLIB_LIB_DIR@
 ZLIB_INCLUDE_DIR	=	@ZLIB_INCLUDE_DIR@
 
 Trf_INCLUDES		=	-I$(ZLIB_INCLUDE_DIR)	\
-				-I$(SSL_INCLUDE_DIR)	\
+				-I$(SSL_INCLUDE_DIR)
 
 #========================================================================
 # Nothing of the variables below this line need to be changed.  Please
