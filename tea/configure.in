@@ -334,7 +334,7 @@ TRF_FIND_ZLIB_SSL
 MD5_LIB_FILE=""
 if test \( $HAS_LIBCRYPT -eq 0 \)
 then
-	MD5_LIB_FILE=libcrypt.`echo $SHARED_LIB_SUFFIX | sed -e 's/^[0-9.]*//'`
+	MD5_LIB_FILE=libcrypt$SHLIB_SUFFIX
 fi
 AC_SUBST(MD5_LIB_FILE)
 
