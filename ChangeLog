@@ -1,3 +1,14 @@
+Mon Oct 25 22:10:01 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* Got new bindist too, and a self extracting
+	  executable/installer. The latter is now a new bindist.
+
+	* Applied patch from Jan to make zip compatible to the official
+	  distribution fo zlib. This additionally fixes the problem with
+	  the -nowrap option where I had to resort to some hackery to stop
+	  a Z_BUF_ERROR from bothering me. The new code iis the official
+	  sanctioned way of making it work (Additional dummy input byte).
+
 Sat Oct 23 00:54:38 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* tea.tests/transform_bb.test: Adapted traces to changed behaviour

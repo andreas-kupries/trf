@@ -896,24 +896,20 @@ ClientData clientData;
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
+    if (c->nowrap) {
+      /*
+       *   Hack required by zlib: Supply an additional dummy
+       *   byte in order to force the generation of Z_STREAM_END.
+       */
+
+      c->state.avail_in = 1;
+    }
+
     PRINT ("inflate (Z_FINISH)\n"); FL;
     res = zf.inflate (&c->state, Z_FINISH);
 
     IN; PRINTLN (ZlibErrorMsg (&c->state, res));
     FL; OT;
-
-    if (c->nowrap && (res == Z_BUF_ERROR)) {
-      /* This here has a hackish flavor to it. In one of the tests the
-       * decompression was done in a single call to 'inflate' which
-       * returned Z_OK. The call here then returned Z_BUF_ERROR
-       * whereas in the corresponding call without nowrap we got the
-       * correct Z_STREAM_END. The resulting decompressed output was
-       * correct though.
-       */
-
-      DONE (ZipFlushDecoder);
-      return TCL_OK;
-    }
 
     if ((res < Z_OK) || (res == Z_NEED_DICT)) {
       if (interp) {

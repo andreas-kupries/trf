@@ -339,27 +339,28 @@ TrfBZ2Options _ANSI_ARGS_ ((void));
 
 typedef struct ZFunctions {
   VOID *handle;
-  int (* deflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
-  int (* deflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
+  int (WINAPI * deflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
+  int (WINAPI * deflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
 
-  int (* deflateInit2_)     _ANSI_ARGS_ ((z_streamp strm, int level,
-					  int method, int windowBits,
-					  int memLevel, int strategy,
-					  CONST char *version,
-					  int stream_size));
-  int (* deflateReset)      _ANSI_ARGS_ ((z_streamp strm));
-  int (* inflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
-  int (* inflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
-  int (* inflateInit2_)     _ANSI_ARGS_ ((z_streamp strm, int windowBits,
-					  CONST char *version,
-					  int stream_size));
-  int (* inflateReset)      _ANSI_ARGS_ ((z_streamp strm));
-  unsigned long (* adler32) _ANSI_ARGS_ ((unsigned long adler,
-					  CONST unsigned char *buf,
-					  unsigned int len));
-  unsigned long (* crc32)   _ANSI_ARGS_ ((unsigned long crc,
-					  CONST unsigned char *buf,
-					  unsigned int len));
+  int (WINAPI * deflateInit2_)     _ANSI_ARGS_ ((z_streamp strm, int level,
+						 int method, int windowBits,
+						 int memLevel, int strategy,
+						 CONST char *version,
+						 int stream_size));
+  int (WINAPI * deflateReset)      _ANSI_ARGS_ ((z_streamp strm));
+  int (WINAPI * inflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
+  int (WINAPI * inflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
+  int (WINAPI * inflateInit2_)     _ANSI_ARGS_ ((z_streamp strm,
+						 int windowBits,
+						 CONST char *version,
+						 int stream_size));
+  int (WINAPI * inflateReset)      _ANSI_ARGS_ ((z_streamp strm));
+  unsigned long (WINAPI * adler32) _ANSI_ARGS_ ((unsigned long adler,
+						 CONST unsigned char *buf,
+						 unsigned int len));
+  unsigned long (WINAPI * crc32)   _ANSI_ARGS_ ((unsigned long crc,
+						 CONST unsigned char *buf,
+						 unsigned int len));
 } zFunctions;
 
 

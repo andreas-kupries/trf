@@ -29,14 +29,15 @@ node trf_home {
 	This document accompanies [trf] @mFullVersion@, as
 	distributed at @mDate@"]
 
-	hr
-	p "[strong "[cem Beware], the 2.0 distribution found here is
-	unofficial. It is incomplete, may contain obvious bugs, use at
-	[cem your] own risk[cem !]"]. On the other hand, if you do you
-	use it, please report any problems with it to [me], so that they
-	can be fixed before the official announcement."
-	hr
-
+	if {0} {
+	    hr
+	    p "[strong "[cem Beware], the 2.0 distribution found here is
+	    unofficial. It is incomplete, may contain obvious bugs, use at
+	    [cem your] own risk[cem !]"]. On the other hand, if you do you
+	    use it, please report any problems with it to [me], so that they
+	    can be fixed before the official announcement."
+	    hr
+	}
 	#  indexing is required
 
 	hr

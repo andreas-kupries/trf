@@ -81,7 +81,7 @@ MAN_INSTALL_DIR =	$(INSTALL_ROOT)$(prefix)/man
 
 # To change the compiler switches, for example to change from -O
 # to -g, change the following line:
-CFLAGS		=	-O2 -fnative-struct -mno-cygwin -DNDEBUG -DUSE_TCL_STUBS -D__WIN32__ -DTCL_THREADS -DHAVE_STDLIB_H
+CFLAGS		=	-O2 -fnative-struct -mno-cygwin -DNDEBUG -DUSE_TCL_STUBS -D__WIN32__ -DWIN32 -D_WINDOWS -DZLIB_DLL -DTCL_THREADS -DHAVE_STDLIB_H
 
 # To disable ANSI-C procedure prototypes reverse the comment characters
 # on the following lines:
@@ -194,8 +194,8 @@ SOURCES	=	../generic/adler.c \
 	../generic/load.c \
 	../generic/crypt.c \
 	../generic/loadman.c \
-	../generic/md5.c \
 	../generic/md2.c \
+	../generic/md5dig.c \
 	../generic/octcode.c \
 	../generic/otpcode.c \
 	../generic/otpmd5.c \
@@ -238,8 +238,8 @@ OBJECTS	=	adler.o \
 	load.o \
 	crypt.o \
 	loadman.o \
-	md5.o \
 	md2.o \
+	md5dig.o \
 	octcode.o \
 	otpcode.o \
 	otpmd5.o \
@@ -331,8 +331,8 @@ crypt.o:	../generic/crypt.c
 loadman.o:	../generic/loadman.c
 	$(CC) -c $(CC_SWITCHES) ../generic/loadman.c -o $@
 
-md5.o:	../generic/md5.c
-	$(CC) -c $(CC_SWITCHES) ../generic/md5.c -o $@
+md5dig.o:	../generic/md5dig.c
+	$(CC) -c $(CC_SWITCHES) ../generic/md5dig.c -o $@
 
 md2.o:	../generic/md2.c
 	$(CC) -c $(CC_SWITCHES) ../generic/md2.c -o $@
