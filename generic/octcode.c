@@ -50,41 +50,62 @@
  * Declarations of internal procedures.
  */
 
-static Trf_ControlBlock CreateEncoder  _ANSI_ARGS_ ((ClientData writeClientData, Trf_WriteProc *fun,
-						     Trf_Options optInfo, Tcl_Interp*   interp,
-						     ClientData clientData));
-static void             DeleteEncoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     ClientData clientData));
-static int              Encode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     unsigned int character,
-						     Tcl_Interp* interp,
-						     ClientData clientData));
-static int              EncodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     unsigned char* buffer,
-						     int bufLen,
-						     Tcl_Interp* interp,
-						     ClientData clientData));
-static int              FlushEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     Tcl_Interp* interp,
-						     ClientData clientData));
-static void             ClearEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     ClientData clientData));
+static Trf_ControlBlock
+CreateEncoder  _ANSI_ARGS_ ((ClientData     writeClientData,
+			     Trf_WriteProc* fun,
+			     Trf_Options    optInfo,
+			     Tcl_Interp*    interp,
+			     ClientData     clientData));
+static void
+DeleteEncoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     ClientData       clientData));
+static int
+Encode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     unsigned int     character,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static int
+EncodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     unsigned char*   buffer,
+			     int              bufLen,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static int
+FlushEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static void
+ClearEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     ClientData       clientData));
 
 
-static Trf_ControlBlock CreateDecoder  _ANSI_ARGS_ ((ClientData writeClientData, Trf_WriteProc *fun,
-						     Trf_Options optInfo, Tcl_Interp*   interp,
-						     ClientData clientData));
-static void             DeleteDecoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     ClientData clientData));
-static int              Decode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     unsigned int character,
-						     Tcl_Interp* interp,
-						     ClientData clientData));
-static int              FlushDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     Tcl_Interp* interp,
-						     ClientData clientData));
-static void             ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     ClientData clientData));
+static Trf_ControlBlock
+CreateDecoder  _ANSI_ARGS_ ((ClientData     writeClientData,
+			     Trf_WriteProc* fun,
+			     Trf_Options    optInfo,
+			     Tcl_Interp*    interp,
+			     ClientData     clientData));
+static void
+DeleteDecoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     ClientData       clientData));
+static int
+Decode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     unsigned int     character,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static int
+DecodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     unsigned char*   buffer,
+			     int              bufLen,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static int
+FlushDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static void
+ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     ClientData       clientData));
 
 
 /*
@@ -107,7 +128,7 @@ static Trf_TypeDefinition convDefinition =
     CreateDecoder,
     DeleteDecoder,
     Decode,
-    NULL,
+    DecodeBuffer,
     FlushDecoder,
     ClearDecoder
   },
@@ -530,17 +551,15 @@ ClientData clientData;
       }
 
       Tcl_ResetResult  (interp);
-      Tcl_AppendResult (interp, "illegal character ", (char*) NULL);
-      Tcl_AppendResult (interp, buf, (char*) NULL);
-      Tcl_AppendResult (interp, " found in input", (char*) NULL);
+      Tcl_AppendResult (interp, "illegal character ", buf,
+			" found in input", (char*) NULL);
     }
     return TCL_ERROR;
   }
 
   character -= '0';
 
-
-  c->bench |= (character << (3 * (2- c->charCount)));
+  c->bench |= (character << (3 * (2 - c->charCount)));
   c->charCount ++;
 
   if (c->charCount >= 3) {
@@ -553,6 +572,88 @@ ClientData clientData;
   }
 
   return TCL_OK;
+
+#undef IN_RANGE
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	DecodeBuffer --
+ *
+ *	------------------------------------------------*
+ *	Decode the given buffer and write the result.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		As of the called WriteFun.
+ *
+ *	Result:
+ *		Generated bytes implicitly via WriteFun.
+ *		A standard Tcl error code.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+DecodeBuffer (ctrlBlock, buffer, bufLen, interp, clientData)
+Trf_ControlBlock ctrlBlock;
+unsigned char*   buffer;
+int              bufLen;
+Tcl_Interp*      interp;
+ClientData       clientData;
+{
+#define IN_RANGE(low,x,high) (((low) <= (x)) && ((x) <= (high)))
+
+  DecoderControl* c      = (DecoderControl*) ctrlBlock;
+  char*  out             = (unsigned char*) Tcl_Alloc (2+bufLen/3);
+  int    res, i, j;
+  unsigned char character;
+
+  for (i=0, j=0; i < bufLen; i++) {
+    character = buffer [i];
+
+    if ((! IN_RANGE ('0', character, '7')) ||
+	((c->charCount == 0) &&
+	 (character > '3'))) {
+
+      if (interp) {
+	char buf [10];
+
+	if (character < ' ' || character > 127) {
+	  sprintf (buf, "0x%02x", character);
+	} else {
+	  buf [0] = '\'';
+	  buf [1] = character;
+	  buf [2] = '\'';
+	  buf [3] = '\0';
+	}
+
+	Tcl_ResetResult  (interp);
+	Tcl_AppendResult (interp, "illegal character ", buf,
+			  " found in input", (char*) NULL);
+      }
+      return TCL_ERROR;
+    }
+
+    character -= '0';
+
+    c->bench |= (character << (3 * (2 - c->charCount)));
+    c->charCount ++;
+
+    if (c->charCount >= 3) {
+      out [j] = c->bench;
+      j ++;
+
+      c->bench     = '\0';
+      c->charCount = 0;
+
+      return res;
+    }
+  }
+
+  res = c->write (c->writeClientData, out, j, interp);
+  return res;
 
 #undef IN_RANGE
 }

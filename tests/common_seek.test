@@ -141,8 +141,9 @@ test seek-2.0 {seeking behind start of stream} {
 
     catch {seek $f -1} res
     close $f
+    regsub $f $res XXXX res
     set res
-} {error during seek on "file6": invalid argument}
+} {error during seek on "XXXX": invalid argument}
 
 test seek-2.1 {seeking relative to the end} {
 
@@ -151,8 +152,9 @@ test seek-2.1 {seeking relative to the end} {
 
     catch {seek $f 0 end} res
     close $f
+    regsub $f $res XXXX res
     set res
-} {error during seek on "file6": invalid argument}
+} {error during seek on "XXXX": invalid argument}
 
 test seek-2.2 {seeking modulo numBytesTransform} {
 
@@ -161,8 +163,9 @@ test seek-2.2 {seeking modulo numBytesTransform} {
 
     catch {seek $f 1 cur} res
     close $f
+    regsub $f $res XXXX res
     set res
-} {error during seek on "file6": invalid argument}
+} {error during seek on "XXXX": invalid argument}
 
 test seek-2.3 {seeking modulo numBytesTransform} {
 
@@ -171,8 +174,9 @@ test seek-2.3 {seeking modulo numBytesTransform} {
     read $f 1
     set fail [catch {seek $f 2 cur} res]
     close $f
+    regsub $f $res XXXX res
     set res
-} {error during seek on "file6": invalid argument}
+} {error during seek on "XXXX": invalid argument}
 
 test seek-2.4 {seeking the unseekable} {
 
@@ -181,8 +185,9 @@ test seek-2.4 {seeking the unseekable} {
 
     catch {seek $f 1} res
     close $f
+    regsub $f $res XXXX res
     set res
-} {error during seek on "sock6": invalid argument}
+} {error during seek on "XXXX": invalid argument}
 
 
 # ----------------------------------------------------------------------

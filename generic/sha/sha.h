@@ -14,7 +14,7 @@ typedef unsigned char BYTE;
 #ifdef __alpha
 typedef unsigned int  UINT32;
 #else
-#ifndef _WIN32
+#ifndef UINT32
 typedef unsigned long UINT32;
 #endif
 #endif

@@ -46,3 +46,12 @@ test common-1.6 {common behaviour, error checking} {
 test common-1.7 {common behaviour, error checking} {
     catch {bin -in stdin XXX} msg; set msg
 } {bin: wrong # args}
+
+test common-2.0 {common behaviour: -in, -out} {
+    set m [memchan]
+    bin -out $m -mode encode A
+    seek $m 0 start
+    set res [bin -in $m -mode decode]
+    close $m
+    set res
+} {A}

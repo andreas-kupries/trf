@@ -81,7 +81,7 @@ MAN_INSTALL_DIR =	$(INSTALL_ROOT)$(prefix)/man
 
 # To change the compiler switches, for example to change from -O
 # to -g, change the following line:
-CFLAGS		=	-O2 -mno-cygwin -DNDEBUG -DUSE_TCL_STUBS -D__WIN32__ -DTCL_THREADS -DHAVE_STDLIB_H
+CFLAGS		=	-O2 -fnative-struct -mno-cygwin -DNDEBUG -DUSE_TCL_STUBS -D__WIN32__ -DTCL_THREADS -DHAVE_STDLIB_H
 
 # To disable ANSI-C procedure prototypes reverse the comment characters
 # on the following lines:
