@@ -36,7 +36,7 @@ foreach {i in digest} {
     899397D96489281E9E76D5E65ABAB751F312E06C06C07C9C1D42ABD31BB6A404
 } {
     if {[info tclversion] < 8.0} {
-	text haval-4.$i-7.6 {haval, immediate} {
+	test haval-4.$i-7.6 {haval, immediate} {
 	    exec_md haval [text2hex $in]
 	} $digest
     } else {

@@ -41,7 +41,7 @@ foreach {i in digest} {
     9b752e45573d4b39f4dbd3323cab82bf63326bfb
 } {
     if {[info tclversion] < 8.0} {
-	text ripemd160-4.$i-7.6 {ripemd160, immediate} {
+	test ripemd160-4.$i-7.6 {ripemd160, immediate} {
 	    exec_md ripemd160 [text2hex $in]
 	} [string toupper $digest]
     } else {

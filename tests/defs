@@ -15,7 +15,11 @@
 #
 # CVS: $Id$
 
-package require Memchan
+if {[info tclversion] < 8.0} {
+    package require -exact Memchan 1.2
+} else {
+    package require Memchan
+}
 
 if ![info exists VERBOSE] {
     set VERBOSE 0

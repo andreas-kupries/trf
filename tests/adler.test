@@ -19,7 +19,7 @@ foreach {i in digest} {
     0 {hello world} 1A0B045D
 } {
     if {[info tclversion] < 8.0} {
-	text adler-4.$i-7.6 {adler, immediate} {
+	test adler-4.$i-7.6 {adler, immediate} {
 	    exec_md adler [text2hex $in]
 	} $digest
     } else {

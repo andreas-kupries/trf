@@ -24,7 +24,7 @@ foreach {i in digest} {
     d2516ee1acfa5baf33dfc1c471e438449ef134c8
 } {
     if {[info tclversion] < 8.0} {
-	text sha-4.$i-7.6 {sha, immediate} {
+	test sha-4.$i-7.6 {sha, immediate} {
 	    exec_md sha [text2hex $in]
 	} [string toupper $digest]
     } else {

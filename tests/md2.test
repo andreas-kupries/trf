@@ -38,7 +38,7 @@ foreach {i in digest} {
     d5976f79d83d3a0dc9806c3c66f3efd8
 } {
     if {[info tclversion] < 8.0} {
-	text md2-4.$i-7.6 {md2, immediate} {
+	test md2-4.$i-7.6 {md2, immediate} {
 	    exec_md md2 [text2hex $in]
 	} [string toupper $digest]
     } else {

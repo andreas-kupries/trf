@@ -19,7 +19,7 @@ foreach {i in digest} {
     1 {hello world} B03CB7
 } {
     if {[info tclversion] < 8.0} {
-	text crc-4.$i-7.6 {crc, immediate} {
+	test crc-4.$i-7.6 {crc, immediate} {
 	    exec_md crc [text2hex $in]
 	} $digest
     } else {
