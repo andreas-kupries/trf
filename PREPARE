@@ -103,7 +103,7 @@ file rename html/capi.html html/capi/capi.html
 mLatex2html \
 	-title    {man "Trf Manual"          install "Trf Installation manual"} \
 	-up       {man "../../../tcltk.html" install "../man/man.html"}         \
-	-up-title {man "Tcl/Tk"              install "Trf Manual"}
+	-up-title {man "Tcl/Tk"              install "Trf Manual"} \
 	\
 	-nav      arrows \
 	-htmldir  html   \
