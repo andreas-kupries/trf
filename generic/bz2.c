@@ -134,6 +134,8 @@ typedef struct _DecoderControl_ {
 
   char* output_buffer;
 
+  int lastRes;
+
 } DecoderControl;
 
 #define KILO     (1024)
@@ -365,7 +367,6 @@ ClientData clientData;
   EncoderControl* c = (EncoderControl*) ctrlBlock;
 
   /* execute conversion specific code here (BZ2) */
-
   int res;
 
   c->state.next_in   = (Bytef*) buffer;
@@ -432,7 +433,6 @@ ClientData clientData;
   EncoderControl* c = (EncoderControl*) ctrlBlock;
 
   /* execute conversion specific code here (BZ2) */
-
   int res;
 
   c->state.next_in   = (Bytef*) NULL;
@@ -442,7 +442,7 @@ ClientData clientData;
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
-    res = bz.compress (&c->state, BZ_FLUSH);
+    res = bz.compress (&c->state, BZ_FINISH);
 
     if (res < BZ_OK) {
       if (interp) {
@@ -557,6 +557,8 @@ ClientData     clientData;
     return (ClientData) NULL;
   }
 
+  c->lastRes = res;
+
   return (ClientData) c;
 }
 
@@ -635,8 +637,9 @@ ClientData clientData;
     c->state.avail_out = OUT_SIZE;
 
     res = bz.decompress (&c->state);
+    c->lastRes = res;
 
-    if (res < BZ_OK) {
+    if ((res < BZ_OK) && (res != BZ_STREAM_END)) {
       if (interp) {
 	Bz2libError (interp, &c->state, res, "decompressor");
       }
@@ -703,8 +706,9 @@ ClientData clientData;
     c->state.avail_out = OUT_SIZE;
 
     res = bz.decompress (&c->state);
+    c->lastRes = res;
 
-    if (res < BZ_OK) {
+    if ((res < BZ_OK) && (res != BZ_STREAM_END)) {
       if (interp) {
 	Bz2libError (interp, &c->state, res, "decompressor");
       }
@@ -759,8 +763,12 @@ ClientData clientData;
   DecoderControl* c = (DecoderControl*) ctrlBlock;
 
   /* execute conversion specific code here (BZ2) */
-
   int res;
+
+  if (c->lastRes == BZ_STREAM_END) {
+    /* Essentially already flushed ! */
+    return TCL_OK;
+  }
 
   c->state.next_in  = (Bytef*) c->output_buffer; /* fake out 'inflate' */
   c->state.avail_in = 0;
@@ -771,7 +779,7 @@ ClientData clientData;
 
     res = bz.decompress (&c->state);
 
-    if (res < BZ_OK) {
+    if ((res < BZ_OK) && (res != BZ_STREAM_END)) {
       if (interp) {
 	Bz2libError (interp, &c->state, res, "decompressor/flush");
       }

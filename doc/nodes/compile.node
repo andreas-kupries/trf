@@ -8,7 +8,7 @@ node trf_compile {
     parent      trf_install
 
     menu {
-	trf_cmac trf_cunix trf_cwin
+	trf_ctea trf_cmac trf_cunix trf_cwin
     }
 
     contents {

@@ -21,6 +21,7 @@ mInsertInfo \
 	doc/nodes/urls.def generic/transform.h generic/patchlevel.h     \
 	mac/README                                    \
 	unix/README unix/configure.in unix/Makefile.in \
+	tea/README tea/configure.in tea/Makefile.in \
 	patches/v8.1.1/README
 
 set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mShortDosVersion@).dll"
@@ -153,6 +154,7 @@ cd ..
 
 # generate configure script to be used
 mConfigure unix
+mConfigure tea
 
 
 # --------------------------------------------------------------

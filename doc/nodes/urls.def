@@ -33,6 +33,10 @@ url rmd       RIPEMD-160 \
 url sfit      {Swiss Federal Institute of Technology} \
 	http://sewww.epfl.ch/
 
+url tea        "TEA"               http://www.scriptics.com/products/tcltk/tea/
+url cygnus     Cygnus                   http://www.cygnus.com/
+url cygwin     CygWin                   http://www.cygnus.com/cygwin
+
 # -------------------------------------------------
 
 url SSLeayLib [lib SSLeay] http://www.ssleay.org/

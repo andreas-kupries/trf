@@ -65,6 +65,7 @@
 #include "havalapp.h"
 #include "haval.h"
 
+#undef  VERSION 
 #define VERSION    1                         /* current version number */
 
 void haval_string _ANSI_ARGS_((char *, unsigned char *)); /* hash a string */

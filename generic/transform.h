@@ -39,10 +39,11 @@ extern "C" {
  * Definition of module version
  */
 
+/*
 #define TRF_VERSION		"@mVersion@"
 #define TRF_MAJOR_VERSION	@mMajor@
 #define TRF_MINOR_VERSION	@mMinor@
-
+*/
 
 /*
  * Definitions to enable the generation of a DLL under Windows.
