@@ -42,12 +42,14 @@ replace_in_file win/README           @VERSION@ ${the-patchlevel}
 replace_in_file unix/README          @DATE@    $long_date
 replace_in_file unix/README          @VERSION@ ${the-patchlevel}
 
+# generate version number without dots.
+regsub -all {\.} ${the-version} {} _
+
 file copy generic/pkgIndex.tcl.in win/pkgIndex.tcl
 replace_in_file win/pkgIndex.tcl @configure_input@ "Distributed at $long_date"
 replace_in_file win/pkgIndex.tcl @TRF_VERSION@  ${the-version}
-replace_in_file win/pkgIndex.tcl @TRF_LIB_FILE@ "trf${the-version}.dll"
+replace_in_file win/pkgIndex.tcl @TRF_LIB_FILE@ "trf${_}.dll"
 
-regsub -all {\.} ${the-version} {} _
 replace_in_file win/makefile.vc @TRF_VERSION@       ${the-version}
 replace_in_file win/makefile.vc @TRF_nodotVERSION@  $_
 replace_in_file win/makefile.vc @DATE@              $long_date
