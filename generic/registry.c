@@ -1082,7 +1082,7 @@ int mode;
 
 #ifdef USE_TCL_STUBS
   parent = (trans->patchIntegrated ?
-	    trans->self : /* 'self' already refers to our parent */
+	    DownChannel (trans) :
 	    trans->parent);
 #else
   parent = trans->parent;

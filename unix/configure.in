@@ -679,7 +679,7 @@ TCL_SHARED_LIBS=""
 
 AC_MSG_CHECKING(for stubs)
 
-if test \( \( $TCL_MAJOR_VERSION -eq 8 -a $TCL_MINOR_VERSION -gt 0 \) -o $TCL_MAJOR_VERSION -gt 8 \) -a "x$ok" = "xyes"
+if test \( $TCL_MAJOR_VERSION -eq 8 -a $TCL_MINOR_VERSION -gt 0 \) -o $TCL_MAJOR_VERSION -gt 8
 then
     AC_MSG_RESULT(yes)
     TRF_USING_STUBS=1
