@@ -5,7 +5,6 @@
 # O. insert various information into some files
 #    (version, patchlevel, current date)
 
-mVerbose \t\tInsert last minute information
 
 set mInfo(@TRF_VERSION@)     $mInfo(@mVersion@)
 set mInfo(@configure_input@) "Distributed at $mInfo(@mDate@)"
@@ -27,8 +26,6 @@ mInsertInfo \
 # I.   clean documentation
 # I.a  remove inofficial documents
 
-mVerbose \t\tRemove inofficial documents
-
 eval mExclude mails patches/v8.0a1 [glob patches/nijtmans.*] DEPENDS
 
 cd doc/speed
@@ -39,7 +36,7 @@ cd ..
 mExclude file delete FUN ascii.man ascii85 scratch-pad code34 Notes ToDo trf.def hash.operation INSTALL INSTALL.optional
 
 # I.b  generate official manual, diverse variants (dvi, ps)
-mVerbose \t\tGenerate official manual
+mLog log info generating manual variants (dvi, ps)
 
 # pwd = doc
 catch {exec latex man}
@@ -58,6 +55,7 @@ file delete install.aux install.log install.toc
 
 # I.c  generate official manual of c-level interface
 #verbose {generate manual of c-level interface}
+mLog log info generating manpages
 
 # pwd = doc
 file mkdir man
@@ -74,7 +72,7 @@ cd ..
 
 
 # II. security measures
-mVerbose \t\tSecurity measures
+mLog log info Security measures
 
 # enable checking at target (do this before generation of manifest)
 cd tests
@@ -89,13 +87,13 @@ mConfigure unix
 
 
 # generate message digests for all files and several digests
-mVerbose \t\tGenerating digests (please wait)
+mLog log info Generating digests (please wait)...
 
 set files [exec /usr/bin/find . -type f -print]
 regsub -all "\n" $files { } files
 
 foreach md {crc crc-zlib adler md5 sha haval} {
-    mVerbose \t\t\t$md ...
+    mLog log info $md ...
     catch {eval exec md -a $md $files > digests.$md}
 }
 
