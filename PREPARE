@@ -1,6 +1,8 @@
 # -*- tcl -*-
 # prepare module 'Trf' for distribution
 
+# do it ourself, must not be included into digest files!
+mExclude PREPARE
 
 # O. insert various information into some files
 #    (version, patchlevel, current date)
