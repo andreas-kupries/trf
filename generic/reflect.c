@@ -662,7 +662,7 @@ cleanup:
   
     memcpy (t, buf, bufLen);
 
-    t [bufLen] == '\0';
+    t [bufLen] = '\0';
     Tcl_DStringAppendElement (&command, t);
 
     Tcl_Free (t);
