@@ -32,8 +32,8 @@ Before starting compilation and installation a few notes:
 	call the \strong {source-directory} from now on.
 \end{itemize}
 
-This package depends in its operation on quite a few others. Here's
-are list of them:
+This package depends in its operation on quite a few others. Here is a
+list of them:
 
 \begin{itemize}
 \item	\strong {\tcl}, of course. The package will compile with 7.6
@@ -47,19 +47,19 @@ are list of them:
 \item	\strong {Memchan}. Trf can be used without, but the
 	testsuite coming with this distribution requires it.
 
-	Current version is 1.2. A binary distribution for Win32 is
+	Current version is 1.3. A binary distribution for Win32 is
 	available.
 
 	\latex{\begin {tabular} {|l|l|} \hline
-	source 	       & \url {ftp://ftp.westend.com/pub/aku/memchan1.2.tar.gz} \\ \hline
-	source (win)   & \url {ftp://ftp.westend.com/pub/aku/memchan12.zip} \\ \hline
-	binary (win32) & \url {ftp://ftp.westend.com/pub/aku/mchan12b.zip} \\ \hline
+	source 	       & \url {ftp://ftp.westend.com/pub/aku/memchan1.3.tar.gz} \\ \hline
+	source (win)   & \url {ftp://ftp.westend.com/pub/aku/memchan13.zip} \\ \hline
+	binary (win32) & \url {ftp://ftp.westend.com/pub/aku/mchan13b.zip} \\ \hline
 	\end {tabular}}
 	\html{	\html{
 	\begin{itemize}
-	\item	\htmladdnormallink {source}{ftp://ftp.westend.com/pub/aku/memchan1.2.tar.gz}
-	\item	\htmladdnormallink {source (win)}{ftp://ftp.westend.com/pub/aku/memchan12.zip}
-	\item	\htmladdnormallink {binary (win32)}{ftp://ftp.westend.com/pub/aku/mchan12b.zip}
+	\item	\htmladdnormallink {source}{ftp://ftp.westend.com/pub/aku/memchan1.3.tar.gz}
+	\item	\htmladdnormallink {source (win)}{ftp://ftp.westend.com/pub/aku/memchan13.zip}
+	\item	\htmladdnormallink {binary (win32)}{ftp://ftp.westend.com/pub/aku/mchan13b.zip}
 	\end{itemize}}}
 
 	
@@ -74,7 +74,7 @@ are list of them:
 	for more info.
 
 \item	\strong {\SSLeay}. Another implementation of 'des',
-	additionally used to implement 'rc2', 'md2' and 'sha-1'. Has
+	additionally used to implement 'rc2', 'md2' and 'sha1'. Has
 	priority over 'libdes' because of this. It will be loaded at
 	runtime, if required. It is therefore optional. See chapter
 	\ref {libdes} for more info.
@@ -120,8 +120,24 @@ Now you have two choices.
 
 	\begin {tabular} {|l|l|} \hline
 	standard.patch	& tcl$<$version$>$/generic	\\ \hline
-	byteorder.patch	& tcl$<$version$>$/		\\ \hline
+	byteorder.patch	& \strong {see below}		\\ \hline
 	\end {tabular}
+
+	\strong {Danger}: The working directories required by the
+	byteorder patch differ between tcl 7.6 and 8.0b1. It is
+	tcl$<$version$>$/ for 7.6 and tcl$<$version$>$/generic for
+	8.0b1. I made some changes to the patch to remove the
+	dependency on \file {configure*}.
+
+	\strong {Remark}: The byteorder patch is required only if the
+	availability of command \cmd {binio} is desired. See the OS
+	specific section on how to activate its compilation.
+
+	\strong {Recommendation}: Unter 7.6 it is a good choice to
+	activate \cmd {binio}, as there is no equivalent functionality
+	available. Tcl 8.0b1 on the other hand has \cmd {fcopy} and
+	\cmd {binary}, so it is no loss if \cmd {binio} is left out.
+
 \end   {enumerate}
 
 
@@ -257,8 +273,10 @@ The makefile will then check number and names of the files in the
 package, generate dependency information, compile them and at last
 build the library.
 
-\item	For a shared library add the \opt {--enable-shared} to \cmd
-	{configure}. 
+\item	In contrast to earlier versions \strong {the system will build
+	a shared library by default}. Give option \opt
+	{--disable-shared} to \cmd {configure} if this is not
+	desired.
 
 \item	To check the extension, type \cmd {make test} or \cmd
 	{make check}. This will build a tclsh containing just tcl and
@@ -268,6 +286,9 @@ build the library.
 \item	At last type \cmd {make install} to install the generated
 	library and the exported header. This installation conforms to
 	the rules set by the package loader mechanism of the tcl-core. 
+
+\item	With \opt{--enable-binio} you are able to activate compilation
+	and linkage of command \cmd {binio}.
 \end {itemize}
 
 You do have a non-standard setup (tcl not installed at \file
@@ -284,7 +305,6 @@ you.
 	\item	\$(TCL\_INCLUDE\_DIR)
 	\item	\file {../../tcl8.0/generic}
 	\item	\file {../../tcl8.0b*/generic}
-	\item	\file {../../tcl8.0a2/generic}
 	\item	\file {../../tcl7.6/generic}
 	\item	\file {../../tcl/generic}
 	\item	\file {../../tcl}
@@ -312,7 +332,6 @@ you.
 	\item	\$(TCL\_LIB\_DIR)
 	\item	\file {../../tcl8.0/unix}
 	\item	\file {../../tcl8.0b*/unix}
-	\item	\file {../../tcl8.0a2/unix}
 	\item	\file {../../tcl7.6/unix}
 	\item	\file {../../tcl/unix}
 	\item	\file {../../tcl}
@@ -353,5 +372,8 @@ The installation conforms to the rules set by the package loader
 mechanism of the tcl-core.
 
 Use \cmd {nmake test} to execute a self test of the generated library.
+
+Uncommenting the variable BINIO allows activation of compilation and
+linkage for command \cmd {binio}.
 
 \end {document}

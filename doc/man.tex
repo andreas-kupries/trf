@@ -1,8 +1,8 @@
 % -*- latex -*-
 \documentclass {report}
-\usepackage{makeidx}
-\usepackage {html}
-\include {defs}
+\usepackage    {makeidx}
+\usepackage    {html}
+\include       {defs}
 \makeindex
 
 % external, but distributed here too
@@ -10,6 +10,7 @@
 \def\installman{\htmladdnormallink {installation manual} {../install/install.html}}
 \def\capi{      \htmladdnormallink {C-level} {../capi/capi.html}}
 \def\capiref{   \htmladdnormallink {online reference} {../capi/capi.html}}
+\def\manps{     \htmladdnormallink{postscript version}{man.ps.gz}}
 
 % remove this for the official release.
 \def\unoff{
@@ -17,6 +18,7 @@
 	release, just to have a complete web site. The official
 	distribution will be made as soon as tcl 8.0b1 is out. Because
 	of this no binary release for \win{} was made, too.}
+
 
 \begin {document}
 
@@ -31,8 +33,9 @@
 	distributed at @mDate@.
 \end{center}
 
-A \htmladdnormallink{postscript version}{man.ps.gz} is available.
+A \manps{} is available.
 \index{postscript version}
+% much more indexing is required!
 
 \strong{Warning:} The contents of this document are likely to change.
 It is advisable not to use links to any pages other than the first
@@ -78,17 +81,16 @@ in tcl8.0, aka
 the \installman{} to gain insight into the requirements of this
 extension.
 
-To repeat the abstract: \trf {} is an extension library to the script
-language \tcl, as created by \jo.
-
 At the \capi{} a set of commands is provided for management,
 implementation and usage of ``transformer''-procedures. These are
-called by the generic channel system to pre- or postprocess data just
-before writing, resp. immediately after reading. This allows
+called by the (patched) generic channel system to pre- or postprocess
+data just before writing, resp. immediately after reading. This allows
 transparent implementation of things like:
 
 \begin {itemize}
 \item	Gathering statistics about the data flowing through a channel.
+% This I had in the first implementation, should port it to this one too.
+
 \item	Converting in and out of printable representations of binary
 	data.
 \item	Decryption, encryption of information read or written.
@@ -200,19 +202,21 @@ All commands are available in 2 modes of operation, ``immediate'' and
 \begin {itemize}
 \item[immediate:]	\cmd {command} -option arg {value} \dots{} \arg {source} \arg {destination}
 
-			In this mode the command reads data from the
-			channel \arg {source}, transforms it according
-			to its specification (and the configuration as
-			defined by the options) and then writes the
-			result into the \arg {destination} channel.
+	In this mode the command reads data from the channel \arg
+	{source}, transforms it according to its specification (and
+	the configuration as defined by the options) and then writes
+	the result into the \arg {destination} channel. 
 
 \item[attached:]	\cmd {command} -attach \arg {channel} -option \arg {value} \dots{}
 
-			Here a transformation procedure is created,
-			configured as defined by the options and then
-			attached to the \arg {channel}. All data read
-			from or written into the \arg {channel} will
-			be transformed accordingly from now on.
+	Here a transformation procedure is created, configured as
+	defined by the options and then attached to the \arg
+	{channel}. All data read from or written into the \arg
+	{channel} will be transformed accordingly from now on. 
+
+	This mode is the one requiring the patches to the
+	core. Without them we would be unable to stack our
+	transformational channel onto the named one.
 \end   {itemize}
 
 
@@ -235,8 +239,9 @@ all lowercase. Options common to them all:
 \item [-direction]	Allowed values are ``encrypt'', ``decrypt'' and all
 			unique abbreviations. Specifies the operation
 			to be executed in immediate mode or the
-			operation executed upon write! if attached to
-			a channel.
+			operation executed upon \strong {write} if
+			attached to a channel.
+
 \item [-key]		Argument to this option has to be a readable
 			channel. The user key for encryption and/or
 			decryption is defined by the contents of this
@@ -297,7 +302,7 @@ Cipher characteristics:
 \end   {center}
 
 The upper limit set upon the keysize of RC2 is artificially imposed,
-due to the implementation of some operations in the framework.
+due to the implementation of reading the key in the framework.
 
 
 \section {Message digests}
@@ -316,14 +321,14 @@ due to the implementation of some operations in the framework.
 
 The commands to invoke them are identical to the names, converted to
 all lowercase. In immediate mode no options are allowed. Attached
-digests have to submodes available:
+digests have two submodes available:
 
 \begin {itemize}
 \item[-mode]	The allowed arguments are ``absorb'', ``write'' and
 		all unique abbreviations.
 
 		In the first submode written data is not changed
-		except for attachment of the message digest at then
+		except for attachment of the message digest at the
 		end of the input. During reading a digest is computed
 		too and then compared to the one attached. The
 		'-matchflag' must be defined to propagate the result
@@ -337,7 +342,7 @@ digests have to submodes available:
 
 \item[-matchflag]	The value specifies the name of global
 			variable to write the result of a digest
-			comparison to. Allowed for mode ``absorb''
+			comparison into. Allowed for mode ``absorb''
 			only. Its definition for a write-only channel
 			will be ignored.
 
@@ -359,10 +364,11 @@ digests have to submodes available:
 
 \section {Data conversion}
 
-All data conversion commands support only one option, ``-mode''.
-Allowed values are ``encode'', ``decode'' and all unique
+All data conversion commands support only one option,
+``-mode''. Allowed values are ``encode'', ``decode'' and all unique
 abbreviations. It specifies the operation to be executed in immediate
-mode or the operation executed upon write! if attached to a channel.
+mode or the operation executed upon \strong {write} if attached to a
+channel.
 
 Encode converts from binary data into the described representation,
 decode does the reverse (obviously :-).
@@ -421,13 +427,18 @@ input.
 	(file, socket, \dots {}) is identical to \cmd {close}.
 
 \item	\cmd {binio}. See file \file {doc/binio.proposal}
-	for more information.
+	for more information. This command is excluded by default, as
+	tcl 8.0b1 now provides equivalent functionality (See commands
+	\cmd {binary} and \cmd {fcopy}). Inclusion requires
+	application of the byteorder patch. See the \installman{} for
+	more information.
 \end	{enumerate}
 
 
 \section {Quick Reference}
 Now a quick reference describing the available commands, their type of
-algorithm and location of implementation.
+algorithm and location of implementation. The format specifiers
+available to \cmd {binio} can be found in a separate table afterward.
 
 \begin {tabular}{|l|l|l|}\hline
 	Command		& Type				& Location \\ \hline\hline
@@ -448,8 +459,8 @@ algorithm and location of implementation.
 	oct		& Conversion			& \trf	\\ \hline
 	rc2		& Blockcipher			& \SSLeay \\ \hline
 	rc4		& Cipher			& \trf	\\ \hline
-	ripemd-160	& Message digest		& \trf	\\ \hline
-	ripemd-128	& Message digest		& \trf	\\ \hline
+	ripemd160	& Message digest		& \trf	\\ \hline
+	ripemd128	& Message digest		& \trf	\\ \hline
 	rs\_ecc		& Error correcting coder	& \trf	\\ \hline
 	sha		& Message digest		& \trf	\\ \hline
 	sha1		& Message digest		& \SSLeay \\ \hline
@@ -457,6 +468,46 @@ algorithm and location of implementation.
 	uuencode	& Conversion			& \trf	\\ \hline
 	zip		& Data compression		& \zlib	\\ \hline
 \end {tabular}
+
+This is more than a table of the format specifiers available to
+\cmd{binio}. It includes a comparison to \cmd{binary format} of tcl
+8.0b1 too.
+
+\begin {tabular}{|l|l|l|}\hline
+Format & Meaning		& Meaning in 8.0b1 \\ \hline\hline
+a & --				& string, '\\0'-padded			\\ \hline
+A & --				& string, space-padded			\\ \hline
+b & --				& binary digits, low-2-high		\\ \hline
+B & --				& binary digits, high-2-low		\\ \hline
+c & signed int, 8 bit (char)	& see left				\\ \hline
+C & unsigned int, 8 bit		& --					\\ \hline
+d & signed int, 32 bit		& floating number, 64 bit		\\ \hline
+D & signed int, 16 bit		& --					\\ \hline
+f & floating number, 32 bit	& see left.				\\ \hline
+F & floating number, 64 bit	& --					\\ \hline
+h & --				& hex digits, low-2-high		\\ \hline
+H & --				& hex digits, high-2-low		\\ \hline
+i & --				& signed int, 32 bit, little endian	\\ \hline
+I & --				& signed int, 32 bit, big-endian	\\ \hline
+l & signed int, 64 bit		& --					\\ \hline
+L & unsigned int, 64 bit	& --					\\ \hline
+o & signed int, 32 bit, octal	& --					\\ \hline
+O & signed int, 16 bit, octal	& --					\\ \hline
+s & string, '\\0'-terminated	& signed int, 16 bit, little-endian	\\ \hline
+S & --				& signed int, 16 bit, big-endian	\\ \hline
+u & unsigned int, 32 bit	& --					\\ \hline
+U & unsigned int, 32 bit	& --					\\ \hline
+x & signed int, 32 bit, hex	& '\\0'					\\ \hline
+X & signed int, 16 bit, hex	& Set cursor relative			\\ \hline
+@ & --				& Set cursor absolute			\\ \hline
+\end {tabular}
+
+There is a more subtle difference too. In contrast to \cmd {binio},
+which uses the channel byteorder to determine the endianness of the
+written data \cmd{binary format} requires an explicit specification. In
+general \cmd{binary format} is much nearer to the perl equivalent
+((un)pack), despite the names.
+
 
 
 \chapter {Copyrights}\label {copyright}
