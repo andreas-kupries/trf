@@ -2565,7 +2565,7 @@ Tcl_Interp*        interp;
 #ifdef TRF_STREAM_DEBUG
   trans->inCounter  = 0;
   trans->outCounter = 0;
-  trans->name       = entry->trfType->name;
+  trans->name       = (char*) entry->trfType->name;
 #endif
 
   trans->patchIntegrated = entry->registry->patchIntegrated;
@@ -2893,7 +2893,7 @@ Tcl_Interp*    interp;
   PRINT ("Data = %d {\n", outLen);
   DUMP  (outLen, outString);
   PRINT ("}\n");
-  STREAM_OUT (trans, read, buf);
+  STREAM_OUT (trans, outLen, outString);
 
   trans->lastStored += outLen;
 
