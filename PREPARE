@@ -45,7 +45,7 @@ eval mExclude \
 	doc/FUN doc/ascii.man doc/ascii85 doc/scratch-pad \
 	doc/code34 doc/Notes doc/ToDo doc/trf.def \
 	doc/hash.operation doc/INSTALL doc/INSTALL.optional \
-	doc/ROADMAP doc/speed doc/trf.xpm
+	doc/ROADMAP doc/speed doc/trf.xpm doc/references
 
 # I.b  generate official manual, diverse variants (dvi, ps)
 mLog info generating manual 

@@ -1,3 +1,12 @@
+Mon Jan 11 22:40:19 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* --- Release 1.3 ---
+
+	* doc/nodes/techintro.node: New node, contains a technical
+	  explanation of the inner working of Trf, with images.
+
+	* doc/nodes/intro.node: Added reference to technical information.
+
 Mon Dec 14 22:04:35 1998  Andreas Kupries  <a.kupries@westend.com>
 
 	* patches/v8.1b1: Started yesterday with the trf patches for the
@@ -155,7 +164,7 @@ Sat Jun 13 13:38:19 1998  Andreas Kupries  <a.kupries@westend.com>
 	  object. As 'Tcl_DuplicateObj' returns an object having refcount
 	  0 I caused a problem by not incrementing the refcount, but
 	  decrementing it, thus trying to free the object a second time.
-	=> transform.test 1.x solved.
+	  => transform.test 1.x solved.
 
 Fri Jun 12 16:13:26 1998  Andreas Kupries  <a.kupries@westend.com>
 
