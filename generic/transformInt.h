@@ -52,11 +52,6 @@
 #else
 #   include "compat/zlib.h"
 #endif
-#ifdef HAVE_DES_H
-#   include <des.h>
-#else
-#   include "compat/des.h"
-#endif
 #endif
 #ifdef HAVE_STDLIB_H
 #   include <stdlib.h>
@@ -237,6 +232,20 @@ TrfZIPOptions _ANSI_ARGS_ ((void));
 #define TRF_MIN_LEVEL_STR "1"
 #define TRF_MAX_LEVEL_STR "9"
 
+
+/*
+ * General purpose library loader functionality.
+ * Used by -> TrfLoadZlib, -> TrfLoadLibdes.
+ */
+
+EXTERN int
+TrfLoadLibrary _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* libName,
+			    VOID** handlePtr, char** symbols, int num));
+
+EXTERN void
+TrfLoadFailed _ANSI_ARGS_ ((VOID** handlePtr));
+
+
 /*
  * 'zlib' will be dynamically loaded. Following a structure to
  * contain the addresses of all functions required by this extension.
@@ -266,29 +275,6 @@ TrfLoadZlib _ANSI_ARGS_ ((Tcl_Interp *interp));
 
 
 /*
- * 'libdes' will be dynamically loaded. Following a structure to
- * contain the addresses of all functions required by this extension.
- *
- * Affected commands are: des
- * They will fail, if the library could not be loaded.
- */
-
-typedef struct LibdesFunctions {
-  VOID *handle;
-  void (* des_set_key)     _ANSI_ARGS_ ((des_cblock *key, des_key_schedule schedule));
-  void (* des_ecb_encrypt) _ANSI_ARGS_ ((des_cblock *input,des_cblock *output,
-					 des_key_schedule schedule, int enc));
-} libdesFunctions;
-
-EXTERN libdesFunctions ld;
-
-EXTERN int
-TrfLoadLibdes _ANSI_ARGS_ ((Tcl_Interp *interp));
-
-
-
-
-/*
  * Internal initialization procedures for all transformers implemented here.
  */
 
@@ -302,8 +288,10 @@ EXTERN int TrfInit_Ascii85  _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int TrfInit_CRC      _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_MD5      _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_MD2      _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_HAVAL    _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_SHA      _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_SHA1     _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_ADLER    _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_CRC_ZLIB _ANSI_ARGS_ ((Tcl_Interp* interp));
 
@@ -311,6 +299,7 @@ EXTERN int TrfInit_IDEA     _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_BLOWFISH _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_DES      _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_RC4      _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_RC2      _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int TrfInit_RS_ECC   _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_ZIP      _ANSI_ARGS_ ((Tcl_Interp* interp));
@@ -325,8 +314,10 @@ EXTERN int TrfInit_Binio    _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 #if (TCL_MAJOR_VERSION < 8)
 #define ADD_RES(interp, text) Tcl_AppendResult (interp, text, (char*) NULL);
+#define RESET_RES(interp)     Tcl_ResetResult  (interp);
 #else
-#define ADD_RES(intrp, text) Tcl_StringObjAppend (Tcl_GetObjResult (interp), (char*) text, -1);
+#define ADD_RES(interp, text) Tcl_StringObjAppend (Tcl_GetObjResult (interp), (char*) text, -1);
+#define RESET_RES(interp)     Tcl_ResetObjResult  (interp);
 
 /* redirect tcl functionality to wrapper, get interpreter result right */
 #define Tcl_GetChannel TrfGetChannel

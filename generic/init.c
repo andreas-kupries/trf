@@ -151,6 +151,11 @@ Tcl_Interp* interp;
     if (res != TCL_OK)
       return res;
 
+    res = TrfInit_RC2 (interp);
+
+    if (res != TCL_OK)
+      return res;
+
     /*
      * Register message digests
      */
@@ -175,12 +180,22 @@ Tcl_Interp* interp;
     if (res != TCL_OK)
       return res;
 
+    res = TrfInit_MD2 (interp);
+
+    if (res != TCL_OK)
+      return res;
+
     res = TrfInit_HAVAL (interp);
 
     if (res != TCL_OK)
       return res;
 
     res = TrfInit_SHA (interp);
+
+    if (res != TCL_OK)
+      return res;
+
+    res = TrfInit_SHA1 (interp);
 
     if (res != TCL_OK)
       return res;

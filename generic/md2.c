@@ -1,7 +1,7 @@
 /*
- * des.c --
+ * md2.c --
  *
- *	Implements and registers blockcipher DES.
+ *	Implements and registers message digest generator MD2.
  *
  *
  * Copyright (c) 1996 Andreas Kupries (a.kupries@westend.com)
@@ -28,51 +28,54 @@
  */
 
 #include "loadman.h"
-/*#include "des/des.h"*/
 
-#define  BLOCK_SIZE       (8)
-#define  MIN_KEYSIZE      (8)
-#define  MAX_KEYSIZE      (8)
-#define  KEYSCHEDULE_SIZE (DES_SCHEDULE_SZ)
+/*
+ * Generator description
+ * ---------------------
+ *
+ * The MD2 alogrithm is used to compute a cryptographically strong
+ * message digest.
+ */
+
+#define DIGEST_SIZE               (MD2_DIGEST_LENGTH)
+#define CTX_TYPE                  MD2_CTX
 
 /*
  * Declarations of internal procedures.
  */
 
-static void BC_Schedule _ANSI_ARGS_ ((VOID*  key, int key_length, int direction,
-				      VOID** e_schedule,
-				      VOID** d_schedule));
-static void BC_Encrypt  _ANSI_ARGS_ ((VOID* in, VOID* out, VOID* key /* schedule */));
-static void BC_Decrypt  _ANSI_ARGS_ ((VOID* in, VOID* out, VOID* key /* schedule */));
-static int  BC_Check    _ANSI_ARGS_ ((Tcl_Interp* interp));
+static void MD_Start     _ANSI_ARGS_ ((VOID* context));
+static void MD_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
+static void MD_UpdateBuf _ANSI_ARGS_ ((VOID* context, unsigned char* buffer, int bufLen));
+static void MD_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
+static int  MD_Check     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 /*
- * cipher definition.
+ * Generator definition.
  */
 
-static Trf_BlockcipherDescription bcDescription = {
-  "des",
-  BLOCK_SIZE,
-  MIN_KEYSIZE,
-  MAX_KEYSIZE,
-  KEYSCHEDULE_SIZE,
-  BC_Schedule,
-  BC_Encrypt,
-  BC_Decrypt,
-  BC_Check
+static Trf_MessageDigestDescription mdDescription = {
+  "md2",
+  sizeof (CTX_TYPE),
+  DIGEST_SIZE,
+  MD_Start,
+  MD_Update,
+  MD_UpdateBuf,
+  MD_Final,
+  MD_Check
 };
 
 /*
  *------------------------------------------------------*
  *
- *	TrfInit_DES --
+ *	TrfInit_MD2 --
  *
  *	------------------------------------------------*
- *	Register the blockcipher implemented in this file.
+ *	Register the generator implemented in this file.
  *	------------------------------------------------*
  *
  *	Sideeffects:
- *		As of 'Trf_RegisterBlockcipher'.
+ *		As of 'Trf_Register'.
  *
  *	Result:
  *		A standard Tcl error code.
@@ -81,20 +84,20 @@ static Trf_BlockcipherDescription bcDescription = {
  */
 
 int
-TrfInit_DES (interp)
+TrfInit_MD2 (interp)
 Tcl_Interp* interp;
 {
-  return Trf_RegisterBlockcipher (interp, &bcDescription);
+  return Trf_RegisterMessageDigest (interp, &mdDescription);
 }
 
 /*
  *------------------------------------------------------*
  *
- *	BC_Schedule --
+ *	MD_Start --
  *
  *	------------------------------------------------*
- *	Generate keyschedules for blockcipher from
- *	specified key.
+ *	Initialize the internal state of the message
+ *	digest generator.
  *	------------------------------------------------*
  *
  *	Sideeffects:
@@ -107,49 +110,20 @@ Tcl_Interp* interp;
  */
 
 static void
-BC_Schedule (key, key_length, direction, e_schedule, d_schedule)
-VOID*  key;
-int    key_length;
-int    direction;
-VOID** e_schedule;
-VOID** d_schedule;
+MD_Start (context)
+VOID* context;
 {
-  if (direction == TRF_ENCRYPT) {
-
-    if (*e_schedule == NULL) {
-      *e_schedule = Tcl_Alloc (KEYSCHEDULE_SIZE);
-
-      if (*d_schedule != NULL) {
-	memcpy (*e_schedule, *d_schedule, KEYSCHEDULE_SIZE);
-      } else {
-	desf.set_key ((des_cblock*) key,
-		      *((des_key_schedule*) *e_schedule));
-      }
-    }
-  } else if (direction == TRF_DECRYPT) {
-    if (*d_schedule == NULL) {
-      *d_schedule = Tcl_Alloc (KEYSCHEDULE_SIZE);
-
-      if (*e_schedule != NULL) {
-	memcpy (*d_schedule, *e_schedule, KEYSCHEDULE_SIZE);
-      } else {
-	desf.set_key ((des_cblock*) key,
-		      *((des_key_schedule*) *d_schedule));
-      }
-
-    }
-  } else {
-    panic ("unknown direction code given to des::BC_Schedule");
-  }
+  md2f.init ((MD2_CTX*) context);
 }
 
 /*
  *------------------------------------------------------*
  *
- *	BC_Encrypt --
+ *	MD_Update --
  *
  *	------------------------------------------------*
- *	Encrypt a single block with the implemented cipher.
+ *	Update the internal state of the message digest
+ *	generator for a single character.
  *	------------------------------------------------*
  *
  *	Sideeffects:
@@ -162,24 +136,23 @@ VOID** d_schedule;
  */
 
 static void
-BC_Encrypt (in, out, key)
-VOID* in;
-VOID* out;
-VOID* key;
+MD_Update (context, character)
+VOID* context;
+unsigned int   character;
 {
-  desf.ecb_encrypt ((des_cblock*) in,
-		    (des_cblock*) out,
-		    * (des_key_schedule*) key,
-		    1);
+  unsigned char buf = character;
+
+  md2f.update ((MD2_CTX*) context, &buf, 1);
 }
 
 /*
  *------------------------------------------------------*
  *
- *	BC_Decrypt --
+ *	MD_UpdateBuf --
  *
  *	------------------------------------------------*
- *	Decrypt a single block with the implemented cipher.
+ *	Update the internal state of the message digest
+ *	generator for a character buffer.
  *	------------------------------------------------*
  *
  *	Sideeffects:
@@ -192,24 +165,22 @@ VOID* key;
  */
 
 static void
-BC_Decrypt (in, out, key)
-VOID* in;
-VOID* out;
-VOID* key;
+MD_UpdateBuf (context, buffer, bufLen)
+VOID* context;
+unsigned char* buffer;
+int   bufLen;
 {
-  desf.ecb_encrypt ((des_cblock*) in,
-		    (des_cblock*) out,
-		    * (des_key_schedule*) key,
-		    0);
+  md2f.update ((MD2_CTX*) context, (unsigned char*) buffer, bufLen);
 }
 
 /*
  *------------------------------------------------------*
  *
- *	BC_Check --
+ *	MD_Final --
  *
  *	------------------------------------------------*
- *	Check for existence of libdes, load it.
+ *	Generate the digest from the internal state of
+ *	the message digest generator.
  *	------------------------------------------------*
  *
  *	Sideeffects:
@@ -217,20 +188,41 @@ VOID* key;
  *
  *	Result:
  *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static void
+MD_Final (context, digest)
+VOID* context;
+VOID* digest;
+{
+  md2f.final ((unsigned char*) digest, (MD2_CTX*) context);
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	MD_Check --
+ *
+ *	------------------------------------------------*
+ *	Do global one-time initializations of the message
+ *	digest generator.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		Loads the shared library containing the
+ *		MD2 functionality
+ *
+ *	Result:
+ *		A standard Tcl error code.
  *
  *------------------------------------------------------*
  */
 
 static int
-BC_Check (interp)
+MD_Check (interp)
 Tcl_Interp* interp;
 {
-  return TrfLoadDes (interp);
+  return TrfLoadMD2 (interp);
 }
-
-/*
- * External code from here on.
- */
-
-/*#include "des/set_key.c"*/
-/*#include "des/ecb_enc.c"*/

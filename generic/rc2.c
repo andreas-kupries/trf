@@ -1,7 +1,7 @@
 /*
- * des.c --
+ * rc2.c --
  *
- *	Implements and registers blockcipher DES.
+ *	Implements and registers blockcipher RC2.
  *
  *
  * Copyright (c) 1996 Andreas Kupries (a.kupries@westend.com)
@@ -28,12 +28,11 @@
  */
 
 #include "loadman.h"
-/*#include "des/des.h"*/
 
-#define  BLOCK_SIZE       (8)
-#define  MIN_KEYSIZE      (8)
-#define  MAX_KEYSIZE      (8)
-#define  KEYSCHEDULE_SIZE (DES_SCHEDULE_SZ)
+#define  BLOCK_SIZE       (RC2_BLOCK)
+#define  MIN_KEYSIZE      (1)
+#define  MAX_KEYSIZE      (1024)
+#define  KEYSCHEDULE_SIZE (RC2_KEY_LENGTH)
 
 /*
  * Declarations of internal procedures.
@@ -51,7 +50,7 @@ static int  BC_Check    _ANSI_ARGS_ ((Tcl_Interp* interp));
  */
 
 static Trf_BlockcipherDescription bcDescription = {
-  "des",
+  "rc2",
   BLOCK_SIZE,
   MIN_KEYSIZE,
   MAX_KEYSIZE,
@@ -65,7 +64,7 @@ static Trf_BlockcipherDescription bcDescription = {
 /*
  *------------------------------------------------------*
  *
- *	TrfInit_DES --
+ *	TrfInit_RC2 --
  *
  *	------------------------------------------------*
  *	Register the blockcipher implemented in this file.
@@ -81,7 +80,7 @@ static Trf_BlockcipherDescription bcDescription = {
  */
 
 int
-TrfInit_DES (interp)
+TrfInit_RC2 (interp)
 Tcl_Interp* interp;
 {
   return Trf_RegisterBlockcipher (interp, &bcDescription);
@@ -122,8 +121,8 @@ VOID** d_schedule;
       if (*d_schedule != NULL) {
 	memcpy (*e_schedule, *d_schedule, KEYSCHEDULE_SIZE);
       } else {
-	desf.set_key ((des_cblock*) key,
-		      *((des_key_schedule*) *e_schedule));
+	rc2f.set_key ((RC2_KEY*) *e_schedule,
+		      key_length, key, 1024);
       }
     }
   } else if (direction == TRF_DECRYPT) {
@@ -133,13 +132,13 @@ VOID** d_schedule;
       if (*e_schedule != NULL) {
 	memcpy (*d_schedule, *e_schedule, KEYSCHEDULE_SIZE);
       } else {
-	desf.set_key ((des_cblock*) key,
-		      *((des_key_schedule*) *d_schedule));
+	rc2f.set_key ((RC2_KEY*) *e_schedule,
+		      key_length, key, 1024);
       }
 
     }
   } else {
-    panic ("unknown direction code given to des::BC_Schedule");
+    panic ("unknown direction code given to rc2::BC_Schedule");
   }
 }
 
@@ -167,10 +166,10 @@ VOID* in;
 VOID* out;
 VOID* key;
 {
-  desf.ecb_encrypt ((des_cblock*) in,
-		    (des_cblock*) out,
-		    * (des_key_schedule*) key,
-		    1);
+  rc2f.ecb_encrypt ((unsigned char*) in,
+		    (unsigned char*) out,
+		    (RC2_KEY*) key,
+		    RC2_ENCRYPT);
 }
 
 /*
@@ -197,10 +196,10 @@ VOID* in;
 VOID* out;
 VOID* key;
 {
-  desf.ecb_encrypt ((des_cblock*) in,
-		    (des_cblock*) out,
-		    * (des_key_schedule*) key,
-		    0);
+  rc2f.ecb_encrypt ((unsigned char*) in,
+		    (unsigned char*) out,
+		    (RC2_KEY*) key,
+		    RC2_DECRYPT);
 }
 
 /*
@@ -225,12 +224,5 @@ static int
 BC_Check (interp)
 Tcl_Interp* interp;
 {
-  return TrfLoadDes (interp);
+  return TrfLoadRC2 (interp);
 }
-
-/*
- * External code from here on.
- */
-
-/*#include "des/set_key.c"*/
-/*#include "des/ecb_enc.c"*/
