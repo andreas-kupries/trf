@@ -34,15 +34,19 @@ if {[string compare test [info procs test]] == 1} then {source defs}
 #define CL 0xcc91732bl
 #define CR 0x8022f684l
 
-
+catch {unset key}
 set key(1) [text2hex "abcdefghijklmnopqrstuvwxyz"]
 set key(2) [text2hex "Who is John Galt?"]
 
+
+catch {unset in}
 array set in {
     1	424c4f5746495348
     2	fedcba9876543210
 }
 
+
+catch {unset out}
 array set out {
     1	324ed0fef413a203
     2	cc91732b8022f684
