@@ -44,7 +44,7 @@ eval mExclude \
 	doc/ROADMAP doc/speed
 
 # I.b  generate official manual, diverse variants (dvi, ps)
-mLog log info generating manual variants (dvi, ps)
+mLog info generating manual variants (dvi, ps)
 
 
 cd doc
@@ -69,7 +69,7 @@ mExclude defs.aux man.idx
 # pwd = doc
 
 # manual pages of C API out of header comments (c2man)
-mLog log info generating manpages
+mLog info generating manpages
 set fail [catch {
     cd ..
     set ipath [file join [file dirname [file dirname [info library]]] include]
@@ -79,10 +79,10 @@ set fail [catch {
     #          ~~~~~~~~~~ => remove gcc specific syntax from header files
     cd doc
 } msg]	;#{}
-if {$fail} {mLog log error $msg}
+if {$fail} {mLog error $msg}
 
 # same as above, but hyperized.
-mLog log info generating hyperized manpages
+mLog info generating hyperized manpages
 set fail [catch {
     cd ..
     set ipath [file join [file dirname [file dirname [info library]]] include]
@@ -92,7 +92,7 @@ set fail [catch {
     #          ~~~~~~~~~~ => remove gcc specific syntax from header files
     cd doc
 } msg]	;#{}
-if {$fail} {mLog log error $msg}
+if {$fail} {mLog error $msg}
 
 # generate base page for c-api documentation
 exec ./capibase > html/capi.html
@@ -101,9 +101,9 @@ file rename html/capi.html html/capi/capi.html
 
 
 mLatex2html \
-	-title-man        "Trf Manual"			\
-	-up-man           "../../../software.html"	\
-	-up-title-man     "Software page"		\
+	-title-man        "Trf Manual"		\
+	-up-man           "../../../tcltk.html"	\
+	-up-title-man     "Tcl/Tk"		\
 	\
 	-title-install    "Trf Installation manual"	\
 	-up-install       "../man/man.html"		\
@@ -115,7 +115,7 @@ mLatex2html \
 # -up-man assumes that the document is part of the
 # hierarchy at http://www.westend.com/~kupries
 # It resides at '.../doc/trf/man/man.html'
-# The software page is 'software.html'
+# The tcltk page is 'tcltk.html'
 
 # compact the pages a little
 eval exec html_crunch [glob html/install/*.html]
@@ -133,7 +133,7 @@ cd ..
 
 
 # II. security measures
-mLog log info Security measures
+mLog info Security measures
 
 # enable checking at target (do this before generation of manifest)
 cd tests
@@ -148,13 +148,13 @@ mConfigure unix
 
 
 # generate message digests for all files and several digests
-mLog log info Generating digests (please wait)...
+mLog info Generating digests (please wait)...
 
 set files [exec /usr/bin/find . -type f -print]
 regsub -all "\n" $files { } files
 
 foreach md {crc crc-zlib adler md5 sha haval ripemd128 ripemd160} {
-    mLog log info $md ...
+    mLog info $md ...
     catch {eval exec md -a $md $files > digests.$md}
 }
 
