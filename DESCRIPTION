@@ -1,4 +1,7 @@
 # -*- tcl -*-
+
+#	ftp://ftp.westend.com/pub/aku/trf@mShortDosVersion@-win32.zip
+
 extension trf {
     description {
 	A loadable extension to Tcl providing commands for data conversion,
@@ -15,7 +18,8 @@ extension trf {
 	collection of tcl-level commands was implemented. Additionally
 	some binary data support is put in as well.
 
-	A separate package containing encryption code is available.
+	A separate package containing encryption transformation is available
+	at the same site carrying this package.
     }
 
     keywords {
@@ -34,7 +38,6 @@ extension trf {
 
     primary-urls {
 	ftp://ftp.westend.com/pub/aku/<ARCH>
-	ftp://ftp.westend.com/pub/aku/trf@mShortDosVersion@-win32.zip
     }
 
     development-platform {Linux 2.0.29, gcc 2.7.2.3}
