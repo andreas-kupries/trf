@@ -70,6 +70,7 @@ INSTALLDIR	=	$(TCL)\lib\$(TRF)
 
 
 TRFOBJS = \
+	$(TMPDIR)\dllEntry.obj \
 	$(TMPDIR)\adler.obj \
 	$(TMPDIR)\asc85code.obj \
 	$(TMPDIR)\b64code.obj \

@@ -1,4 +1,11 @@
 
+> #if (TCL_MAJOR_VERSION < 8)
+> #define Tcl_GetStringResult(interp) (interp->result)
+> #endif
+
+sinnvoll fuer einige stellen ?
+
+
 <>	Stubs! in Trf, for TrfCrypt.
 
 <>	tools/md5sum

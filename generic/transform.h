@@ -71,7 +71,6 @@ extern "C" {
 
 #   if defined(_MSC_VER)
 #	define TRF_EXPORT(a,b) TCL_STORAGE_CLASS a b
-#	define DllEntryPoint DllMain
 #   else
 #	if defined(__BORLANDC__)
 #	    define TRF_EXPORT(a,b) a _export b

@@ -46,11 +46,18 @@ node trf_home {
 
 	hr
 
-	p "Other extensions using this one are
+	p "Packages built upon the fundament provided by [trf] are
 	"
 
 	bullet_list {
-	    li "[link trfcrypt], by myself"
+	    li "[link trfcrypt], by myself,
+	    contains various encryption systems
+	    "
+
+	    li "[tls], an SSL/TLS implementation,
+	    by Matt Newman <matt@novadigm.com>.
+	    [tls_source].
+	    "
 	}
     }
 }

@@ -117,7 +117,7 @@ VOID* context;
 {
   /* call md specific initialization here */
 
-  CRC = z.crc32 (0L, Z_NULL, 0);
+  CRC = zf.crc32 (0L, Z_NULL, 0);
 }
 
 /*
@@ -148,7 +148,7 @@ unsigned int   character;
 
   unsigned char buf = character;
 
-  CRC = z.crc32 (CRC, &buf, 1);
+  CRC = zf.crc32 (CRC, &buf, 1);
 }
 
 /*
@@ -178,7 +178,7 @@ int   bufLen;
 {
   /* call md specific update here */
 
-  CRC = z.crc32 (CRC, buffer, bufLen);
+  CRC = zf.crc32 (CRC, buffer, bufLen);
 }
 
 /*

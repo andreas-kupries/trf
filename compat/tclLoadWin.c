@@ -15,9 +15,12 @@
  * enable usage of procedure internal to tcl
  */
 
+#ifdef USE_TCL_STUBS
+#include "tclWinInt.h"
+#else
 EXTERN void
 TclWinConvertError _ANSI_ARGS_((DWORD errCode));
-
+#endif
 
 typedef struct LibraryList {
     HINSTANCE handle;
@@ -63,11 +66,6 @@ VOID *dlopen(path, mode)
     LibraryList *ptr;
     static int initialized = 0;
 
-    /* DEBUG * /
-    printf ("dlopen (%p='%s', %d)\n", path, path, mode);
-    printf ("\tinitialized = %d\n", initialized);
-    / * DEBUG */
-
     if (!initialized) {
 	initialized = 1;
 	Tcl_CreateExitHandler((Tcl_ExitProc *) UnloadLibraries,
@@ -75,19 +73,11 @@ VOID *dlopen(path, mode)
     }
     handle = (VOID *) LoadLibrary(path);
 
-    /* DEBUG * /
-    printf ("\thandle = %p\n", handle);
-    / * DEBUG */
-
     if (handle != NULL) {
 	    ptr = (LibraryList*) ckalloc(sizeof(LibraryList));
 	    ptr->handle = (HINSTANCE) handle;
 	    ptr->nextPtr = libraryList;
 	    libraryList = ptr;
-
-	    /* DEBUG * /
-	    printf ("\tlibraryList = %p\n", libraryList);
-	    / * DEBUG */
     }
     return handle;
 }
@@ -118,16 +108,9 @@ dlclose(handle)
 {
     LibraryList *ptr, *prevPtr;
 
-    /* DEBUG * /
-    printf ("dlclose (%p)\n", handle);
-    / * DEBUG */
-
     ptr = libraryList; prevPtr = NULL;
     while (ptr != NULL) {
 	if (ptr->handle == (HINSTANCE) handle) {
-	  /* DEBUG * /
-	  printf ("\tfreeing library\n");
-	  / * DEBUG */
 	    FreeLibrary((HINSTANCE) handle);
 	    if (prevPtr) {
 		prevPtr->nextPtr = ptr->nextPtr;
@@ -140,9 +123,6 @@ dlclose(handle)
 	prevPtr = ptr;
 	ptr = ptr->nextPtr;
     }
-    /* DEBUG * /
-    printf ("\thandle not found\n");
-    / * DEBUG */
     return -1;
 }
 
@@ -227,10 +207,6 @@ UnloadLibraries(clientData)
 {
     LibraryList *ptr;
     LibraryList *list = *((LibraryList **) clientData);
-
-    /* DEBUG * /
-    printf ("UnloadLibraries\n");
-    / * DEBUG */
 
     while (list != NULL) {
 	FreeLibrary(list->handle);

@@ -42,8 +42,30 @@ maintained by Jan Nijtmans (nijtmans@nici.kun.nl) contain this patch too .
 
 Supporting (optional) packages are:
 
-*	memchan 1.0  or higher (required by testsuite)
-*	zlib-1.0.4   or higher (1.1.2 is current!)
+*	memchan 1.0  or higher (required by testsuite, by same author)
+
+	See	http://www.oche.de/~akupries/soft/memchan/
+
+*	zlib-1.0.4   or higher (1.1.3 is current!)
+
+	See	http://www.cdrom.com/pub/infozip/zlib/
+
+*	SSLeay or OpenSSL
+
+	See	http://www.ssleay.org/
+	or	http://www.openssl.org/
+
+Packages built upon the fundament provided by Trf are
+
+*	TrfCrypt, contains various encryption systems, by myself.
+
+	See	http://www.oche.de/~akupries/soft/trfcrypt/
+
+*	TLS, an SSL/TLS implementation for all valid Tcl channels,
+	by Matt Newman <matt@novadigm.com>
+
+	See	http://www.sensus.org/tcl/tls.htm
+		http://www.sensus.org/tcl/tls11.tgz
 
 
 This distribution contains the source code for Tcl-Trf + documentation

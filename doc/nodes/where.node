@@ -7,6 +7,10 @@ node trf_where {
     description "Where to get the Trf distribution"
     parent      trf_home
 
+    menu {
+	memchan_bdist
+    }
+
     contents {
 	p "The extension is distributed in several variants, as listed
 	below. The given links allow an immediate download.
@@ -45,12 +49,18 @@ node trf_where {
 	    }
 	    table_row bgcolor=#ffffcc {
 		table_data {
-		    cgi_puts [link trf_win32bin]
-		    cgi_puts "<br>[cem [strong Note:]] This distribution was compiled
-		    with VC++ 5.0, on Win NT 4sp3. It is not usable for
-		    Win95/98."
+		    p "The binary distributions are on a separate page."
+		    p [link memchan_bdist]
 		}
 	    }
+	}
+
+	hr
+	p "[strong [cem Upcoming:]] Version [strong 2.0]."
+	p "Changes to expect:"
+	bullet_list {
+	    li "Drops support for Tcl 7.x. / Tk 4.x."
+	    li "Allows compilation with its own stub table."
 	}
     }
 }

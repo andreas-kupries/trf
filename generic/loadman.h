@@ -49,13 +49,13 @@ extern "C" {
 #ifdef HAVE_MD2_H
 #   include <md2.h>
 #else
-#   include "compat/md2.h"
+#   include "../compat/md2.h"
 #endif
 
 #ifdef HAVE_SHA_H
 #   include <sha.h>
 #else
-#   include "compat/sha.h"
+#   include "../compat/sha.h"
 #endif
 
 #ifdef TCL_STORAGE_CLASS

@@ -39,7 +39,7 @@ static char* symbols [] = {
  * Global variable containing the vectors into the 'zlib'-library.
  */
 
-zFunctions z = {0}; /* THREADING: serialize initialization */
+zFunctions zf = {0}; /* THREADING: serialize initialization */
 
 
 int
@@ -50,7 +50,7 @@ TrfLoadZlib (interp)
 
   TrfLock; /* THREADING: serialize initialization */
 
-  res = Trf_LoadLibrary (interp, Z_LIB_NAME, (VOID**) &z, symbols, 10);
+  res = Trf_LoadLibrary (interp, Z_LIB_NAME, (VOID**) &zf, symbols, 10);
   TrfUnlock;
 
   return res;

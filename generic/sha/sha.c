@@ -6,7 +6,12 @@
 /* NIST's proposed modification to SHA of 7/11/94 may be */
 /* activated by defining USE_MODIFIED_SHA */
 
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
+#else
+#include "../../compat/stdlib.h"
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include "sha.h"

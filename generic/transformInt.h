@@ -48,18 +48,18 @@ extern "C" {
 #ifdef HAVE_DLFCN_H
 #   include <dlfcn.h>
 #else
-#   include "compat/dlfcn.h"
+#   include "../compat/dlfcn.h"
 #endif
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>
 #else
-#   include "compat/zlib.h"
+#   include "../compat/zlib.h"
 #endif
 #endif
 #ifdef HAVE_STDLIB_H
 #   include <stdlib.h>
 #else
-#   include "compat/stdlib.h"
+#   include "../compat/stdlib.h"
 #endif
 #endif
 

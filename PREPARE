@@ -26,7 +26,7 @@ mInsertInfo \
 set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mShortDosVersion@).dll"
 eval mInsertInfo \
 	win/README      win/pkgIndex.tcl \
-	win/makefile.vc win/makefile.vc5 \
+	win/makefile.vc win/makefile.vc5 win/Makefile.gnu \
 	win/trf.rc [glob win/trf*.README]
 
 mGetDescription
@@ -105,6 +105,9 @@ exec ./capibase > nodes/capi.node
 # Now generate documentation for linkage into my
 # site and standalone distribution
 
+mHandleBinaryDistributions
+#mHandleBinaryDistributions doc/license.terms README win/msvcrt.dll
+
 # -up-man assumes that the document is part of the
 # hierarchy at http://www.westend.com/~kupries
 # It resides at '~kupries/doc/trf/index.html'
@@ -160,32 +163,34 @@ mConfigure unix
 # --------------------------------------------------------------
 # make that a procedure, later.
 
-# trf1480.dll is a copy of trf1380.dll, due to no change in functionality.
-# creation of trf1481.dll is waiting in the todo pipeline.
+if {0} {
+    # trf1480.dll is a copy of trf1380.dll, due to no change in functionality.
+    # creation of trf1481.dll is waiting in the todo pipeline.
 
-file copy win/trf1380.dll win/trf1480.dll
-file copy win/trf1380.lib win/trf1480.lib
-file copy win/trf1580.dll win/trf1680.dll
-file copy win/trf1580.lib win/trf1680.lib
-file rename win/trf1380.README win/trf1680.README
+    file copy win/trf1380.dll win/trf1480.dll
+    file copy win/trf1380.lib win/trf1480.lib
+    file copy win/trf1580.dll win/trf1680.dll
+    file copy win/trf1580.lib win/trf1680.lib
+    file rename win/trf1380.README win/trf1680.README
 
-set bindir  "[::pool::string::cap $mName]${mVersion}"
+    set bindir  "[::pool::string::cap $mName]${mVersion}"
 
-file mkdir $bindir [file join $bindir patches]
-eval file copy [glob win/trf*] $bindir
-file copy      doc/license.terms win/pkgIndex.tcl win/msvcrt.dll README $bindir
-eval file copy [glob patches/*] [file join $bindir patches]
+    file mkdir $bindir [file join $bindir patches]
+    eval file copy [glob win/trf*] $bindir
+    file copy      doc/license.terms win/pkgIndex.tcl win/msvcrt.dll README $bindir
+    eval file copy [glob patches/*] [file join $bindir patches]
 
-set supfolder [file join .. sup.${mName}${mFullVersion}]
-cd $bindir
-exec unzip [file join .. $supfolder doc.zip]
-file rename ${mName}${mFullVersion}/doc/html doc
-file delete -force ${mName}${mFullVersion}
-cd ..
+    set supfolder [file join .. sup.${mName}${mFullVersion}]
+    cd $bindir
+    exec unzip [file join .. $supfolder doc.zip]
+    file rename ${mName}${mFullVersion}/doc/html doc
+    file delete -force ${mName}${mFullVersion}
+    cd ..
 
-exec zip -r9 win32.zip $bindir
-mSupport win32.zip
-file delete -force $bindir win32.zip
+    exec zip -r9 win32.zip $bindir
+    mSupport win32.zip
+    file delete -force $bindir win32.zip
+}
 
 # --------------------------------------------------------------
 

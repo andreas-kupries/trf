@@ -153,6 +153,7 @@ INSTALLDIR	=	$(PKG_INSTALLBASEDIR)\$(TRF)
 # List of the object files to generate and link.
 
 TRFOBJS = \
+	$(TMPDIR)\dllEntry.obj \
 	$(TMPDIR)\adler.obj \
 	$(TMPDIR)\asc85code.obj \
 	$(TMPDIR)\b64code.obj \

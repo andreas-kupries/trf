@@ -217,7 +217,7 @@ ClientData     clientData;
     return (ClientData) NULL;
   }
 
-  res = z.deflateInit_ (&c->state, o->level, ZLIB_VERSION, sizeof(z_stream));
+  res = zf.deflateInit_ (&c->state, o->level, ZLIB_VERSION, sizeof(z_stream));
 
   if (res != Z_OK) {
     if (interp) {
@@ -259,7 +259,7 @@ ClientData clientData;
 
   /* release conversion specific items here (ZIP) */
 
-  z.deflateEnd (&c->state);
+  zf.deflateEnd (&c->state);
   Tcl_Free ((char*) c->output_buffer);
   Tcl_Free ((char*) c);
 }
@@ -306,7 +306,7 @@ ClientData clientData;
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
-    res = z.deflate (&c->state, Z_NO_FLUSH);
+    res = zf.deflate (&c->state, Z_NO_FLUSH);
 
     if (res < Z_OK) {
       if (interp) {
@@ -375,7 +375,7 @@ ClientData clientData;
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
-    res = z.deflate (&c->state, Z_NO_FLUSH);
+    res = zf.deflate (&c->state, Z_NO_FLUSH);
 
     if (res < Z_OK) {
       if (interp) {
@@ -442,7 +442,7 @@ ClientData clientData;
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
-    res = z.deflate (&c->state, Z_FINISH);
+    res = zf.deflate (&c->state, Z_FINISH);
 
     if (res < Z_OK) {
       if (interp) {
@@ -495,7 +495,7 @@ ClientData clientData;
 
   /* execute conversion specific code here (ZIP) */
 
-  z.deflateReset (&c->state);
+  zf.deflateReset (&c->state);
 }
 
 /*
@@ -545,7 +545,7 @@ ClientData     clientData;
     return (ClientData) NULL;
   }
 
-  res = z.inflateInit_ (&c->state, ZLIB_VERSION, sizeof (z_stream));
+  res = zf.inflateInit_ (&c->state, ZLIB_VERSION, sizeof (z_stream));
 
   if (res != Z_OK) {
     if (interp) {
@@ -587,7 +587,7 @@ ClientData clientData;
 
   /* release conversion specific items here (ZIP) */
 
-  z.inflateEnd (&c->state);
+  zf.inflateEnd (&c->state);
 
   Tcl_Free ((char*) c->output_buffer);
   Tcl_Free ((char*) c);
@@ -634,7 +634,7 @@ ClientData clientData;
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
-    res = z.inflate (&c->state, Z_NO_FLUSH);
+    res = zf.inflate (&c->state, Z_NO_FLUSH);
 
     if (res < Z_OK) {
       if (interp) {
@@ -702,7 +702,7 @@ ClientData clientData;
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
-    res = z.inflate (&c->state, Z_NO_FLUSH);
+    res = zf.inflate (&c->state, Z_NO_FLUSH);
 
     if (res < Z_OK) {
       if (interp) {
@@ -769,7 +769,7 @@ ClientData clientData;
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
-    res = z.inflate (&c->state, Z_FINISH);
+    res = zf.inflate (&c->state, Z_FINISH);
 
     if ((res < Z_OK) || (res == Z_NEED_DICT)) {
       if (interp) {
@@ -822,7 +822,7 @@ ClientData clientData;
 
   /* execute conversion specific code here (ZIP) */
 
-  z.inflateReset (&c->state);
+  zf.inflateReset (&c->state);
 }
 
 /*
