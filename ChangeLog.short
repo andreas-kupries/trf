@@ -1,3 +1,18 @@
+Changes from 2.0p6 to 2.0p7
+
+*	Bugfixes for
+
+	-	usage of wrong strings in the script 'transform'.
+	-	wrong variable in makefile
+	-	a buffer overun in the quoted-printable encoding.
+	-	static library support.
+
+*	Patch from Jan Nijtmans for usage of TEA build chain with
+	mingw32.
+
+*	Added a link to the TclAH extension (Authentication
+	Hashes) to the documentation.
+
 Changes from 2.0p5 to 2.0p6
 
 *	Bugfixes
