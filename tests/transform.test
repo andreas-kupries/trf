@@ -16,6 +16,15 @@
 if {[string compare test [info procs test]] == 1} then {source defs}
 
 
+proc 82 {a b} {
+    if {[string compare [info tclversion] 8.2] < 0} {
+	return $b
+    } else {
+	return $a
+    }
+}
+
+
 proc identity {operation buffer} {
     global  tracevar
     lappend tracevar "${operation}-[string length $buffer]"
@@ -60,4 +69,5 @@ test transform-2.1 {transform behaviour, attached read} {
     close             $in
 
     set tracevar
-} {create/write-0 create/read-0 query/ratio-0 query/maxRead-0 read-17 query/maxRead-0 flush/read-0 flush/write-0 delete/write-0 delete/read-0}
+} [82 {create/write-0 create/read-0 query/ratio-0 query/maxRead-0 read-17 query/maxRead-0 flush/read-0 flush/write-0 delete/write-0 delete/read-0} {create/write-0 create/read-0 query/ratio-0 query/maxRead-0 read-17 query/maxRead-0 flush/read-0 query/maxRead-0 flush/write-0 delete/write-0 delete/read-0}]
+

@@ -3370,10 +3370,12 @@ SeekCalculatePolicies (trans)
    * stack of transformations.
    */
 
+#ifdef USE_TCL_STUBS
   Tcl_Channel self = trans->self;
   Tcl_Channel next;
 
   int stopped = 0;
+#endif
 
   START (SeekCalculatePolicies);
 
@@ -3508,7 +3510,9 @@ SeekCalculatePolicies (trans)
   trans->seekCfg.overideAllowed = 0;
 #endif
 
+#ifdef USE_TCL_STUBS
 done:
+#endif
   trans->seekState.used.numBytesTransform =
     trans->seekCfg.chosen.numBytesTransform;
 
