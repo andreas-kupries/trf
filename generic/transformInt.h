@@ -328,6 +328,9 @@ TrfBZ2Options _ANSI_ARGS_ ((void));
 #define TRF_MIN_LEVEL_STR "1"
 #define TRF_MAX_LEVEL_STR "9"
 
+#ifndef WINAPI
+#define WINAPI
+#endif
 
 /*
  * 'zlib' will be dynamically loaded. Following a structure to
