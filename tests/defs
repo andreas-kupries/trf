@@ -131,6 +131,13 @@ proc defblock {name hexdata} {
     set x $hexdata
 }
 
+proc defblock_decimal {name list_of_decimals} {
+    upvar $name $name
+    set hex ""
+    foreach i $list_of_decimals {append hex [format %02x $i]}
+
+    defblock $name $hex
+}
 
 proc hex2chan {hexdata} {
     set               x [memchan]

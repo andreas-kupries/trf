@@ -29,14 +29,14 @@ test transform-1.0 {transform behaviour, immediate write} {
     set     tracevar ""
     lappend tracevar [transform -mode write -command identity foobarflabbergast]
     set     tracevar
-} {create/write-0 write-17 flush_write-0 delete/write-0 foobarflabbergast}
+} {create/write-0 write-17 flush/write-0 delete/write-0 foobarflabbergast}
 
 
 test transform-1.1 {transform behaviour, immediate read} {
     set     tracevar ""
     lappend tracevar [transform -mode read -command identity foobarflabbergast]
     set     tracevar
-} {create/read-0 read-17 flush_read-0 delete/read-0 foobarflabbergast}
+} {create/read-0 read-17 flush/read-0 delete/read-0 foobarflabbergast}
 
 
 test transform-2.0 {transform behaviour, attached write} {
