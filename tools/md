@@ -101,14 +101,14 @@ proc gen-hash {} {
 
 	fconfigure  $f -translation binary
 	hex -attach [set digest [memchan]] -mode encode
-	$md -attach $f                     -mode write -read-dest $digest
+	$md -attach $f                     -mode write -read-dest $digest -read-type channel
 
 	read  $f
 	close $f
 
 	#transform remove $digest head
 	unstack $digest
-	seek $digest 0
+	seek    $digest 0
 
 	if {0 == [string compare stdin $f]} {
 	    puts $out "[string tolower [read $digest]]"
@@ -162,14 +162,14 @@ proc check-hash {} {
 
 	fconfigure  $f -translation binary
 	hex -attach [set digest [memchan]] -mode encode
-	$md -attach $f                     -mode write -read-dest $digest
+	$md -attach $f                     -mode write -read-dest $digest -read-type channel
 
 	read  $f
 	close $f
 
 	#transform remove $digest head
 	unstack $digest
-	seek             $digest 0
+	seek    $digest 0
 
 	set new_digest [string tolower [read $digest]]
 	close $digest
