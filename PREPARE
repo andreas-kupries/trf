@@ -35,8 +35,8 @@ mGenerateANNOUNCE
 # I.a  remove inofficial documents
 
 eval mExclude \
-	mails patches/v8.0a1 patches/v8.0a2 patches/v8.0b1 \
-	[glob patches/v8.0b2/*.orig] \
+	mails patches/v8.0a1 patches/v8.0a2 patches/v8.0b1 patches/v8.0b2 \
+	[glob patches/v8.0/*.orig] \
 	[glob patches/nijtmans.*] DEPENDS doc/file doc/delete \
 	doc/FUN doc/ascii.man doc/ascii85 doc/scratch-pad \
 	doc/code34 doc/Notes doc/ToDo doc/trf.def \

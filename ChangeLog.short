@@ -1,12 +1,13 @@
 Changes from b3 to final:
 
 *	**** WARNING to all users of earlier versions ****
+
 	The script API was rewritten to take advantage of the Tcl 8.x
 	object API. The ability to operate on channels was retained,
 	albeit under a different syntax. Please reread the manual, at
 	least chapter 5 (Available commands).
 
-*	Extended C-level API allows for (block)cipher specific option
+*a	Extended C-level API allows for (block)cipher specific option
 	processing.
 
 *	A general transformation was added, under the name 'transform'.
@@ -16,7 +17,7 @@ Changes from b3 to final:
 
 	<>	ROT, for the fun of it.
 	<>	SAFER, by the author of IDEA.
-
+		(uses *a)
 
 
 Changes from b2 to b3:

@@ -1,3 +1,10 @@
+Mon Aug 18 21:18:31 1997  Andreas Kupries  <a.kupries@westend.com>
+
+	* win/makefile.vc, PREPARE: finishing touches, removed last
+	  remnants of '8.0b2'.
+
+	* patches/v8.0: Added patches for tcl 8.0 final.
+
 Tue Jul 29 00:18:21 1997  Andreas Kupries  <a.kupries@westend.com>
 
 	* Ready for relase of Tcl 8.0 final now.
