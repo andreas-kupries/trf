@@ -29,8 +29,6 @@
 \begin{center}\large
 	This document accompanies \trf{} @mFullVersion@, as
 	distributed at @mDate@.
-
-	\unoff
 \end{center}
 
 A \htmladdnormallink{postscript version}{man.ps.gz} is available.
@@ -44,10 +42,14 @@ page (this page).
 \begin{abstract} 
 \trf {} is an extension library to the script language \tcl, as created
 by \jo. It extends the language at the C-level with so-called
-``transformer''-procedures. Build upon this framework (and as proof of
-concept) a collection of \tcl{}-level commands was implemented, most
-of them related to cryptography. Additionally some binary data support
-is put in as well.
+``transformer''-procedures. With the help of some patches to the core
+the package is able to intercept all read/write operations on
+designated channels, thus giving it the ability to transform the
+buffer contents as desired. This allows things like transparent
+encryption, compression, charset recoding, etc.
+Build upon this framework (and as proof of concept) a collection of
+\tcl{}-level commands was implemented, most of them related to
+cryptography. Additionally some binary data support is put in as well.
 \end{abstract} 
 \pagebreak
 \tableofcontents
