@@ -346,8 +346,17 @@ else
 		# (3)
 		MD5_LIB_FILE=libmd5crypt$TCL_SHLIB_SUFFIX
 		TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=\\\"libmd5crypt$TCL_SHLIB_SUFFIX\\\""
-		LIBS="-lcrypt $LIBS"
-		SHLIB_LD_LIBS="-lcrypt $SHLIB_LD_LIBS"
+
+		# Sun Solaris is special, we may not use -lcrypt !
+		# Verified for: SunOS 5.5.1 (Solaris 2.5)
+		#		SunOS 5.6   (Solaris 2.6)
+
+		case "`uname -s`" in
+		SunOS*)	;;
+		*)	LIBS="-lcrypt $LIBS"
+			SHLIB_LD_LIBS="-lcrypt $SHLIB_LD_LIBS"
+			;;
+		esac
 
 		eval AC_DEFINE_UNQUOTED(CRYPT_LIB_NAME, "libmd5crypt$TCL_SHLIB_SUFFIX")
 	fi
