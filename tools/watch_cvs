@@ -6,14 +6,14 @@
 cd `dirname $0`/..
 
 export CVSROOT
-CVSROOT=:pserver:anonymous@cvs.tcltrf.sourceforge.net:/cvsroot/trf
+CVSROOT=:pserver:anonymous@cvs1:/cvsroot/trf
 
-if [ 0 -lt `cvs diff trf 2>/dev/null | wc -l` ]
+if [ 0 -lt `cvs -d $CVSROOT diff trf 2>/dev/null | wc -l` ]
 then
 	out=$HOME/logs/trf
 	mkdir -p `dirname $out`
 
-	cvs co trf >$out 2>&1
+	cvs -d $CVSROOT co trf >$out 2>&1
 	mkdir -p trf/htdocs/state
 
         # Use a new htdocs_setup script immediately.
@@ -21,7 +21,7 @@ then
         # only after with the change after the current
         # one.
 
-        cp ./trf/tools/htdocs_setup ./tools_setup
+        cp ./trf/tools/htdocs_setup ./tools/htdocs_setup
 
 	(sleep 60 ; ./tools/htdocs_setup ) &
 fi

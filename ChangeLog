@@ -1,3 +1,11 @@
+2003-01-20  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
+
+	* tools/rules/manpage.html.site: Redone in the likeness of memchan.
+	* tools/mpexpand:                Now ready for documentation of trf
+	* tools/manpage_regen:           in doctools format.
+	* tools/nroff_regen:
+	* tools/watch_cvs:
+
 2003-01-09  Andreas Kupries  <andreask@activestate.com>
 
 	* ./tclconfig/tcl.m4:       Added code to look for and load
@@ -44,7 +52,7 @@
 
 	* configure: Regenerated.
 
-2002-10-15  Andreas Kupries  <andreask@pliers.activestate.com>
+2002-10-15  Andreas Kupries  <andreask@activestate.com>
 
 	* Makefile.in (Trf_INCLUDES): Continuation to empty line followed
 	  by comment tripped the HP make. It extended the continuation
@@ -57,7 +65,7 @@
 	  +DAportable we specify for the AS PA-RISC2.2 build host. This is
 	  a problem for _all_ TEA and TEA 2 based configure files.
 
-2002-10-02  Andreas Kupries  <andreask@pliers.activestate.com>
+2002-10-02  Andreas Kupries  <andreask@activestate.com>
 
 	* configure.in (crypt): Check for crypt forced to false on
 	  Windows.
