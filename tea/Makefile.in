@@ -753,7 +753,9 @@ install-lib-binaries: installdirs
 	    $(RANLIB) $(DESTDIR)$(libdir)/$$p; \
 	  else :; fi; \
 	done
-	$(TCLSH_PROG) mkIndex.tcl
+	if test "x$(MAKE_LIB)" = "x$(MAKE_SHARED_LIB)"; then \
+	  $(TCLSH_PROG) mkIndex.tcl; \
+	fi
 
 #========================================================================
 # Install binary executables (e.g. .exe files)
