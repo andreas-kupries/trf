@@ -1,3 +1,11 @@
+Wed Oct  4 20:44:40 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* tools/fixhbline:
+	* tools/findinpath: Fixed problem with tool combo when an
+ 	  interp-app (wish and/or tclsh) is not found by 'findinpath'. We
+ 	  must not stop the installation, only 'fixhbline' is able to
+ 	  decide which of the two interp-apps will be required.
+
 Wed Aug  9 20:52:41 2000  Andreas Kupries  <a.kupries@westend.com>
 
 	* -- Released 2.1. --

@@ -15,5 +15,6 @@ foreach p $path {
     }
 }
 
-# not found
-exit 1
+# not found -- no error, fixhbline will check for empty name
+#exit 1
+exit 0

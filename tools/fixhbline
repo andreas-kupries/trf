@@ -30,6 +30,11 @@ if {![regexp {^#!} $ipPath]} {
 if {[regexp {wish} $ipPath]} {
     # wish application
 
+    if {{} == $wish_path} {
+	# wish was not found
+	exit 5
+    }
+
     set    fout [open $appscript.[pid] w]
     puts  $fout "#!$wish_path"
     fcopy $fin $fout
@@ -44,6 +49,11 @@ if {[regexp {wish} $ipPath]} {
 
 if {[regexp {tclsh} $ipPath]} {
     # tclsh application
+
+    if {{} == $wish_path} {
+	# tclsh was not found
+	exit 6
+    }
 
     set    fout [open $appscript.[pid] w]
     puts  $fout "#!$tclsh_path"
