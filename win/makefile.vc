@@ -70,6 +70,7 @@ TRFOBJS = \
 	$(TMPDIR)\blockcipher.obj \
 	$(TMPDIR)\blowfish.obj \
 	$(TMPDIR)\c_opt.obj \
+	$(TMPDIR)\c_util.obj \
 	$(TMPDIR)\cipher.obj \
 	$(TMPDIR)\convert.obj \
 	$(TMPDIR)\crc.obj \
@@ -88,6 +89,7 @@ TRFOBJS = \
 	$(TMPDIR)\octcode.obj \
 	$(TMPDIR)\rc4.obj \
 	$(TMPDIR)\rc2.obj \
+	$(TMPDIR)\rot.obj \
 	$(TMPDIR)\registry.obj \
 	$(TMPDIR)\rs_ecc.obj \
 	$(TMPDIR)\sha.obj \
