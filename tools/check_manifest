@@ -7,7 +7,7 @@ set manifest [lindex $argv 0]
 rename file ori_file
 proc   file {name} {
     global files
-    set    files(name) 1
+    set    files($name) 1
     if {! [ori_file exists $name]} {
 	puts stdout "missing: $name"
     }
@@ -15,6 +15,7 @@ proc   file {name} {
 
 # read manifest and check existence of all listed files
 source $manifest
+
 
 # now backwards: find all files and check
 # for files not listed in the manifest
