@@ -30,7 +30,8 @@
 #include	"transformInt.h"
 
 static int
-TrfUnstackCmd _ANSI_ARGS_ ((ClientData notUsed, Tcl_Interp* interp, int argc, char** argv));
+TrfUnstackCmd _ANSI_ARGS_ ((ClientData notUsed, Tcl_Interp* interp,
+			    int argc, char** argv));
 
 /*
  *----------------------------------------------------------------------
@@ -85,7 +86,12 @@ TrfUnstackCmd (notUsed, interp, argc, argv)
     return TCL_ERROR;
   }
 
+#ifdef USE_TCL_STUBS
   Tcl_UnstackChannel (interp, chan);
+#else
+  Tcl_UndoReplaceChannel (interp, chan); /* Non-stub Tcl, 8.0.x or below */
+#endif
+
   return TCL_OK;
 }
 

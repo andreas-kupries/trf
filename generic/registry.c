@@ -1918,12 +1918,16 @@ Tcl_Interp*        interp;
   if (trans->patchIntegrated) {
     trans->parent = NULL;
   }
-  
+
+#ifdef USE_TCL_STUBS
   trans->self = Tcl_StackChannel (interp, entry->transType,
 				  (ClientData) trans, trans->mode,
 				  attach);
-  
-
+#else
+  trans->self = Tcl_ReplaceChannel (interp, entry->transType,
+				    (ClientData) trans, trans->mode,
+				    attach);
+#endif
 
   if (trans->self == (Tcl_Channel) NULL) {
     Tcl_Free ((char*) trans);
