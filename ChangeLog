@@ -1,5 +1,10 @@
 Wed Jul 23 00:02:03 1997  Andreas Kupries  <a.kupries@westend.com>
 
+	* generic/reflect.c (Execute): Added missing separators in 7.6 code.
+
+	* unix/Makefile.in (test): Added SSL_INSTALL_DIR/lib to library
+	  search path, just to be prepared.
+
 	* tests/transform.test: New file, check behaviour of
 	  transformation using scripts to do the work.
 
