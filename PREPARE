@@ -2,84 +2,49 @@
 # prepare module 'Trf' for distribution
 
 
+
+
 # O. insert various information into some files
 #    (version, patchlevel, current date)
 
-set date       [date now]
-set long_date  [clock format [clock scan $date] -format {%B %d, %Y}]
-set short_date [string toupper [clock format [clock scan $date] -format {%d-%b-%Y}]]
-
-# generate version number without dots.
-regsub -all {\.} ${the-version} {} nodot_version
-
-
-replace_in_file LSM                  @DATE@ $short_date
-replace_in_file DESCRIPTION          @DATE@ $long_date
-replace_in_file README               @DATE@ $long_date
-replace_in_file generic/transform.h  @DATE@ $long_date
-replace_in_file generic/patchlevel.h @DATE@ $long_date
-
-set major [lindex [split ${the-version} .] 0]
-set minor [lindex [split ${the-version} .] 1]
-
-replace_in_file README               @VERSION@ ${the-patchlevel}
-replace_in_file ANNOUNCE             @VERSION@ ${the-patchlevel}
-replace_in_file LSM                  @VERSION@ ${the-patchlevel}
-replace_in_file DESCRIPTION          @VERSION@ ${the-patchlevel}
-
-replace_in_file README               @NODOT_VERSION@ $nodot_version
-replace_in_file ANNOUNCE             @NODOT_VERSION@ $nodot_version
-replace_in_file LSM                  @NODOT_VERSION@ $nodot_version
-replace_in_file DESCRIPTION          @NODOT_VERSION@ $nodot_version
-
-replace_in_file generic/transform.h  @VERSION@       ${the-version}
-replace_in_file generic/transform.h  @MAJOR_VERSION@ $major
-replace_in_file generic/transform.h  @MINOR_VERSION@ $minor
-
-replace_in_file unix/configure.in    @VERSION@       ${the-version}
-replace_in_file unix/configure.in    @MAJOR_VERSION@ $major
-replace_in_file unix/configure.in    @MINOR_VERSION@ $minor
-
-replace_in_file generic/patchlevel.h @VERSION@ ${the-patchlevel}
-
-replace_in_file mac/README           @DATE@    $long_date
-replace_in_file mac/README           @VERSION@ ${the-patchlevel}
-
-replace_in_file win/README           @DATE@    $long_date
-replace_in_file win/README           @VERSION@ ${the-patchlevel}
-
-replace_in_file unix/README          @DATE@    $long_date
-replace_in_file unix/README          @VERSION@ ${the-patchlevel}
+set mInfo(@configure_input@) "Distributed at $mInfo(@mDate@)"
+set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mDosVersion@).dll"
 
 file copy generic/pkgIndex.tcl.in win/pkgIndex.tcl
-replace_in_file win/pkgIndex.tcl @configure_input@ "Distributed at $long_date"
-replace_in_file win/pkgIndex.tcl @TRF_VERSION@  ${the-version}
-replace_in_file win/pkgIndex.tcl @TRF_LIB_FILE@ "trf${nodot_version}.dll"
 
-replace_in_file win/makefile.vc @TRF_VERSION@       ${the-version}
-replace_in_file win/makefile.vc @TRF_nodotVERSION@  $nodot_version
-replace_in_file win/makefile.vc @DATE@              $long_date
+mInsertInfo \
+	ANNOUNCE \
+	README \
+	LSM \
+	DESCRIPTION \
+	generic/transform.h \
+	generic/patchlevel.h \
+	unix/configure.in \
+	mac/README \
+	win/README \
+	unix/README \
+	win/pkgIndex.tcl \
+	win/makefile.vc \
+	doc/install.tex
 
-replace_in_file doc/install.tex @VERSION@ ${the-patchlevel}
-replace_in_file doc/install.tex @DATE@    $long_date
 
 
 # I.   clean documentation
 # I.a  remove inofficial documents
-verbose {remove inofficial documents}
 
-eval file delete -force mails [glob patches/nijtmans.*]
-file delete -force patches/v8.0a1
+mVerbose \t\t\tremove inofficial documents
+
+eval mExclude mails patches/v8.0a1 [glob patches/nijtmans.*]
 
 cd doc/speed
 exec /bin/ln -s		../../tests/sha.test.vec f1000000
 cd ..
 
 # pwd = doc
-file delete FUN ascii.man ascii85 scratch-pad code34 Notes ToDo trf.def hash.operation INSTALL INSTALL.optional
+mExclude file delete FUN ascii.man ascii85 scratch-pad code34 Notes ToDo trf.def hash.operation INSTALL INSTALL.optional
 
 # I.b  generate official manual, diverse variants (dvi, ps)
-verbose {generate official manual}
+mVerbose \t\t\tgenerate official manual
 
 # pwd = doc
 catch {exec latex man}
@@ -114,7 +79,7 @@ cd ..
 
 
 # II. security measures
-verbose {security measures}
+mVerbose \t\t\tsecurity measures
 
 # enable checking at target (do this before generation of manifest)
 cd tests
@@ -124,25 +89,19 @@ cd ..
 
 
 # generate configure script to be used
-cd unix
-exec autoconf
-cd ..
+mConfigure unix
+
 
 
 # generate message digests for all files and several digests
-verbose {	generating digests (please wait)}
+mVerbose \t\t\tgenerating digests (please wait)
 set files [exec /usr/bin/find . -type f -print]
 regsub -all "\n" $files { } files
 
 foreach md {crc crc-zlib adler md5 sha haval} {
-    verbose "		$md ..."
+    mVerbose \t\t\t\t$md ...
     catch {eval exec md -a $md $files > digests.$md}
 }
 
 # should secure digest files and checker application against
 # tampering (-> PGP signature)
-
-# III.  record distributed files
-verbose {produce manifest}
-exec tools/get-manifest	Trf
-
