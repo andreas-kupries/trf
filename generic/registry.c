@@ -563,7 +563,7 @@ struct Tcl_Obj* CONST * objv;
     int i;
     for (i = 0; i < objc; i++) {
       PRINT ("Argument [%03d] = \"%s\"\n",
-	     i, TclGetStringFromObj (objv [i], NULL)); FL;
+	     i, Tcl_GetStringFromObj (objv [i], NULL)); FL;
     }
   }
 #endif
