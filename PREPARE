@@ -79,25 +79,6 @@ mLatex2html \
 	-htmldir       html \
 	man.tex install.tex
 
-# -- old code, not removed yet
-if {0} {
-    # html'ized manual from lates source (latex2html)
-    # nav-ICONs from america, have to change that
-    mLog log info hyperized manual
-    set fail [catch {
-	exec latex2html -dir html/man -t "Trf Manual" man.tex 2>/dev/null >/dev/null
-	eval file delete [glob html/man/.*.dir html/man/.*.pag html/man/*.pl html/man/images.*]
-    } msg]	;#{}
-    if {$fail} {mLog log error $msg}
-    
-    mLog log info hyperized installation manual
-    set fail [catch {
-	exec latex2html -dir html/install -t "Trf Installation manual" install.tex 2>/dev/null >/dev/null
-	eval file delete [glob html/install/.*.dir html/install/.*.pag html/install/*.pl html/install/images.*]
-    } msg]	;#{}
-    if {$fail} {mLog log error $msg}
-}
-
 # remove temp files from latex runs
 file delete install.aux install.log install.toc
 file delete man.aux man.log man.toc

@@ -4,6 +4,9 @@ Wed May 21 18:16:42 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  distribute html versions of the manuals. The urls inside are
 	  currently not hyperized yet.
 
+	  -- switched from custom code to procedure now provided by
+	  'makedist'.
+
 Mon May 19 22:35:19 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* doc/man.tex, install.tex: checked with 'ispell', added new
