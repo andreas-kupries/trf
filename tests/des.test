@@ -134,13 +134,13 @@ array set out {
 if {[info tclversion] < 8.0} {
     foreach i [lsort [array names key]] {
 	test des-1.$i-7.6 {des encryption} {
-	    exec_bc des $key($i) {} $in($i) {-dir encrypt -mode ecb -key @key @in @out}
+	    exec_cipher des $key($i) {} $in($i) {-dir encrypt -mode ecb -key @key @in @out}
 	} $out($i) ; # {}
     }
 
     foreach i [lsort [array names key]] {
 	test des-2.$i-7.6 {des decryption} {
-	    exec_bc des $key($i) {} $out($i) {-dir decrypt -mode ecb -key @key @in @out}
+	    exec_cipher des $key($i) {} $out($i) {-dir decrypt -mode ecb -key @key @in @out}
 	} $in($i) ; # {}
     }
 } else {

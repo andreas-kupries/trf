@@ -147,35 +147,35 @@ defblock outE {
 
 if {[info tclversion] < 8.0} {
     test idea-2.0-7.6 {idea ecb encryption} {
-	exec_bc idea $keyA {} $in {-dir encrypt -key @key -mode ecb @in @out}
+	exec_cipher idea $keyA {} $in {-dir encrypt -key @key -mode ecb @in @out}
     } [string toupper $outA] ; # {}
 
     test idea-2.1-7.6 {idea ecb encryption} {
-	exec_bc idea $keyB {} $in {-dir encrypt -key @key -mode ecb @in @out}
+	exec_cipher idea $keyB {} $in {-dir encrypt -key @key -mode ecb @in @out}
     } [string toupper $outB] ; # {}
 
     test idea-3.0-7.6 {idea cbc encryption} {
-	exec_bc idea $keyA $iv $in {-dir encrypt -key @key -mode cbc -iv @iv @in @out}
+	exec_cipher idea $keyA $iv $in {-dir encrypt -key @key -mode cbc -iv @iv @in @out}
     } [string toupper $outC] ; # {}
 
     test idea-3.1-7.6 {idea cbc decryption} {
-	exec_bc idea $keyA $iv $outC {-dir decrypt -key @key -mode cbc -iv @iv @in @out}
+	exec_cipher idea $keyA $iv $outC {-dir decrypt -key @key -mode cbc -iv @iv @in @out}
     } [string toupper $in] ; # {}
 
     test idea-4.0-7.6 {idea cfb encryption} {
-	exec_bc idea $keyA $iv $in {-dir encrypt -key @key -mode cfb -shift 8 -iv @iv @in @out}
+	exec_cipher idea $keyA $iv $in {-dir encrypt -key @key -mode cfb -shift 8 -iv @iv @in @out}
     } [string toupper $outD] ; # {}
 
     test idea-4.1-7.6 {idea cfb decryption} {
-	exec_bc idea $keyA $iv $outD {-dir decrypt -key @key -mode cfb -shift 8 -iv @iv @in @out}
+	exec_cipher idea $keyA $iv $outD {-dir decrypt -key @key -mode cfb -shift 8 -iv @iv @in @out}
     } [string toupper $in] ; # {}
 
     test idea-5.0-7.6 {idea ofb encryption} {
-	exec_bc idea $keyA $iv $in {-dir encrypt -key @key -mode ofb -shift 8 -iv @iv @in @out}
+	exec_cipher idea $keyA $iv $in {-dir encrypt -key @key -mode ofb -shift 8 -iv @iv @in @out}
     } [string toupper $outE] ; # {}
 
     test idea-5.1-7.6 {idea ofb decryption} {
-	exec_bc idea $keyA $iv $outE {-dir decrypt -key @key -mode ofb -shift 8 -iv @iv @in @out}
+	exec_cipher idea $keyA $iv $outE {-dir decrypt -key @key -mode ofb -shift 8 -iv @iv @in @out}
     } [string toupper $in] ; # {}
 
 

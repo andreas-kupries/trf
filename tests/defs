@@ -168,14 +168,16 @@ proc text2chan {data} {
 if {[info tclversion] < 8.0} {
     proc exec_cipher {bc key iv in bc_args} {
 	set _key [hex2chan $key]
-	set _iv  [hex2chan $iv]
 	set _in  [hex2chan $in]
+	if {$iv != {}} {set _iv [hex2chan $iv]}
+
 	set has_out 0
 	set text ""
 
 	regsub -all {@key} $bc_args $_key bc_args
-	regsub -all {@iv}  $bc_args "-in $_iv"  bc_args
-	regsub -all {@in}  $bc_args $_in  bc_args
+	regsub -all {@in}  $bc_args "-in $_in"  bc_args
+
+	if {$iv != {}} {regsub -all {@iv} $bc_args $_iv bc_args}
 
 	if {[regexp -- {@out} $bc_args]} {
 	    set _out [memchan]
@@ -185,6 +187,8 @@ if {[info tclversion] < 8.0} {
 	    set has_out 1
 	}
 
+puts "<<$bc $bc_args -key-type channel>>"
+
 	if {$iv == {}} {
 	    eval $bc $bc_args -key-type channel
 	} else {
@@ -192,8 +196,8 @@ if {[info tclversion] < 8.0} {
 	}
 
 	close $_key
-	close $_iv
 	close $_in
+	if {$iv != {}} {close $_iv}
 
 	if {$has_out} {
 	    unstack $_out
@@ -214,7 +218,7 @@ if {[info tclversion] < 8.0} {
 	seek            $in 0
 
 	set       out [memchan]
-	hex -m e $out
+	hex -attach $out -m e 
 
 	$md -in $in -out $out
 

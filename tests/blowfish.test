@@ -60,13 +60,13 @@ array set out {
 if {[info tclversion] < 8.0} {
     foreach i [lsort [array names key]] {
 	test blowfish-1.$i-7.6 {blowfish encryption} {
-	    exec_bc blowfish $key($i) {} $in($i) {-dir encrypt -mode ecb -key @key @in @out}
+	    exec_cipher blowfish $key($i) {} $in($i) {-dir encrypt -mode ecb -key @key @in @out}
 	} [string toupper $out($i)] ; # {}
     }
 
     foreach i [lsort [array names key]] {
 	test blowfish-2.$i-7.6 {blowfish decryption} {
-	    exec_bc blowfish $key($i) {} $out($i) {-dir decrypt -mode ecb -key @key @in @out}
+	    exec_cipher blowfish $key($i) {} $out($i) {-dir decrypt -mode ecb -key @key @in @out}
 	} [string toupper $in($i)] ; # {}
     }
 } else {
