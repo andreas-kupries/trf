@@ -1,4 +1,8 @@
-Changes from 2.0 to 2.0p2
+Changes from 2.0p3 to 2.0p4
+
+*	Bugfix in the TEA makefile.
+
+Changes from 2.0 to 2.0p3
 
 *	Fixed several small bugs.
 

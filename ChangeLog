@@ -1,3 +1,8 @@
+Sat Jan 15 00:30:22 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* tea/Makefile.in (install-lib-binaries): Fixed error in this
+	  target. Mailed problem and fix to TEA mailing list.
+
 Wed Dec 15 19:27:01 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* -- Release 2.0p3 --
