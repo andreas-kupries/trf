@@ -69,9 +69,20 @@
 #endif
 
 
-/* make internal procedure of tcl available */
+/* Define macro which is TRUE for tcl versions >= 8.1
+ * Required as there are incompatibilities between 8.0 and 8.1
+ */
+
+#define GT81 ((TCL_MAJOR_VERSION > 8) || \
+	      ((TCL_MAJOR_VERSION == 8) && \
+	       (TCL_MINOR_VERSION >= 1)))
+
+
+#if ! (GT81)
+/* enable use of procedure internal to tcl */
 EXTERN void
-panic _ANSI_ARGS_ ((CONST char* format, ...));
+panic _ANSI_ARGS_ ((char* format, ...));
+#endif
 
 
 /*
@@ -270,15 +281,6 @@ EXTERN int TrfInit_Unstack   _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_Binio     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int TrfInit_Transform _ANSI_ARGS_ ((Tcl_Interp* interp));
-
-
-/* Define macro which is TRUE for tcl versions >= 8.1
- * Required as there are incompatibilities between 8.0 and 8.1
- */
-
-#define GT81 ((TCL_MAJOR_VERSION > 8) || \
-	      ((TCL_MAJOR_VERSION == 8) && \
-	       (TCL_MINOR_VERSION >= 1)))
 
 
 #undef TCL_STORAGE_CLASS

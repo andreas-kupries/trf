@@ -296,9 +296,12 @@ ClientData             clientData;
 	  }
 	}
       }
-
     } else {
+#if GT81
+      Tcl_Panic ("unknown mode given to dig_opt.c::CheckOptions");
+#else
       panic ("unknown mode given to dig_opt.c::CheckOptions");
+#endif
     }
   }
 

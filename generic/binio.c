@@ -811,7 +811,11 @@ int   len;
     FLIP (2,5);
     FLIP (3,4);
   } else {
+#if GT81
+    Tcl_Panic ("unknown buffer size %d", len);
+#else
     panic ("unknown buffer size %d", len);
+#endif
   }
 }
 

@@ -615,11 +615,11 @@ int             transmit;
   if (res != TCL_OK)
     goto cleanup;
 
-#if GT81
-  res = Tcl_EvalObj (c->interp, command, TCL_EVAL_GLOBAL);
-#else
+  /*#if GT81
+    res = Tcl_EvalObj (c->interp, command, TCL_EVAL_GLOBAL);
+    #else*/
   res = Tcl_GlobalEvalObj (c->interp, command);
-#endif
+  /*#endif*/
 
   Tcl_DecrRefCount (command);
 

@@ -1,5 +1,17 @@
 Thu Mar 25 12:40:20 1999  Andreas Kupries  <a.kupries@westend.com>
 
+	* generic/digest.c: Restored usage of 'Tcl_SetObjVar2'. Change
+	  between 8.1b1 and 8.1b2. No change between 8.0.x and 8.1b2.
+
+	* generic/reflect.c: Restored usage of 'Tcl_GlobalEvalObj'. Change
+	  between 8.1b1 and 8.1b2. No change between 8.0.x and 8.1b2.
+
+	* generic/binio.c, util.c, dig_opt.c, transformInt.h:
+	  Conditionalized usage of 'panic'. Now using 'Tcl_Panic' in case
+	  of compilation against tcl 8.1.
+
+	* unix/Makefile.in: Changed to allow usage of stubs.
+
 	* generic/sha/fip180-1.pdf: Added description of SHA-1.
 
 	* doc/ToDo: Added: Create stub-table for Trf too, to be
@@ -16,7 +28,9 @@ Thu Mar 25 12:40:20 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* unix/configure.in: Added code to handle stubs, as in
 	  'memchan'. Added code to disallow 'binio' for tcl 8.x and
-	  beyond. The user is refered to 'binary' instead.
+	  beyond. The user is refered to 'binary' instead. 'binio' is
+	  deprecated from now on, and the associated byteorder patch will
+	  be phased out, no new versions will be made.
 
 Sun Mar 21 16:01:44 1999  Andreas Kupries  <a.kupries@westend.com>
 

@@ -1010,13 +1010,13 @@ Trf_MessageDigestDescription* md;
     Tcl_Obj* digestObj = Tcl_NewStringObj (digest, md->digest_size);
     Tcl_Obj* result;
 
-#if GT81
-    /* 8.1 and beyond */
-    Tcl_IncrRefCount(digestObj);
+    /*#if GT81
+      / * 8.1 and beyond * /
+      Tcl_IncrRefCount(digestObj);
 
-    result = Tcl_SetObjVar2 (interp, destHandle, (char*) NULL, digestObj,
-			     TCL_LEAVE_ERR_MSG | TCL_GLOBAL_ONLY);
-#else
+      result = Tcl_SetObjVar2 (interp, destHandle, (char*) NULL, digestObj,
+      TCL_LEAVE_ERR_MSG | TCL_GLOBAL_ONLY);
+      #else*/
     /* 8.0 section */
     Tcl_Obj* varName = Tcl_NewStringObj (destHandle, strlen (destHandle));
 
@@ -1026,7 +1026,7 @@ Trf_MessageDigestDescription* md;
     result = Tcl_ObjSetVar2 (interp, varName, (Tcl_Obj*) NULL, digestObj,
 			     TCL_LEAVE_ERR_MSG | TCL_GLOBAL_ONLY);
     Tcl_DecrRefCount(varName);
-#endif /* GT81 */
+    /*#endif / * GT81 */
 
     Tcl_DecrRefCount(digestObj);
 
