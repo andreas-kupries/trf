@@ -10,7 +10,7 @@
 # @configure_input@
 #
 
-foreach {__maj__ __min__} [info tclversion] {break}
+foreach {__maj__ __min__} [string trimright [split [info tclversion] .] +] {break}
 
 if {@TRF_USING_STUBS@} {
     # Compiled with stubs, allow 8.1 and beyond.
@@ -21,7 +21,7 @@ if {@TRF_USING_STUBS@} {
 } else {
     # Compiled without stubs, allow 8.0.x and below.
 
-    if {$__maj__ < 8 || ($__maj__ == 8 && $__min__ = 0)} {
+    if {$__maj__ < 8 || ($__maj__ == 8 && $__min__ == 0)} {
 	package ifneeded Trf @TRF_VERSION@ \
 		"[list load [file join $dir @TRF_LIB_FILE@] Trf]"
     }
