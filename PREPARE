@@ -19,7 +19,7 @@ mInsertInfo \
 	doc/install.tex doc/man.tex \
 	generic/transform.h generic/patchlevel.h \
 	mac/README \
-	unix/README unix/configure.in \
+	unix/README unix/configure.in unix/Makefile.in \
 	win/README win/pkgIndex.tcl win/makefile.vc
 
 
