@@ -1,3 +1,8 @@
+2004-02-18  Andreas Kupries  <andreask@activestate.com>
+
+	* tests/base64.test: Extended the tests to use not only memchan,
+	  but also files as data source. For comparison.
+
 2003-04-04  Andreas Kupries  <andreask@activestate.com>
 
 	* configure.in:

@@ -69,3 +69,42 @@ test base64-7.2 {base64, partial conversion for attachments} {
     list [string length $data] $data
 } {9 {aGVsbG8=
 }}
+
+test base64-7.3 {base64, original data, no transform} {
+    puts -nonewline [set ma [memchan]] aGVsbA
+    seek $ma 0
+    set data [read $ma]
+    close $ma
+    list [string length $data] $data
+} {6 aGVsbA}
+
+test base64-7.4 {base64, original data, no transform} {
+    puts -nonewline [set ma [memchan]] hello
+    seek $ma 0
+    set data [read $ma]
+    close $ma
+    list [string length $data] $data
+} {5 hello}
+
+
+
+set p [makeFile {aGVsbA} foo]
+test base64-7.5 {base64, partial conversion for attachments} {
+    set ma [open $p r+]
+    base64 -mode encode -attach $ma
+
+    set data [read $ma]
+    close $ma
+    list [string length $data] $data
+} {4 hell}
+
+set p [makeFile {hell} foo]
+test base64-7.6 {base64, partial conversion for attachments} {
+    set ma [open $p r+]
+    base64 -mode decode -attach $ma
+
+    set data [read $ma]
+    close $ma
+    list [string length $data] $data
+} {9 {aGVsbAo=
+}}
