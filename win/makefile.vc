@@ -47,7 +47,8 @@ MSVCRT_SYS	= c:\windows\system\msvcrt.dll
 # given below. Relevant only for SSLeay 0.9 and opensll 0.9.2b.
 
 #SSL_LIBRARY	= -DSSL_LIB_NAME=\"libeay32.dll\"
-
+#ZLIB_STATIC	= -DZLIB_STATIC_BUILD
+#BZLIB_STATIC	= -DBZLIB_STATIC_BUILD
 
 # Set this to the appropriate value of /MACHINE: for your platform
 MACHINE	= IX86
@@ -126,7 +127,7 @@ WINDIR          = $(ROOT)\win
 GENERICDIR	= $(ROOT)\generic
 
 TRF_INCLUDES	= -I$(WINDIR) -I$(GENERICDIR) -I$(ROOT) -I$(TCL)\include
-TRF_DEFINES	= -nologo -D__WIN32__ -DHAVE_STDLIB_H $(BINIO) $(SSL_LIBRARY) -DBUILD_trf -DBUGS_ON_EXIT
+TRF_DEFINES	= -nologo -D__WIN32__ -DHAVE_STDLIB_H $(BINIO) $(SSL_LIBRARY) -DBUILD_trf -DBUGS_ON_EXIT $(ZLIB_STATIC) $(BZLIB_STATIC)
 
 #!include <ntwin32.mak> # thats this for?
 

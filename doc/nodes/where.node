@@ -34,6 +34,11 @@ node trf_where {
 	    }
 	    table_row bgcolor=#ffffcc {
 		table_data {
+		    cgi_puts [link trf_src_tbz]
+		}
+	    }
+	    table_row bgcolor=#ffffcc {
+		table_data {
 		    cgi_puts [link trf_doc_tgz]
 		}
 	    }
@@ -51,18 +56,15 @@ node trf_where {
 		table_data {
 		    p "The binary distributions are on a separate page."
 		    p [link trf_bdist]
-
-		    p "The binary distributions for version 1.8 are
-		    available on its site."
-		    p [link trf_bdist18]
 		}
 	    }
 	}
 
 	hr
-	p "[strong Upcoming:] Version [strong 2.1]."
+	p "[strong [cem Upcoming:]] Version [strong 2.0]."
 	p "Changes to expect:"
 	bullet_list {
+	    li "Drops support for Tcl 7.x. / Tk 4.x."
 	    li "Allows compilation with its own stub table."
 	}
     }

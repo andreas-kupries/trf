@@ -93,6 +93,21 @@ AC_ARG_WITH(ssl-lib-dir,
 	[SSL_LIB_DIR=$withval],
 	[])
 
+AC_ARG_WITH(bz2-lib-dir,
+	[  --with-bz2-lib-dir=DIR	libbz2 resides in DIR],
+	[BZ2_LIB_DIR=$withval],
+	[])
+
+
+AC_ARG_ENABLE(static-zlib,
+	[  --enable-static-zlib         link 'zlib' statically],
+	[STATIC_ZLIB=$enableval], [STATIC_ZLIB=no])
+
+AC_ARG_ENABLE(static-bzlib,
+	[  --enable-static-bzlib         link 'bzlib' statically],
+	[STATIC_BZLIB=$enableval], [STATIC_BZLIB=no])
+
+
 
 dnl ----------------------------------------------------------------
 dnl
@@ -493,6 +508,55 @@ AC_SUBST(SSL_LIB_DIR)
 AC_CACHE_VAL(trf_cv_SSL_LIB_DIR, [trf_cv_SSL_LIB_DIR="$SSL_LIB_DIR"])
 
 
+dnl ----------------------------------------------------------------
+dnl
+dnl Locate bz2 library
+dnl Searches:
+dnl	BZ2_LIB_DIR		(--with-bz2, --with-bz2-lib-dir)
+dnl	TCL_LIB_DIR		(--with-tcl, --with-tcl-lib-dir)
+dnl	$exec_prefix/lib	(--exec-prefix)
+dnl	$prefix/lib		(--prefix)
+dnl	/usr/local/bz2/lib
+dnl	/usr/local/lib
+dnl	/usr/lib
+dnl
+AC_CACHE_CHECK(for bz2 compressor library,
+	trf_cv_lib_BZ2_LIB_DIR,
+	[trf_cv_lib_BZ2_LIB_DIR=""
+	 places="$BZ2_LIB_DIR \
+	$TCL_LIB_DIR \
+	$exec_prefix/lib \
+	$prefix/lib \
+	/usr/local/bz2/lib \
+	/usr/local/lib \
+	/usr/lib \
+	/lib"
+    for dir in $places; do
+        if test -n "$trf_cv_lib_BZ2_LIB_DIR"; then
+            break
+        fi
+
+        for libsuff in .so ".so.*" .sl .a; do
+	    if test -n "$trf_cv_lib_BZ2_LIB_DIR"; then
+                    break
+            fi
+            if test -f $dir/libbz2$libsuff; then
+                trf_cv_lib_BZ2_LIB_DIR="$dir"
+		    BZ2_LIB_DIR="$dir"
+            fi
+        done
+    done])
+
+BZ2_LIB_DIR="$trf_cv_lib_BZ2_LIB_DIR"
+if test -z "$BZ2_LIB_DIR" ; then
+    AC_MSG_WARN(not found; use --with-bz2-lib-dir=path)
+else
+    TRF_TESTS="$TRF_TESTS hasBz"
+fi
+
+
+AC_SUBST(BZ2_LIB_DIR)
+AC_CACHE_VAL(trf_cv_BZ2_LIB_DIR, [trf_cv_BZ2_LIB_DIR="$BZ2_LIB_DIR"])
 
 dnl
 dnl ----------------------------------------------------------------
@@ -587,6 +651,21 @@ else
 EOF
 	fi
 fi
+
+if test "x$ZLIB_STATIC" = "xyes"
+then
+	cat >> confdefs.h <<\EOF
+#define ZLIB_STATIC_BUILD
+EOF
+fi
+
+if test "x$BZLIB_STATIC" = "xyes"
+then
+	cat >> confdefs.h <<\EOF
+#define BZLIB_STATIC_BUILD
+EOF
+fi
+
 
 #--------------------------------------------------------------------
 #	The statements below define a collection of symbols related to

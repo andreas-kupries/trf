@@ -10,12 +10,6 @@ proc url {code text url} {
 
 # -------------------------------------------------
 
-url trf18       "version 1.8" http://www.oche.de/~akupries/soft/trf1.8/
-url trf_bdist18 "Trf 1.8 binary distributions" http://www.oche.de/~akupries/soft/trf1.8/trf_bdist.html
-
-
-url adams_md5 "[lib MD5] package" http://www.cybernetics.demon.co.uk/projects/md5/md5.html
-
 url tcl       [lang tcl]               http://www.scriptics.com/
 #url sun       Sun                      http://www.scriptics.com/
 url scriptics Scriptics                http://www.scriptics.com/
@@ -36,10 +30,6 @@ url rmd       RIPEMD-160 \
 
 url sfit      {Swiss Federal Institute of Technology} \
 	http://sewww.epfl.ch/
-
-url tea        "TEA"               http://www.scriptics.com/products/tcltk/tea/
-url cygnus     Cygnus                   http://www.cygnus.com/
-url cygwin     CygWin                   http://www.cygnus.com/cygwin
 
 # -------------------------------------------------
 
@@ -62,7 +52,7 @@ url zlib_win \
 
 url zLib [lib zlib] http://www.cdrom.com/pub/infozip/zlib/
 
-url bzlib      [lib bzlib] http://www.muraroa.demon.co.uk/
+url bzLib      [lib bzlib] http://www.muraroa.demon.co.uk/
 url bzip       [cmd bzip]  http://www.muraroa.demon.co.uk/
 url bzlib_home http://www.muraroa.demon.co.uk/ http://www.muraroa.demon.co.uk/
 
@@ -75,6 +65,7 @@ url tls        [lib TLS]    http://www.sensus.org/tcl/
 set base http://www.oche.de/~akupries/soft/trf/download
 
 link trf_src_tgz  {Sources, Unix}                  ${base}/trf@mFullVersion@.tar.gz
+link trf_src_tbz  {Sources, Unix, bzip compressed} ${base}/trf@mFullVersion@.tar.bz2
 link trf_src_zip  {Sources, Win*}                  ${base}/trf@mFullVersion@.zip
 link trf_doc_tgz  {Standalone documentation, Unix} ${base}/trf@mFullVersion@.doc.tar.gz
 link trf_doc_zip  {Standalone documentation, Win*} ${base}/trf@mFullVersion@.doc.zip
