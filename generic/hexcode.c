@@ -603,11 +603,11 @@ ClientData       clientData;
       if (interp) {
 	char buf [10];
 
-	if (character < ' ' || character > 127) {
-	  sprintf (buf, "0x%02x", character);
+	if (nibble < ' ' || nibble > 127) {
+	  sprintf (buf, "0x%02x", nibble);
 	} else {
 	  buf [0] = '\'';
-	  buf [1] = character;
+	  buf [1] = nibble;
 	  buf [2] = '\'';
 	  buf [3] = '\0';
 	}
