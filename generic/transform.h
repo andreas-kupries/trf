@@ -726,16 +726,17 @@ Trf_RegisterMessageDigest _ANSI_ARGS_ ((Tcl_Interp* interp,
  */
 
 #ifdef __C2MAN__
-typedef void Trf_CSchedule (VOID*  key,       /* user key */
-			    int    key_length /* length of user key (in byte) */,
-			    int    direction  /* requested internal key
-					       * (TRF_ENCRYPT, TRF_DECRYPT) */,
-			    VOID** e_schedule /* internal key for encryption */,
-			    VOID** d_schedule /* internal key for decryption */);
+typedef void Trf_CSchedule (VOID*       key,       /* user key */
+			    int         key_length /* length of user key (in byte) */,
+			    Trf_Options cOptions   /* cipher specific option info */,
+			    int         direction  /* requested internal key
+						    * (TRF_ENCRYPT, TRF_DECRYPT) */,
+			    VOID**      e_schedule /* internal key for encryption */,
+			    VOID**      d_schedule /* internal key for decryption */);
 #else
-typedef void Trf_CSchedule _ANSI_ARGS_ ((VOID*  key, int key_length, int direction,
-					 VOID** e_schedule,
-					 VOID** d_schedule));
+typedef void Trf_CSchedule _ANSI_ARGS_ ((VOID*  key, int key_length,
+					 Trf_Options cOptions, int direction,
+					 VOID** e_schedule, VOID** d_schedule));
 #endif
 
 /*
@@ -806,6 +807,8 @@ typedef struct _Trf_CipherDescription {
   Trf_CDecryptChar* decryptProc;
   Trf_CCheck*       checkProc;
 
+  Trf_OptionVectors* options;    /* reference to description of additional options,
+				  * can be shared between ciphers. Might be NULL. */
 } Trf_CipherDescription;
 
 #define TRF_KEYSIZE_INFINITY (0)
@@ -850,12 +853,14 @@ Trf_RegisterCipher _ANSI_ARGS_ ((Tcl_Interp* interp,
 #ifdef __C2MAN__
 typedef void Trf_BCSchedule (VOID*  key        /* user key */,
 			     int    key_length /* length of user key (in byte) */,
+			     Trf_Options cOptions   /* cipher specific option info */,
 			     int    direction  /* requested internal key
 						* (TRF_ENCRYPT, TRF_DECRYPT) */,
 			     VOID** e_schedule /* internal key for encryption */,
 			     VOID** d_schedule /* internal key for decryption */);
 #else
-typedef void Trf_BCSchedule _ANSI_ARGS_ ((VOID*  key, int key_length, int direction,
+typedef void Trf_BCSchedule _ANSI_ARGS_ ((VOID*  key, int key_length,
+					  Trf_Options cOptions, int direction,
 					  VOID** e_schedule,
 					  VOID** d_schedule));
 #endif
@@ -921,6 +926,8 @@ typedef struct _Trf_BlockcipherDescription {
   Trf_BCDecryptBlock* decryptProc;
   Trf_BCCheck*        checkProc;
 
+  Trf_OptionVectors* options;    /* reference to description of additional options,
+				  * can be shared between ciphers. Might be NULL */
 } Trf_BlockcipherDescription;
 
 

@@ -551,22 +551,39 @@ Trf_ControlBlock ctrlBlock;
 }
 #endif
 
-
+/*
+ *------------------------------------------------------*
+ *
+ *	InitializeState --
+ *
+ *	------------------------------------------------*
+ *	Initialize the general state of the cipher system.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
 
 static void
 InitializeState (c, o, direction, c_desc)
-EncoderControl*             c;
+EncoderControl*        c;
 TrfCipherOptionBlock*  o;
-int                         direction;
+int                    direction;
 Trf_CipherDescription* c_desc;
 {
   c->key = (unsigned char*) Tcl_Alloc (c_desc->ks_size);
 
   if (direction == TRF_ENCRYPT) {
     if (o->encrypt_keyschedule == NULL) {
-      (*c_desc->scheduleProc) (o->key, o->key_length, direction,
-				&(o->encrypt_keyschedule),
-				&(o->decrypt_keyschedule));
+      (*c_desc->scheduleProc) (o->key, o->key_length,
+			       o->cOptionInfo, direction,
+			       &(o->encrypt_keyschedule),
+			       &(o->decrypt_keyschedule));
       o->eks_length = c_desc->ks_size;
     }
 
@@ -574,9 +591,10 @@ Trf_CipherDescription* c_desc;
 
   } else if (direction == TRF_DECRYPT) {
     if (o->decrypt_keyschedule == NULL) {
-      (*c_desc->scheduleProc) (o->key, o->key_length, direction,
-				&(o->encrypt_keyschedule),
-				&(o->decrypt_keyschedule));
+      (*c_desc->scheduleProc) (o->key, o->key_length,
+			       o->cOptionInfo, direction,
+			       &(o->encrypt_keyschedule),
+			       &(o->decrypt_keyschedule));
       o->dks_length = c_desc->ks_size;
     }
 

@@ -650,8 +650,9 @@ cleanup:
   Tcl_DStringInit          (&command);
   Tcl_DStringAppend        (&command, c->command, -1);
   Tcl_DStringAppend        (&command, " ", -1);
-  Tcl_DStringAppend        (&command, op, -1);
+  Tcl_DStringAppend        (&command, op,  -1);
   Tcl_DStringAppend        (&command, " ", -1);
+  Tcl_DStringAppend        (&command, "",   1); /* terminate buffer for sure */
   Tcl_DStringAppendElement (&command, buf);
 
   res = Tcl_GlobalEval (c->interp, command.string);

@@ -39,9 +39,9 @@
  * Declarations of internal procedures.
  */
 
-static void BC_Schedule _ANSI_ARGS_ ((VOID*  key, int key_length, int direction,
-				      VOID** e_schedule,
-				      VOID** d_schedule));
+static void BC_Schedule _ANSI_ARGS_ ((VOID*  key, int key_length,
+				      Trf_Options cOptions, int direction,
+				      VOID** e_schedule, VOID** d_schedule));
 static void BC_Encrypt  _ANSI_ARGS_ ((VOID* in, VOID* out, VOID* key /* schedule */));
 static void BC_Decrypt  _ANSI_ARGS_ ((VOID* in, VOID* out, VOID* key /* schedule */));
 
@@ -58,7 +58,8 @@ static Trf_BlockcipherDescription bcDescription = {
   BC_Schedule,
   BC_Encrypt,
   BC_Decrypt,
-  NULL
+  NULL,
+  NULL /* no additional options */
 };
 
 /*
@@ -106,9 +107,10 @@ Tcl_Interp* interp;
  */
 
 static void
-BC_Schedule (key, key_length, direction, e_schedule, d_schedule)
+BC_Schedule (key, key_length, cOptions, direction, e_schedule, d_schedule)
 VOID*  key;
 int    key_length;
+Trf_Options cOptions;
 int    direction;
 VOID** e_schedule;
 VOID** d_schedule;

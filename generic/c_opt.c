@@ -117,7 +117,8 @@ static Trf_Options
 CreateOptions (clientData)
 ClientData clientData;
 {
-  TrfCipherOptionBlock* o;
+  Trf_CipherDescription* c_desc = (Trf_CipherDescription*) clientData;
+  TrfCipherOptionBlock*  o;
 
   o = (TrfCipherOptionBlock*) Tcl_Alloc (sizeof (TrfCipherOptionBlock));
 
@@ -134,6 +135,12 @@ ClientData clientData;
   o->dks_length          = -1;
   o->encrypt_keyschedule = NULL;
   o->decrypt_keyschedule = NULL;
+
+  if (c_desc->options != (Trf_OptionVectors*) NULL) {
+    o->cOptionInfo = c_desc->options->createProc ((ClientData) NULL);
+  } else {
+    o->cOptionInfo = (Trf_Options) NULL;
+  }
 
   return (Trf_Options) o;
 }
@@ -163,9 +170,7 @@ Trf_Options options;
 ClientData clientData;
 {
   TrfCipherOptionBlock*  o       = (TrfCipherOptionBlock*) options;
-#if 0
   Trf_CipherDescription* c_desc = (Trf_CipherDescription*) clientData;
-#endif
 
   if (o->keyData != NULL) {
 #if (TCL_MAJOR_VERSION < 8)
@@ -188,6 +193,11 @@ ClientData clientData;
   if (o->decrypt_keyschedule != NULL) {
     memset (o->decrypt_keyschedule, '\0', o->dks_length);
     Tcl_Free ((char*) o->decrypt_keyschedule);
+  }
+
+  if (c_desc->options != (Trf_OptionVectors*) NULL) {
+    c_desc->options->deleteProc (o->cOptionInfo,
+				 (ClientData)  NULL);
   }
 
   Tcl_Free ((char*) o);
@@ -221,6 +231,7 @@ ClientData             clientData;
 {
   TrfCipherOptionBlock*       o = (TrfCipherOptionBlock*) options;
   Trf_CipherDescription* c_desc = (Trf_CipherDescription*) clientData;
+  int                    res;
 
   /*
    * Call cipher dependent check of environment first.
@@ -246,9 +257,19 @@ ClientData             clientData;
     return TCL_ERROR;
   }
 
-  return TrfGetData (interp, "key", o->keyDataIsChan, o->keyData,
-		     c_desc->min_keysize, c_desc->max_keysize,
-		     &o->key, &o->key_length);
+  res = TrfGetData (interp, "key", o->keyDataIsChan, o->keyData,
+		    c_desc->min_keysize, c_desc->max_keysize,
+		    &o->key, &o->key_length);
+
+  if (res != TCL_OK)
+    return res;
+
+  if (c_desc->options != (Trf_OptionVectors*) NULL) {
+    return c_desc->options->checkProc (o->cOptionInfo, interp, baseOptions,
+				       (ClientData)  NULL);
+  }
+
+  return TCL_OK;
 }
 
 /*
@@ -292,7 +313,7 @@ ClientData  clientData;
    */
 
   TrfCipherOptionBlock*  o      = (TrfCipherOptionBlock*) options;
-  /*  Trf_CipherDescription* c_desc = (Trf_CipherDescription*) clientData; */
+  Trf_CipherDescription* c_desc = (Trf_CipherDescription*) clientData;
   CONST char*            value;
 
   int len = strlen (optname + 1);
@@ -359,6 +380,21 @@ ClientData  clientData;
   return TCL_OK;
 
  unknown_option:
+  /* At last try for cipher specific options, if possible at all.
+   */
+
+  if (c_desc->options != (Trf_OptionVectors*) NULL) {
+#if (TCL_MAJOR_VERSION < 8)
+    return c_desc->options->setProc (o->cOptionInfo, interp,
+				     optname, optvalue,
+				     (ClientData)  NULL);
+#else
+    return c_desc->options->setObjProc (o->cOptionInfo, interp,
+					optname, optvalue,
+					(ClientData)  NULL);
+#endif
+  }
+
   Tcl_AppendResult (interp, "unknown option '", (char*) NULL);
   Tcl_AppendResult (interp, optname, (char*) NULL);
   Tcl_AppendResult (interp, "'", (char*) NULL);

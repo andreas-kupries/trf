@@ -1244,7 +1244,23 @@ Trf_ControlBlock ctrlBlock;
 }
 #endif
 
-
+/*
+ *------------------------------------------------------*
+ *
+ *	InitializeState --
+ *
+ *	------------------------------------------------*
+ *	Initialize the general state of the cipher system.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		See above.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
 
 static void
 InitializeState (c, o, direction, bc_desc)
@@ -1293,7 +1309,8 @@ Trf_BlockcipherDescription* bc_desc;
 
   if (direction == TRF_ENCRYPT) {
     if (o->encrypt_keyschedule == NULL) {
-      (*bc_desc->scheduleProc) (o->key, o->key_length, direction,
+      (*bc_desc->scheduleProc) (o->key, o->key_length,
+				o->cOptionInfo, direction,
 				&(o->encrypt_keyschedule),
 				&(o->decrypt_keyschedule));
       o->eks_length = bc_desc->ks_size;
@@ -1311,7 +1328,8 @@ Trf_BlockcipherDescription* bc_desc;
 
   } else if (direction == TRF_DECRYPT) {
     if (o->decrypt_keyschedule == NULL) {
-      (*bc_desc->scheduleProc) (o->key, o->key_length, direction,
+      (*bc_desc->scheduleProc) (o->key, o->key_length,
+				o->cOptionInfo, direction,
 				&(o->encrypt_keyschedule),
 				&(o->decrypt_keyschedule));
       o->dks_length = bc_desc->ks_size;

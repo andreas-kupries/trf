@@ -161,6 +161,11 @@ Tcl_Interp* interp;
     if (res != TCL_OK)
       return res;
 
+    res = TrfInit_SAFER (interp);
+
+    if (res != TCL_OK)
+      return res;
+
     /*
      * Register message digests
      */

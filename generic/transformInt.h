@@ -194,6 +194,9 @@ typedef struct _TrfBlockcipherOptionBlock {
   Tcl_Obj*       ivData;   /* IV  information */
 #endif
 
+  Trf_Options  cOptionInfo; /* reference to cipher specific option
+			     * information. */
+
   /* ---- derived information ----
    *
    * Area used for communication between vectors
@@ -241,6 +244,9 @@ typedef struct _TrfCipherOptionBlock {
 #else
   Tcl_Obj*       keyData;  /* Key information */
 #endif
+
+  Trf_Options    cOptionInfo; /* reference to cipher specific option
+			       * information. */
 
   /* ---- derived information ----
    *
@@ -388,6 +394,7 @@ EXTERN int TrfInit_DES       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_RC4       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_RC2       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_ROT       _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_SAFER     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int TrfInit_RS_ECC    _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_ZIP       _ANSI_ARGS_ ((Tcl_Interp* interp));

@@ -117,7 +117,8 @@ static Trf_Options
 CreateOptions (clientData)
 ClientData clientData;
 {
-  TrfBlockcipherOptionBlock* o;
+  Trf_BlockcipherDescription* bc_desc = (Trf_BlockcipherDescription*) clientData;
+  TrfBlockcipherOptionBlock*  o;
 
   o = (TrfBlockcipherOptionBlock*) Tcl_Alloc (sizeof (TrfBlockcipherOptionBlock));
 
@@ -139,6 +140,12 @@ ClientData clientData;
   o->dks_length          = -1;
   o->encrypt_keyschedule = NULL;
   o->decrypt_keyschedule = NULL;
+
+  if (bc_desc->options != (Trf_OptionVectors*) NULL) {
+    o->cOptionInfo = bc_desc->options->createProc ((ClientData) o);
+  } else {
+    o->cOptionInfo = (Trf_Options) NULL;
+  }
 
   return (Trf_Options) o;
 }
@@ -204,6 +211,10 @@ ClientData clientData;
   if (o->decrypt_keyschedule != NULL) {
     memset (o->decrypt_keyschedule, '\0', o->dks_length);
     Tcl_Free ((char*) o->decrypt_keyschedule);
+  }
+
+  if (bc_desc->options != (Trf_OptionVectors*) NULL) {
+    bc_desc->options->deleteProc (o->cOptionInfo, (ClientData) o);
   }
 
   Tcl_Free ((char*) o);
@@ -296,9 +307,17 @@ ClientData             clientData;
      */
     int dummy;
 
-    return TrfGetData (interp, "iv", o->ivDataIsChan, o->ivData,
-		       bc_desc->block_size, bc_desc->block_size,
-		       &o->iv, &dummy);
+    res = TrfGetData (interp, "iv", o->ivDataIsChan, o->ivData,
+		      bc_desc->block_size, bc_desc->block_size,
+		      &o->iv, &dummy);
+
+    if (res != TCL_OK)
+      return res;
+  }
+
+  if (bc_desc->options != (Trf_OptionVectors*) NULL) {
+    return bc_desc->options->checkProc (o->cOptionInfo, interp,
+					baseOptions, (ClientData) o);
   }
 
   return TCL_OK;
@@ -505,6 +524,19 @@ ClientData  clientData;
   return TCL_OK;
 
  unknown_option:
+  /* At last try for cipher specific options, if possible at all.
+   */
+
+  if (bc_desc->options != (Trf_OptionVectors*) NULL) {
+#if (TCL_MAJOR_VERSION < 8)
+    return bc_desc->options->setProc (o->cOptionInfo, interp, optname,
+				      optvalue, (ClientData) o);
+#else
+    return bc_desc->options->setObjProc (o->cOptionInfo, interp, optname,
+					 optvalue, (ClientData) o);
+#endif
+  }
+
   Tcl_AppendResult (interp, "unknown option '", (char*) NULL);
   Tcl_AppendResult (interp, optname, (char*) NULL);
   Tcl_AppendResult (interp, "'", (char*) NULL);
