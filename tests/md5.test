@@ -48,8 +48,32 @@ test md5-2.0 {md5} {
 } {5EB63BBBE01EEED093CB22BB8F5ACDC3}
 
 
-puts {
-    Do you have a validation test suite for md5? (or knowlegde about such?)
-    Please mail me, so that i'm able to include it here, making this code
-    better.
+# test suite from RFC 1321
+foreach {i in out} {
+    1 {}                          d41d8cd98f00b204e9800998ecf8427e
+    2 a                           0cc175b9c0f1b6a831c399e269772661
+    3 abc                         900150983cd24fb0d6963f7d28e17f72
+    4 message digest              f96b697d7cb7938d525a2f31aaf161d0
+    5 abcdefghijklmnopqrstuvwxyz  c3fcd3d76192e4007dfb496cca67e13b
+    6 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789   d174ab98d277d9f5a5611c2c9f419d9f
+    7 12345678901234567890123456789012345678901234567890123456789012345678901234567890   57edf4a22be3c955ac49da2e2107b67a
+} {
+    test md5-3.$i "md5, rfc 1321 testsuite, $i" {
+	puts -nonewline [set ma [memchan]] $in
+	seek $ma 0
+
+	md5  $ma [set mb [memchan]]
+	seek $mb 0
+
+	hex  -mode encode $mb [set mc [memchan]]
+	seek $mc 0
+
+	set res [read -nonewline $mc]
+	
+	close $ma
+	close $mb
+	close $mc
+
+	set res
+    } $out
 }
