@@ -234,18 +234,22 @@ case "`uname -s`" in
 	if test "${SHARED_BUILD}" = "1" ; then
 	    SHLIB_LD_LIBS="\"`cygpath -w ${TCL_BIN_DIR}/${TCL_STUB_LIB_FILE}`\" ${TCL_SHLIB_LD_LIBS}"
 	    eval "${PACKAGE}_LIB_FILE=${PACKAGE}${SHARED_LIB_SUFFIX}"
+	    eval "${PACKAGE}_STUB_LIB_FILE=${PACKAGE}stub${UNSHARED_LIB_SUFFIX}"
 	    RANLIB=:
 	else
 	    eval "${PACKAGE}_LIB_FILE=${PACKAGE}${UNSHARED_LIB_SUFFIX}"
+	    eval "${PACKAGE}_STUB_LIB_FILE=${PACKAGE}stub${UNSHARED_LIB_SUFFIX}"
 	fi
 	;;
     *)
 	if test "${SHARED_BUILD}" = "1" ; then
 	    SHLIB_LD_LIBS="${TCL_STUB_LIB_SPEC}"
 	    eval "${PACKAGE}_LIB_FILE=lib${PACKAGE}${SHARED_LIB_SUFFIX}"
+	    eval "${PACKAGE}_STUB_LIB_FILE=lib${PACKAGE}stub${UNSHARED_LIB_SUFFIX}"
 	    RANLIB=:
 	else
 	    eval "${PACKAGE}_LIB_FILE=lib${PACKAGE}${UNSHARED_LIB_SUFFIX}"
+	    eval "${PACKAGE}_STUB_LIB_FILE=lib${PACKAGE}stub${UNSHARED_LIB_SUFFIX}"
 	fi
 	;;
 esac
@@ -255,6 +259,7 @@ esac
 #--------------------------------------------------------------------
 
 AC_SUBST(Trf_LIB_FILE)
+AC_SUBST(Trf_STUB_LIB_FILE)
 AC_SUBST(SHLIB_LD_LIBS)
 
 #--------------------------------------------------------------------

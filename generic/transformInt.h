@@ -448,6 +448,7 @@ EXTERN void TrfUnlockIt _ANSI_ARGS_ ((void));
 #define TrfUnlock
 #endif
 
+#include "trfIntDecls.h"
 
 #undef TCL_STORAGE_CLASS
 #define TCL_STORAGE_CLASS DLLIMPORT

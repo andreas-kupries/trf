@@ -31,7 +31,7 @@ TRF_COMPATDIR	=	$(TRF_TOPDIR)/compat
 # This is the (parameterized) name of the library that we are building.
 #========================================================================
 
-lib_BINARIES	=	$(Trf_LIB_FILE)
+lib_BINARIES	=	$(Trf_LIB_FILE) $(Trf_STUB_LIB_FILE)
 BINARIES	=	$(lib_BINARIES)
 
 #========================================================================
@@ -51,7 +51,8 @@ TRF_BASE_SRC	=	$(TRF_GENSRCDIR)/zlib.c		\
 			$(TRF_GENSRCDIR)/init.c		\
 			$(TRF_GENSRCDIR)/registry.c	\
 			$(TRF_GENSRCDIR)/unstack.c	\
-			$(TRF_GENSRCDIR)/load.c
+			$(TRF_GENSRCDIR)/load.c		\
+			$(TRF_GENSRCDIR)/trfStubInit.c
 
 # Deprecated		$(TRF_GENSRCDIR)/binio.c
 
@@ -103,6 +104,8 @@ SOURCES		=	$(Trf_SOURCES)
 # above.
 #========================================================================
 
+Trf_STUB_OBJECTS=	trfStubLib.$(OBJEXT)
+
 Trf_OBJECTS	=	$(TRF_BASE_OBJ)		\
 			$(TRF_CVT_OBJ)		\
 			$(TRF_MD_OBJ)		\
@@ -115,7 +118,8 @@ TRF_BASE_OBJ	=	@DL_OBJS@ bz2lib.$(OBJEXT)	\
 			init.$(OBJEXT)		\
 			registry.$(OBJEXT) 	\
 			unstack.$(OBJEXT) 	\
-			load.$(OBJEXT)
+			load.$(OBJEXT)		\
+			trfStubInit.$(OBJEXT)
 
 # Deprecated		binio.$(OBJEXT)
 
@@ -168,8 +172,11 @@ OBJECTS		=	$(Trf_OBJECTS)
 # objects and the library itself in a platform-independent manner.
 #========================================================================
 
-Trf_LIB_FILE		=	@Trf_LIB_FILE@
-$(Trf_LIB_FILE)_OBJECTS	=	$(Trf_OBJECTS)
+Trf_LIB_FILE			=	@Trf_LIB_FILE@
+$(Trf_LIB_FILE)_OBJECTS		=	$(Trf_OBJECTS)
+
+Trf_STUB_LIB_FILE		=	@Trf_STUB_LIB_FILE@
+$(Trf_STUB_LIB_FILE)_OBJECTS	=	$(Trf_STUB_OBJECTS)
 
 Trf_INCLUDES		=	-I$(ZLIB_INCLUDE_DIR) -I$(SSL_INCLUDE_DIR)
 
@@ -178,6 +185,14 @@ Trf_INCLUDES		=	-I$(ZLIB_INCLUDE_DIR) -I$(SSL_INCLUDE_DIR)
 #========================================================================
 
 GENERIC_HDRS	=
+
+#========================================================================
+# Define a list of files containing the stub declarations.
+#========================================================================
+
+Trf_DECLS = \
+	$(TRF_GENSRCDIR)/trf.decls \
+	$(TRF_GENSRCDIR)/trfInt.decls
 
 #========================================================================
 # Add additional lines to handle any additional AC_SUBST cases that
@@ -404,6 +419,33 @@ ttest:
 
 depend:
 
+#
+# Target to regenerate header files and stub files from the *.decls tables.
+#
+
+genstubs:
+	$(TCLSH_PROG)	\
+		$(TRF_TOOLDIR)/genStubs.tcl $(TRF_GENSRCDIR) \
+		$(TRF_GENSRCDIR)/trf.decls	\
+		$(TRF_GENSRCDIR)/trfInt.decls
+
+#
+# Target to check that all exported functions have an entry in the stubs
+# tables.
+#
+
+checkstubs:
+	-@for i in `nm -p $(Trf_LIB_FILE) | awk '$$2 ~ /T/ { print $$3 }' \
+		| sort -n`; do \
+		match=0; \
+		for j in $(Trf_DECLS); do \
+		    if [ `grep -c $$i $$j` -gt 0 ]; then \
+			match=1; \
+		    fi; \
+		done; \
+		if [ $$match -eq 0 ]; then echo $$i; fi \
+	done
+
 #========================================================================
 # Enumerate the names of the object files included in this package.
 # These objects are created and linked into the final library.  In
@@ -421,6 +463,9 @@ $(Trf_LIB_FILE): $(Trf_OBJECTS)
 	-rm -f $(Trf_LIB_FILE)
 	@MAKE_LIB@
 	$(RANLIB) $(Trf_LIB_FILE)
+
+$(Trf_STUB_LIB_FILE): $(Trf_STUB_OBJECTS)
+	$(AR) cr $@ $(Trf_STUB_OBJECTS)
 
 #========================================================================
 # We need to enumerate the list of .c to .o lines here.
@@ -445,6 +490,12 @@ $(Trf_LIB_FILE): $(Trf_OBJECTS)
 # exampleA.$(OBJEXT): $(srcdir)/src/win/exampleA.c
 # 	$(COMPILE) -c `@CYGPATH@ $(srcdir)/src/win/exampleA.c` -o $@
 #========================================================================
+
+trfStubLib.$(OBJEXT):	$(TRF_GENSRCDIR)/trfStubLib.c
+	$(COMPILE) -c `@CYGPATH@ $(TRF_GENSRCDIR)/trfStubLib.c` -o $@
+
+trfStubInit.$(OBJEXT):	$(TRF_GENSRCDIR)/trfStubInit.c
+	$(COMPILE) -c `@CYGPATH@ $(TRF_GENSRCDIR)/trfStubInit.c` -o $@
 
 load.$(OBJEXT): $(TRF_GENSRCDIR)/load.c
 	$(COMPILE) -c `@CYGPATH@ $(TRF_GENSRCDIR)/load.c` -o $@

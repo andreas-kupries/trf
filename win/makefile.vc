@@ -68,6 +68,8 @@ TRFLIB		=	$(TRF).lib
 TRFDLL		=	$(TRF).dll
 INSTALLDIR	=	$(TCL)\lib\$(TRF)
 
+TRFSTUBOBJS	=	\
+	$(TMPDIR)\trfStubLib.obj
 
 TRFOBJS = \
 	$(TMPDIR)\dllEntry.obj \
@@ -110,6 +112,7 @@ TRFOBJS = \
 	$(TMPDIR)\qpcode.obj \
 	$(TMPDIR)\reflect.obj \
 	$(TMPDIR)\ref_opt.obj \
+	$(TMPDIR)\trfStubInit.obj \
 	$(TMPDIR)\tclLoadWin.obj
 
 
@@ -119,6 +122,7 @@ cc32		= $(TOOLS32)\bin\cl.exe
 link32		= $(TOOLS32)\bin\link.exe
 rc32		= $(TOOLS32)\bin\rc.exe
 include32	= -I$(TOOLS32)\include
+lib32		= "$(TOOLS32)\bin\lib.exe"
 CP      	= copy
 RM      	= del
 
@@ -214,8 +218,8 @@ cvarsdll   = $(cvarsmt) -D_DLL
 # Project specific targets
 ######################################################################
 
-release:    $(TRFDLL)
-all:	    $(TRFDLL)
+release:    $(TRFDLL) $(TRF_STUB_LIB_FILE)
+all:	    $(TRFDLL) $(TRF_STUB_LIB_FILE)
 test:	    $(TRFDLL)
 	$(TCLSH) <<
 		load $(TRFDLL)
@@ -228,6 +232,9 @@ install:	$(TRFDLL)
 	$(CP) $(TRFDLL)              $(INSTALLDIR)\$(TRFDLL)
 	$(CP) $(WINDIR)\pkgIndex.tcl $(INSTALLDIR)\pkgIndex.tcl
 
+
+$(TRF_STUB_LIB_FILE):  $(TRFSTUBOBJS)
+	$(lib32) /out:$@ $(TRFSTUBOBJS)
 
 $(TRFDLL): $(TRFOBJS)
 	$(link32) $(ldebug) $(dlllflags) $(TCLLIB) \

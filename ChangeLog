@@ -1,3 +1,13 @@
+Mon Sep 20 21:53:56 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* Used his changes to win/Makefile.gnu as template for the changes
+	  to unix/Makefile.in, tea/Makefile.in and win/makefile.vc*. Had
+	  to change the configure.in's as well.
+
+	* Jan Nijtmans provided the basic changes to stubify Trf, to let
+	  it export its own stub table, for usage by extensions like
+	  TrfCrypt.
+
 Sun Sep 19 01:29:23 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/zip_opt.c, registry.c, reflect.c, ref_opt.c, digest.c,

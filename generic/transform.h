@@ -799,6 +799,25 @@ TRF_EXPORT (void,Trf_FlipRegisterLong) _ANSI_ARGS_ ((VOID* buffer, int length));
  * End of exported interface
  */
 
+#include "trfDecls.h"
+
+/*
+ * Convenience declaration of Trf_InitStubs.
+ * This function is not *implemented* by the trf library, so the storage
+ * class is neither DLLEXPORT nor DLLIMPORT
+ */
+
+#undef TCL_STORAGE_CLASS
+#define TCL_STORAGE_CLASS
+
+EXTERN char *Trf_InitStubs _ANSI_ARGS_((Tcl_Interp *interp, CONST char *version, int exact));
+
+#ifndef USE_TRF_STUBS
+
+#define Trf_InitStubs(interp, version, exact) \
+    Tcl_PkgRequire(interp, "Trf", version, exact)
+
+#endif
 
 #undef  TCL_STORAGE_CLASS
 #define TCL_STORAGE_CLASS DLLIMPORT

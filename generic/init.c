@@ -28,6 +28,9 @@
  */
 
 #include "transformInt.h"
+
+extern TrfStubs trfStubs;
+
 
 /*
  *------------------------------------------------------*
@@ -84,8 +87,21 @@ Tcl_Interp* interp;
     registry->patchIntegrated = 0;
 #endif
 
+#if GT81
+
+    /* register extension as now available package */
+    Tcl_PkgProvideEx (interp, "Trf", TRF_VERSION, (ClientData) &trfStubs);
+
+#ifndef __WIN32__
+    Trf_InitStubs(interp, TRF_VERSION, 0);
+#endif
+
+#else
+
     /* register extension as now available package */
     Tcl_PkgProvide (interp, "Trf", TRF_VERSION);
+
+#endif
 
     res = TrfInit_Unstack (interp);
 

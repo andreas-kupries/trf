@@ -12,7 +12,7 @@ TCL_VERSION	= 82
 TRF_DLL_FILE	    = ${EXTENSION}@mShortDosVersion@.dll
 TRF_LIB_FILE	    = lib${EXTENSION}@mShortDosVersion@.a
 TRF_STATIC_LIB_FILE = lib${EXTENSION}@mShortDosVersion@s.a
-
+TRF_STUB_LIB_FILE   = lib${EXTENSION}stub@mShortDosVersion@s.a
 
 SSL_LIBRARY	= -DSSL_LIB_NAME=\"libeay32.dll\"
 BZ2_LIBRARY	= -DBZ2_LIB_NAME=\"bz2.dll\"
@@ -215,6 +215,7 @@ SOURCES	=	../generic/adler.c \
 	../generic/qpcode.c \
 	../generic/reflect.c \
 	../generic/ref_opt.c \
+	../generic/trfStubInit.c \
 	../compat/tclLoadWin.c
 
 
@@ -257,11 +258,12 @@ OBJECTS	=	adler.o \
 	qpcode.o \
 	reflect.o \
 	ref_opt.o \
+	trfStubInit.o \
 	tclLoadWin.o
 
 #-------------------------------------------------------#
 
-default:	$(TRF_DLL_FILE) $(TRF_LIB_FILE)
+default:	$(TRF_DLL_FILE) $(TRF_LIB_FILE) $(TRF_STUB_LIB_FILE)
 
 all:	default
 
@@ -270,6 +272,12 @@ test:	$(TRF_DLL_FILE)
 
 
 #-------------------------------------------------------#
+
+trfStubLib.o:	../generic/trfStubLib.c
+	$(CC) -c $(CC_SWITCHES) ../generic/trfStubLib.c -o $@
+
+trfStubInit.o:	../generic/trfStubInit.c
+	$(CC) -c $(CC_SWITCHES) ../generic/trfStubInit.c -o $@
 
 adler.o:	../generic/adler.c
 	$(CC) -c $(CC_SWITCHES) ../generic/adler.c -o $@
@@ -408,6 +416,8 @@ $(TRF_LIB_FILE): trf.def $(TRF_DLL_FILE)
 $(TRF_STATIC_LIB_FILE): $(OBJECTS)
 	$(AR) cr $@ $(OBJECTS)
 
+$(TRF_STUB_LIB_FILE): trfStubLib.o
+	$(AR) cr $@ trfStubLib.o
 
 trf.def: $(OBJECTS)
 	$(DLLTOOL) --export-all --exclude-symbols DllMain@12,DllEntryPoint@0,z  --output-def $@ $(OBJECTS)
