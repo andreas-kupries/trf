@@ -40,9 +40,15 @@ static void        DeleteOptions _ANSI_ARGS_ ((Trf_Options options,
 static int         CheckOptions  _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
 					       CONST Trf_BaseOptions* baseOptions,
 					       ClientData clientData));
+#if (TCL_MAJOR_VERSION >= 8)
 static int         SetOption     _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
-		   			      CONST char* optname, CONST char* optvalue,
+					       CONST char* optname, CONST Tcl_Obj* optvalue,
 					       ClientData clientData));
+#else
+static int         SetOption     _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
+					       CONST char* optname, CONST char* optvalue,
+					       ClientData clientData));
+#endif
 static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
 					       ClientData clientData));
 
@@ -74,7 +80,13 @@ TrfMDOptions ()
       CreateOptions,
       DeleteOptions,
       CheckOptions,
+#if (TCL_MAJOR_VERSION >= 8)
+      NULL,      /* no string procedure */
       SetOption,
+#else
+      SetOption,
+      NULL,      /* no object procedure */
+#endif
       QueryOptions
     };
 
@@ -203,40 +215,34 @@ ClientData             clientData;
 	(o->matchFlag != (char*) NULL)       ||
 	(o->readDest  != (Tcl_Channel) NULL) ||
 	(o->writeDest != (Tcl_Channel) NULL)) {
-      Tcl_AppendResult (interp, "immediate: no options allowed",
-			(char*) NULL);
+      ADD_RES (interp, "immediate: no options allowed");
       return TCL_ERROR;
     }
   } else /* ATTACH */ {
     if (o->mode == TRF_UNKNOWN_MODE) {
-      Tcl_AppendResult (interp, "attach: -mode not defined",
-			(char*) NULL);
+      ADD_RES (interp, "attach: -mode not defined");
       return TCL_ERROR;
     } else if (o->mode == TRF_ABSORB_HASH) {
       if ((baseOptions->attach_mode & TCL_READABLE) &&
 	  (o->matchFlag == (char*) NULL)) {
-	Tcl_AppendResult (interp, "attach: -matchflag not defined",
-			  (char*) NULL);
+	ADD_RES (interp, "attach: -matchflag not defined");
 	return TCL_ERROR;
       }
     } else if (o->mode == TRF_WRITE_HASH) {
       if (o->matchFlag != (char*) NULL) {
-	Tcl_AppendResult (interp, "attach, external: -matchflag not allowed",
-			  (char*) NULL);
+	ADD_RES (interp, "attach: -matchflag not allowed");
 	return TCL_ERROR;
       }
 
       if ((baseOptions->attach_mode & TCL_READABLE) &&
 	  (o->readDest == (Tcl_Channel) NULL)) {
-	Tcl_AppendResult (interp, "attach, external: -read-dest missing",
-			  (char*) NULL);
+	ADD_RES (interp, "attach, external: -read-dest missing");
 	return TCL_ERROR;
       }
 
       if ((baseOptions->attach_mode & TCL_WRITABLE) &&
 	  (o->writeDest == (Tcl_Channel) NULL)) {
-	Tcl_AppendResult (interp, "attach, external: -write-dest missing",
-			  (char*) NULL);
+	ADD_RES (interp, "attach, external: -write-dest missing");
 	return TCL_ERROR;
       }
 
@@ -276,7 +282,11 @@ SetOption (options, interp, optname, optvalue, clientData)
 Trf_Options options;
 Tcl_Interp* interp;
 CONST char* optname;
-CONST char* optvalue;
+#if (TCL_MAJOR_VERSION >= 8)
+CONST Tcl_Obj* optvalue;
+#else
+CONST char*    optvalue;
+#endif
 ClientData  clientData;
 {
   /* Possible options:
@@ -288,19 +298,26 @@ ClientData  clientData;
    */
 
   TrfMDOptionBlock* o = (TrfMDOptionBlock*) options;
+  CONST char*       value;
 
   int len = strlen (optname + 1);
+
+#if (TCL_MAJOR_VERSION >= 8)
+    value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
+#else
+    value = optvalue;
+#endif
 
   switch (optname [1]) {
   case 'm':
     if (len == 1) {
       goto unknown_option;
     } else if (0 == strncmp (optname, "-mode", len)) {
-      len = strlen (optvalue);
+      len = strlen (value);
 
-      switch (optvalue [0]) {
+      switch (value [0]) {
       case 'a':
-	if (0 == strncmp (optvalue, "absorb", len)) {
+	if (0 == strncmp (value, "absorb", len)) {
 	  o->mode = TRF_ABSORB_HASH;
 	} else {
 	  goto unknown_mode;
@@ -308,7 +325,7 @@ ClientData  clientData;
 	break;
 
       case 'w':
-	if (0 == strncmp (optvalue, "write", len)) {
+	if (0 == strncmp (value, "write", len)) {
 	  o->mode = TRF_WRITE_HASH;
 	} else {
 	  goto unknown_mode;
@@ -317,17 +334,19 @@ ClientData  clientData;
 
       default:
       unknown_mode:
-	Tcl_AppendResult (interp, "unknown mode '", optvalue, "'", (char*) NULL);
+	ADD_RES (interp, "unknown mode '");
+	ADD_RES (interp, value);
+	ADD_RES (interp, "'");
 	return TCL_ERROR;
-      } /* switch (optvalue) */
+      } /* switch (value) */
 
     } else if (0 == strncmp (optname, "-matchflag", len)) {
       if (o->matchFlag)
 	Tcl_Free (o->matchFlag);
 
-      o->matchFlag = (char*) Tcl_Alloc (1 + strlen (optvalue));
+      o->matchFlag = (char*) Tcl_Alloc (1 + strlen (value));
       o->mfInterp  = interp;
-      strcpy (o->matchFlag, optvalue);
+      strcpy (o->matchFlag, value);
 
     } else {
       goto unknown_option;
@@ -338,11 +357,12 @@ ClientData  clientData;
     if (0 == strncmp (optname, "-write-dest", len)) {
       int access;
 
-      o->writeDest = Tcl_GetChannel (interp, (char*) optvalue, &access);
+      o->writeDest = Tcl_GetChannel (interp, (char*) value, &access);
       if (o->writeDest == (Tcl_Channel) NULL)
 	return TCL_ERROR;
       else if (! (access & TCL_WRITABLE)) {
-	Tcl_AppendResult (interp, optvalue, " not opened for writing", (char*) NULL);
+	ADD_RES (interp, value);
+	ADD_RES (interp, " not opened for writing");
 	return TCL_ERROR;
       }
     } else {
@@ -354,11 +374,12 @@ ClientData  clientData;
     if (0 == strncmp (optname, "-read-dest", len)) {
       int access;
 
-      o->readDest = Tcl_GetChannel (interp, (char*) optvalue, &access);
+      o->readDest = Tcl_GetChannel (interp, (char*) value, &access);
       if (o->readDest == (Tcl_Channel) NULL)
 	return TCL_ERROR;
       else if (! (access & TCL_WRITABLE)) {
-	Tcl_AppendResult (interp, optvalue, " not opened for writing", (char*) NULL);
+	ADD_RES (interp, value);
+	ADD_RES (interp, " not opened for writing");
 	return TCL_ERROR;
       }
     } else {
@@ -374,8 +395,9 @@ ClientData  clientData;
   return TCL_OK;
 
  unknown_option:
-  Tcl_AppendResult (interp, "unknown option '", optname, "'",
-		    (char*) NULL);
+  ADD_RES (interp, "unknown option '");
+  ADD_RES (interp, optname);
+  ADD_RES (interp, "'");
   return TCL_ERROR;
 }
 

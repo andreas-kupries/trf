@@ -77,9 +77,15 @@ typedef struct _TrfTransformationInstance_ {
 static void
 TrfDeleteRegistry _ANSI_ARGS_ ((ClientData clientData, Tcl_Interp *interp));
 
+#if (TCL_MAJOR_VERSION >= 8)
+static int
+TrfExecuteObjCmd _ANSI_ARGS_((ClientData clientData, Tcl_Interp* interp,
+			      int objc, struct Tcl_Obj* objv []));
+#else
 static int
 TrfExecuteCmd _ANSI_ARGS_((ClientData clientData, Tcl_Interp* interp,
 			   int argc, char** argv));
+#endif
 
 static void
 TrfDeleteCmd _ANSI_ARGS_((ClientData clientData));
@@ -254,7 +260,9 @@ CONST Trf_TypeDefinition* type;
   assert (IMPLY(type->options != NULL, type->options->createProc != NULL));
   assert (IMPLY(type->options != NULL, type->options->deleteProc != NULL));
   assert (IMPLY(type->options != NULL, type->options->checkProc  != NULL));
-  assert (IMPLY(type->options != NULL, type->options->setProc    != NULL));
+  assert (IMPLY(type->options != NULL,
+		(type->options->setProc   != NULL) ||
+		(type->options->setObjProc != NULL)));
   assert (IMPLY(type->options != NULL, type->options->queryProc  != NULL));
 
   assert (type->encoder.createProc);
@@ -277,8 +285,14 @@ CONST Trf_TypeDefinition* type;
   entry->transType  = (Tcl_ChannelType*)   Tcl_Alloc (sizeof (Tcl_ChannelType)); 
   entry->trfType    = (Trf_TypeDefinition*) type;
   entry->interp     = interp;
+#if (TCL_MAJOR_VERSION >= 8)
+  entry->trfCommand = Tcl_CreateObjCommand (interp, (char*) type->name,
+					    strlen (type->name), TrfExecuteObjCmd,
+					    (ClientData) entry, TrfDeleteCmd);
+#else
   entry->trfCommand = Tcl_CreateCommand (interp, (char*) type->name, TrfExecuteCmd,
 					 (ClientData) entry, TrfDeleteCmd);
+#endif
 
   /*
    * Set up channel type
@@ -378,6 +392,19 @@ Tcl_Interp* interp;
   Tcl_DeleteHashTable (hTablePtr);
 }
 
+/* (readable) shortcuts for calling the option processing vectors.
+ */
+
+#define CLT  (entry->trfType->clientData)
+#define OPT  (entry->trfType->options)
+
+#define CREATE_OPTINFO         (OPT ? (*OPT->createProc) (CLT) : NULL)
+#define DELETE_OPTINFO         if (optInfo) (*OPT->deleteProc) (optInfo, CLT)
+#define CHECK_OPTINFO(baseOpt) (optInfo ? (*OPT->checkProc) (optInfo, interp, &baseOpt, CLT) : TCL_OK)
+#define SET_OPTION(opt,optval) (optInfo ? (*OPT->setProc) (optInfo, interp, opt, optval, CLT) : TCL_ERROR)
+#define ENCODE_REQUEST(entry,optInfo) (optInfo ? (*OPT->queryProc) (optInfo, CLT) : 1)
+
+#if (TCL_MAJOR_VERSION < 8)
 /*
  *------------------------------------------------------*
  *
@@ -406,20 +433,6 @@ Tcl_Interp* interp;
 int         argc;
 char**      argv;
 {
-  /* (readable) shortcuts for calling the option processing vectors.
-   */
-
-#define CLT  (entry->trfType->clientData)
-#define OPT  (entry->trfType->options)
-
-#define CREATE_OPTINFO         (OPT ? (*OPT->createProc) (CLT) : NULL)
-#define DELETE_OPTINFO         if (optInfo) (*OPT->deleteProc) (optInfo, CLT)
-#define CHECK_OPTINFO(baseOpt) (optInfo ? (*OPT->checkProc) (optInfo, interp, &baseOpt, CLT) : TCL_OK)
-#define SET_OPTION(opt,optval) (optInfo ? (*OPT->setProc) (optInfo, interp, opt, optval, CLT) : TCL_ERROR)
-#define ENCODE_REQUEST(entry,optInfo) (optInfo ? (*OPT->queryProc) (optInfo, CLT) : 1)
-
-
-
   int                res, len;
   Tcl_Channel        source, destination;
   int                src_mode, dst_mode;
@@ -513,8 +526,8 @@ char**      argv;
     /* Determine channels to use */
 
     source = Tcl_GetChannel (interp, argv [0], &src_mode);
-	if (source == (Tcl_Channel) NULL)
-	  return TCL_ERROR;
+    if (source == (Tcl_Channel) NULL)
+      return TCL_ERROR;
 
     destination = Tcl_GetChannel (interp, argv [1], &dst_mode);
     if (destination == (Tcl_Channel) NULL)
@@ -555,6 +568,187 @@ char**      argv;
 		    (char*) NULL);
   return TCL_ERROR;
 }
+
+#else /* -> TCL_MAJOR_VERSION >= 8 */
+/*
+ *------------------------------------------------------*
+ *
+ *	TrfExecuteObjCmd --
+ *
+ *	------------------------------------------------*
+ *	Implementation procedure for all conversion commands.
+ *	Equivalent to 'TrfExecuteCmd', but using the new
+ *	Object interfaces.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		See 'TrfExecuteCmd'.
+ *
+ *	Result:
+ *		A standard TCL error code.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+TrfExecuteObjCmd (clientData, interp, objc, objv)
+ClientData       clientData;
+Tcl_Interp*      interp;
+int              objc;
+struct Tcl_Obj** objv;
+{
+  /* (readable) shortcuts for calling the option processing vectors.
+   * as defined in 'TrfExecuteCmd'.
+   */
+
+#define SET_OPTION_OBJ(opt,optval) (optInfo ? (*OPT->setObjProc) (optInfo, interp, opt, optval, CLT) : TCL_ERROR)
+
+  int                res, len;
+  Tcl_Channel        source, destination;
+  int                src_mode, dst_mode;
+  const char*        cmd;
+  const char*        option;
+  struct Tcl_Obj*    optarg;
+  Trf_RegistryEntry* entry;
+  Trf_Options        optInfo;
+  Trf_BaseOptions    baseOpt;
+
+  baseOpt.attach      = (Tcl_Channel) NULL;
+  baseOpt.attach_mode = 0;
+
+  entry = (Trf_RegistryEntry*) clientData;
+  cmd   = Tcl_GetStringFromObj (objv [0], NULL);
+
+  objc --;
+  objv ++;
+
+
+  if (1 == (objc % 2)) {
+    ADD_RES (interp, cmd);
+    ADD_RES (interp, ": wrong # args");
+    return TCL_ERROR;
+  }
+
+  optInfo = CREATE_OPTINFO;
+
+  while ((objc > 0) && (*Tcl_GetStringFromObj (objv [0], NULL) == '-')) {
+    /*
+     * Process options, as long as they are found
+     */
+
+    option = Tcl_GetStringFromObj (objv [0], NULL);
+    optarg = objv [1];
+
+    objc -= 2;
+    objv += 2;
+
+    len = strlen (option+1);
+    
+    if (len < 1)
+      goto unknown_option;
+
+    switch (option [1])
+      {
+      case 'a':
+	if (0 != strncmp (option, "-attach", len))
+	  goto unknown_option;
+
+	baseOpt.attach = Tcl_GetChannel (interp,
+					 Tcl_GetStringFromObj (optarg, NULL),
+					 &baseOpt.attach_mode);
+	if (baseOpt.attach == (Tcl_Channel) NULL)
+	  return TCL_ERROR;
+	break;
+
+      default:
+	if ((*OPT->setObjProc) == NULL) {
+	  res = SET_OPTION     (option, Tcl_GetStringFromObj (optarg, NULL));
+	} else {
+	  res = SET_OPTION_OBJ (option, optarg);
+	}
+
+	if (res != TCL_OK) {
+	  DELETE_OPTINFO;
+	  return TCL_ERROR;
+	}
+	break;
+      } /* switch option */
+  } /* while options */
+
+  /*
+   * Check argument restrictions, insert defaults if necessary,
+   * execute the required operation.
+   */
+
+  res = CHECK_OPTINFO (baseOpt);
+  if (res != TCL_OK) {
+    DELETE_OPTINFO;
+    return TCL_ERROR;
+  }
+
+  if (baseOpt.attach == (Tcl_Channel) NULL) /* TRF_IMMEDIATE */ {
+    /*
+     * Direct rendering requested
+     */
+
+    if (objc < 1) {
+      ADD_RES (interp, cmd);
+      ADD_RES (interp, ": source, destination missing");
+      return TCL_ERROR;
+    } else if (objc < 2) {
+      ADD_RES (interp, cmd);
+      ADD_RES (interp, ": destination missing");
+      return TCL_ERROR;
+    }
+
+    /* Determine channels to use */
+
+    source = Tcl_GetChannel (interp, Tcl_GetStringFromObj (objv [0], NULL), &src_mode);
+    if (source == (Tcl_Channel) NULL)
+	  return TCL_ERROR;
+
+    destination = Tcl_GetChannel (interp, Tcl_GetStringFromObj (objv [1], NULL), &dst_mode);
+    if (destination == (Tcl_Channel) NULL)
+      return TCL_ERROR;
+
+    if (! (src_mode & TCL_READABLE)) {
+      ADD_RES (interp, cmd);
+      ADD_RES (interp, ": source-channel not readable");
+      return TCL_ERROR;
+    }
+
+    if (! (dst_mode & TCL_WRITABLE)) {
+      ADD_RES (interp, cmd);
+      ADD_RES (interp, ": destination-channel not writable");
+      return TCL_ERROR;
+    }
+
+    /*
+     * Transform input now.
+     */
+
+    res = TransformImmediate (interp, entry, source, destination, optInfo);
+
+  } else /* TRF_ATTACH */ {
+    /*
+     * User requested attachment of transformation procedure to a channel.
+     */
+
+    res = AttachTransform (entry, baseOpt.attach, optInfo, interp);
+  }
+
+  DELETE_OPTINFO;
+  return res;
+
+ unknown_option:
+  DELETE_OPTINFO;
+  ADD_RES (interp, cmd);
+  ADD_RES (interp, ": unknown option '");
+  ADD_RES (interp, option);
+  ADD_RES (interp, "'");
+  return TCL_ERROR;
+}
+#endif /* TCL_MAJOR_VERSION < 8 */
 
 /*
  *------------------------------------------------------*
@@ -1115,12 +1309,12 @@ Tcl_Interp*        interp;
 
   if (new == (Tcl_Channel) NULL) {
     Tcl_Free ((char*) trans);
-    Tcl_AppendResult (interp, "internal error in Tcl_ReplaceChannel", (char*) NULL);
+    ADD_RES (interp, "internal error in Tcl_ReplaceChannel");
     return TCL_ERROR;
   }
 
-/*  Tcl_RegisterChannel (interp, new); */
-  Tcl_AppendResult    (interp, Tcl_GetChannelName (new), (char*) NULL);
+  /*  Tcl_RegisterChannel (interp, new); */
+  ADD_RES (interp, Tcl_GetChannelName (new));
 
   return TCL_OK;
 }
@@ -1158,10 +1352,10 @@ Tcl_Interp*    interp;
 
   if (res < 0) {
     if (interp) {
-      Tcl_AppendResult (interp, "error writing \"",
-			Tcl_GetChannelName (destination),
-			"\": ", Tcl_PosixError (interp),
-			(char *) NULL);
+      ADD_RES (interp, "error writing \"");
+      ADD_RES (interp, Tcl_GetChannelName (destination));
+      ADD_RES (interp, "\": ");
+      ADD_RES (interp, Tcl_PosixError (interp));
     }
     return TCL_ERROR;
   }

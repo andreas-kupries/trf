@@ -44,12 +44,19 @@ static int         CheckOptions  _ANSI_ARGS_ ((Trf_Options            options,
 					       CONST Trf_BaseOptions* baseOptions,
 					       ClientData             clientData));
 
+#if (TCL_MAJOR_VERSION >= 8)
+static int         SetOption     _ANSI_ARGS_ ((Trf_Options    options,
+					       Tcl_Interp*    interp,
+					       CONST char*    optname,
+					       CONST Tcl_Obj* optvalue,
+					       ClientData     clientData));
+#else
 static int         SetOption     _ANSI_ARGS_ ((Trf_Options options,
 					       Tcl_Interp* interp,
 					       CONST char* optname,
 					       CONST char* optvalue,
 					       ClientData  clientData));
-
+#endif
 static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
 					       ClientData  clientData));
 
@@ -81,7 +88,13 @@ TrfZIPOptions ()
       CreateOptions,
       DeleteOptions,
       CheckOptions,
+#if (TCL_MAJOR_VERSION >= 8)
+      NULL,      /* no string procedure */
       SetOption,
+#else
+      SetOption,
+      NULL,      /* no object procedure */
+#endif
       QueryOptions
     };
 
@@ -193,7 +206,7 @@ ClientData             clientData;
 
   if (baseOptions->attach == (Tcl_Channel) NULL) /* IMMEDIATE? */ {
     if (o->mode == TRF_UNKNOWN_MODE) {
-      Tcl_AppendResult (interp, "mode not defined", (char*) NULL);
+      ADD_RES (interp, "mode not defined");
       return TCL_ERROR;
     }
   } else /* ATTACH */ {
@@ -229,7 +242,11 @@ SetOption (options, interp, optname, optvalue, clientData)
 Trf_Options options;
 Tcl_Interp* interp;
 CONST char* optname;
-CONST char* optvalue;
+#if (TCL_MAJOR_VERSION >= 8)
+CONST Tcl_Obj* optvalue;
+#else
+CONST char*    optvalue;
+#endif
 ClientData  clientData;
 {
   /* Possible options:
@@ -241,27 +258,42 @@ ClientData  clientData;
 
   TrfZipOptionBlock* o = (TrfZipOptionBlock*) options;
   int              len = strlen (optname + 1);
+  CONST char*      value;
 
   switch (optname [1]) {
   case 'l':
     if (0 != strncmp (optname, "-level", len))
       goto unknown_option;
+
+#if (TCL_MAJOR_VERSION >= 8)
+    value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
+#else
+    value = optvalue;
+#endif
     
-    len = strlen (optvalue);
-    if (0 == strncmp (optvalue, "default", len)) {
+    len = strlen (value);
+    if (0 == strncmp (value, "default", len)) {
       o->level = TRF_DEFAULT_LEVEL;
     } else {
       int res, val;
 
-      res = Tcl_GetInt (interp, (char*) optvalue, &val);
+#if (TCL_MAJOR_VERSION >= 8)
+      long v;
+      res = Tcl_GetIntFromObj (interp, (Tcl_Obj*) optvalue, &v);
+      val = v;
+#else
+      res = Tcl_GetInt        (interp, optvalue, &val);
+#endif
+
       if (res != TCL_OK) {
 	return res;
       }
 
       if ((val < TRF_MIN_LEVEL) || (val > TRF_MAX_LEVEL)) {
-	Tcl_AppendResult (interp, "level out of range ",
-			  TRF_MIN_LEVEL_STR, "..",
-			  TRF_MAX_LEVEL_STR, (char*) NULL);
+	ADD_RES (interp, "level out of range ");
+	ADD_RES (interp, TRF_MIN_LEVEL_STR);
+	ADD_RES (interp, "..");
+	ADD_RES (interp, TRF_MAX_LEVEL_STR);
 	return TCL_ERROR;
       }
 
@@ -273,18 +305,23 @@ ClientData  clientData;
     if (0 != strncmp (optname, "-mode", len))
       goto unknown_option;
 
-    len = strlen (optvalue);
+#if (TCL_MAJOR_VERSION >= 8)
+    value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
+#else
+    value = optvalue;
+#endif
+    len = strlen (value);
 
-    switch (optvalue [0]) {
+    switch (value [0]) {
     case 'c':
-      if (0 != strncmp (optvalue, "compress", len))
+      if (0 != strncmp (value, "compress", len))
 	goto unknown_mode;
       
       o->mode = TRF_COMPRESS;
       break;
 
     case 'd':
-      if (0 != strncmp (optvalue, "decompress", len))
+      if (0 != strncmp (value, "decompress", len))
 	goto unknown_mode;
       
       o->mode = TRF_DECOMPRESS;
@@ -292,8 +329,9 @@ ClientData  clientData;
 
     default:
     unknown_mode:
-      Tcl_AppendResult (interp, "unknown mode '", optvalue, "'",
-			(char*) NULL);
+      ADD_RES (interp, "unknown mode '");
+      ADD_RES (interp, value);
+      ADD_RES (interp, "'");
       return TCL_ERROR;
       break;
     } /* switch optvalue */
@@ -307,8 +345,9 @@ ClientData  clientData;
   return TCL_OK;
 
  unknown_option:
-  Tcl_AppendResult (interp, "unknown option '", optname, "'",
-		    (char*) NULL);
+  ADD_RES (interp, "unknown option '");
+  ADD_RES (interp, optname);
+  ADD_RES (interp, "'");
   return TCL_ERROR;
 }
 

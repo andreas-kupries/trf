@@ -318,4 +318,21 @@ EXTERN int TrfInit_ZIP      _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_Unstack  _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_Binio    _ANSI_ARGS_ ((Tcl_Interp* interp));
 
+
+/*
+ * Define general result generation, dependent on major tcl version.
+ */
+
+#if (TCL_MAJOR_VERSION < 8)
+#define ADD_RES(interp, text) Tcl_AppendResult (interp, text, (char*) NULL);
+#else
+#define ADD_RES(intrp, text) Tcl_StringObjAppend (Tcl_GetObjResult (interp), (char*) text, -1);
+
+/* redirect tcl functionality to wrapper, get interpreter result right */
+#define Tcl_GetChannel TrfGetChannel
+
+EXTERN Tcl_Channel TrfGetChannel _ANSI_ARGS_((Tcl_Interp *interp,
+					      char *chanName, int *modePtr));
+#endif
+
 #endif /* TRF_INT_H */

@@ -403,10 +403,10 @@ ClientData       clientData;
 
     if (res < 0) {
       if (interp) {
-	Tcl_AppendResult (interp, "error writing \"",
-			  Tcl_GetChannelName (c->dest),
-			  "\": ", Tcl_PosixError (interp),
-			  (char *) NULL);
+	ADD_RES (interp, "error writing \"");
+	ADD_RES (interp, Tcl_GetChannelName (c->dest));
+	ADD_RES (interp, "\": ");
+	ADD_RES (interp, Tcl_PosixError (interp));
 	res = TCL_ERROR;
       }
     }
@@ -817,10 +817,10 @@ ClientData       clientData;
 
     if (resW < 0) {
       if (interp) {
-	Tcl_AppendResult (interp, "error writing \"",
-			  Tcl_GetChannelName (c->dest),
-			  "\": ", Tcl_PosixError (interp),
-			  (char *) NULL);
+	ADD_RES (interp, "error writing \"");
+	ADD_RES (interp, Tcl_GetChannelName (c->dest));
+	ADD_RES (interp, "\": ");
+	ADD_RES (interp, Tcl_PosixError (interp));
       }
 
       res = TCL_ERROR;
@@ -831,7 +831,7 @@ ClientData       clientData;
      */
 
     if (interp) {
-      Tcl_AppendResult (interp, "not enough bytes in channel", (char*) NULL);
+      ADD_RES (interp, "not enough bytes in channel");
     }
 
     res = TCL_ERROR;

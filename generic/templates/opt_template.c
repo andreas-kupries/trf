@@ -44,11 +44,19 @@ static int         CheckOptions  _ANSI_ARGS_ ((Trf_Options            options,
 					       CONST Trf_BaseOptions* baseOptions,
 					       ClientData             clientData));
 
+#if (TCL_MAJOR_VERSION >= 8)
+static int         SetOption     _ANSI_ARGS_ ((Trf_Options    options,
+					       Tcl_Interp*    interp,
+					       CONST char*    optname,
+					       CONST Tcl_Obj* optvalue,
+					       ClientData     clientData));
+#else
 static int         SetOption     _ANSI_ARGS_ ((Trf_Options options,
 					       Tcl_Interp* interp,
 					       CONST char* optname,
 					       CONST char* optvalue,
 					       ClientData  clientData));
+#endif
 
 static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
 					       ClientData  clientData));
@@ -81,7 +89,13 @@ Trf_XXXOptions ()
       CreateOptions,
       DeleteOptions,
       CheckOptions,
+#if (TCL_MAJOR_VERSION >= 8)
+      NULL,      /* no string procedure */
       SetOption,
+#else
+      SetOption,
+      NULL,      /* no object procedure */
+#endif
       QueryOptions
     };
 
@@ -195,14 +209,26 @@ SetOption (options, interp, optname, optvalue, clientData)
 Trf_Options options;
 Tcl_Interp* interp;
 CONST char* optname;
-CONST char* optvalue;
+#if (TCL_MAJOR_VERSION >= 8)
+CONST Tcl_Obj* optvalue;
+#else
+CONST char*    optvalue;
+#endif
 ClientData  clientData;
 {
   /* Possible options:
    *
    */
 
+  CONST char*             value;
   int len = strlen (optname + 1);
+
+  /* move into case-code if possible */
+#if (TCL_MAJOR_VERSION >= 8)
+    value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
+#else
+    value = optvalue;
+#endif
 
   switch (optname [1]) {
   default:
@@ -213,8 +239,9 @@ ClientData  clientData;
   return TCL_OK;
 
  unknown_option:
-  Tcl_AppendResult (interp, "unknown option '", optname, "'",
-		    (char*) NULL);
+  ADD_RES (interp, "unknown option '");
+  ADD_RES (interp, optname);
+  ADD_RES (interp, "'");
   return TCL_ERROR;
 }
 

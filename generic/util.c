@@ -284,3 +284,43 @@ char*       out;
   out [3] = (077 &   (in [2] & 077));
 }
 
+#if (TCL_MAJOR_VERSION >= 8)
+/*
+ *------------------------------------------------------*
+ *
+ *	TrfGetChannel --
+ *
+ *	------------------------------------------------*
+ *	objectbased wrapper to Tcl_GetChannel. Main thing
+ *	to do is placement of a generated error message
+ *	into the 'objResult'!
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		See 'Tcl_GetChannel'. An error message
+ *		in 'result' is moved to 'objResult'.
+ *
+ *	Results:
+ *		See above.
+ *
+ *------------------------------------------------------*
+ */
+
+Tcl_Channel
+TrfGetChannel (interp, chanName, modePtr)
+Tcl_Interp* interp;
+char*       chanName;
+int*        modePtr;
+{
+  Tcl_Channel res;
+#undef Tcl_GetChannel
+
+  res = Tcl_GetChannel (interp, chanName, modePtr);
+  if (res == NULL) {
+    Tcl_StringObjAppend (Tcl_GetObjResult (interp), interp->result, -1);
+    /* Tcl_FreeResult (interp); */
+  }
+
+  return res;
+}
+#endif

@@ -1,4 +1,68 @@
+Tue Feb 11 18:46:01 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* 'binio', 'unstack' need conversion too.
+
+	* -------------- tests ok.
+
+	* generic/util.c (TrfGetChannel): Wrapper to 'Tcl_GetChannel'.
+	  Required by objectbased commands, copies the standard result
+	  into the 'objResult' of the interpreter. Automatically activated
+	  in 'transformInt.h', for tcl major >= 8.
+
+	* generic/blockcipher.c, digest.c, rs_ecc.c, zip.c: see below.
+
+	* generic/b64code.c, octcode.c, hexcode.c, bincode.c, uucode.c,
+	  asc85code.c: changed result generation from 'Tcl_AppendResult'
+	  to 'ADD_RES'. 
+
+	* 2nd iteration through files named below, changed result
+	  generation from 'Tcl_AppendResult' to 'ADD_RES'.
+
+	* generic/transformInt.h (ADD_RES): New macro. Used to build
+	  command results in a version independent manner. Its definition
+	  depends upon the tcl version!
+
+	* generic/registry.c (Trf_Register): adapted validity checks to
+	  changed 'Trf_OptionVectors' structure.
+
+	* generic/templates/opt_template.c: ok.
+
+	* generic/bc_opt.c (SetOption): ok.
+	  (TrfBlockcipherOptions): ok.
+
+	* generic/zip_opt.c (SetOption): ok.
+	  (TrfZIPOptions): ok.
+
+	* generic/c_opt.c (SetOption): ok.
+	  (TrfCipherOptions): ok.
+
+	* generic/dig_opt.c (SetOption): ok.
+	  (TrfMDOptions): ok.
+
+	* generic/convert.c (SetOption): ok.
+	  (Trf_ConverterOptions): ok.
+
+	* zipt_opt.c, dig_opt.c, bc_opt.c, c_opt.c, convert.c: adaption to
+	  object interfaces required here!
+
+	* generic/transform.h (Trf_OptionVectors): added 'setObjProc' to
+	  structure. 
+	  /* ********* POTENTIAL INCOMPATIBILITY at C-level ********* */
+
+	* generic/transform.h: New prototype 'Trf_SetObjOption'. Object
+	  equivalent to 'Trf_SetOption'. Use VOID for Tcl_Obj if compiled
+	  against tcl major version below 8.
+
+	* generic/registry.c (Trf_Register): Uses 'TrfExecuteObjCmd' if possible.
+
+	* generic/registry.c (TrfExecuteObjCmd): New function, equivalent
+	  to 'TrfExecuteCmd', uses the object interfaces of tcl 8.
+	  Conditionally compilation removes functionality for Tcl below
+	  version 8.x
+
 Thu Feb  6 19:27:41 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* Reorg. complete, distribution running again (unix).
 
 	* unix/Makefile: corrected MANIFEST check, removed target
 	  'depend'. Removed tests for 'makedepend' from 'configure.in'.

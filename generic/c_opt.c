@@ -40,9 +40,15 @@ static void        DeleteOptions _ANSI_ARGS_ ((Trf_Options options,
 static int         CheckOptions  _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
 					       CONST Trf_BaseOptions* baseOptions,
 					       ClientData clientData));
+#if (TCL_MAJOR_VERSION >= 8)
+static int         SetOption     _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
+					       CONST char* optname, CONST Tcl_Obj* optvalue,
+					       ClientData clientData));
+#else
 static int         SetOption     _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
 					       CONST char* optname, CONST char* optvalue,
 					       ClientData clientData));
+#endif
 static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
 					       ClientData clientData));
 
@@ -74,7 +80,13 @@ TrfCipherOptions ()
       CreateOptions,
       DeleteOptions,
       CheckOptions,
+#if (TCL_MAJOR_VERSION >= 8)
+      NULL,      /* no string procedure */
       SetOption,
+#else
+      SetOption,
+      NULL,      /* no object procedure */
+#endif
       QueryOptions
     };
 
@@ -210,12 +222,12 @@ ClientData             clientData;
   }
 
   if (o->direction == TRF_UNKNOWN_MODE) {
-    Tcl_AppendResult (interp, "direction not specified", (char*) NULL);
+    ADD_RES (interp, "direction not specified");
     return TCL_ERROR;
   }
 
   if (o->key == NULL) {
-    Tcl_AppendResult (interp, "key not specified", (char*) NULL);
+    ADD_RES (interp, "key not specified");
     return TCL_ERROR;
   }
 
@@ -246,38 +258,46 @@ SetOption (options, interp, optname, optvalue, clientData)
 Trf_Options options;
 Tcl_Interp* interp;
 CONST char* optname;
-CONST char* optvalue;
+#if (TCL_MAJOR_VERSION >= 8)
+CONST Tcl_Obj* optvalue;
+#else
+CONST char*    optvalue;
+#endif
 ClientData  clientData;
 {
   /* Possible options:
    *
    * -direction	encrypt/decrypt
-   * -mode	ecb/cc/cfb/ofb
    * -key	<readable channel>
-   * -iv	<readable channel>
-   * -shift	<number>
    */
 
   TrfCipherOptionBlock*  o      = (TrfCipherOptionBlock*) options;
   Trf_CipherDescription* c_desc = (Trf_CipherDescription*) clientData;
+  CONST char*            value;
 
   int len = strlen (optname + 1);
+
+#if (TCL_MAJOR_VERSION >= 8)
+  value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
+#else
+  value = optvalue;
+#endif
 
   switch (optname [1]) {
   case 'd':
     if (0 == strncmp (optname, "-direction", len)) {
-      len = strlen (optvalue);
+      len = strlen (value);
 
-      switch (optvalue [0]) {
+      switch (value [0]) {
       case 'e':
-	if (0 == strncmp ("encrypt", optvalue, len)) {
+	if (0 == strncmp ("encrypt", value, len)) {
 	  o->direction = TRF_ENCRYPT;
 	} else
 	  goto unknown_direction;
 	break;
 
       case 'd':
-	if (0 == strncmp ("decrypt", optvalue, len)) {
+	if (0 == strncmp ("decrypt", value, len)) {
 	  o->direction = TRF_DECRYPT;
 	} else
 	  goto unknown_direction;
@@ -285,7 +305,9 @@ ClientData  clientData;
 
       default:
       unknown_direction:
-	Tcl_AppendResult (interp, "unknown direction \"", optvalue, "\"", (char*) NULL);
+	ADD_RES (interp, "unknown direction \"");
+	ADD_RES (interp, value);
+	ADD_RES (interp, "\"");
 	return TCL_ERROR;
       }
     } else
@@ -297,13 +319,13 @@ ClientData  clientData;
       int         access;
       Tcl_Channel key;
 
-      key = Tcl_GetChannel (interp, (char*) optvalue, &access);
+      key = Tcl_GetChannel (interp, (char*) value, &access);
       if (key == (Tcl_Channel) NULL)
 	return TCL_ERROR;
       else if (! (access & TCL_READABLE)) {
-	Tcl_AppendResult (interp, "key \"", optvalue,
-			  "\" not opened for reading",
-			  (char*) NULL);
+	ADD_RES (interp, "key \"");
+	ADD_RES (interp, value);
+	ADD_RES (interp, "\" not opened for reading");
 	return TCL_ERROR;
       } else {
 	/*
@@ -315,13 +337,14 @@ ClientData  clientData;
 
 	if (res < 0) {
 	  Tcl_Free (tmp);
-	  Tcl_AppendResult (interp, "error reading key from \"", optvalue,
-			    "\": ", Tcl_PosixError (interp),
-			    (char *) NULL);
+	  ADD_RES (interp, "error reading key from \"");
+	  ADD_RES (interp, value);
+	  ADD_RES (interp, "\": ");
+	  ADD_RES (interp, Tcl_PosixError (interp));
 	  return TCL_ERROR;
 	} else if (res < c_desc->min_keysize) {
 	  Tcl_Free (tmp);
-	  Tcl_AppendResult (interp, "key to short (< minimal keysize)", (char*) NULL);
+	  ADD_RES (interp, "key to short (< minimal keysize)");
 	  return TCL_ERROR;
 	}
 
@@ -340,8 +363,9 @@ ClientData  clientData;
   return TCL_OK;
 
  unknown_option:
-  Tcl_AppendResult (interp, "unknown option '", optname, "'",
-		    (char*) NULL);
+  ADD_RES (interp, "unknown option '");
+  ADD_RES (interp, optname);
+  ADD_RES (interp, "'");
   return TCL_ERROR;
 }
 

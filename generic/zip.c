@@ -889,5 +889,8 @@ CONST char* prefix;
     }
   }
 
-  Tcl_AppendResult (interp, "zlib error (", prefix, "): ", msg, (char*) NULL);
+  ADD_RES (interp, "zlib error (");
+  ADD_RES (interp, prefix);
+  ADD_RES (interp, "): ");
+  ADD_RES (interp, msg);
 }

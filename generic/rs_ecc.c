@@ -746,9 +746,7 @@ ClientData       clientData;
 
   if (c->charCount > 0) {
     if (interp != NULL) {
-      Tcl_AppendResult (interp,
-			"can not decode incomplete block at end of input",
-			(char*) NULL);
+      ADD_RES (interp, "can not decode incomplete block at end of input");
     }
 
     return TCL_ERROR;

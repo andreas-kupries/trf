@@ -527,9 +527,7 @@ ClientData clientData;
      */
 
     if (interp) {
-      Tcl_AppendResult (interp,
-			"illegal padding inside the string",
-			(char*) NULL);
+      ADD_RES (interp, "illegal padding inside the string");
     }
     return TCL_ERROR;
   }
@@ -548,9 +546,7 @@ ClientData clientData;
 
     if (res != TCL_OK) {
       if (interp) {
-	Tcl_AppendResult (interp,
-			  "illegal characters in string",
-			  (char*) NULL);
+	ADD_RES (interp, "illegal characters in string");
       }
       return res;
     }
@@ -617,9 +613,7 @@ ClientData clientData;
 
     if (res != TCL_OK) {
       if (interp) {
-	Tcl_AppendResult (interp,
-			  "illegal characters in string",
-			  (char*) NULL);
+	ADD_RES (interp, "illegal characters in string");
       }
       return res;
     }

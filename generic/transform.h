@@ -215,6 +215,41 @@ typedef int Trf_SetOption _ANSI_ARGS_ ((Trf_Options options,
 					ClientData  clientData));
 #endif
 
+#if (TCL_MAJOR_VERSION < 8)
+#define Tcl_Obj VOID /* create dummy for missing definition */
+#endif
+
+/*
+ * Interface to procedures to define the value of an option.
+ * The procedure takes the specified optionname (rejecting
+ * illegal ones) and places the given optionvalue into the
+ * container. All necessary conversions from a Tcl_Obj to the
+ * required type should be done here. Return value is a standard
+ * tcl error code. In case of failure and interp not NULL an
+ * error message should be left in the result area of the
+ * specified interpreter. This procedure makes sense for tcl
+ * version 8 and above only
+ */
+
+#ifdef __C2MAN__
+typedef int Trf_SetObjOption (Trf_Options    options,   /* container to place the value into */
+			      Tcl_Interp*    interp,    /* interpreter for error messages
+							 * (NULL possible) */
+			      CONST char*    optname,   /* name of option to define */
+			      CONST Tcl_Obj* optvalue,  /* value to set into the container */
+			      ClientData     clientData /* arbitrary information, as defined in
+							 * Trf_TypeDefinition.clientData */);
+#else
+typedef int Trf_SetObjOption _ANSI_ARGS_ ((Trf_Options options,
+					Tcl_Interp*    interp,
+					CONST char*    optname,
+					CONST Tcl_Obj* optvalue,
+					ClientData     clientData));
+#endif
+
+
+
+
 /*
  * Interface to procedures to query an option container.
  * The result value decides wether the encoder- or decoder-set of vectors
@@ -246,6 +281,7 @@ typedef struct _Trf_OptionVectors_ {
   Trf_DeleteOptions*  deleteProc; /* delete option container */
   Trf_CheckOptions*   checkProc;  /* check defined options for consistency, errors, ... */
   Trf_SetOption*      setProc;    /* define an option value */
+  Trf_SetObjOption*   setObjProc; /* define an option value via Tcl_Obj (Tcl 8.x) */
   Trf_QueryOptions*   queryProc;  /* query, wether encode (1) / decode (0) requested by options */
 } Trf_OptionVectors;
 
