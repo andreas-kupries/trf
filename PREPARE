@@ -6,8 +6,8 @@
 #    (version, patchlevel, current date)
 
 set date       [date now]
-set long_date  [clock format $date -format {%B %d, %Y}]
-set short_date [string toupper [clock format $date -format {%d-%b-%Y}]]
+set long_date  [clock format [clock scan $date] -format {%B %d, %Y}]
+set short_date [string toupper [clock format [clock scan $date] -format {%d-%b-%Y}]]
 
 replace_in_file LSM                  @DATE@ $short_date
 replace_in_file DESCRIPTION          @DATE@ $long_date
