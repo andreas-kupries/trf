@@ -80,6 +80,7 @@ set fail [catch {
 } msg]	;#{}
 if {$fail} {mLog log error $msg}
 
+mLog log info hyperized installation manual
 set fail [catch {
     exec latex2html -dir html/install -t "Trf Installation manual" install.tex
     eval file delete [glob html/install/.*.dir html/install/.*.pag html/install/*.pl html/install/images.*]
