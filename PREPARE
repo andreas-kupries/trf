@@ -43,7 +43,7 @@ replace_in_file unix/README          @DATE@    $long_date
 replace_in_file unix/README          @VERSION@ ${the-patchlevel}
 
 file copy generic/pkgIndex.tcl.in win/pkgIndex.tcl
-replace_in_file win/pkgIndex.tcl @configure_input@ "Distributed at ${long-date}"
+replace_in_file win/pkgIndex.tcl @configure_input@ "Distributed at $long_date"
 replace_in_file win/pkgIndex.tcl @TRF_VERSION@  ${the-version}
 replace_in_file win/pkgIndex.tcl @TRF_LIB_FILE@ "trf${the-version}.dll"
 
