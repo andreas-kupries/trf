@@ -39,6 +39,7 @@ exec_prefix	=	@exec_prefix@
 
 # Directory containing scripts supporting the work of this makefile
 tool		=	$(TOP_DIR)/tools
+top_tool	=	./tools
 
 
 # The following definition can be set to non-null for special systems
@@ -234,12 +235,11 @@ LOADLIBES	=	@TRF_BUILD_LIB_SPEC@ $(ALL_LIBS)
 
 #-------------------------------------------------------#
 
-all:	check-package depend library
+all:	check-package library
 
 clean:
 	rm -f $(OBJECTS) $(TRF_LIB_FILE) $(APP) $(TCLSH_OBJS) $(DOCTEMP)
-	rm -f TAGS depend *~ */*~ core*
-	-mv Makefile.bak Makefile
+	rm -f TAGS *~ */*~ core*
 
 distclean:	clean
 	rm -f config.status config.cache config.log Makefile \
@@ -270,17 +270,17 @@ install-bin:	application
 
 lib:	library
 
-library:	depend $(TRF_LIB_FILE)
+library:	$(TRF_LIB_FILE)
 	@echo ... done
 
 app:	application
 
-application:	depend library $(APP)
+application:	library $(APP)
 	@echo ... done tclsh
 
-depend:	$(HEADER) $(SOURCES)
-	@MAKEDEPEND@ -D___MAKEDEPEND___ -- @MKDEP_FLAGS@ $(CC_SWITCHES) -- $(SOURCES)
-	touch depend
+#depend:	$(HEADER) $(SOURCES)
+#	@MAKEDEPEND@ -D___MAKEDEPEND___ -- @MKDEP_FLAGS@ $(CC_SWITCHES) -- $(SOURCES)
+#	touch depend
 
 #-------------------------------------------------------#
 
@@ -289,8 +289,8 @@ TAGS:
 
 check-package:
 	@mv $(TOP_DIR)/MANIFEST /tmp/MANIFEST
-	@$(tool)/get-manifest $(EXTENSION)
-	@-diff /tmp/MANIFEST MANIFEST | sed -e 's/</missing:/' -e 's/>/added:  /' | $(tool)/skip-trash Makefile Makefile.bak depend patchlevel.h transform.h pkgIndex.tcl "config.*"
+	@cd $(TOP_DIR) ; $(top_tool)/get-manifest $(EXTENSION)
+	@-diff /tmp/MANIFEST $(TOP_DIR)/MANIFEST | sed -e 's/</missing:/' -e 's/>/added:  /' | $(tool)/skip-trash Makefile pkgIndex.tcl "config.*"
 	@mv /tmp/MANIFEST $(TOP_DIR)/MANIFEST
 
 
