@@ -36,6 +36,10 @@ Changes from b1 to b2:
 The package compiles cleanly with tcl 7.6, 8.0a2 (not a1!).
 
 It can be found at
+        <ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.tar.gz>
+        <ftp://ftp.westend.com/pub/aku/trf@mDosVersion@.zip>
+        <ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.readme>
+or
         <ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz>
         <ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip>
         <ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme>
