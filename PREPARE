@@ -75,7 +75,7 @@ if {$fail} {mLog log error $msg}
 # nav-ICONs from america, have to change that
 mLog log info hyperized manual
 set fail [catch {
-    exec latex2html -dir html/man -t "Trf Manual" manual.tex
+    exec latex2html -dir html/man -t "Trf Manual" man.tex
     eval file delete [glob html/man/.*.dir html/man/.*.pag html/man/*.pl html/man/images.*]
 } msg]	;#{}
 if {$fail} {mLog log error $msg}
