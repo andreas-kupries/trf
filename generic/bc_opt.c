@@ -40,13 +40,13 @@ static void        DeleteOptions _ANSI_ARGS_ ((Trf_Options options,
 static int         CheckOptions  _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
 					       CONST Trf_BaseOptions* baseOptions,
 					       ClientData clientData));
-#if (TCL_MAJOR_VERSION >= 8)
+#if (TCL_MAJOR_VERSION < 8)
 static int         SetOption     _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
-					       CONST char* optname, CONST Tcl_Obj* optvalue,
+					       CONST char* optname, CONST char* optvalue,
 					       ClientData clientData));
 #else
 static int         SetOption     _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
-					       CONST char* optname, CONST char* optvalue,
+					       CONST char* optname, CONST Tcl_Obj* optvalue,
 					       ClientData clientData));
 #endif
 static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
@@ -80,12 +80,12 @@ TrfBlockcipherOptions ()
       CreateOptions,
       DeleteOptions,
       CheckOptions,
-#if (TCL_MAJOR_VERSION >= 8)
-      NULL,      /* no string procedure */
-      SetOption,
-#else
+#if (TCL_MAJOR_VERSION < 8)
       SetOption,
       NULL,      /* no object procedure */
+#else
+      NULL,      /* no string procedure */
+      SetOption,
 #endif
       QueryOptions
     };
@@ -123,12 +123,17 @@ ClientData clientData;
 
   o->direction      = TRF_UNKNOWN_MODE;
   o->operation_mode = TRF_UNKNOWN_MODE;
+  o->keyDataIsChan  = 0;
+  o->keyData        = NULL;
+  o->ivDataIsChan   = 0;
+  o->ivData         = NULL;
+
+  /* ---- derived information ---- */
+
   o->key_length     = -1;
   o->key            = NULL;
   o->iv             = NULL;
   o->shift_width    = -1;
-
-  /* ---- derived information ---- */
 
   o->eks_length          = -1;
   o->dks_length          = -1;
@@ -164,6 +169,22 @@ ClientData clientData;
 {
   TrfBlockcipherOptionBlock*  o       = (TrfBlockcipherOptionBlock*) options;
   Trf_BlockcipherDescription* bc_desc = (Trf_BlockcipherDescription*) clientData;
+
+  if (o->keyData != NULL) {
+#if (TCL_MAJOR_VERSION < 8)
+    Tcl_Free (o->keyData);
+#else
+    Tcl_DecrRefCount(o->keyData);
+#endif
+  }
+
+  if (o->ivData != NULL) {
+#if (TCL_MAJOR_VERSION < 8)
+    Tcl_Free (o->ivData);
+#else
+    Tcl_DecrRefCount(o->ivData);
+#endif
+  }
 
   if (o->key != NULL) {
     memset (o->key, '\0', o->key_length);
@@ -216,6 +237,7 @@ ClientData             clientData;
 {
   TrfBlockcipherOptionBlock*        o = (TrfBlockcipherOptionBlock*) options;
   Trf_BlockcipherDescription* bc_desc = (Trf_BlockcipherDescription*) clientData;
+  int res;
 
   /*
    * Call cipher dependent check of environment first.
@@ -229,32 +251,54 @@ ClientData             clientData;
 
 
   if (o->direction == TRF_UNKNOWN_MODE) {
-    ADD_RES (interp, "direction not specified");
+    Tcl_AppendResult (interp, "direction not specified", (char*) NULL);
     return TCL_ERROR;
   }
 
   if (o->operation_mode == TRF_UNKNOWN_MODE) {
-    ADD_RES (interp, "mode not specified");
+    Tcl_AppendResult (interp, "mode not specified", (char*) NULL);
     return TCL_ERROR;
   }
 
-  if (o->key == NULL) {
-    ADD_RES (interp, "key not specified");
+  if (o->keyData == NULL) {
+    Tcl_AppendResult (interp, "key not specified", (char*) NULL);
     return TCL_ERROR;
   }
 
   if (o->operation_mode >= TRF_CBC_MODE) {
-    if (o->iv == NULL) {
-      ADD_RES (interp, "iv not specified for stream mode");
+    if (o->ivData == NULL) {
+      Tcl_AppendResult (interp, "iv not specified for stream mode", (char*) NULL);
       return TCL_ERROR;
     }
   }
 
   if (o->operation_mode >= TRF_CFB_MODE) {
     if (o->shift_width < 0) {
-      ADD_RES (interp, "shift not specified for feedback mode");
+      Tcl_AppendResult (interp, "shift not specified for feedback mode", (char*) NULL);
       return TCL_ERROR;
     }
+  }
+
+  /*
+   * Interpret '-key' in dependance of '-key-type'.
+   */
+
+  res = TrfGetData (interp, "key", o->keyDataIsChan, o->keyData,
+		     bc_desc->min_keysize, bc_desc->max_keysize,
+		     &o->key, &o->key_length);
+
+  if (res != TCL_OK)
+    return res;
+
+  if (o->operation_mode >= TRF_CBC_MODE) {
+    /*
+     * Interpret '-iv' in dependance of '-iv-type'.
+     */
+    int dummy;
+
+    return TrfGetData (interp, "iv", o->ivDataIsChan, o->ivData,
+		       bc_desc->block_size, bc_desc->block_size,
+		       &o->iv, &dummy);
   }
 
   return TCL_OK;
@@ -284,10 +328,10 @@ SetOption (options, interp, optname, optvalue, clientData)
 Trf_Options options;
 Tcl_Interp* interp;
 CONST char* optname;
-#if (TCL_MAJOR_VERSION >= 8)
-CONST Tcl_Obj* optvalue;
-#else
+#if (TCL_MAJOR_VERSION < 8)
 CONST char*    optvalue;
+#else
+CONST Tcl_Obj* optvalue;
 #endif
 ClientData  clientData;
 {
@@ -295,25 +339,33 @@ ClientData  clientData;
    *
    * -direction	encrypt/decrypt
    * -mode	ecb/cbc/cfb/ofb
-   * -key	<readable channel>
-   * -iv	<readable channel>
    * -shift	<number>
+   *
+   * -key-type  data|channel
+   * -key	<value>, either channel handle or immediate
+   *                     information (dependent on value of
+   *                     -key-type).
+   *
+   * -iv-type	data|channel
+   * -iv	<value>, either channel handle or immediate
+   *                     information (dependent on value of
+   *                     -iv-type).
    */
 
   TrfBlockcipherOptionBlock*  o       = (TrfBlockcipherOptionBlock*) options;
   Trf_BlockcipherDescription* bc_desc = (Trf_BlockcipherDescription*) clientData;
+  int                         len = strlen (optname + 1);
   CONST char*                 value;
 
-  int len = strlen (optname + 1);
+#if (TCL_MAJOR_VERSION < 8)
+  value = optvalue;
+#else
+  value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
+#endif
 
   switch (optname [1]) {
   case 'd':
     if (0 == strncmp (optname, "-direction", len)) {
-#if (TCL_MAJOR_VERSION >= 8)
-      value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
-#else
-      value = optvalue;
-#endif
       len = strlen (value);
 
       switch (value [0]) {
@@ -333,9 +385,9 @@ ClientData  clientData;
 
       default:
       unknown_direction:
-	ADD_RES (interp, "unknown direction \"");
-	ADD_RES (interp, value);
-	ADD_RES (interp, "\"");
+	Tcl_AppendResult (interp, "unknown direction \"", (char*) NULL);
+	Tcl_AppendResult (interp, value, (char*) NULL);
+	Tcl_AppendResult (interp, "\"", (char*) NULL);
 	return TCL_ERROR;
       }
     } else
@@ -344,11 +396,6 @@ ClientData  clientData;
 
   case 'm':
     if (0 == strncmp (optname, "-mode", len)) {
-#if (TCL_MAJOR_VERSION >= 8)
-      value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
-#else
-      value = optvalue;
-#endif
       len = strlen (value);
 
       switch (value [0]) {
@@ -379,9 +426,9 @@ ClientData  clientData;
 
       default:
       unknown_mode:
-	ADD_RES (interp, "unknown mode \"");
-	ADD_RES (interp, value);
-	ADD_RES (interp, "\"");
+	Tcl_AppendResult (interp, "unknown mode \"", (char*) NULL);
+	Tcl_AppendResult (interp, value, (char*) NULL);
+	Tcl_AppendResult (interp, "\"", (char*) NULL);
 	return TCL_ERROR;
       }
     } else
@@ -390,94 +437,34 @@ ClientData  clientData;
 
   case 'i':
     if (0 == strncmp (optname, "-iv", len)) {
-      int         access;
-      Tcl_Channel iv;
-
-#if (TCL_MAJOR_VERSION >= 8)
-      value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
+      /*
+       * Save information, interpret later (CheckOption)
+       */
+#if (TCL_MAJOR_VERSION < 8)
+      o->ivData = strcpy (Tcl_Alloc (1 + strlen (optvalue)), optvalue);
 #else
-      value = optvalue;
+      o->ivData = (Tcl_Obj*) optvalue;
+      Tcl_IncrRefCount (o->ivData);
 #endif
-
-      iv = Tcl_GetChannel (interp, (char*) value, &access);
-
-      if (iv == (Tcl_Channel) NULL)
-	return TCL_ERROR;
-      else if (! (access & TCL_READABLE)) {
-	ADD_RES (interp, "iv \"");
-	ADD_RES (interp, value);
-	ADD_RES (interp, "\" not opened for reading");
-	return TCL_ERROR;
-      } else {
-	/*
-	 * Extract iv information from channel.
-	 */
-
-	char* tmp = Tcl_Alloc (bc_desc->block_size);
-	int res   = Tcl_Read  (iv, tmp, bc_desc->block_size);
-
-	if (res < 0) {
-	  Tcl_Free (tmp);
-	  ADD_RES (interp, "error reading iv from \"");
-	  ADD_RES (interp, value);
-	  ADD_RES (interp, "\": ");
-	  ADD_RES (interp, Tcl_PosixError (interp));
-	  return TCL_ERROR;
-	} else if (res < bc_desc->block_size) {
-	  Tcl_Free (tmp);
-	  ADD_RES (interp, "iv to short (< blocksize)");
-	  return TCL_ERROR;
-	}
-
-	o->iv = tmp;
-      }
+    } else if (0 == strncmp (optname, "-iv-type", len)) {
+      return TrfGetDataType (interp, "iv", value, &o->ivDataIsChan);
     } else
       goto unknown_option;
     break;
 
   case 'k':
     if (0 == strncmp (optname, "-key", len)) {
-      int         access;
-      Tcl_Channel key;
-
-#if (TCL_MAJOR_VERSION >= 8)
-      value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
+      /*
+       * Save information, interpret later (CheckOption)
+       */
+#if (TCL_MAJOR_VERSION < 8)
+      o->keyData = strcpy (Tcl_Alloc (1 + strlen (optvalue)), optvalue);
 #else
-      value = optvalue;
+      o->keyData = (Tcl_Obj*) optvalue;
+      Tcl_IncrRefCount (o->keyData);
 #endif
-
-      key = Tcl_GetChannel (interp, (char*) value, &access);
-      if (key == (Tcl_Channel) NULL)
-	return TCL_ERROR;
-      else if (! (access & TCL_READABLE)) {
-	ADD_RES (interp, "key \"");
-	ADD_RES (interp, value);
-	ADD_RES (interp, "\" not opened for reading");
-	return TCL_ERROR;
-      } else {
-	/*
-	 * Extract key from channel.
-	 */
-
-	char* tmp = Tcl_Alloc (bc_desc->max_keysize);
-	int res   = Tcl_Read  (key, tmp, bc_desc->max_keysize);
-
-	if (res < 0) {
-	  Tcl_Free (tmp);
-	  ADD_RES (interp, "error reading key from \"");
-	  ADD_RES (interp, value);
-	  ADD_RES (interp, "\": ");
-	  ADD_RES (interp, Tcl_PosixError (interp));
-	  return TCL_ERROR;
-	} else if (res < bc_desc->min_keysize) {
-	  Tcl_Free (tmp);
-	  ADD_RES (interp, "key to short (< minimal keysize)");
-	  return TCL_ERROR;
-	}
-
-	o->key        = tmp;
-	o->key_length = res;
-      }
+    } else if (0 == strncmp (optname, "-key-type", len)) {
+      return TrfGetDataType (interp, "key", value, &o->keyDataIsChan);
     } else
       goto unknown_option;
     break;
@@ -486,23 +473,24 @@ ClientData  clientData;
     if (0 == strncmp (optname, "-shift", len)) {
       int res;
 
-#if (TCL_MAJOR_VERSION >= 8)
+#if (TCL_MAJOR_VERSION < 8)
+      res = Tcl_GetInt (interp, (char*) optvalue, &o->shift_width);
+#else
       int sw;
       res = Tcl_GetIntFromObj (interp, (Tcl_Obj*) optvalue, &sw);
       o->shift_width = sw;
-#else
-      res = Tcl_GetInt (interp, (char*) optvalue, &o->shift_width);
 #endif
+
       if (res != TCL_OK)
 	return res;
       else if (o->shift_width <= 0) {
-	ADD_RES (interp, "shift must be > 0");
+	Tcl_AppendResult (interp, "shift must be > 0", (char*) NULL);
 	return TCL_ERROR;
       } else if (o->shift_width > bc_desc->block_size) {
-	ADD_RES (interp, "shift to large (> blocksize)");
+	Tcl_AppendResult (interp, "shift to large (> blocksize)", (char*) NULL);
 	return TCL_ERROR;
       } else if ((bc_desc->block_size % o->shift_width) != 0) {
-	ADD_RES (interp, "shift not a divisor of blocksize");
+	Tcl_AppendResult (interp, "shift not a divisor of blocksize", (char*) NULL);
 	return TCL_ERROR;
       }
     } else
@@ -517,9 +505,9 @@ ClientData  clientData;
   return TCL_OK;
 
  unknown_option:
-  ADD_RES (interp, "unknown option '");
-  ADD_RES (interp, optname);
-  ADD_RES (interp, "'");
+  Tcl_AppendResult (interp, "unknown option '", (char*) NULL);
+  Tcl_AppendResult (interp, optname, (char*) NULL);
+  Tcl_AppendResult (interp, "'", (char*) NULL);
   return TCL_ERROR;
 }
 

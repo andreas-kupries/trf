@@ -113,8 +113,19 @@ typedef struct _EncoderControl_ {
   ClientData     writeClientData;
 
   int            operation_mode;
-  Tcl_Channel    dest;           /* target for ATTACH_WRITE. possibly NULL */
+
+  char*          destHandle;	/* Name of target for ATTACH_WRITE */
+  Tcl_Channel    dest;		/* Channel target for ATTACH_WRITE. possibly NULL */
+  Tcl_Interp*    vInterp;	/* Interpreter containing 'destHandle', if name of variable */
+
+  /* Possible combinations:
+   * destHandle != NULL, vInterp != NULL, dest == NULL  /ATTACH_WRITE, to variable
+   * destHandle == NULL, vInterp == NULL, dest != NULL  /ATTACH_WRITE, to channel
+   * destHandle == NULL, vInterp == NULL, dest == NULL  /ATTACH_ABSORB, or IMMEDIATE
+   */
+
   VOID*          context;
+
 
 } EncoderControl;
 
@@ -128,11 +139,20 @@ typedef struct _DecoderControl_ {
   ClientData     writeClientData;
 
   int            operation_mode;
-  Tcl_Channel    dest;           /* target for ATTACH_WRITE. possibly NULL  */
-  VOID*          context;
 
+  char*          destHandle;	/* Name of target for ATTACH_WRITE */
+  Tcl_Channel    dest;		/* Channel target for ATTACH_WRITE. possibly NULL */
+  Tcl_Interp*    vInterp;	/* Interpreter containing 'destHandle', if name of variable */
+
+  /* Possible combinations:
+   * destHandle != NULL, dest == NULL	/ATTACH_WRITE, to variable
+   * destHandle == NULL, dest != NULL	/ATTACH_WRITE, to channel
+   * destHandle == NULL, dest == NULL	/ATTACH_ABSORB, or IMMEDIATE
+   * vInterp always set, because of 'matchFlag'.
+   */
+
+  VOID*          context;
   char*          matchFlag;      /* target for ATTACH_ABSORB */
-  Tcl_Interp*    mfInterp;       /* interpreter containing matchFlag */
 
   unsigned char* digest_buffer;
   short          buffer_pos;
@@ -141,6 +161,10 @@ typedef struct _DecoderControl_ {
 } DecoderControl;
 
 
+static int
+WriteDigest _ANSI_ARGS_ ((Tcl_Interp* interp, char* destHandle,
+			  Tcl_Channel dest,   char* digest,
+			  Trf_MessageDigestDescription* md));
 
 
 /*
@@ -217,14 +241,26 @@ ClientData    clientData;
   c->write           = fun;
   c->writeClientData = writeClientData;
 
-  c->operation_mode = (o->behaviour == TRF_IMMEDIATE ?
-		       IMMEDIATE :
-		       (o->mode == TRF_ABSORB_HASH ?
-			ATTACH_ABSORB :
-			ATTACH_WRITE));
+  if ((o->behaviour == TRF_IMMEDIATE) || (o->mode == TRF_ABSORB_HASH)) {
+    c->operation_mode = (o->behaviour == TRF_IMMEDIATE) ? IMMEDIATE : ATTACH_ABSORB;
+    c->vInterp        = (Tcl_Interp*) NULL;
+    c->destHandle     = (char*)       NULL;
+    c->dest           = (Tcl_Channel) NULL;
+  } else {
+    c->operation_mode = ATTACH_WRITE;
 
-  c->dest = (c->operation_mode == ATTACH_WRITE ?
-	     o->writeDest : (Tcl_Channel) NULL);
+    if (o->wdIsChannel) {
+      c->vInterp        = (Tcl_Interp*) NULL;
+      c->destHandle     = (char*)       NULL;
+      c->dest           = o->wdChannel;
+    } else {
+      c->vInterp        = o->vInterp;
+      c->destHandle     = o->writeDestination;
+      c->dest           = (Tcl_Channel) NULL;
+
+      o->writeDestination = (char*) NULL; /* ownership moved, prevent early free */
+    }
+  }
 
   /*
    * Create and initialize the context.
@@ -391,30 +427,18 @@ ClientData       clientData;
   char*                     digest;
   int                          res = TCL_OK;
 
-  digest = (char*) Tcl_Alloc (md->digest_size);
+  /*
+   * Get a bit more, for a trailing \0 in 7.6, see 'WriteDigest' too
+   */
+  digest = (char*) Tcl_Alloc (2 + md->digest_size);
   (*md->finalProc) (c->context, digest);
 
   if (c->operation_mode == ATTACH_WRITE) {
-    if (c->dest != (Tcl_Channel) NULL)
-      /* Skip writing, if no channel available for result */
-      res = Tcl_Write (c->dest, digest, md->digest_size);
-    else
-      res = 0;
-
-    if (res < 0) {
-      if (interp) {
-	ADD_RES (interp, "error writing \"");
-	ADD_RES (interp, Tcl_GetChannelName (c->dest));
-	ADD_RES (interp, "\": ");
-	ADD_RES (interp, Tcl_PosixError (interp));
-	res = TCL_ERROR;
-      }
-    }
+    res = WriteDigest (c->vInterp, c->destHandle, c->dest, digest, md);
   } else {
     /*
-     * immediate execution or attached channel absorbs checksum.
+     * Immediate execution or attached channel absorbing the checksum.
      */
-
     res = c->write (c->writeClientData, digest, md->digest_size, interp);
   }
 
@@ -486,17 +510,29 @@ ClientData    clientData;
   c->write           = fun;
   c->writeClientData = writeClientData;
 
-  c->operation_mode = (o->mode == TRF_ABSORB_HASH ?
-		       ATTACH_ABSORB :
-		       ATTACH_WRITE);
-
-  c->dest = (c->operation_mode == ATTACH_WRITE ?
-	     o->readDest : (Tcl_Channel) NULL);
-
   c->matchFlag  = o->matchFlag;
-  c->mfInterp   = o->mfInterp;
+  c->vInterp    = o->vInterp;
   o->matchFlag  = NULL;
 
+  /* impossible: (o->behaviour == TRF_IMMEDIATE) */
+
+  if (o->mode == TRF_ABSORB_HASH) {
+    c->operation_mode = ATTACH_ABSORB;
+    c->destHandle     = (char*)       NULL;
+    c->dest           = (Tcl_Channel) NULL;
+  } else {
+    c->operation_mode = ATTACH_WRITE;
+
+    if (o->rdIsChannel) {
+      c->destHandle     = (char*)       NULL;
+      c->dest           = o->rdChannel;
+    } else {
+      c->destHandle     = o->readDestination;
+      c->dest           = (Tcl_Channel) NULL;
+
+      o->readDestination = (char*) NULL; /* ownership moved, prevent early free */
+    }  
+  }
 
   c->buffer_pos = 0;
   c->charCount  = 0;
@@ -802,36 +838,21 @@ ClientData       clientData;
   char* digest;
   int res= TCL_OK;
 
-  digest = (char*) Tcl_Alloc (md->digest_size);
-
+  /*
+   * Get a bit more, for a trailing \0 in 7.6, see 'WriteDigest' too
+   */
+  digest = (char*) Tcl_Alloc (2 + md->digest_size);
   (*md->finalProc) (c->context, digest);
 
   if (c->operation_mode == ATTACH_WRITE) {
-    int resW;
-
-    if (c->dest != (Tcl_Channel) NULL)
-      /* Skip writing, if no channel available for result */
-      resW = Tcl_Write (c->dest, (char*) digest, md->digest_size);
-    else
-      resW = 0;
-
-    if (resW < 0) {
-      if (interp) {
-	ADD_RES (interp, "error writing \"");
-	ADD_RES (interp, Tcl_GetChannelName (c->dest));
-	ADD_RES (interp, "\": ");
-	ADD_RES (interp, Tcl_PosixError (interp));
-      }
-
-      res = TCL_ERROR;
-    }
+    res = WriteDigest (c->vInterp, c->destHandle, c->dest, digest, md);
   } else if (c->charCount < md->digest_size) {
     /*
-     * Not enough data in channel!
+     * ATTACH_ABSORB, not enough data in input!
      */
 
     if (interp) {
-      ADD_RES (interp, "not enough bytes in channel");
+      Tcl_AppendResult (interp, "not enough bytes in input", (char*) NULL);
     }
 
     res = TCL_ERROR;
@@ -859,13 +880,13 @@ ClientData       clientData;
     }
 
     /*
-     * Compare computed and transmitted checksums
+     * Compare computed and transmitted checksums.
      */
 
     result_text = (0 == memcmp ((VOID*) digest, (VOID*) c->digest_buffer, md->digest_size) ?
 		   "ok" : "failed");
 
-    Tcl_SetVar (c->mfInterp, c->matchFlag, result_text, TCL_GLOBAL_ONLY);
+    Tcl_SetVar (c->vInterp, c->matchFlag, result_text, TCL_GLOBAL_ONLY);
   }
 
   Tcl_Free (digest);
@@ -903,4 +924,77 @@ ClientData       clientData;
 
   (*md->startProc) (c->context);
   memset (c->digest_buffer, '\0', md->digest_size);
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	WriteDigest --
+ *
+ *	------------------------------------------------*
+ *	Writes the generated digest into the destination
+ *	variable, or channel.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		May leave an error message in the
+ *		interpreter result area.
+ *
+ *	Result:
+ *		A standard Tcl error message.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+WriteDigest (interp, destHandle, dest, digest, md)
+Tcl_Interp*                   interp;
+char*                         destHandle;
+Tcl_Channel                   dest;
+char*                         digest;
+Trf_MessageDigestDescription* md;
+{
+  if (destHandle != (char*) NULL) {
+#if (TCL_MAJOR_VERSION < 8)
+    /*
+     * Prevent running into unused memory
+     * Assumes that 'digest' was allocated bigger than required.
+     */
+    digest [md->digest_size] = '\0';
+
+    if (Tcl_SetVar (interp, destHandle, digest,
+		    TCL_LEAVE_ERR_MSG | TCL_GLOBAL_ONLY) == (char*) NULL) {
+      return TCL_ERROR;
+    }
+#else
+    Tcl_Obj* varName   = Tcl_NewStringObj (destHandle, strlen (destHandle));
+    Tcl_Obj* digestObj = Tcl_NewStringObj (digest, md->digest_size);
+
+    Tcl_IncrRefCount(varName);
+    Tcl_IncrRefCount(digestObj);
+
+    if (Tcl_ObjSetVar2 (interp, varName, (Tcl_Obj*) NULL, digestObj,
+			TCL_LEAVE_ERR_MSG | TCL_GLOBAL_ONLY) == (Tcl_Obj*) NULL) {
+      Tcl_DecrRefCount(varName);
+      Tcl_DecrRefCount(digestObj);
+      return TCL_ERROR;
+    }
+
+    Tcl_DecrRefCount(varName);
+    Tcl_DecrRefCount(digestObj);
+#endif
+  } else if (dest != (Tcl_Channel) NULL) {
+    int res = Tcl_Write (dest, digest, md->digest_size);
+
+    if (res < 0) {
+      if (interp) {
+	Tcl_AppendResult (interp,
+			  "error writing \"", Tcl_GetChannelName (dest),
+			  "\": ", Tcl_PosixError (interp), (char*) NULL);
+      }
+      return TCL_ERROR;
+    }
+  }
+
+  return TCL_OK;
 }

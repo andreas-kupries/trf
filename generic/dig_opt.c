@@ -40,18 +40,23 @@ static void        DeleteOptions _ANSI_ARGS_ ((Trf_Options options,
 static int         CheckOptions  _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
 					       CONST Trf_BaseOptions* baseOptions,
 					       ClientData clientData));
-#if (TCL_MAJOR_VERSION >= 8)
+#if (TCL_MAJOR_VERSION < 8)
 static int         SetOption     _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
-					       CONST char* optname, CONST Tcl_Obj* optvalue,
+					       CONST char* optname, CONST char* optvalue,
 					       ClientData clientData));
 #else
 static int         SetOption     _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
-					       CONST char* optname, CONST char* optvalue,
+					       CONST char* optname, CONST Tcl_Obj* optvalue,
 					       ClientData clientData));
 #endif
 static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
 					       ClientData clientData));
 
+static int         TargetType _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* typeString,
+					    int* isChannel));
+
+static int         DigestMode _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* modeString,
+					    int* mode));
 
 /*
  *------------------------------------------------------*
@@ -80,12 +85,12 @@ TrfMDOptions ()
       CreateOptions,
       DeleteOptions,
       CheckOptions,
-#if (TCL_MAJOR_VERSION >= 8)
-      NULL,      /* no string procedure */
-      SetOption,
-#else
+#if (TCL_MAJOR_VERSION < 8)
       SetOption,
       NULL,      /* no object procedure */
+#else
+      NULL,      /* no string procedure */
+      SetOption,
 #endif
       QueryOptions
     };
@@ -119,13 +124,17 @@ ClientData clientData;
 {
   TrfMDOptionBlock* o;
 
-  o            = (TrfMDOptionBlock*) Tcl_Alloc (sizeof (TrfMDOptionBlock));
-  o->behaviour = TRF_IMMEDIATE; /* irrelevant until set by 'CheckOptions' */
-  o->mode      = TRF_UNKNOWN_MODE;
-  o->readDest  = (Tcl_Channel) NULL;
-  o->writeDest = (Tcl_Channel) NULL;
-  o->matchFlag = (char*) NULL;
-  o->mfInterp  = (Tcl_Interp*) NULL;
+  o			= (TrfMDOptionBlock*) Tcl_Alloc (sizeof (TrfMDOptionBlock));
+  o->behaviour		= TRF_IMMEDIATE; /* irrelevant until set by 'CheckOptions' */
+  o->mode		= TRF_UNKNOWN_MODE;
+  o->readDestination	= (char*) NULL;
+  o->writeDestination	= (char*) NULL;
+  o->rdIsChannel        = 0;
+  o->wdIsChannel        = 1;
+  o->matchFlag		= (char*) NULL;
+  o->vInterp		= (Tcl_Interp*) NULL;
+  o->rdChannel		= (Tcl_Channel) NULL;
+  o->wdChannel		= (Tcl_Channel) NULL;
 
   return (Trf_Options) o;
 }
@@ -155,6 +164,14 @@ Trf_Options options;
 ClientData  clientData;
 {
   TrfMDOptionBlock* o = (TrfMDOptionBlock*) options;
+
+  if (o->readDestination) {
+    Tcl_Free ((char*) o->readDestination);
+  }
+
+  if (o->writeDestination) {
+    Tcl_Free ((char*) o->writeDestination);
+  }
 
   if (o->matchFlag) {
     Tcl_Free ((char*) o->matchFlag);
@@ -205,49 +222,82 @@ ClientData             clientData;
   /* TRF_IMMEDIATE: no options allowed
    * TRF_ATTACH:    -mode required
    *                TRF_ABSORB_HASH: -matchflag required (only if channel is read)
-   *                TRF_WRITE_HASH:  -write/read-dest required according to access
-   *                                  mode of attched channel. specified channels
-   *                                  must be writable (already checked by 'SetOption')
+   *                TRF_WRITE_HASH:  -write/read-destination required according to
+   *				      access mode of attached channel. If a channel
+   *                                  is used as target, then it has to be writable.
    */
 
-  if (baseOptions->attach == (Tcl_Channel) NULL) /* IMMEDIATE */ {
-    if ((o->mode      != TRF_UNKNOWN_MODE)   ||
-	(o->matchFlag != (char*) NULL)       ||
-	(o->readDest  != (Tcl_Channel) NULL) ||
-	(o->writeDest != (Tcl_Channel) NULL)) {
-      ADD_RES (interp, "immediate: no options allowed");
+  if (baseOptions->attach == (Tcl_Channel) NULL) {
+    if ((o->mode             != TRF_UNKNOWN_MODE) ||
+	(o->matchFlag        != (char*) NULL)     ||
+	(o->readDestination  != (char*) NULL)     ||
+	(o->writeDestination != (char*) NULL)) {
+      /* IMMEDIATE MODE */
+      Tcl_AppendResult (interp, "immediate: no options allowed", (char*) NULL);
       return TCL_ERROR;
     }
-  } else /* ATTACH */ {
+  } else {
+    /* ATTACH MODE / FILTER */
     if (o->mode == TRF_UNKNOWN_MODE) {
-      ADD_RES (interp, "attach: -mode not defined");
+      Tcl_AppendResult (interp, "attach: -mode not defined", (char*) NULL);
       return TCL_ERROR;
+
     } else if (o->mode == TRF_ABSORB_HASH) {
       if ((baseOptions->attach_mode & TCL_READABLE) &&
 	  (o->matchFlag == (char*) NULL)) {
-	ADD_RES (interp, "attach: -matchflag not defined");
+	Tcl_AppendResult (interp, "attach: -matchflag not defined", (char*) NULL);
 	return TCL_ERROR;
       }
+
     } else if (o->mode == TRF_WRITE_HASH) {
       if (o->matchFlag != (char*) NULL) {
-	ADD_RES (interp, "attach: -matchflag not allowed");
+	Tcl_AppendResult (interp, "attach: -matchflag not allowed", (char*) NULL);
 	return TCL_ERROR;
       }
 
-      if ((baseOptions->attach_mode & TCL_READABLE) &&
-	  (o->readDest == (Tcl_Channel) NULL)) {
-	ADD_RES (interp, "attach, external: -read-dest missing");
-	return TCL_ERROR;
+      if (baseOptions->attach_mode & TCL_READABLE) {
+	if (o->readDestination == (char*) NULL) {
+	  Tcl_AppendResult (interp, "attach, external: -read-destination missing",
+			    (char*) NULL);
+	  return TCL_ERROR;
+	} else if (o->rdIsChannel) {
+	  int mode;
+	  o->rdChannel = Tcl_GetChannel (interp, (char*) o->readDestination, &mode);
+
+	  if (o->rdChannel == (Tcl_Channel) NULL)
+	    return TCL_ERROR;
+	  else  if (! (mode & TCL_WRITABLE)) {
+	    Tcl_AppendResult (interp,
+			      "read destination channel '", o->readDestination,
+			      "' not opened for writing", (char*) NULL);
+	    return TCL_ERROR;
+	  }
+	}
       }
 
-      if ((baseOptions->attach_mode & TCL_WRITABLE) &&
-	  (o->writeDest == (Tcl_Channel) NULL)) {
-	ADD_RES (interp, "attach, external: -write-dest missing");
-	return TCL_ERROR;
+      if (baseOptions->attach_mode & TCL_WRITABLE) {
+	if (o->writeDestination == (char*) NULL) {
+	  Tcl_AppendResult (interp, "attach, external: -write-destination missing",
+			    (char*) NULL);
+	  return TCL_ERROR;
+	} else if (o->wdIsChannel) {
+	  int mode;
+
+	  o->wdChannel = Tcl_GetChannel (interp, (char*) o->writeDestination, &mode);
+
+	  if (o->wdChannel == (Tcl_Channel) NULL)
+	    return TCL_ERROR;
+	  else  if (! (mode & TCL_WRITABLE)) {
+	    Tcl_AppendResult (interp,
+			      "write destination channel '", o->writeDestination,
+			      "' not opened for writing", (char*) NULL);
+	    return TCL_ERROR;
+	  }
+	}
       }
 
     } else {
-      panic ("unknown mode-code given to message-digest::CheckOptions");
+      panic ("unknown mode given to dig_opt.c::CheckOptions");
     }
   }
 
@@ -282,109 +332,86 @@ SetOption (options, interp, optname, optvalue, clientData)
 Trf_Options options;
 Tcl_Interp* interp;
 CONST char* optname;
-#if (TCL_MAJOR_VERSION >= 8)
-CONST Tcl_Obj* optvalue;
-#else
+#if (TCL_MAJOR_VERSION < 8)
 CONST char*    optvalue;
+#else
+CONST Tcl_Obj* optvalue;
 #endif
 ClientData  clientData;
 {
   /* Possible options:
    *
-   *	-mode		absorb|write
-   *	-matchflag	<varname>
-   *	-write-dest	<channel>
-   *	-read-dest	<channel>
+   *	-mode			absorb|write
+   *	-matchflag		<varname>
+   *	-write-destination	<channel> | <variable>
+   *	-read-destination	<channel> | <variable>
    */
 
   TrfMDOptionBlock* o = (TrfMDOptionBlock*) options;
   CONST char*       value;
 
-  int len = strlen (optname + 1);
+  int len = strlen (optname);
 
-#if (TCL_MAJOR_VERSION >= 8)
-    value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
-#else
+#if (TCL_MAJOR_VERSION < 8)
     value = optvalue;
+#else
+    value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
 #endif
 
   switch (optname [1]) {
   case 'm':
-    if (len == 1) {
+    if (len < 3)
       goto unknown_option;
-    } else if (0 == strncmp (optname, "-mode", len)) {
-      len = strlen (value);
 
-      switch (value [0]) {
-      case 'a':
-	if (0 == strncmp (value, "absorb", len)) {
-	  o->mode = TRF_ABSORB_HASH;
-	} else {
-	  goto unknown_mode;
-	}
-	break;
-
-      case 'w':
-	if (0 == strncmp (value, "write", len)) {
-	  o->mode = TRF_WRITE_HASH;
-	} else {
-	  goto unknown_mode;
-	}
-	break;
-
-      default:
-      unknown_mode:
-	ADD_RES (interp, "unknown mode '");
-	ADD_RES (interp, value);
-	ADD_RES (interp, "'");
-	return TCL_ERROR;
-      } /* switch (value) */
+    if (0 == strncmp (optname, "-mode", len)) {
+      return DigestMode (interp, value, &o->mode);
 
     } else if (0 == strncmp (optname, "-matchflag", len)) {
-      if (o->matchFlag)
+      if (o->matchFlag) {
 	Tcl_Free (o->matchFlag);
+      }
 
-      o->matchFlag = (char*) Tcl_Alloc (1 + strlen (value));
-      o->mfInterp  = interp;
-      strcpy (o->matchFlag, value);
+      o->vInterp   = interp;
+      o->matchFlag = strcpy (Tcl_Alloc (1 + strlen (value)), value);
 
-    } else {
+    } else
       goto unknown_option;
-    }
     break;
 
   case 'w':
-    if (0 == strncmp (optname, "-write-dest", len)) {
-      int access;
-
-      o->writeDest = Tcl_GetChannel (interp, (char*) value, &access);
-      if (o->writeDest == (Tcl_Channel) NULL)
-	return TCL_ERROR;
-      else if (! (access & TCL_WRITABLE)) {
-	ADD_RES (interp, value);
-	ADD_RES (interp, " not opened for writing");
-	return TCL_ERROR;
-      }
-    } else {
+    if (len < 8)
       goto unknown_option;
-    }
+
+    if (0 == strncmp (optname, "-write-destination", len)) {
+      if (o->writeDestination) {
+	Tcl_Free (o->writeDestination);
+      }
+
+      o->vInterp          = interp;
+      o->writeDestination = strcpy (Tcl_Alloc (1+strlen (value)), value);
+
+    } else if (0 == strncmp (optname, "-write-type", len)) {
+      return TargetType (interp, value, &o->wdIsChannel);
+    } else
+      goto unknown_option;
     break;
 
   case 'r':
-    if (0 == strncmp (optname, "-read-dest", len)) {
-      int access;
-
-      o->readDest = Tcl_GetChannel (interp, (char*) value, &access);
-      if (o->readDest == (Tcl_Channel) NULL)
-	return TCL_ERROR;
-      else if (! (access & TCL_WRITABLE)) {
-	ADD_RES (interp, value);
-	ADD_RES (interp, " not opened for writing");
-	return TCL_ERROR;
-      }
-    } else {
+    if (len < 7)
       goto unknown_option;
-    }
+
+    if (0 == strncmp (optname, "-read-destination", len)) {
+      if (o->readDestination) {
+	Tcl_Free (o->readDestination);
+      }
+
+      o->vInterp         = interp;
+      o->readDestination = strcpy (Tcl_Alloc (1+strlen (value)), value);
+
+    } else if (0 == strncmp (optname, "-read-type", len)) {
+      return TargetType (interp, value, &o->rdIsChannel);
+    } else
+      goto unknown_option;
     break;
 
   default:
@@ -395,9 +422,7 @@ ClientData  clientData;
   return TCL_OK;
 
  unknown_option:
-  ADD_RES (interp, "unknown option '");
-  ADD_RES (interp, optname);
-  ADD_RES (interp, "'");
+  Tcl_AppendResult (interp, "unknown option '", optname, "'", (char*) NULL);
   return TCL_ERROR;
 }
 
@@ -431,3 +456,108 @@ ClientData  clientData;
   return 1;
 }
 
+/*
+ *------------------------------------------------------*
+ *
+ *	TargetType --
+ *
+ *	------------------------------------------------*
+ *	Determines from a string what destination was
+ *	given to the message digest.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		May leave an error message in the
+ *		interpreter result area.
+ *
+ *	Result:
+ *		A standard Tcl error code, in case of
+ *		success 'isChannel' is set too.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+TargetType (interp, typeString, isChannel)
+Tcl_Interp* interp;
+CONST char* typeString;
+int*        isChannel;
+{
+  int len = strlen (typeString);
+
+  switch (typeString [0]) {
+  case 'v':
+    if (0 == strncmp ("variable", typeString, len)) {
+      *isChannel = 0;
+    } else
+      goto unknown_type;
+    break;
+
+  case 'c':
+    if (0 == strncmp ("channel", typeString, len)) {
+      *isChannel = 1;
+    } else
+      goto unknown_type;
+    break;
+
+  default:
+  unknown_type:
+    Tcl_AppendResult (interp, "unknown target-type '",
+		      typeString, "'", (char*) NULL);
+    return TCL_ERROR;
+  }
+
+  return TCL_OK;
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	DigestMode --
+ *
+ *	------------------------------------------------*
+ *	Determines the operation mode of the digest.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		May leave an error message in the
+ *		interpreter result area.
+ *
+ *	Result:
+ *		A standard Tcl error code, in case of
+ *		success 'mode' is set too.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+DigestMode (interp, modeString, mode)
+Tcl_Interp* interp;
+CONST char* modeString;
+int*        mode;
+{
+  int len = strlen (modeString);
+
+  switch (modeString [0]) {
+  case 'a':
+    if (0 == strncmp (modeString, "absorb", len)) {
+      *mode = TRF_ABSORB_HASH;
+    } else
+      goto unknown_mode;
+    break;
+
+  case 'w':
+    if (0 == strncmp (modeString, "write", len)) {
+      *mode = TRF_WRITE_HASH;
+    } else
+      goto unknown_mode;
+    break;
+
+  default:
+  unknown_mode:
+    Tcl_AppendResult (interp, "unknown mode '", modeString, "'", (char*) NULL);
+    return TCL_ERROR;
+  }
+
+  return TCL_OK;
+}

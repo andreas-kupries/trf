@@ -1,7 +1,7 @@
 /*
- * blowfish.c --
+ * rot.c --
  *
- *	Implements and registers blockcipher BLOWFISH.
+ *	Implements and registers cipher ROT.
  *
  *
  * Copyright (c) 1996 Andreas Kupries (a.kupries@westend.com)
@@ -28,50 +28,47 @@
  */
 
 #include "transformInt.h"
-#include "blowfish/blowfish.h"
 
-#define  BLOCK_SIZE       (8)
 #define  MIN_KEYSIZE      (1)
-#define  MAX_KEYSIZE      (MAXKEYBYTES)
-#define  KEYSCHEDULE_SIZE (sizeof (Blowfish_keyschedule))
+#define  MAX_KEYSIZE      (1)
+#define  KEYSCHEDULE_SIZE (sizeof (char))
 
 /*
  * Declarations of internal procedures.
  */
 
-static void BC_Schedule _ANSI_ARGS_ ((VOID*  key, int key_length, int direction,
+static void C_Schedule _ANSI_ARGS_ ((VOID*  key, int key_length, int direction,
 				      VOID** e_schedule,
 				      VOID** d_schedule));
-static void BC_Encrypt  _ANSI_ARGS_ ((VOID* in, VOID* out, VOID* key /* schedule */));
-static void BC_Decrypt  _ANSI_ARGS_ ((VOID* in, VOID* out, VOID* key /* schedule */));
+static void C_Encrypt  _ANSI_ARGS_ ((unsigned char* inout, VOID* key /* schedule */));
+static void C_Decrypt  _ANSI_ARGS_ ((unsigned char* inout, VOID* key /* schedule */));
 
 /*
  * cipher definition.
  */
 
-static Trf_BlockcipherDescription bcDescription = {
-  "blowfish",
-  BLOCK_SIZE,
+static Trf_CipherDescription cDescription = {
+  "rot",
   MIN_KEYSIZE,
   MAX_KEYSIZE,
   KEYSCHEDULE_SIZE,
-  BC_Schedule,
-  BC_Encrypt,
-  BC_Decrypt,
+  C_Schedule,
+  C_Encrypt,
+  C_Decrypt,
   NULL
 };
 
 /*
  *------------------------------------------------------*
  *
- *	TrfInit_BLOWFISH --
+ *	TrfInit_ROT --
  *
  *	------------------------------------------------*
- *	Register the blockcipher implemented in this file.
+ *	Register the cipher implemented in this file.
  *	------------------------------------------------*
  *
  *	Sideeffects:
- *		As of 'Trf_RegisterBlockcipher'.
+ *		As of 'Trf_RegisterCipher'.
  *
  *	Result:
  *		A standard Tcl error code.
@@ -80,19 +77,19 @@ static Trf_BlockcipherDescription bcDescription = {
  */
 
 int
-TrfInit_BLOWFISH (interp)
+TrfInit_ROT (interp)
 Tcl_Interp* interp;
 {
-  return Trf_RegisterBlockcipher (interp, &bcDescription);
+  return Trf_RegisterCipher (interp, &cDescription);
 }
 
 /*
  *------------------------------------------------------*
  *
- *	BC_Schedule --
+ *	C_Schedule --
  *
  *	------------------------------------------------*
- *	Generate keyschedules for blockcipher from
+ *	Generate keyschedules for cipher from
  *	specified key.
  *	------------------------------------------------*
  *
@@ -106,23 +103,24 @@ Tcl_Interp* interp;
  */
 
 static void
-BC_Schedule (key, key_length, direction, e_schedule, d_schedule)
-VOID*  key;
+C_Schedule (keyptr, key_length, direction, e_schedule, d_schedule)
+VOID*  keyptr;
 int    key_length;
 int    direction;
 VOID** e_schedule;
 VOID** d_schedule;
 {
+  char* key = (char*) keyptr;
+
   if (direction == TRF_ENCRYPT) {
 
     if (*e_schedule == NULL) {
       *e_schedule = Tcl_Alloc (KEYSCHEDULE_SIZE);
 
       if (*d_schedule != NULL) {
-	memcpy (*e_schedule, *d_schedule, KEYSCHEDULE_SIZE);
+	*((char*) *e_schedule) = *((char*) *d_schedule);
       } else {
-	InitializeBlowfish ((unsigned char*) key, (short) key_length,
-			    (Blowfish_keyschedule*) *e_schedule);
+	*((char*) *e_schedule) = (char) (*key);
       }
     }
   } else if (direction == TRF_DECRYPT) {
@@ -130,25 +128,24 @@ VOID** d_schedule;
       *d_schedule = Tcl_Alloc (KEYSCHEDULE_SIZE);
 
       if (*e_schedule != NULL) {
-	memcpy (*d_schedule, *e_schedule, KEYSCHEDULE_SIZE);
+	*((char*) *d_schedule) = *((char*) *e_schedule);
       } else {
-	InitializeBlowfish ((unsigned char*) key, (short) key_length,
-			    (Blowfish_keyschedule*) *d_schedule);
+	*((char*) *d_schedule) = (char) (*key);
       }
 
     }
   } else {
-    panic ("unknown direction code given to blowfish::BC_Schedule");
+    panic ("unknown direction code given to rot::C_Schedule");
   }
 }
 
 /*
  *------------------------------------------------------*
  *
- *	BC_Encrypt --
+ *	C_Encrypt --
  *
  *	------------------------------------------------*
- *	Encrypt a single block with the implemented cipher.
+ *	Encrypt a single character with the implemented cipher.
  *	------------------------------------------------*
  *
  *	Sideeffects:
@@ -161,49 +158,17 @@ VOID** d_schedule;
  */
 
 static void
-BC_Encrypt (in, out, key)
-VOID* in;
-VOID* out;
-VOID* key;
+C_Encrypt (inout, key)
+unsigned char* inout;
+VOID*          key;
 {
-  unsigned char* i = (unsigned char*) in;
-  unsigned char* o = (unsigned char*) out;
-
-  union aword left;
-  union aword right;
-
-  /* assume implicit bigendian order of incoming byte stream */
-
-  left.word     = 0;
-  right.word    = 0;
-
-  left.w.byte0  = i [0];
-  left.w.byte1  = i [1];
-  left.w.byte2  = i [2];
-  left.w.byte3  = i [3];
-  right.w.byte0 = i [4];
-  right.w.byte1 = i [5];
-  right.w.byte2 = i [6];
-  right.w.byte3 = i [7];
-
-  Blowfish_encipher ((Blowfish_keyschedule*) key,
-		     (UWORD_32bits*)        &left,
-		     (UWORD_32bits*)        &right);
-
-  o [0] = left.w.byte0;
-  o [1] = left.w.byte1;
-  o [2] = left.w.byte2;
-  o [3] = left.w.byte3;
-  o [4] = right.w.byte0;
-  o [5] = right.w.byte1;
-  o [6] = right.w.byte2;
-  o [7] = right.w.byte3;
+  (*inout) = (*inout) + *((char*) key);
 }
 
 /*
  *------------------------------------------------------*
  *
- *	BC_Decrypt --
+ *	C_Decrypt --
  *
  *	------------------------------------------------*
  *	Decrypt a single block with the implemented cipher.
@@ -219,47 +184,10 @@ VOID* key;
  */
 
 static void
-BC_Decrypt (in, out, key)
-VOID* in;
-VOID* out;
-VOID* key;
+C_Decrypt (inout, key)
+unsigned char* inout;
+VOID*          key;
 {
-  unsigned char* i = (unsigned char*) in;
-  unsigned char* o = (unsigned char*) out;
-
-  union aword left;
-  union aword right;
-
-  /* assume implicit bigendian order of incoming byte stream */
-
-  left.word     = 0;
-  right.word    = 0;
-
-  left.w.byte0  = i [0];
-  left.w.byte1  = i [1];
-  left.w.byte2  = i [2];
-  left.w.byte3  = i [3];
-  right.w.byte0 = i [4];
-  right.w.byte1 = i [5];
-  right.w.byte2 = i [6];
-  right.w.byte3 = i [7];
-
-  Blowfish_decipher ((Blowfish_keyschedule*) key,
-		     (UWORD_32bits*) &left,
-		     (UWORD_32bits*) &right);
-
-  o [0] = left.w.byte0;
-  o [1] = left.w.byte1;
-  o [2] = left.w.byte2;
-  o [3] = left.w.byte3;
-  o [4] = right.w.byte0;
-  o [5] = right.w.byte1;
-  o [6] = right.w.byte2;
-  o [7] = right.w.byte3;
+  (*inout) = (*inout) - *((char*) key);
 }
 
-/*
- * External code from here on.
- */
-
-#include "blowfish/blowfish.c"

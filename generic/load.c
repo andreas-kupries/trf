@@ -70,8 +70,8 @@ TrfLoadLibrary (interp, libName, handlePtr, symbols, num)
 
     if (lib->handle != NULL) {
       if (lib->handle == FAILED) {
-	ADD_RES (interp, "cannot open ");
-	ADD_RES (interp, libName);
+	Tcl_AppendResult (interp, "cannot open ", (char*) NULL);
+	Tcl_AppendResult (interp, libName, (char*) NULL);
       }
       return (lib->handle != FAILED) ? TCL_OK : TCL_ERROR;
     }
@@ -83,10 +83,10 @@ TrfLoadLibrary (interp, libName, handlePtr, symbols, num)
     while (handle == NULL) {
 	if ((r = strrchr(buf,'.')) != NULL) {
 	    if ((r[1] < '0') || (r[1] > '9')) {
-	        ADD_RES (interp, "cannot open ");
-	        ADD_RES (interp, libName);
-	        ADD_RES (interp, ": ");
-	        ADD_RES (interp, dlerror ());
+	        Tcl_AppendResult (interp, "cannot open ", (char*) NULL);
+	        Tcl_AppendResult (interp, libName, (char*) NULL);
+	        Tcl_AppendResult (interp, ": ", (char*) NULL);
+	        Tcl_AppendResult (interp, dlerror (), (char*) NULL);
 		lib->handle = FAILED;
 		return TCL_ERROR;
 	    }
@@ -108,11 +108,11 @@ TrfLoadLibrary (interp, libName, handlePtr, symbols, num)
 	    strcpy(buf+1,*q);
 	    *p = (char *) dlsym(handle,buf);
 	    if ((num > 0) && (*p == (char *)NULL)) {
-	        ADD_RES (interp, "cannot open ");
-	        ADD_RES (interp, libName);
-	        ADD_RES (interp, ": symbol \"");
-	        ADD_RES (interp, *q);
-	        ADD_RES (interp, "\" not found");
+	        Tcl_AppendResult (interp, "cannot open ", (char*) NULL);
+	        Tcl_AppendResult (interp, libName, (char*) NULL);
+	        Tcl_AppendResult (interp, ": symbol \"", (char*) NULL);
+	        Tcl_AppendResult (interp, *q, (char*) NULL);
+	        Tcl_AppendResult (interp, "\" not found", (char*) NULL);
 		dlclose(handle);
 		lib->handle = FAILED;
 		return TCL_ERROR;

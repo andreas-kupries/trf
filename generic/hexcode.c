@@ -459,9 +459,10 @@ ClientData clientData;
 	buf [3] = '\0';
       }
 
-      ADD_RES (interp, "illegal character ");
-      ADD_RES (interp, buf);
-      ADD_RES (interp, " found in input");
+      Tcl_ResetResult  (interp);
+      Tcl_AppendResult (interp, "illegal character ", (char*) NULL);
+      Tcl_AppendResult (interp, buf, (char*) NULL);
+      Tcl_AppendResult (interp, " found in input", (char*) NULL);
     }
     return TCL_ERROR;
   }

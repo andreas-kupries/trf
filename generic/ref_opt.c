@@ -196,21 +196,21 @@ ClientData             clientData;
   TrfTransformOptionBlock* o = (TrfTransformOptionBlock*) options;
 
   if (o->command == NULL) {
-    ADD_RES (interp, "command not specified");
+    Tcl_AppendResult (interp, "command not specified", (char*) NULL);
     return TCL_ERROR;
   }
 
 #if (TCL_MAJOR_VERSION >= 8)
   if ((o->command->bytes == 0) && (o->command->typePtr == NULL)) {
     /* object defined, but empty, reject this too */
-    ADD_RES (interp, "command specified, but empty");
+    Tcl_AppendResult (interp, "command specified, but empty", (char*) NULL);
     return TCL_ERROR;
   }
 #endif
 
   if (baseOptions->attach == (Tcl_Channel) NULL) /* IMMEDIATE? */ {
     if (o->mode == TRF_UNKNOWN_MODE) {
-      ADD_RES (interp, "mode not defined");
+      Tcl_AppendResult (interp, "mode not defined", (char*) NULL);
       return TCL_ERROR;
     }
   } else /* ATTACH */ {
@@ -218,7 +218,7 @@ ClientData             clientData;
       /* operation mode irrelevant for attached transformation,
        * and specification therefore ruled as illegal.
        */
-      ADD_RES (interp, "mode illegal for attached transformation");
+      Tcl_AppendResult (interp, "mode illegal for attached transformation", (char*) NULL);
       return TCL_ERROR;
     }
     o->mode = TRF_WRITE_MODE;
@@ -293,9 +293,9 @@ ClientData  clientData;
 
     default:
     unknown_mode:
-      ADD_RES (interp, "unknown mode '");
-      ADD_RES (interp, value);
-      ADD_RES (interp, "'");
+      Tcl_AppendResult (interp, "unknown mode '", (char*) NULL);
+      Tcl_AppendResult (interp, value, (char*) NULL);
+      Tcl_AppendResult (interp, "'", (char*) NULL);
       return TCL_ERROR;
       break;
     } /* switch optvalue */
@@ -329,9 +329,9 @@ ClientData  clientData;
   return TCL_OK;
 
  unknown_option:
-  ADD_RES (interp, "unknown option '");
-  ADD_RES (interp, optname);
-  ADD_RES (interp, "'");
+  Tcl_AppendResult (interp, "unknown option '", (char*) NULL);
+  Tcl_AppendResult (interp, optname, (char*) NULL);
+  Tcl_AppendResult (interp, "'", (char*) NULL);
   return TCL_ERROR;
 }
 

@@ -39,13 +39,22 @@
  * Structures used by an attached transformation procedure
  *
  * => Information stored for a single direction of the channel.
+ * => Information required by a result buffer.
  * => Information stored for the complete channel.
  */
 
 typedef struct _DirectionInfo_ {
-  Trf_ControlBlock   control; /* control block of conversion */
-  Trf_Vectors*       vectors; /* vectors used during the conversion */
+  Trf_ControlBlock   control; /* control block of transformation */
+  Trf_Vectors*       vectors; /* vectors used during the transformation */
 } DirectionInfo;
+
+
+typedef struct _ResultBuffer_ {
+  unsigned char* buf;
+  int            allocated;
+  int            used;
+} ResultBuffer;
+
 
 typedef struct _TrfTransformationInstance_ {
   Tcl_Channel parent; /* The channel superceded by this one */
@@ -57,21 +66,20 @@ typedef struct _TrfTransformationInstance_ {
 		      * TCL_READABLE, TCL_WRITABLE */
 
   /* Tcl_Transformation standard;   data required for all transformation instances */
-  DirectionInfo      in;         /* information for conversion of read data */
-  DirectionInfo      out;        /* information for conversion of written data */
+  DirectionInfo      in;         /* information for transformation of read data */
+  DirectionInfo      out;        /* information for transformation of written data */
   ClientData         clientData; /* copy from entry->trfType->clientData */
 
   /*
-   * internal result buffer used during conversions of incoming data.
-   * Used to store results waiting for retrieval too, i.e. state
-   * information carried from call to call.
+   * internal result buffer used during transformations of incoming data.
+   * Stores results waiting for retrieval too, i.e. state information
+   * carried from call to call.
    */
 
-  unsigned char* result;
-  int   allocated;
-  int   used;
+  ResultBuffer result;
 
 } TrfTransformationInstance;
+
 
 #define INCREMENT (512)
 #define READ_CHUNK_SIZE 4096
@@ -121,15 +129,24 @@ TrfReady _ANSI_ARGS_ ((ClientData instanceData, int mask));
 
 static Tcl_File
 TrfGetFile _ANSI_ARGS_ ((ClientData instanceData, int mask));
-#else
-static int
-TrfGetFile _ANSI_ARGS_ ((ClientData instanceData, int direction, ClientData* handlePtr));
-#endif
 
 static int
 TransformImmediate _ANSI_ARGS_ ((Tcl_Interp* interp, Trf_RegistryEntry* entry,
 				 Tcl_Channel source, Tcl_Channel destination,
+				 CONST char* in,
 				 Trf_Options optInfo));
+
+#else
+static int
+TrfGetFile _ANSI_ARGS_ ((ClientData instanceData, int direction, ClientData* handlePtr));
+
+static int
+TransformImmediate _ANSI_ARGS_ ((Tcl_Interp* interp, Trf_RegistryEntry* entry,
+				 Tcl_Channel source, Tcl_Channel destination,
+				 struct Tcl_Obj* CONST in,
+				 Trf_Options optInfo));
+
+#endif
 
 static int
 AttachTransform _ANSI_ARGS_ ((Trf_RegistryEntry* entry,
@@ -146,6 +163,11 @@ static int
 PutTrans _ANSI_ARGS_ ((ClientData clientData,
 		       unsigned char* outString, int outLen,
 		       Tcl_Interp* interp));
+
+static int
+PutInterpResult _ANSI_ARGS_ ((ClientData clientData,
+			      unsigned char* outString, int outLen,
+			      Tcl_Interp* interp));
 
 /*
  *------------------------------------------------------*
@@ -154,7 +176,7 @@ PutTrans _ANSI_ARGS_ ((ClientData clientData,
  *
  *	------------------------------------------------*
  *	Accessor to the interpreter associated registry
- *	of conversions.
+ *	of transformations.
  *	------------------------------------------------*
  *
  *	Sideeffects:
@@ -163,7 +185,7 @@ PutTrans _ANSI_ARGS_ ((ClientData clientData,
  *		with the specified interpreter.
  *
  *	Result:
- *		The internal registry of conversions.
+ *		The internal registry of transformations.
  *
  *------------------------------------------------------*
  */
@@ -194,15 +216,15 @@ Tcl_Interp* interp;
  *
  *	------------------------------------------------*
  *	Accessor to the interpreter associated registry
- *	of conversions. Does not create the registry (in
- *	contrast to TrfGetRegistry).
+ *	of transformations. Does not create the registry
+ *	(in contrast to 'TrfGetRegistry').
  *	------------------------------------------------*
  *
  *	Sideeffects:
  *		None.
  *
  *	Result:
- *		The internal registry of conversions.
+ *		The internal registry of transformations.
  *
  *------------------------------------------------------*
  */
@@ -224,14 +246,14 @@ Tcl_Interp* interp;
  *	Trf_Register --
  *
  *	------------------------------------------------*
- *	Announce a conversion to the registry associated
+ *	Announce a transformation to the registry associated
  *	with the specified interpreter.
  *	------------------------------------------------*
  *
  *	Sideeffects:
  *		May create the registry. Allocates and
  *		initializes the structure describing
- *		the announced conversion
+ *		the announced transformation.
  *
  *	Result:
  *		A standard TCL error code.
@@ -289,7 +311,7 @@ CONST Trf_TypeDefinition* type;
   assert (type->decoder.clearProc);
 
   /*
-   * Generate command to execute conversions and/or generate transformations
+   * Generate command to execute transformations immediately or to generate filters.
    */
 
   entry             = (Trf_RegistryEntry*) Tcl_Alloc (sizeof (Trf_RegistryEntry));
@@ -341,11 +363,11 @@ CONST Trf_TypeDefinition* type;
  *	Trf_Unregister --
  *
  *	------------------------------------------------*
- *	Removess the conversion from the registry
+ *	Removes the transformation from the registry
  *	------------------------------------------------*
  *
  *	Sideeffects:
- *		Releases memory allocated in 'Trf_Register'.
+ *		Releases the memory allocated in 'Trf_Register'.
  *
  *	Result:
  *		A standard TCL error code.
@@ -380,11 +402,11 @@ Trf_RegistryEntry* entry;
  *	------------------------------------------------*
  *	Trap handler. Called by the Tcl core during
  *	interpreter destruction. Destroys the registry
- *	of conversions.
+ *	of transformations.
  *	------------------------------------------------*
  *
  *	Sideeffects:
- *		Releases memory allocated in 'TrfGetRegistry'.
+ *		Releases the memory allocated in 'TrfGetRegistry'.
  *
  *	Result:
  *		None.
@@ -426,12 +448,12 @@ Tcl_Interp* interp;
  *	TrfExecuteCmd --
  *
  *	------------------------------------------------*
- *	Implementation procedure for all conversion commands.
+ *	Implementation procedure for all transformations.
  *	------------------------------------------------*
  *
  *	Sideeffects:
  *		Mostly as defined by 'Transform' or
- *		'CreateTransform'. Leaves a message in
+ *		'AttachTransform'. Leaves a message in
  *		the interpreter result area in case of
  *		an error.
  *
@@ -449,29 +471,27 @@ int         argc;
 char**      argv;
 {
   int                res, len;
-  Tcl_Channel        source, destination;
-  int                src_mode, dst_mode;
+  /*  Tcl_Channel        source, destination; */
+  /*  int                src_mode, dst_mode;  */
   const char*        cmd;
   const char*        option;
   const char*        optarg;
   Trf_RegistryEntry* entry;
   Trf_Options        optInfo;
   Trf_BaseOptions    baseOpt;
+  int                mode;
+  int                wrong_mod2;
 
   baseOpt.attach      = (Tcl_Channel) NULL;
   baseOpt.attach_mode = 0;
+  baseOpt.source      = (Tcl_Channel) NULL;
+  baseOpt.destination = (Tcl_Channel) NULL;
 
   entry = (Trf_RegistryEntry*) clientData;
   cmd   = argv [0];
 
   argc --;
   argv ++;
-
-
-  if (1 == (argc % 2)) {
-      Tcl_AppendResult (interp, cmd, ": wrong # args", (char*) NULL);
-      return TCL_ERROR;
-  }
 
   optInfo = CREATE_OPTINFO;
 
@@ -480,34 +500,67 @@ char**      argv;
      * Process options, as long as they are found
      */
 
+    if (argc < 2) {
+      /* option, but without argument */
+      Tcl_AppendResult (interp, cmd, ": wrong # args", (char*) NULL);
+      goto cleanup_after_error;      
+    }
+
     option = argv [0];
     optarg = argv [1];
 
     argc -= 2;
     argv += 2;
 
-    len = strlen (option+1);
+    len = strlen (option);
     
-    if (len < 1)
+    if (len < 2)
       goto unknown_option;
 
     switch (option [1])
       {
       case 'a':
 	if (0 != strncmp (option, "-attach", len))
-	  goto unknown_option;
+	  goto check_for_trans_option;
 
 	baseOpt.attach = Tcl_GetChannel (interp, (char*) optarg, &baseOpt.attach_mode);
 	if (baseOpt.attach == (Tcl_Channel) NULL)
-	  return TCL_ERROR;
+	  goto cleanup_after_error;
+	break;
+
+      case 'i':
+	if (0 != strncmp (option, "-in", len))
+	  goto check_for_trans_option;
+
+	baseOpt.source = Tcl_GetChannel (interp, (char*) optarg, &mode);
+	if (baseOpt.source == (Tcl_Channel) NULL)
+	  goto cleanup_after_error;
+
+	if (! (mode & TCL_READABLE)) {
+	  Tcl_AppendResult (interp, cmd, ": source-channel not readable", (char*) NULL);
+	  goto cleanup_after_error;
+	}
+	break;
+
+      case 'o':
+	if (0 != strncmp (option, "-out", len))
+	  goto check_for_trans_option;
+
+	baseOpt.destination = Tcl_GetChannel (interp, (char*) optarg, &mode);
+	if (baseOpt.destination == (Tcl_Channel) NULL)
+	  goto cleanup_after_error;
+
+	if (! (mode & TCL_WRITABLE)) {
+	  Tcl_AppendResult (interp, cmd, ": destination-channel not writable", (char*) NULL);
+	  goto cleanup_after_error;
+	}
 	break;
 
       default:
+      check_for_trans_option:
 	res = SET_OPTION (option, optarg);
-	if (res != TCL_OK) {
-	  DELETE_OPTINFO;
-	  return TCL_ERROR;
-	}
+	if (res != TCL_OK)
+	  goto cleanup_after_error;
 	break;
       } /* switch option */
   } /* while options */
@@ -515,57 +568,48 @@ char**      argv;
   /*
    * Check argument restrictions, insert defaults if necessary,
    * execute the required operation.
+   *
+   * -attach => -in, -out not allowed, and reverse.
    */
 
-  res = CHECK_OPTINFO (baseOpt);
-  if (res != TCL_OK) {
-    DELETE_OPTINFO;
-    return TCL_ERROR;
+  if ((baseOpt.attach != (Tcl_Channel) NULL) &&
+      ((baseOpt.source      != (Tcl_Channel) NULL) ||
+       (baseOpt.destination != (Tcl_Channel) NULL))) {
+    Tcl_AppendResult (interp, cmd,
+		      ": inconsistent options, -in/-out not allowed with -attach",
+		      (char*) NULL);
+    goto cleanup_after_error;
   }
+
+  if ((baseOpt.source == (Tcl_Channel) NULL) &&
+      (baseOpt.attach == (Tcl_Channel) NULL))
+    wrong_mod2 = 0;
+  else
+    wrong_mod2 = 1;
+
+  if (wrong_mod2 == (argc % 2)) {
+      Tcl_AppendResult (interp, cmd, ": wrong # args", (char*) NULL);
+      goto cleanup_after_error;
+  }
+
+  res = CHECK_OPTINFO (baseOpt);
+  if (res != TCL_OK)
+    goto cleanup_after_error;
 
   if (baseOpt.attach == (Tcl_Channel) NULL) /* TRF_IMMEDIATE */ {
     /*
-     * Direct rendering requested
+     * Immediate execution of transformation requested.
+     *
+     * 4 possible cases:
+     * % argv [0] -> result
+     * % argv [0] -> channel	(-out)
+     * % channel  -> result	(-in)
+     * % channel  -> channel	(-in, -out)
      */
 
-    if (argc < 1) {
-      Tcl_AppendResult (interp, cmd, ": source, destination missing",
-			(char*) NULL);
-      return TCL_ERROR;
-    } else if (argc < 2) {
-      Tcl_AppendResult (interp, cmd, ": destination missing",
-			(char*) NULL);
-      return TCL_ERROR;
-    }
-
-    /* Determine channels to use */
-
-    source = Tcl_GetChannel (interp, argv [0], &src_mode);
-    if (source == (Tcl_Channel) NULL)
-      return TCL_ERROR;
-
-    destination = Tcl_GetChannel (interp, argv [1], &dst_mode);
-    if (destination == (Tcl_Channel) NULL)
-      return TCL_ERROR;
-
-    if (! (src_mode & TCL_READABLE)) {
-      Tcl_AppendResult (interp, cmd, ": source-channel not readable",
-			(char*) NULL);
-      return TCL_ERROR;
-    }
-
-    if (! (dst_mode & TCL_WRITABLE)) {
-      Tcl_AppendResult (interp, cmd, ": destination-channel not writable",
-			(char*) NULL);
-      return TCL_ERROR;
-    }
-
-    /*
-     * Transform input now.
-     */
-
-    res = TransformImmediate (interp, entry, source, destination, optInfo);
-
+    res = TransformImmediate (interp, entry,
+			      baseOpt.source, baseOpt.destination,
+			      argv [0], optInfo);
   } else /* TRF_ATTACH */ {
     /*
      * User requested attachment of transformation procedure to a channel.
@@ -577,10 +621,14 @@ char**      argv;
   DELETE_OPTINFO;
   return res;
 
- unknown_option:
-  DELETE_OPTINFO;
+
+unknown_option:
   Tcl_AppendResult (interp, cmd, ": unknown option '", option, "'",
 		    (char*) NULL);
+  /* fall through to cleanup */
+
+cleanup_after_error:
+  DELETE_OPTINFO;
   return TCL_ERROR;
 }
 
@@ -591,7 +639,7 @@ char**      argv;
  *	TrfExecuteObjCmd --
  *
  *	------------------------------------------------*
- *	Implementation procedure for all conversion commands.
+ *	Implementation procedure for all transformations.
  *	Equivalent to 'TrfExecuteCmd', but using the new
  *	Object interfaces.
  *	------------------------------------------------*
@@ -619,30 +667,28 @@ struct Tcl_Obj* CONST * objv;
 #define SET_OPTION_OBJ(opt,optval) (optInfo ? (*OPT->setObjProc) (optInfo, interp, opt, optval, CLT) : TCL_ERROR)
 
   int                res, len;
-  Tcl_Channel        source, destination;
-  int                src_mode, dst_mode;
+  /*  Tcl_Channel        source, destination;*/
+  /*  int                src_mode, dst_mode;*/
   const char*        cmd;
   const char*        option;
   struct Tcl_Obj*    optarg;
   Trf_RegistryEntry* entry;
   Trf_Options        optInfo;
   Trf_BaseOptions    baseOpt;
+  int                mode;
+  int                wrong_mod2;
+
 
   baseOpt.attach      = (Tcl_Channel) NULL;
   baseOpt.attach_mode = 0;
+  baseOpt.source      = (Tcl_Channel) NULL;
+  baseOpt.destination = (Tcl_Channel) NULL;
 
   entry = (Trf_RegistryEntry*) clientData;
   cmd   = Tcl_GetStringFromObj (objv [0], NULL);
 
   objc --;
   objv ++;
-
-
-  if (1 == (objc % 2)) {
-    ADD_RES (interp, cmd);
-    ADD_RES (interp, ": wrong # args");
-    return TCL_ERROR;
-  }
 
   optInfo = CREATE_OPTINFO;
 
@@ -651,41 +697,82 @@ struct Tcl_Obj* CONST * objv;
      * Process options, as long as they are found
      */
 
+    if (objc < 2) {
+      /* option, but without argument */
+      Tcl_AppendResult (interp, cmd, ": wrong # args", (char*) NULL);
+      goto cleanup_after_error;      
+    }
+
     option = Tcl_GetStringFromObj (objv [0], NULL);
     optarg = objv [1];
 
     objc -= 2;
     objv += 2;
 
-    len = strlen (option+1);
+    len = strlen (option);
     
-    if (len < 1)
+    if (len < 2)
       goto unknown_option;
 
     switch (option [1])
       {
       case 'a':
 	if (0 != strncmp (option, "-attach", len))
-	  goto unknown_option;
+	  goto check_for_trans_option;
 
 	baseOpt.attach = Tcl_GetChannel (interp,
 					 Tcl_GetStringFromObj (optarg, NULL),
 					 &baseOpt.attach_mode);
 	if (baseOpt.attach == (Tcl_Channel) NULL)
-	  return TCL_ERROR;
+	  goto cleanup_after_error;
+	break;
+
+      case 'i':
+	if (0 != strncmp (option, "-in", len))
+	  goto check_for_trans_option;
+
+	baseOpt.source = Tcl_GetChannel (interp,
+					 Tcl_GetStringFromObj (optarg, NULL),
+					 &mode);
+	if (baseOpt.source == (Tcl_Channel) NULL)
+	  goto cleanup_after_error;
+
+	if (! (mode & TCL_READABLE)) {
+	  Tcl_AppendResult (interp, cmd,
+			    ": source-channel not readable",
+			    (char*) NULL);
+	  goto cleanup_after_error;
+	}
+	break;
+
+      case 'o':
+	if (0 != strncmp (option, "-out", len))
+	  goto check_for_trans_option;
+
+	baseOpt.destination = Tcl_GetChannel (interp,
+					      Tcl_GetStringFromObj (optarg, NULL),
+					      &mode);
+	if (baseOpt.destination == (Tcl_Channel) NULL)
+	  goto cleanup_after_error;
+
+	if (! (mode & TCL_WRITABLE)) {
+	  Tcl_AppendResult (interp, cmd,
+			    ": destination-channel not writable",
+			    (char*) NULL);
+	  goto cleanup_after_error;
+	}
 	break;
 
       default:
+      check_for_trans_option:
 	if ((*OPT->setObjProc) == NULL) {
 	  res = SET_OPTION     (option, Tcl_GetStringFromObj (optarg, NULL));
 	} else {
 	  res = SET_OPTION_OBJ (option, optarg);
 	}
 
-	if (res != TCL_OK) {
-	  DELETE_OPTINFO;
-	  return TCL_ERROR;
-	}
+	if (res != TCL_OK)
+	  goto cleanup_after_error;
 	break;
       } /* switch option */
   } /* while options */
@@ -695,6 +782,26 @@ struct Tcl_Obj* CONST * objv;
    * execute the required operation.
    */
 
+  if ((baseOpt.attach != (Tcl_Channel) NULL) &&
+      ((baseOpt.source      != (Tcl_Channel) NULL) ||
+       (baseOpt.destination != (Tcl_Channel) NULL))) {
+    Tcl_AppendResult (interp, cmd,
+		      ": inconsistent options, -in/-out not allowed with -attach",
+		      (char*) NULL);
+    goto cleanup_after_error;
+  }
+
+  if ((baseOpt.source == (Tcl_Channel) NULL) &&
+      (baseOpt.attach == (Tcl_Channel) NULL))
+    wrong_mod2 = 0;
+  else
+    wrong_mod2 = 1;
+
+  if (wrong_mod2 == (objc % 2)) {
+      Tcl_AppendResult (interp, cmd, ": wrong # args", (char*) NULL);
+      goto cleanup_after_error;
+  }
+
   res = CHECK_OPTINFO (baseOpt);
   if (res != TCL_OK) {
     DELETE_OPTINFO;
@@ -703,46 +810,12 @@ struct Tcl_Obj* CONST * objv;
 
   if (baseOpt.attach == (Tcl_Channel) NULL) /* TRF_IMMEDIATE */ {
     /*
-     * Direct rendering requested
+     * Immediate execution of transformation requested.
      */
 
-    if (objc < 1) {
-      ADD_RES (interp, cmd);
-      ADD_RES (interp, ": source, destination missing");
-      return TCL_ERROR;
-    } else if (objc < 2) {
-      ADD_RES (interp, cmd);
-      ADD_RES (interp, ": destination missing");
-      return TCL_ERROR;
-    }
-
-    /* Determine channels to use */
-
-    source = Tcl_GetChannel (interp, Tcl_GetStringFromObj (objv [0], NULL), &src_mode);
-    if (source == (Tcl_Channel) NULL)
-	  return TCL_ERROR;
-
-    destination = Tcl_GetChannel (interp, Tcl_GetStringFromObj (objv [1], NULL), &dst_mode);
-    if (destination == (Tcl_Channel) NULL)
-      return TCL_ERROR;
-
-    if (! (src_mode & TCL_READABLE)) {
-      ADD_RES (interp, cmd);
-      ADD_RES (interp, ": source-channel not readable");
-      return TCL_ERROR;
-    }
-
-    if (! (dst_mode & TCL_WRITABLE)) {
-      ADD_RES (interp, cmd);
-      ADD_RES (interp, ": destination-channel not writable");
-      return TCL_ERROR;
-    }
-
-    /*
-     * Transform input now.
-     */
-
-    res = TransformImmediate (interp, entry, source, destination, optInfo);
+    res = TransformImmediate (interp, entry,
+			      baseOpt.source, baseOpt.destination,
+			      objv [0], optInfo);
 
   } else /* TRF_ATTACH */ {
     /*
@@ -755,12 +828,14 @@ struct Tcl_Obj* CONST * objv;
   DELETE_OPTINFO;
   return res;
 
- unknown_option:
+
+unknown_option:
+  Tcl_AppendResult (interp, cmd, ": unknown option '", option, "'",
+		    (char*) NULL);
+  /* fall through to cleanup */
+
+cleanup_after_error:
   DELETE_OPTINFO;
-  ADD_RES (interp, cmd);
-  ADD_RES (interp, ": unknown option '");
-  ADD_RES (interp, option);
-  ADD_RES (interp, "'");
   return TCL_ERROR;
 }
 #endif /* TCL_MAJOR_VERSION < 8 */
@@ -773,11 +848,11 @@ struct Tcl_Obj* CONST * objv;
  *	------------------------------------------------*
  *	Trap handler. Called by the Tcl core during
  *	destruction of the command for invocation of a
- *	conversion.
+ *	transformation.
  *	------------------------------------------------*
  *
  *	Sideeffects:
- *		Removes the conversion from the registry.
+ *		Removes the transformation from the registry.
  *
  *	Result:
  *		None.
@@ -803,11 +878,12 @@ ClientData clientData;
  *
  *	------------------------------------------------*
  *	Trap handler. Called by the generic IO system
- *	during destruction of the conversion channel.
+ *	during destruction of the transformation channel.
  *	------------------------------------------------*
  *
  *	Sideeffects:
- *		Releases memory allocated in 'CreateTransform'.
+ *		Releases the memory allocated in
+ *		'AttachTransform'.
  *
  *	Result:
  *		None.
@@ -828,7 +904,7 @@ Tcl_Interp* interp;
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
 
   /*
-   * Flush data waiting in conversion buffers to output.
+   * Flush data waiting in transformation buffers to output.
    * Flush input too, maybe there are side effects other
    * parts do rely on (-> message digests).
    */
@@ -857,8 +933,8 @@ Tcl_Interp* interp;
     trans->in.vectors->deleteProc  (trans->in.control,  trans->clientData);
   }
 
-  if (trans->allocated)
-    Tcl_Free (trans->result);
+  if (trans->result.allocated)
+    Tcl_Free (trans->result.buf);
 
   return TCL_OK;
 }
@@ -896,25 +972,25 @@ int*       errorCodePtr;
   gotBytes = 0;
 
   while (toRead > 0) {
-    if (trans->used > 0) {
+    if (trans->result.used > 0) {
       /*
        * First: copy as much possible from the result buffer.
        */
 
-      if (trans->used >= toRead) {
+      if (trans->result.used >= toRead) {
 	/*
 	 * More than enough, take data from the internal buffer, then return.
 	 * Don't forget to shift the remaining parts down.
 	 */
 
-	memcpy ((VOID*) buf, (VOID*) trans->result, toRead);
-	if (trans->used > toRead) {
-	  memmove ((VOID*) trans->result,
-		   (VOID*) (trans->result + toRead),
-		   trans->used - toRead);
+	memcpy ((VOID*) buf, (VOID*) trans->result.buf, toRead);
+	if (trans->result.used > toRead) {
+	  memmove ((VOID*) trans->result.buf,
+		   (VOID*) (trans->result.buf + toRead),
+		   trans->result.used - toRead);
 	}
 
-	trans->used -= toRead;
+	trans->result.used -= toRead;
 	gotBytes    += toRead;
 	toRead = 0;
 
@@ -925,17 +1001,17 @@ int*       errorCodePtr;
 	 * Not enough in buffer to satisfy the caller, take all, then try to read more.
 	 */
 
-	memcpy ((VOID*) buf, (VOID*) trans->result, trans->used);
+	memcpy ((VOID*) buf, (VOID*) trans->result.buf, trans->result.used);
 
-	buf      += trans->used;
-	toRead   -= trans->used;
-	gotBytes += trans->used;
-	trans->used = 0;
+	buf      += trans->result.used;
+	toRead   -= trans->result.used;
+	gotBytes += trans->result.used;
+	trans->result.used = 0;
       }
     }
 
     /*
-     * trans->used == 0, toRead > 0 here 
+     * trans->result.used == 0, toRead > 0 here 
      * Use 'buf'! as target to store the intermediary
      * information read from the parent channel.
      */
@@ -971,7 +1047,7 @@ int*       errorCodePtr;
 	res = trans->in.vectors->flushProc (trans->in.control,
 					    (Tcl_Interp*) NULL,
 					    trans->clientData);
-	if (trans->used == 0) {
+	if (trans->result.used == 0) {
 	  /* we had nothing to flush */
 	  return gotBytes;
 	}
@@ -1018,7 +1094,7 @@ int*       errorCodePtr;
  *	------------------------------------------------*
  *
  *	Sideeffects:
- *		As defined by the conversion.
+ *		As defined by the transformation.
  *
  *	Result:
  *		A transformed buffer.
@@ -1039,8 +1115,9 @@ int*       errorCodePtr;
   /* should assert (trans->mode & TCL_WRITABLE) */
 
   /*
-   * transformation results are automatically written to the parent channel
-   * ('PutDestination' was configured as write procedure in 'AttachTransformation')
+   * transformation results are automatically written to
+   * the parent channel ('PutDestination' was configured
+   * as write procedure in 'AttachTransformation').
    */
 
     if (trans->out.vectors->convertBufProc){ 
@@ -1278,7 +1355,7 @@ ClientData* handlePtr;		/* Place to store the handle into */
  *	TransformImmediate --
  *
  *	------------------------------------------------*
- *	Read from source, apply the specified conversion
+ *	Read from source, apply the specified transformation
  *	and write the result to destination.
  *	------------------------------------------------*
  *
@@ -1293,69 +1370,163 @@ ClientData* handlePtr;		/* Place to store the handle into */
  */
 
 static int
-TransformImmediate (interp, entry, source, destination, optInfo)
+TransformImmediate (interp, entry, source, destination, in, optInfo)
 Tcl_Interp*        interp;
 Trf_RegistryEntry* entry;
 Tcl_Channel        source;
 Tcl_Channel        destination;
+#if (TCL_MAJOR_VERSION < 8)
+CONST char*        in;
+#else
+struct Tcl_Obj* CONST in;
+#endif
 Trf_Options        optInfo;
 {
   Trf_Vectors*     v;
   Trf_ControlBlock control;
-  unsigned char*   buf;
   int              res = TCL_OK;
-  int actuallyRead;
+
+  ResultBuffer r;
 
   if (ENCODE_REQUEST (entry, optInfo))
     v = &(entry->trfType->encoder);
   else
     v = &(entry->trfType->decoder);
 
-  control = v->createProc ((ClientData) destination, PutDestination,
-			   optInfo, interp,
-			   entry->trfType->clientData);
+  /* Take care of output (channel vs. interpreter result area).
+   */
+
+  if (destination == (Tcl_Channel) NULL) {
+    r.buf       = (unsigned char*) NULL;
+    r.used      = 0;
+    r.allocated = 0;
+
+    control = v->createProc ((ClientData) &r, PutInterpResult,
+			     optInfo, interp,
+			     entry->trfType->clientData);
+  } else {
+    control = v->createProc ((ClientData) destination, PutDestination,
+			     optInfo, interp,
+			     entry->trfType->clientData);
+  }
 
   if (control == (Trf_ControlBlock) NULL) {
     return TCL_ERROR;
   }
 
-  buf = (unsigned char*) Tcl_Alloc (READ_CHUNK_SIZE);
 
-  while (1) {
-    if (Tcl_Eof (source))
-      break;
+  /* Now differentiate between immediate value and channel as input.
+   */
 
-    actuallyRead = Tcl_Read (source, buf, READ_CHUNK_SIZE);
+  if (source == (Tcl_Channel) NULL) {
+    /* Immediate value.
+     * -- VERSION DEPENDENT CODE --
+     */
+    int            length;
+    unsigned char* buf;
 
-    if (actuallyRead <= 0)
-      break;
+#if (TCL_MAJOR_VERSION < 8)
+    /* 7.6, argument 'in' is a string.
+     */
+    length = strlen (in);
+    buf    = in;
+#else
+    /* 8.x, argument 'in' is arbitrary object, its string rep. may contain \0.
+     */
+    buf = Tcl_GetStringFromObj (in, &length);
+#endif
 
     if (v->convertBufProc) {
-      res = v->convertBufProc (control, buf, actuallyRead, interp,
+      /* play it safe, use a copy, avoid clobbering the input. */
+      unsigned char* tmp;
+
+      tmp = Tcl_Alloc (length);
+      memcpy (tmp, buf, length);
+
+      res = v->convertBufProc (control, tmp, length, interp,
 			       entry->trfType->clientData);
+      Tcl_Free (tmp);
     } else {
       unsigned int i, c;
-
-      for (i=0; i < ((unsigned int) actuallyRead); i++) {
+      
+      for (i=0; i < ((unsigned int) length); i++) {
 	c = buf [i];
 	res = v->convertProc (control, c, interp,
 			      entry->trfType->clientData);
-	  
+	
 	if (res != TCL_OK)
 	  break;
       }
     }
 
-    if (res != TCL_OK)
-      break;
+    if (res == TCL_OK)
+      res = v->flushProc (control, interp, entry->trfType->clientData);
+  } else {
+    /* Read from channel.
+     */
+
+    unsigned char* buf;
+    int            actuallyRead;
+
+    buf = (unsigned char*) Tcl_Alloc (READ_CHUNK_SIZE);
+
+    while (1) {
+      if (Tcl_Eof (source))
+	break;
+
+      actuallyRead = Tcl_Read (source, buf, READ_CHUNK_SIZE);
+
+      if (actuallyRead <= 0)
+	break;
+
+      if (v->convertBufProc) {
+	res = v->convertBufProc (control, buf, actuallyRead, interp,
+				 entry->trfType->clientData);
+      } else {
+	unsigned int i, c;
+	
+	for (i=0; i < ((unsigned int) actuallyRead); i++) {
+	  c = buf [i];
+	  res = v->convertProc (control, c, interp,
+				entry->trfType->clientData);
+	  
+	  if (res != TCL_OK)
+	    break;
+	}
+      }
+
+      if (res != TCL_OK)
+	break;
+    }
+
+    Tcl_Free (buf);
+
+    if (res == TCL_OK)
+      res = v->flushProc (control, interp, entry->trfType->clientData);
   }
 
-  Tcl_Free (buf);
-
-  if (res == TCL_OK)
-    res = v->flushProc (control, interp, entry->trfType->clientData);
-
   v->deleteProc (control, entry->trfType->clientData);
+
+
+  if (destination == (Tcl_Channel) NULL) {
+    /* Now write into interpreter result area.
+     */
+
+    if (res != TCL_OK) {
+      Tcl_Free (r.buf);
+    } else {
+#if (TCL_MAJOR_VERSION < 8)
+      Tcl_ResetResult (interp);
+      Tcl_AppendResult (interp, r.buf, (char*) NULL);
+#else
+      Tcl_Obj* o = Tcl_NewStringObj (r.buf, r.used);
+
+      Tcl_IncrRefCount (o);
+      Tcl_SetObjResult (interp, o);
+      Tcl_DecrRefCount (o);
+#endif
+    }
+  }
 
   return res;
 }
@@ -1366,8 +1537,8 @@ Trf_Options        optInfo;
  *	AttachTransform --
  *
  *	------------------------------------------------*
- *	Create an instance of a conversion transformation
- *	and associate it with the specified channel.
+ *	Create an instance of a transformation and
+ *	associate as filter it with the specified channel.
  *	------------------------------------------------*
  *
  *	Sideeffects:
@@ -1415,6 +1586,10 @@ Tcl_Interp*        interp;
     trans->in.vectors  = ((trans->mode & TCL_READABLE) ? &entry->trfType->encoder : NULL);
   }
 
+  /* 'PutDestination' is ok for write, only read
+   * requires 'PutTrans' and its internal buffer.
+   */
+
   if (trans->mode & TCL_WRITABLE) {
     trans->out.control = trans->out.vectors->createProc ((ClientData) trans->parent,
 							 PutDestination,
@@ -1438,9 +1613,9 @@ Tcl_Interp*        interp;
     }
   }
 
-  trans->result    = (unsigned char*) NULL;
-  trans->allocated = 0;
-  trans->used      = 0;
+  trans->result.buf       = (unsigned char*) NULL;
+  trans->result.allocated = 0;
+  trans->result.used      = 0;
 
   /*
    * Build channel from converter definition and stack it upon the one we shall attach to.
@@ -1453,12 +1628,12 @@ Tcl_Interp*        interp;
 
   if (new == (Tcl_Channel) NULL) {
     Tcl_Free ((char*) trans);
-    ADD_RES (interp, "internal error in Tcl_ReplaceChannel");
+    Tcl_AppendResult (interp, "internal error in Tcl_ReplaceChannel", (char*) NULL);
     return TCL_ERROR;
   }
 
   /*  Tcl_RegisterChannel (interp, new); */
-  ADD_RES (interp, Tcl_GetChannelName (new));
+  Tcl_AppendResult (interp, Tcl_GetChannelName (new), (char*) NULL);
 
   return TCL_OK;
 }
@@ -1469,8 +1644,8 @@ Tcl_Interp*        interp;
  *	PutDestination --
  *
  *	------------------------------------------------*
- *	Handler used by a conversion to write its results.
- *	Used during the explicit conversion done by 'Transform'.
+ *	Handler used by a transformation to write its results.
+ *	Used during the explicit transformation done by 'Transform'.
  *	------------------------------------------------*
  *
  *	Sideeffects:
@@ -1496,10 +1671,10 @@ Tcl_Interp*    interp;
 
   if (res < 0) {
     if (interp) {
-      ADD_RES (interp, "error writing \"");
-      ADD_RES (interp, Tcl_GetChannelName (destination));
-      ADD_RES (interp, "\": ");
-      ADD_RES (interp, Tcl_PosixError (interp));
+      Tcl_AppendResult (interp, "error writing \"",               (char*) NULL);
+      Tcl_AppendResult (interp, Tcl_GetChannelName (destination), (char*) NULL);
+      Tcl_AppendResult (interp, "\": ",                           (char*) NULL);
+      Tcl_AppendResult (interp, Tcl_PosixError (interp),          (char*) NULL);
     }
     return TCL_ERROR;
   }
@@ -1513,8 +1688,9 @@ Tcl_Interp*    interp;
  *	PutTrans --
  *
  *	------------------------------------------------*
- *	Handler used by a conversion to write its results
- *	(to be read later). Used by conversion transformations.
+ *	Handler used by a transformation to write its
+ *	results (to be read later). Used by transformations
+ *	acting as filter.
  *	------------------------------------------------*
  *
  *	Sideeffects:
@@ -1534,28 +1710,80 @@ int            outLen;
 Tcl_Interp*    interp;
 {
   TrfTransformationInstance* trans = (TrfTransformationInstance*) clientData;
-  unsigned char*             actual;
 
-  if ((outLen + trans->used) > trans->allocated) {
+  if ((outLen + trans->result.used) > trans->result.allocated) {
     /*
      * Extension of internal buffer required.
      */
 
-    if (trans->allocated == 0) {
-      trans->allocated = outLen + INCREMENT;
-      trans->result    = (unsigned char*) Tcl_Alloc (trans->allocated);
+    if (trans->result.allocated == 0) {
+      trans->result.allocated = outLen + INCREMENT;
+      trans->result.buf    = (unsigned char*) Tcl_Alloc (trans->result.allocated);
     } else {
-      trans->allocated += outLen + INCREMENT;
-      trans->result     = (unsigned char*) Tcl_Realloc (trans->result, trans->allocated);
+      trans->result.allocated += outLen + INCREMENT;
+      trans->result.buf     = (unsigned char*) Tcl_Realloc (trans->result.buf, trans->result.allocated);
+    }
+  }
+
+  /* now copy data */
+  memcpy (trans->result.buf + trans->result.used, outString, outLen);
+  trans->result.used += outLen;
+
+  return TCL_OK;
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	PutInterpResult --
+ *
+ *	------------------------------------------------*
+ *	Handler used by a transformation to write its
+ *	results into the interpreter result area.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		changes the contents of the interpreter
+ *		result area.
+ *
+ *	Result:
+ *		A standard Tcl error code.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+PutInterpResult (clientData, outString, outLen, interp)
+ClientData     clientData;
+unsigned char* outString;
+int            outLen;
+Tcl_Interp*    interp;
+{
+  ResultBuffer* r = (ResultBuffer*) clientData;
+
+#if 0
+  printf ("-- %d '%s'\n", outLen, outString);
+  fflush (stdout);
+#endif
+
+  if ((outLen + r->used) > r->allocated) {
+    /*
+     * Extension of internal buffer required.
+     */
+
+    if (r->allocated == 0) {
+      r->allocated = outLen + INCREMENT;
+      r->buf    = (unsigned char*) Tcl_Alloc (r->allocated);
+    } else {
+      r->allocated += outLen + INCREMENT;
+      r->buf     = (unsigned char*) Tcl_Realloc (r->buf, r->allocated);
     }
   }
 
   /* now copy data */
 
-  for (actual = trans->result + trans->used, trans->used += outLen;
-       outLen > 0;
-       outLen --, actual ++, outString ++)
-    *actual = *outString;
+  memcpy (r->buf + r->used, outString, outLen);
+  r->used += outLen;
 
   return TCL_OK;
 }

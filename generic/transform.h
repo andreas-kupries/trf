@@ -135,13 +135,20 @@ Trf_IsInitialized _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 /*
  * Structure used to remember the values of fundamental option(s).
- * Then only 2 values currently defined remember handle and access-mode
- * of the channel specified as argument to option '-attach'.
+ * The values currently defined remember:
+ * * Handle and access-mode of the channel specified as argument
+ *   to option '-attach'.
+ * * Handle of channel specified as argument to '-in'.
+ * * Handle of channel specified as argument to '-out'.
  */
 
 typedef struct _Trf_BaseOptions_ {
   Tcl_Channel attach;      /* NULL => immediate mode                */
   int         attach_mode; /* access mode of 'attach' (if not NULL) */
+
+  /* Relevant in immediate mode only! (attach == NULL) */
+  Tcl_Channel source;      /* NULL => use non option argument as input */
+  Tcl_Channel destination; /* NULL => leave transformation result in interpreter result area */
 } Trf_BaseOptions;
 
 
@@ -791,7 +798,8 @@ typedef int Trf_CCheck _ANSI_ARGS_ ((Tcl_Interp* interp));
 typedef struct _Trf_CipherDescription {
   char*             name;         /* name of cipher, also name of command */
   unsigned short    min_keysize;  /* minimal allowed size of a user key (in byte) */
-  unsigned short    max_keysize;  /* maximal allowed size of a user key (in byte) */
+  unsigned short    max_keysize;  /* maximal allowed size of a user key (in byte).
+				   * 0 is used to denote infinity! */
   unsigned short    ks_size;      /* size of a keyschedule (= internal key) */
   Trf_CSchedule*    scheduleProc;
   Trf_CEncryptChar* encryptProc;
@@ -800,6 +808,7 @@ typedef struct _Trf_CipherDescription {
 
 } Trf_CipherDescription;
 
+#define TRF_KEYSIZE_INFINITY (0)
 
 /*
  * Procedure to register a (stream) cipher in an interpreter.

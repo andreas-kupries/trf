@@ -40,13 +40,13 @@ static void        DeleteOptions _ANSI_ARGS_ ((Trf_Options options,
 static int         CheckOptions  _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
 					       CONST Trf_BaseOptions* baseOptions,
 					       ClientData clientData));
-#if (TCL_MAJOR_VERSION >= 8)
+#if (TCL_MAJOR_VERSION < 8)
 static int         SetOption     _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
-					       CONST char* optname, CONST Tcl_Obj* optvalue,
+					       CONST char* optname, CONST char* optvalue,
 					       ClientData clientData));
 #else
 static int         SetOption     _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
-					       CONST char* optname, CONST char* optvalue,
+					       CONST char* optname, CONST Tcl_Obj* optvalue,
 					       ClientData clientData));
 #endif
 static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
@@ -80,12 +80,12 @@ TrfCipherOptions ()
       CreateOptions,
       DeleteOptions,
       CheckOptions,
-#if (TCL_MAJOR_VERSION >= 8)
-      NULL,      /* no string procedure */
-      SetOption,
-#else
+#if (TCL_MAJOR_VERSION < 8)
       SetOption,
       NULL,      /* no object procedure */
+#else
+      NULL,      /* no string procedure */
+      SetOption,
 #endif
       QueryOptions
     };
@@ -122,10 +122,13 @@ ClientData clientData;
   o = (TrfCipherOptionBlock*) Tcl_Alloc (sizeof (TrfCipherOptionBlock));
 
   o->direction      = TRF_UNKNOWN_MODE;
-  o->key_length     = -1;
-  o->key            = NULL;
+  o->keyDataIsChan  = 0;
+  o->keyData        = NULL;
 
   /* ---- derived information ---- */
+
+  o->key_length     = -1;
+  o->key            = NULL;
 
   o->eks_length          = -1;
   o->dks_length          = -1;
@@ -163,6 +166,14 @@ ClientData clientData;
 #if 0
   Trf_CipherDescription* c_desc = (Trf_CipherDescription*) clientData;
 #endif
+
+  if (o->keyData != NULL) {
+#if (TCL_MAJOR_VERSION < 8)
+    Tcl_Free (o->keyData);
+#else
+    Tcl_DecrRefCount(o->keyData);
+#endif
+  }
 
   if (o->key != NULL) {
     memset (o->key, '\0', o->key_length);
@@ -222,16 +233,22 @@ ClientData             clientData;
   }
 
   if (o->direction == TRF_UNKNOWN_MODE) {
-    ADD_RES (interp, "direction not specified");
+    Tcl_AppendResult (interp, "direction not specified", (char*) NULL);
     return TCL_ERROR;
   }
 
-  if (o->key == NULL) {
-    ADD_RES (interp, "key not specified");
+  /*
+   * Interpret '-key' in dependance of '-key-type'.
+   */
+
+  if (o->keyData == NULL) {
+    Tcl_AppendResult (interp, "key not specified", (char*) NULL);
     return TCL_ERROR;
   }
 
-  return TCL_OK;
+  return TrfGetData (interp, "key", o->keyDataIsChan, o->keyData,
+		     c_desc->min_keysize, c_desc->max_keysize,
+		     &o->key, &o->key_length);
 }
 
 /*
@@ -258,29 +275,32 @@ SetOption (options, interp, optname, optvalue, clientData)
 Trf_Options options;
 Tcl_Interp* interp;
 CONST char* optname;
-#if (TCL_MAJOR_VERSION >= 8)
-CONST Tcl_Obj* optvalue;
-#else
+#if (TCL_MAJOR_VERSION < 8)
 CONST char*    optvalue;
+#else
+CONST Tcl_Obj* optvalue;
 #endif
 ClientData  clientData;
 {
   /* Possible options:
    *
    * -direction	encrypt/decrypt
-   * -key	<readable channel>
+   * -key-type  data|channel
+   * -key	<value>, either channel handle or immediate
+   *                     information (dependent on value of
+   *                     -key-type).
    */
 
   TrfCipherOptionBlock*  o      = (TrfCipherOptionBlock*) options;
-  Trf_CipherDescription* c_desc = (Trf_CipherDescription*) clientData;
+  /*  Trf_CipherDescription* c_desc = (Trf_CipherDescription*) clientData; */
   CONST char*            value;
 
   int len = strlen (optname + 1);
 
-#if (TCL_MAJOR_VERSION >= 8)
-  value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
-#else
+#if (TCL_MAJOR_VERSION < 8)
   value = optvalue;
+#else
+  value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
 #endif
 
   switch (optname [1]) {
@@ -305,9 +325,9 @@ ClientData  clientData;
 
       default:
       unknown_direction:
-	ADD_RES (interp, "unknown direction \"");
-	ADD_RES (interp, value);
-	ADD_RES (interp, "\"");
+	Tcl_AppendResult (interp, "unknown direction \"", (char*) NULL);
+	Tcl_AppendResult (interp, value, (char*) NULL);
+	Tcl_AppendResult (interp, "\"", (char*) NULL);
 	return TCL_ERROR;
       }
     } else
@@ -316,41 +336,17 @@ ClientData  clientData;
 
   case 'k':
     if (0 == strncmp (optname, "-key", len)) {
-      int         access;
-      Tcl_Channel key;
-
-      key = Tcl_GetChannel (interp, (char*) value, &access);
-      if (key == (Tcl_Channel) NULL)
-	return TCL_ERROR;
-      else if (! (access & TCL_READABLE)) {
-	ADD_RES (interp, "key \"");
-	ADD_RES (interp, value);
-	ADD_RES (interp, "\" not opened for reading");
-	return TCL_ERROR;
-      } else {
-	/*
-	 * Extract key from channel.
-	 */
-
-	char* tmp = Tcl_Alloc (c_desc->max_keysize);
-	int res   = Tcl_Read  (key, tmp, c_desc->max_keysize);
-
-	if (res < 0) {
-	  Tcl_Free (tmp);
-	  ADD_RES (interp, "error reading key from \"");
-	  ADD_RES (interp, value);
-	  ADD_RES (interp, "\": ");
-	  ADD_RES (interp, Tcl_PosixError (interp));
-	  return TCL_ERROR;
-	} else if (res < c_desc->min_keysize) {
-	  Tcl_Free (tmp);
-	  ADD_RES (interp, "key to short (< minimal keysize)");
-	  return TCL_ERROR;
-	}
-
-	o->key        = tmp;
-	o->key_length = res;
-      }
+      /*
+       * Save information, interpret later (CheckOption)
+       */
+#if (TCL_MAJOR_VERSION < 8)
+      o->keyData = strcpy (Tcl_Alloc (1 + strlen (optvalue)), optvalue);
+#else
+      o->keyData = (Tcl_Obj*) optvalue;
+      Tcl_IncrRefCount (o->keyData);
+#endif
+    } else if (0 == strncmp (optname, "-key-type", len)) {
+      return TrfGetDataType (interp, "key", value, &o->keyDataIsChan);
     } else
       goto unknown_option;
     break;
@@ -363,9 +359,9 @@ ClientData  clientData;
   return TCL_OK;
 
  unknown_option:
-  ADD_RES (interp, "unknown option '");
-  ADD_RES (interp, optname);
-  ADD_RES (interp, "'");
+  Tcl_AppendResult (interp, "unknown option '", (char*) NULL);
+  Tcl_AppendResult (interp, optname, (char*) NULL);
+  Tcl_AppendResult (interp, "'", (char*) NULL);
   return TCL_ERROR;
 }
 

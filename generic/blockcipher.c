@@ -696,7 +696,7 @@ ClientData clientData;
 
     if (c->byteCount > 0) {
       if (interp) {
-	ADD_RES (interp, "can not encrypt incomplete block at end of input");
+	Tcl_AppendResult (interp, "can not encrypt incomplete block at end of input", (char*) NULL);
       }
       return TCL_ERROR;
     }

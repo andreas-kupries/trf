@@ -332,7 +332,24 @@ ClientData clientData;
     unsigned char buf [4];
 
     TrfSplit3to4     (c->buf, buf, 3);
+
+#define CRLF_AT(i,v) ((v[i] == '\r') && (v[i+1] == '\n'))
+#define CRLF_IN(v) (CRLF_AT(0,v) || CRLF_AT(1,v))
+
+    /* dbg + */
+    if (CRLF_IN (c->buf)){ 
+      printf ("split (%d,%d,%d) = %d,%d,%d,%d = ",
+	      c->buf [0], c->buf [1], c->buf [2],
+	      buf [0], buf [1], buf [2], buf [3]);
+    }
+
     TrfApplyEncoding (buf, 4, baseMap);
+
+    if (CRLF_IN (c->buf)) {
+      printf ("%c%c%c%c\n", buf [0], buf [1], buf [2], buf [3]);
+      fflush (stdout);
+    }
+    /* dbg - */
 
     c->charCount = 0;
     memset (c->buf, '\0', 3);
@@ -529,7 +546,8 @@ ClientData clientData;
      */
 
     if (interp) {
-      ADD_RES (interp, "illegal padding inside the string");
+      Tcl_ResetResult  (interp);
+      Tcl_AppendResult (interp, "illegal padding inside the string", (char*) NULL);
     }
     return TCL_ERROR;
   }
@@ -548,7 +566,8 @@ ClientData clientData;
 
     if (res != TCL_OK) {
       if (interp) {
-	ADD_RES (interp, "illegal characters in string");
+	Tcl_ResetResult  (interp);
+	Tcl_AppendResult (interp, "illegal character found in input", (char*) NULL);
       }
       return res;
     }
@@ -615,7 +634,8 @@ ClientData clientData;
 
     if (res != TCL_OK) {
       if (interp) {
-	ADD_RES (interp, "illegal characters in string");
+	Tcl_ResetResult  (interp);
+	Tcl_AppendResult (interp, "illegal character found in input", (char*) NULL);
       }
       return res;
     }

@@ -182,7 +182,7 @@ ClientData             clientData;
 
   if (baseOptions->attach == (Tcl_Channel) NULL) /* IMMEDIATE? */ {
     if (o->mode == TRF_UNKNOWN_MODE) {
-      ADD_RES (interp, "mode not defined");
+      Tcl_AppendResult (interp, "mode not defined", (char*) NULL);
       return TCL_ERROR;
     }
   } else /* ATTACH */ {
@@ -260,9 +260,9 @@ ClientData  clientData;
 
     default:
     unknown_mode:
-      ADD_RES (interp, "unknown mode '");
-      ADD_RES (interp, value);
-      ADD_RES (interp, "'");
+      Tcl_AppendResult (interp, "unknown mode '", (char*) NULL);
+      Tcl_AppendResult (interp, value, (char*) NULL);
+      Tcl_AppendResult (interp, "'", (char*) NULL);
       return TCL_ERROR;
       break;
     } /* switch optvalue */
@@ -276,9 +276,9 @@ ClientData  clientData;
   return TCL_OK;
 
  unknown_option:
-  ADD_RES (interp, "unknown option '");
-  ADD_RES (interp, optname);
-  ADD_RES (interp, "'");
+  Tcl_AppendResult (interp, "unknown option '", (char*) NULL);
+  Tcl_AppendResult (interp, optname, (char*) NULL);
+  Tcl_AppendResult (interp, "'", (char*) NULL);
   return TCL_ERROR;
 }
 

@@ -584,8 +584,9 @@ ClientData clientData;
   if (c->charCount > 0) {
     if (c->charCount < 2) {
       if (interp) {
-	ADD_RES (interp, "partial character sequence at end to ");
-	ADD_RES (interp, "short (2 characters required at least)");
+	Tcl_ResetResult  (interp);
+	Tcl_AppendResult (interp, "partial character sequence at end to ", (char*) NULL);
+	Tcl_AppendResult (interp, "short (2 characters required at least)", (char*) NULL);
       }
 
       return TCL_ERROR;
@@ -658,7 +659,7 @@ ClientData clientData;
       c->charCount = 0;
       memset (c->buf, '\0', 5);
 
-      return c->write (c->writeClientData, result, 4, interp);
+      return c->write (c->writeClientData, result, partial, interp);
     }
   }
 
@@ -758,14 +759,15 @@ int         partial;
 
       quint [i] = '\0';
 
+      Tcl_ResetResult  (interp);
       if (partial > 0) {
-	ADD_RES (interp, "illegal quintuple '");
-	ADD_RES (interp, quint);
-	ADD_RES (interp, "' at end of input (illegal characters)");
+	Tcl_AppendResult (interp, "illegal quintuple '", (char*) NULL);
+	Tcl_AppendResult (interp, quint, (char*) NULL);
+	Tcl_AppendResult (interp, "' at end of input (illegal characters)", (char*) NULL);
       } else {
-	ADD_RES (interp, "illegal quintuple '");
-	ADD_RES (interp, quint);
-	ADD_RES (interp, "' in input (illegal characters)");
+	Tcl_AppendResult (interp, "illegal quintuple '", (char*) NULL);
+	Tcl_AppendResult (interp, quint, (char*) NULL);
+	Tcl_AppendResult (interp, "' in input (illegal characters)", (char*) NULL);
       }
     }
 
@@ -799,9 +801,10 @@ int         partial;
 
       quint [i] = '\0';
 
-      ADD_RES (interp, "illegal quintuple '");
-      ADD_RES (interp, quint);
-      ADD_RES (interp, "' in input (> 2^32-1)");
+      Tcl_ResetResult  (interp);
+      Tcl_AppendResult (interp, "illegal quintuple '", (char*) NULL);
+      Tcl_AppendResult (interp, quint, (char*) NULL);
+      Tcl_AppendResult (interp, "' in input (> 2^32-1)", (char*) NULL);
     }
 
     return TCL_ERROR;

@@ -106,6 +106,29 @@ EXTERN void TrfApplyEncoding   _ANSI_ARGS_ ((unsigned char* buf, int length, CON
 EXTERN int  TrfReverseEncoding _ANSI_ARGS_ ((unsigned char* buf, int length, CONST char* reverseMap,
 					     unsigned int padChar, int* hasPadding));
 
+
+/*
+ * Helper procedures for ciphers.
+ */
+
+#if (TCL_MAJOR_VERSION < 8)
+EXTERN int
+TrfGetData _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* dataName, int dataIsChannel,
+			 CONST char* data, unsigned short min_bytes, unsigned short max_bytes,
+			 VOID** buf, int* length));
+#else
+EXTERN int
+TrfGetData _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* dataName, int dataIsChannel,
+			 CONST Tcl_Obj* data, unsigned short min_bytes, unsigned short max_bytes,
+			 VOID** buf, int* length));
+#endif
+
+EXTERN int
+TrfGetDataType _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* dataName,
+			     CONST char* typeString, int* isChannel));
+
+
+
 /*
  * Definition of option information for message digests and accessor
  * to set of vectors processing these.
@@ -115,11 +138,27 @@ EXTERN int  TrfReverseEncoding _ANSI_ARGS_ ((unsigned char* buf, int length, CON
 typedef struct _TrfMDOptionBlock {
   int         behaviour; /* IMMEDIATE vs. ATTACH, got from checkProc */
   int         mode;      /* what to to with the generated hashvalue */
-  Tcl_Channel readDest;  /* channel to write the hash of read    data to (mode = TRF_WRITE_HASH) */
-  Tcl_Channel writeDest; /* channel to write the hash of written data to (mode = TRF_WRITE_HASH) */
-  char*       matchFlag; /* Name of global variable to write the matchresult into (TRF_ABSORB_HASH)
-			  */
-  Tcl_Interp* mfInterp;  /* Interpreter containing the variable named in 'matchFlag' */
+
+  char*       readDestination;	/* Name of channel (or global variable)
+				 * to write the hash of read data to
+				 * (mode = TRF_WRITE_HASH) */
+  char*       writeDestination;	/* Name of channel (or global variable)
+				 * to write the hash of written data to
+				 * (mode = TRF_WRITE_HASH) */
+
+  int        rdIsChannel; /* typeflag for 'readDestination',  true for a channel */
+  int        wdIsChannel; /* typeflag for 'writeDestination', true for a channel */
+
+  char*       matchFlag; /* Name of global variable to write the match-
+			  * result into (TRF_ABSORB_HASH) */
+
+  Tcl_Interp* vInterp;	/* Interpreter containing the variable named in
+			 * 'matchFlag', or '*Destination'. */
+
+  /* derived information */
+
+  Tcl_Channel rdChannel;  /* Channel associated to 'readDestination' */
+  Tcl_Channel wdChannel;  /* Channel associated to 'writeDestination' */
 } TrfMDOptionBlock;
 
 #define TRF_IMMEDIATE (1)
@@ -143,10 +182,17 @@ typedef struct _TrfBlockcipherOptionBlock {
   int   operation_mode; /* ECB, CBC, CFB, OFB */
   int   shift_width;    /* shift per operation for feedback modes.
 			 * given in bytes. */
-  int   key_length;     /* length of key (required for ciphers with
-			 * variable keysize) */
-  VOID* key;            /* key data */
-  VOID* iv;             /* initialization vector for stream modes. */
+
+  int   keyDataIsChan; /* Flag for interpretation of keyData */
+  int   ivDataIsChan;  /* Flag for interpretation of ivData  */
+
+#if (TCL_MAJOR_VERSION < 8)
+  unsigned char* keyData;  /* Key information */
+  unsigned char* ivData;   /* IV  information */
+#else
+  Tcl_Obj*       keyData;  /* Key information */
+  Tcl_Obj*       ivData;   /* IV  information */
+#endif
 
   /* ---- derived information ----
    *
@@ -157,6 +203,11 @@ typedef struct _TrfBlockcipherOptionBlock {
    *
    * to avoid duplicate execution of complex and/or common operations.
    */
+
+  int   key_length;     /* length of key (required for ciphers with
+			 * variable keysize) */
+  VOID* key;            /* key data */
+  VOID* iv;             /* initialization vector for stream modes. */
 
   int eks_length;
   int dks_length;
@@ -182,9 +233,14 @@ TrfBlockcipherOptions _ANSI_ARGS_ ((void));
 
 typedef struct _TrfCipherOptionBlock {
   int   direction;      /* encryption, decryption */
-  int   key_length;     /* length of key (required for ciphers with
-			 * variable keysize) */
-  VOID* key;            /* key data */
+
+  int   keyDataIsChan; /* Flag for interpretation of keyData */
+
+#if (TCL_MAJOR_VERSION < 8)
+  unsigned char* keyData;  /* Key information */
+#else
+  Tcl_Obj*       keyData;  /* Key information */
+#endif
 
   /* ---- derived information ----
    *
@@ -195,6 +251,10 @@ typedef struct _TrfCipherOptionBlock {
    *
    * to avoid duplicate execution of complex and/or common operations.
    */
+
+  int   key_length;     /* length of key (required for ciphers with
+			 * variable keysize) */
+  VOID* key;            /* key data */
 
   int eks_length;
   int dks_length;

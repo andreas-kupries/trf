@@ -31,7 +31,7 @@
 #include "rc4/rc4.h"
 
 #define  MIN_KEYSIZE      (1)
-#define  MAX_KEYSIZE      (256)
+#define  MAX_KEYSIZE      (TRF_KEYSIZE_INFINITY)
 #define  KEYSCHEDULE_SIZE (sizeof (rc4_key))
 
 /*
@@ -136,7 +136,7 @@ VOID** d_schedule;
 
     }
   } else {
-    panic ("unknown direction code given to idea::BC_Schedule");
+    panic ("unknown direction code given to rc4::C_Schedule");
   }
 }
 
