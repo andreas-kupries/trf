@@ -1,3 +1,10 @@
+Wed Mar 22 19:48:30 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/init.c (Trf_Init, line 90): Removed '&&
+	  defined(USE_TRF_STUBS)', see Feb 25, as it messes up package
+	  initialization for normal compilation (Trfcrypt thinks 'This
+	  implementation of trf does not support stubs', uh).
+
 Tue Mar 21 21:22:06 2000  Andreas Kupries  <a.kupries@westend.com>
 
 	* unix/Makefile.in (genstubs): Fixed usage of wrong variable
