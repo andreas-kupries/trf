@@ -1,3 +1,10 @@
+Changes from 2.0 to 2.0p2
+
+*	Fixed several small bugs.
+
+*	Fixed some annoying bugs related to the changes made to Md5.
+
+
 Changes from 1.8 to 2.0
 
 *	Dropped support for Tcl 7.6.

@@ -342,13 +342,17 @@ TRF_FIND_ZLIB_SSL
 MD5_LIB_FILE=""
 if test \( $HAS_LIBCRYPT -eq 0 \)
 then
+	# (1)
 	MD5_LIB_FILE=libcrypt$SHLIB_SUFFIX
 	TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=libcrypt$SHLIB_SUFFIX"
 else
+	# (2,3)
 	if test \( $HAS_LIBCRYPT_MD5 -eq 0 \)
 	then
+		# (3)
 		MD5_LIB_FILE=libmd5crypt$SHLIB_SUFFIX
 		TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=libmd5crypt$SHLIB_SUFFIX"
+		LIBS="-lcrypt $LIBS"
 	fi
 fi
 

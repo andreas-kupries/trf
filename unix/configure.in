@@ -27,7 +27,7 @@ fi
 
 AC_PROG_CC
 dnl AC_PATH_PROG(MAKEDEPEND,makedepend,:)
-AC_HAVE_HEADERS(dlfcn.h stdlib.h)
+AC_HAVE_HEADERS(dlfcn.h stdlib.h features.h)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long int)
 
@@ -896,18 +896,24 @@ fi
 #	(1) libcrypt not present		=> compile, use that name.
 #	(2) libcrypt present, contains Md5	=> nothing to do
 #	(3) libcrypt present, no Md5		=> compile, name = libmd5crypt
+#						   use -lcrypt to link the
+#						   existing one too.
 #--------------------------------------------------------------------
 
 MD5_LIB_FILE=""
 if test \( $HAS_LIBCRYPT -eq 0 \)
 then
+	# (1)
 	MD5_LIB_FILE=libcrypt$SHLIB_SUFFIX
 	TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=libcrypt$SHLIB_SUFFIX"
 else
+	# (2,3)
 	if test \( $HAS_LIBCRYPT_MD5 -eq 0 \)
 	then
+		# (3)
 		MD5_LIB_FILE=libmd5crypt$SHLIB_SUFFIX
 		TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=libmd5crypt$SHLIB_SUFFIX"
+		LIBS="-lcrypt $LIBS"
 	fi
 fi
 

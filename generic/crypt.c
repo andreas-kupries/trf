@@ -49,7 +49,7 @@ TrfMd5CryptObjCmd _ANSI_ARGS_ ((ClientData notUsed, Tcl_Interp* interp,
  *	A standard Tcl result.
  *
  * Side effects:
- *	Unstacks the channel, thereby restoring its parent.
+ *	None.
  *
  *----------------------------------------------------------------------
  */

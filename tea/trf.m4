@@ -336,8 +336,6 @@ AC_SUBST(BZ2_LIB_DIR)
 AC_CACHE_VAL(trf_cv_BZ2_LIB_DIR, [trf_cv_BZ2_LIB_DIR="$BZ2_LIB_DIR"])
 
 
-
-
 if test "x$ZLIB_STATIC" = "xyes"
 then
 	eval AC_DEFINE_UNQUOTED(ZLIB_STATIC_BUILD, 1)
@@ -361,5 +359,5 @@ fi
 
 AC_SUBST(TRF_TESTS)
 
-AC_HAVE_HEADERS(dlfcn.h stdlib.h)
+AC_HAVE_HEADERS(dlfcn.h stdlib.h features.h)
 ])

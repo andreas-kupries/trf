@@ -25,7 +25,13 @@
 #ifndef _CRYPT_H
 
 #define _CRYPT_H	1
+
+#ifdef HAVE_FEATURES_H
 #include <features.h>
+#else
+#include <trf_features.h>
+#endif
+
 
 __BEGIN_DECLS
 

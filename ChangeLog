@@ -1,3 +1,18 @@
+Fri Dec 10 18:32:48 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* md5-crypt/crypt.h: Now switchable between inclusion of
+	  features.h and trf_features.h. Switch based on infomration
+	  coming from the configure. See below.
+
+	* md5-crypt/trf_features.h: The hacked 'features.h' under a new
+	  name, to avoid name clashes with an existing features.h
+	  (glibc-based Linux).
+
+	* (tea|unix)/configure.in: Added check for features.h. New code to
+	  add -lcrypt to LIBS if we have to compile md5 crypt with crypt
+	  present. Required to get both the real 'crypt' and the 'md5
+	  crypt'.
+
 Wed Dec  1 21:07:57 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* (tea,unix)/configure.in (MD5_LIB_FILE): Added check to
@@ -16,7 +31,7 @@ Thu Nov 25 22:14:28 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/registry.c (TrfClose): Added patch suggested by Mikhail
  	  Teterin <mi@aldan.algebra.com> to avoid a crash of the
- 	  interpreter upon exit. Restricted to usage without stubss / 8.0
+ 	  interpreter upon exit. Restricted to usage without stubs / 8.0
  	  series. Some platforms seem to call TrfClose with bogus
  	  instanceData and interpreter references (NULL) during exit with
  	  transformation channels left open.
