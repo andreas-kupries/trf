@@ -113,7 +113,7 @@ WINDIR          = $(ROOT)\win
 GENERICDIR	= $(ROOT)\generic
 
 TRF_INCLUDES	= -I$(WINDIR) -I$(GENERICDIR) -I$(ROOT) -I$(TCL)\include
-TRF_DEFINES	= -nologo -D__WIN32__ -DHAVE_STDLIB_H $(BINIO)
+TRF_DEFINES	= -nologo -D__WIN32__ -DHAVE_STDLIB_H $(BINIO) -DBUILD_trf
 
 #!include <ntwin32.mak> # thats this for?
 
