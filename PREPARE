@@ -48,7 +48,9 @@ eval mExclude \
 	doc/hash.operation doc/INSTALL doc/INSTALL.optional \
 	doc/ROADMAP doc/speed doc/trf.xpm doc/references \
 	patches/v8.1b3/gendiff patches/v8.1b3/getorig \
-	patches/v8.1b3/getcurrent patches/v8.1b3/setorig
+	patches/v8.1b3/getcurrent patches/v8.1b3/setorig \
+	patches/v8.1/gendiff patches/v8.1/getorig patches/v8.1/genstubs \
+	patches/v8.1/getcurrent patches/v8.1/setorig
 
 # I.b  generate official manual, diverse variants (dvi, ps)
 mLog info generating manual 

@@ -1,5 +1,13 @@
+Fri May  7 20:47:56 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* --------------- 1.6 re-release ------------------
+
+	* patches/v8.1: Added patch kit for 8.1 final.
+
 Thu Apr 22 21:46:12 1999  Andreas Kupries  <a.kupries@westend.com>
 
+	* --------------- 1.6 released --------------------
+	
 	* Tested compilation against unpatched core. The resulting library
 	  was usable for a patched core (-attach, unstack), and rejected
 	  these features if loaded by an unpatched interpreter. Wonderful.
