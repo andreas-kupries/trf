@@ -1,3 +1,8 @@
+Sun Mar 21 16:01:44 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* Generated patches for 8.1b2, fixed a bug in the byteorder
+	  patch. 
+
 Sun Mar 14 19:29:33 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* Generated patches for 8.0.4 and 8.0.5.
