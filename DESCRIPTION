@@ -26,13 +26,14 @@ extension trf {
 	tcl, conversion, message digests,
 	data compression, error-correction, binary io, crc, md2, md5,
 	sha, sha-1, haval, adler, ripemd-160, dual, hexadecimal, octal,
-	uuencode, base64, ascii85, reed-solomon, zlib
+	uuencode, base64, ascii85, reed-solomon, zlib, otp_md5, otp_sha1,
+	otp_words
     }
 
     author       {Andreas Kupries (a.kupries@westend.com)}
     maintenance  {Andreas Kupries (a.kupries@westend.com)}
 
-    version	   1.6
+    version	   1.7
     copying-policy {BSD-Style, see 'tcl'-license}
     date           {@mDate@}
 

@@ -54,7 +54,7 @@ static int  MD_Check     _ANSI_ARGS_ ((Tcl_Interp* interp));
  * Generator definition.
  */
 
-static Trf_MessageDigestDescription mdDescription = {
+static Trf_MessageDigestDescription mdDescription = { /* THREADING: constant, read-only => safe */
   "md2",
   sizeof (CTX_TYPE),
   DIGEST_SIZE,

@@ -568,8 +568,15 @@ char**      argv;
      * Process options, as long as they are found
      */
 
+    if (0 == strcmp (argv[0], "--")) {
+      /* end of option list */
+      argc--, argv++;
+      break;
+    }
+
     if (argc < 2) {
       /* option, but without argument */
+
       Tcl_AppendResult (interp, cmd, ": wrong # args", (char*) NULL);
       goto cleanup_after_error;      
     }
@@ -768,13 +775,20 @@ struct Tcl_Obj* CONST * objv;
      * Process options, as long as they are found
      */
 
+    option = Tcl_GetStringFromObj (objv [0], NULL);
+
+    if (0 == strcmp (option, "--")) {
+      /* end of option list */
+      objc--, objv++;
+      break;
+    }
+
     if (objc < 2) {
       /* option, but without argument */
       Tcl_AppendResult (interp, cmd, ": wrong # args", (char*) NULL);
       goto cleanup_after_error;      
     }
 
-    option = Tcl_GetStringFromObj (objv [0], NULL);
     optarg = objv [1];
 
     objc -= 2;

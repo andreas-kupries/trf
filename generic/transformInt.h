@@ -1,3 +1,6 @@
+#ifndef TRF_INT_H
+#define TRF_INT_H
+
 /* -*- c -*-
  * transformInt.h - internal definitions
  *
@@ -24,8 +27,9 @@
  * CVS: $Id$
  */
 
-#ifndef TRF_INT_H
-#define TRF_INT_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include "transform.h"
 #include <errno.h>
@@ -82,6 +86,9 @@
 /* enable use of procedure internal to tcl */
 EXTERN void
 panic _ANSI_ARGS_ ((char* format, ...));
+
+#undef  Tcl_Panic
+#define Tcl_Panic panic
 #endif
 
 
@@ -245,7 +252,8 @@ typedef struct ZFunctions {
   unsigned long (* crc32)   _ANSI_ARGS_ ((unsigned long crc, CONST unsigned char *buf, unsigned int len));
 } zFunctions;
 
-EXTERN zFunctions z;
+
+EXTERN zFunctions z; /* THREADING: serialize initialization */
 
 EXTERN int
 TrfLoadZlib _ANSI_ARGS_ ((Tcl_Interp *interp));
@@ -300,6 +308,7 @@ EXTERN int TrfInit_Hex       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_UU        _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_B64       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_Ascii85   _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_OTP_WORDS _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int TrfInit_CRC       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_MD5       _ANSI_ARGS_ ((Tcl_Interp* interp));
@@ -307,10 +316,12 @@ EXTERN int TrfInit_MD2       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_HAVAL     _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_SHA       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_SHA1      _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_OTP_SHA1  _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_ADLER     _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_CRC_ZLIB  _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_RIPEMD128 _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_RIPEMD160 _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_OTP_MD5   _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int TrfInit_RS_ECC    _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_ZIP       _ANSI_ARGS_ ((Tcl_Interp* interp));
@@ -321,7 +332,25 @@ EXTERN int TrfInit_Binio     _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_Transform _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 
+#if GT81 && defined (TCL_THREADS) /* THREADING: Lock procedures */
+
+EXTERN void TrfLock   _ANSI_ARGS_ ((void));
+EXTERN void TrfUnlock _ANSI_ARGS_ ((void));
+
+#else
+/* Either older version of Tcl, or non-threaded 8.1.x.
+ * Whatever, locking is not required, undefine the calls.
+ */
+
+#define TrfLock
+#define TrfUnlock
+#endif
+
+
 #undef TCL_STORAGE_CLASS
 #define TCL_STORAGE_CLASS DLLIMPORT
 
+#ifdef __cplusplus
+}
+#endif /* C++ */
 #endif /* TRF_INT_H */

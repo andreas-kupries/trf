@@ -92,7 +92,7 @@ static Trf_TypeDefinition convDefinition =
 {
   "base64",
   NULL, /* clientData not used by conversions. */
-  NULL, /* set later by Trf_InitB64 */
+  NULL, /* set later by Trf_InitB64 */ /* THREADING: serialize initialization */
   {
     CreateEncoder,
     DeleteEncoder,
@@ -148,6 +148,7 @@ typedef struct _DecoderControl_ {
  *                                      1         2         3         4         5         6   6
  *                            01234567890123456789012345678901234567890123456789012345678901234 */
 static CONST char* baseMap = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+/* basemap: THREADING: constant, read-only => safe */
 
 #define PAD '='
 
@@ -159,7 +160,7 @@ static CONST char* baseMap = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwx
  */
 
 #define Ccc (CONST char) /* Ccc = CONST char cast */
-static CONST char baseMapReverse [] = {
+static CONST char baseMapReverse [] = { /* THREADING: constant, read-only => safe */
   Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200,
   Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200,
   Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200,
@@ -219,7 +220,9 @@ int
 TrfInit_B64 (interp)
 Tcl_Interp* interp;
 {
+  TrfLock; /* THREADING: serialize initialization */
   convDefinition.options = Trf_ConverterOptions ();
+  TrfUnlock;
 
   return Trf_Register (interp, &convDefinition);
 }
@@ -336,15 +339,17 @@ ClientData clientData;
 #define CRLF_AT(i,v) ((v[i] == '\r') && (v[i+1] == '\n'))
 #define CRLF_IN(v) (CRLF_AT(0,v) || CRLF_AT(1,v))
 
-    /* dbg + */
+    /* dbg + * /
     if (CRLF_IN (c->buf)){ 
       printf ("split (%d,%d,%d) = %d,%d,%d,%d = ",
 	      c->buf [0], c->buf [1], c->buf [2],
 	      buf [0], buf [1], buf [2], buf [3]);
     }
+    /**/
 
     TrfApplyEncoding (buf, 4, baseMap);
 
+    /** /
     if (CRLF_IN (c->buf)) {
       printf ("%c%c%c%c\n", buf [0], buf [1], buf [2], buf [3]);
       fflush (stdout);

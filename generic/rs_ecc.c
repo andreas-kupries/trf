@@ -93,7 +93,7 @@ static void             ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 static Trf_TypeDefinition convDefinition =
 {
   "rs_ecc",
-  NULL, /* filled later by TrfInit_RS_ECC */
+  NULL, /* filled later by TrfInit_RS_ECC */ /* THREADING: serialize initialization */
   NULL, /* not used */
   {
     CreateEncoder,
@@ -164,7 +164,9 @@ int
 TrfInit_RS_ECC (interp)
 Tcl_Interp* interp;
 {
+  TrfLock; /* THREADING: serialize initialization */
   convDefinition.options = Trf_ConverterOptions ();
+  TrfUnlock;
 
   return Trf_Register (interp, &convDefinition);
 }
@@ -790,5 +792,6 @@ ClientData       clientData;
  * External code from here on.
  */
 
+/* #include rs-ecc/*.c: THREADING: import of three constant vars, read-only => safe */
 #include "rs-ecc/gflib.c"
 #include "rs-ecc/rslib.c"

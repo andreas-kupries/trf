@@ -83,7 +83,7 @@ static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
 Trf_OptionVectors*
 TrfZIPOptions ()
 {
-  static Trf_OptionVectors optVec =
+  static Trf_OptionVectors optVec = /* THREADING: constant, read-only => safe */
     {
       CreateOptions,
       DeleteOptions,

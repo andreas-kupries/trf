@@ -73,7 +73,7 @@ static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options, ClientData c
 Trf_OptionVectors*
 Trf_ConverterOptions ()
 {
-  static Trf_OptionVectors optVec =
+  static Trf_OptionVectors optVec = /* THREADING: constant, read-only => safe */
     {
       CreateOptions,
       DeleteOptions,

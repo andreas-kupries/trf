@@ -50,11 +50,18 @@ node trf_conv {
 		representation as defined in the 'Postscript Reference
 		Manual' (2nd Edition, section 3.13, page 129)."
 	    }
+	    defrow otp_words {
+		p "Blocks of 64-bits are encoded as six English words,
+		as defined in [rfc 2289].
+                See also [link _ otp_md5 trf_md.html].
+		"
+	    }
 	}
 
 	p "
-	All of these are able to convert an incomplete block at the
-	end of input."
-
+	With the exception of [strong otp_words]
+	all of these are able to convert an incomplete block at the
+	end of input.
+	"
     }
 }

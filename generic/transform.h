@@ -1,3 +1,5 @@
+#ifndef TRF_H
+#define TRF_H
 /* -*- c -*-
  *
  * transform.h - externally visible facilities of data transformers
@@ -27,8 +29,9 @@
  * CVS: $Id$
  */
 
-#ifndef TRF_H
-#define TRF_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <tcl.h>
 
@@ -800,4 +803,7 @@ TRF_EXPORT (void,Trf_FlipRegisterLong) _ANSI_ARGS_ ((VOID* buffer, int length));
 #undef  TCL_STORAGE_CLASS
 #define TCL_STORAGE_CLASS DLLIMPORT
 
+#ifdef __cplusplus
+}
+#endif /* C++ */
 #endif /* TRF_H */

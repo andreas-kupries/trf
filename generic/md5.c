@@ -38,7 +38,11 @@
  * message digest.
  */
 
+#ifndef OTP
 #define DIGEST_SIZE               (16)
+#else
+#define DIGEST_SIZE               (8)
+#endif
 #define CTX_TYPE                  MD5_CTX
 
 /*
@@ -54,8 +58,12 @@ static void MD_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
  * Generator definition.
  */
 
-static Trf_MessageDigestDescription mdDescription = {
+static Trf_MessageDigestDescription mdDescription = { /* THREADING: constant, read-only => safe */
+#ifndef OTP 
   "md5",
+#else
+  "otp_md5",
+#endif
   sizeof (CTX_TYPE),
   DIGEST_SIZE,
   MD_Start,
@@ -84,7 +92,11 @@ static Trf_MessageDigestDescription mdDescription = {
  */
 
 int
+#ifndef	OTP
 TrfInit_MD5 (interp)
+#else
+TrfInit_OTP_MD5 (interp)
+#endif
 Tcl_Interp* interp;
 {
   return Trf_RegisterMessageDigest (interp, &mdDescription);
@@ -197,11 +209,25 @@ MD_Final (context, digest)
 VOID* context;
 VOID* digest;
 {
+#ifndef OTP
   MD5Final ((unsigned char*) digest, (MD5_CTX*) context);
+#else
+    int    i;
+    unsigned char result[16];
+
+    MD5Final ((unsigned char*) result, (MD5_CTX*) context);
+
+    for (i = 0; i < 8; i++)
+        result[i] ^= result[i + 8];
+
+    memcpy ((VOID *) digest, (VOID *) result, DIGEST_SIZE);
+#endif
 }
 
 /*
  * External code from here on.
  */
 
-#include "md5/md5.c"
+#ifndef OTP
+#include "md5/md5.c" /* THREADING: import of one constant var, read-only => safe */
+#endif

@@ -1,3 +1,31 @@
+Sun May 30 10:49:42 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* Threading: Done.
+
+Sat May 29 22:56:31 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* The patchkit for Tcl 8.1 is usable for Tcl 8.1.1 too. No new
+	  patchkit was made.
+
+	* generic/*.[ch]: Went through the code and looked for possible
+ 	  problems with regard to multi-threading (written global
+ 	  variables). Marked all found places with /* THREADING */ and
+ 	  some additional explanation.
+
+Thu May 27 00:16:17 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* doc/nodes/ (md.node, conv.node, cmd.node): Integrated OTP
+	  documentation from Marshall Rose.
+
+	* generic/ (transformInt.h, registry.c, init.c, otp*.c, md5.c,
+	  sha1.c): Integrated OTP code from Marshall Rose
+	  <mrose@dbc.mtview.ca.us>.
+
+Tue May 25 23:22:21 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/*.h: Added preprocessor definitions allowing the usage
+	  of the headers with a C++ compiler.
+
 Fri May  7 20:47:56 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* --------------- 1.6 re-release ------------------

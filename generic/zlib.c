@@ -39,12 +39,19 @@ static char* symbols [] = {
  * Global variable containing the vectors into the 'zlib'-library.
  */
 
-zFunctions z = {0};
+zFunctions z = {0}; /* THREADING: serialize initialization */
 
 
 int
 TrfLoadZlib (interp)
     Tcl_Interp* interp;
 {
-  return Trf_LoadLibrary (interp, Z_LIB_NAME, (VOID**) &z, symbols, 10);
+  int res;
+
+  TrfLock; /* THREADING: serialize initialization */
+
+  res = Trf_LoadLibrary (interp, Z_LIB_NAME, (VOID**) &z, symbols, 10);
+  TrfUnlock;
+
+  return res
 }

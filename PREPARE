@@ -20,7 +20,8 @@ mInsertInfo \
 	doc/nodes/home.node doc/nodes/install.node doc/nodes/intro.node \
 	doc/nodes/urls.def generic/transform.h generic/patchlevel.h     \
 	mac/README                                    \
-	unix/README unix/configure.in unix/Makefile.in
+	unix/README unix/configure.in unix/Makefile.in \
+	patches/v8.1.1/README
 
 set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mShortDosVersion@).dll"
 eval mInsertInfo \
@@ -32,6 +33,8 @@ mGetDescription
 mExpandUrls
 mGenerateLSM
 mGenerateANNOUNCE
+
+package require MSA ; mGenerateAnnounceMail ; # mSupport AMAIL
 
 
 

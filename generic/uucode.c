@@ -92,7 +92,7 @@ static Trf_TypeDefinition convDefinition =
 {
   "uuencode",
   NULL, /* clientData not used by converters */
-  NULL, /* set later by Trf_InitUU */
+  NULL, /* set later by Trf_InitUU */ /* THREADING: serialize initialization */
   {
     CreateEncoder,
     DeleteEncoder,
@@ -148,6 +148,7 @@ typedef struct _DecoderControl_ {
  *                                       1         2         3         4         5          6   6
  *                            01 2345678901234567890123456789012345678901234567890123456789 01234 */
 static CONST char* uuMap   = "`!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_~";
+/* uuMap: THREADING: constant, read-only => safe */
 
 #define PAD '~'
 
@@ -159,7 +160,7 @@ static CONST char* uuMap   = "`!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOP
  */
 
 #define Ccc (CONST char) /* Ccc = CONST char cast */
-static CONST char uuMapReverse [] = {
+static CONST char uuMapReverse [] = { /* THREADING: constant, read-only => safe */
   Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200,
   Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200,
   Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200, Ccc 0200,
@@ -219,7 +220,9 @@ int
 TrfInit_UU (interp)
 Tcl_Interp* interp;
 {
+  TrfLock; /* THREADING: serialize initialization */
   convDefinition.options = Trf_ConverterOptions ();
+  TrfUnlock;
 
   return Trf_Register (interp, &convDefinition);
 }

@@ -37,7 +37,11 @@
  * message digest.
  */
 
+#ifndef OTP
 #define DIGEST_SIZE               (SHA_DIGEST_LENGTH)
+#else
+#define DIGEST_SIZE               (8)
+#endif
 #define CTX_TYPE                  SHA_CTX
 
 /*
@@ -54,8 +58,12 @@ static int  MD_Check     _ANSI_ARGS_ ((Tcl_Interp* interp));
  * Generator definition.
  */
 
-static Trf_MessageDigestDescription mdDescription = {
+static Trf_MessageDigestDescription mdDescription = { /* THREADING: constant, read-only => safe */
+#ifndef OTP
   "sha1",
+#else
+  "otp_sha1",
+#endif
   sizeof (CTX_TYPE),
   DIGEST_SIZE,
   MD_Start,
@@ -84,7 +92,11 @@ static Trf_MessageDigestDescription mdDescription = {
  */
 
 int
+#ifndef OTP
 TrfInit_SHA1 (interp)
+#else
+TrfInit_OTP_SHA1 (interp)
+#endif
 Tcl_Interp* interp;
 {
   return Trf_RegisterMessageDigest (interp, &mdDescription);
@@ -197,7 +209,20 @@ MD_Final (context, digest)
 VOID* context;
 VOID* digest;
 {
+#ifndef OTP
   sha1f.final ((unsigned char*) digest, (SHA_CTX*) context);
+#else
+    unsigned int result[SHA_DIGEST_LENGTH / sizeof (char)];
+
+    sha1f.final ((unsigned char*) result, (SHA_CTX*) context);
+
+    result[0] ^= result[2];
+    result[1] ^= result[3];
+    result[0] ^= result[4];
+
+    Trf_FlipRegisterLong ((VOID*) result, DIGEST_SIZE);
+    memcpy ((VOID *) digest, (VOID *) result, DIGEST_SIZE);
+#endif
 }
 
 /*

@@ -88,11 +88,7 @@ int               length;
     case 0:
     default:
       /* should not happen */
-#if GT81
       Tcl_Panic ("illegal length given to TrfSplit3to4");
-#else
-      panic ("illegal length given to TrfSplit3to4");
-#endif
     }
   }
 }
@@ -220,11 +216,7 @@ int*           hasPadding;
   int i, pad, maplen;
 
   if ((length < 1) || (length > 4)) {
-#if GT81
     Tcl_Panic ("illegal length given to TrfReverseEncoding");
-#else
-    panic ("illegal length given to TrfReverseEncoding");
-#endif
   }
 
   pad = 4 - length;
@@ -465,6 +457,9 @@ int   length;
   }
 }
 
+/*
+ *------------------------------------------------------*
+ */
 /* internal procedures, for testing */
 
 void

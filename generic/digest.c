@@ -82,7 +82,7 @@ static void             ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
  * Generator definition.
  */
 
-static Trf_TypeDefinition mdDefinition =
+static Trf_TypeDefinition mdDefinition = /* THREADING: constant, read-only => safe */
 {
   NULL, /* filled later by Trf_RegisterMessageDigest (in a copy) */
   NULL, /* filled later by Trf_RegisterMessageDigest (in a copy) */
@@ -196,6 +196,7 @@ CONST Trf_MessageDigestDescription* md_desc;
 {
   Trf_TypeDefinition* md;
 
+  /* THREADING: read-only access => safe */
   md = (Trf_TypeDefinition*) Tcl_Alloc (sizeof (Trf_TypeDefinition));
 
   memcpy ((VOID*) md, (VOID*) &mdDefinition, sizeof (Trf_TypeDefinition));

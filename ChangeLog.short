@@ -1,7 +1,22 @@
+Changes from 1.6 to 1.7
+
+*	Headers now usable with a C++ compiler.
+
+*	Marshall Rose <mrose@dbc.mtview.ca.us> donated code to
+	implement the otp variants of md5 and sha1, according
+	to RFC 2289.
+
+*	The option processor now understands '--', it will stop
+	the treatment of the following arguments as options. Again
+	from Marshall Rose.
+
+*	The patchkit for Tcl 8.1 is usable for Tcl 8.1.1 too.
+	No new patchkit was made.
+
+
 Changes from 1.6 to 1.6
 
 *	Added the patch kit for tcl 8.1 final
-
 
 Changes from 1.5 to 1.6
 

@@ -157,6 +157,11 @@ Tcl_Interp* interp;
     if (res != TCL_OK)
       return res;
 
+    res = TrfInit_OTP_MD5 (interp);
+
+    if (res != TCL_OK)
+      return res;
+
     res = TrfInit_MD2 (interp);
 
     if (res != TCL_OK)
@@ -173,6 +178,11 @@ Tcl_Interp* interp;
       return res;
 
     res = TrfInit_SHA1 (interp);
+
+    if (res != TCL_OK)
+      return res;
+
+    res = TrfInit_OTP_SHA1 (interp);
 
     if (res != TCL_OK)
       return res;
@@ -221,6 +231,11 @@ Tcl_Interp* interp;
       return res;
 
     res = TrfInit_Oct (interp);
+
+    if (res != TCL_OK)
+      return res;
+
+    res = TrfInit_OTP_WORDS (interp);
 
     if (res != TCL_OK)
       return res;
@@ -288,3 +303,42 @@ Tcl_Interp* interp;
 
   return hTablePtr != (Tcl_HashTable*) NULL;
 }
+
+#if GT81 && defined (TCL_THREADS) /* THREADING: lock procedures */
+/*
+ *------------------------------------------------------*
+ *
+ *	Trf(Un)Lock --
+ *
+ *	------------------------------------------------*
+ *	Internal functions, used to serialize write-access
+ *	to several global variables. Required only for
+ *	a thread-enabled Tcl 8.1.x
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		None.
+ *
+ *	Result:
+ *		1 if and onlly if the extension is already
+ *		initialized in the specified interpreter,
+ *		0 else.
+ *
+ *------------------------------------------------------*
+ */
+
+TCL_DECLARE_MUTEX(trfInitMutex)
+
+void
+TrfLock ()
+{
+  TcL_MutexLock (&trfInitMutex);
+}
+
+void
+TrfUnlock ()
+{
+  TcL_MutexUnlock (&trfInitMutex);
+}
+
+#endif /* GT81 */

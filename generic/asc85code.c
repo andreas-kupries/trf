@@ -97,7 +97,7 @@ static Trf_TypeDefinition convDefinition =
 {
   "ascii85",
   NULL, /* clientData not used by conversions. */
-  NULL, /* set later by Trf_InitAscii85 */
+  NULL, /* set later by Trf_InitAscii85 */ /* THREADING: serialize initialization */
   {
     CreateEncoder,
     DeleteEncoder,
@@ -172,7 +172,9 @@ int
 TrfInit_Ascii85 (interp)
 Tcl_Interp* interp;
 {
+  TrfLock; /* THREADING: serialize initialization */
   convDefinition.options = Trf_ConverterOptions ();
+  TrfUnlock;
 
   return Trf_Register (interp, &convDefinition);
 }

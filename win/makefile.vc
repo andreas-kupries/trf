@@ -46,7 +46,7 @@ MSVCRT_SYS	= c:\windows\system\msvcrt.dll
 # The name of the SSLeay library changed from crypto32.dll to the value
 # given below. Relevant only for SSLeay 0.9 and opensll 0.9.2b.
 
-#SSL_LIBRARY	= -DSSL_LIB_NAME=libeay32.dll
+#SSL_LIBRARY	= -DSSL_LIB_NAME=\"libeay32.dll\"
 
 
 # Set this to the appropriate value of /MACHINE: for your platform
@@ -88,6 +88,9 @@ TRFOBJS = \
 	$(TMPDIR)\md5.obj \
 	$(TMPDIR)\md2.obj \
 	$(TMPDIR)\octcode.obj \
+	$(TMPDIR)\otpcode.obj \
+	$(TMPDIR)\otpmd5.obj \
+	$(TMPDIR)\otpsha1.obj \
 	$(TMPDIR)\registry.obj \
 	$(TMPDIR)\rs_ecc.obj \
 	$(TMPDIR)\sha.obj \

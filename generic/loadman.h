@@ -1,9 +1,12 @@
+#ifndef TRF_LOADMANAGER_H
+#define TRF_LOADMANAGER_H
+
 /* -*- c -*-
  * loadman.h -
  *
  * internal definitions for loading of shared libraries required by Trf.
  *
- * Copyright (c) 1996 Andreas Kupries (a.kupries@westend.com)
+ * Copyright (c) 1996-1999 Andreas Kupries (a.kupries@westend.com)
  * All rights reserved.
  *
  * Permission is hereby granted, without written agreement and without
@@ -26,9 +29,6 @@
  * CVS: $Id$
  */
 
-#ifndef TRF_LOADMANAGER_H
-#define TRF_LOADMANAGER_H
-
 /*
  * The procedures defined here manage the loading of libraries required
  * by various glue-code for crytographic algorithms. Dependent on the
@@ -40,6 +40,10 @@
  * to do the filling.
  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "transformInt.h"
 
 #ifdef HAVE_MD2_H
@@ -47,6 +51,7 @@
 #else
 #   include "compat/md2.h"
 #endif
+
 #ifdef HAVE_SHA_H
 #   include <sha.h>
 #else
@@ -62,9 +67,12 @@
 # define TCL_STORAGE_CLASS DLLIMPORT
 #endif
 
+/* Structures, variables and functions to load and access the functionality
+ * required for MD2 and SHA1. Affected command in case of failure: md2, sha1.
+ */
 
-/* MD2, message digest.
- * Affected command in case of failure: md2
+/* Structures containing the vectors to jump through to the implementation
+ * of the functionality.
  */
 
 typedef struct Md2Functions {
@@ -74,16 +82,6 @@ typedef struct Md2Functions {
   void (* final)  _ANSI_ARGS_ ((unsigned char* digest, MD2_CTX* c));
 } md2Functions;
 
-EXTERN md2Functions md2f;
-
-EXTERN int
-TrfLoadMD2 _ANSI_ARGS_ ((Tcl_Interp *interp));
-
-
-/* SHA1, message digest.
- * Affected command in case of failure: sha1
- */
-
 typedef struct Sha1Functions {
   long loaded;
   void (* init)   _ANSI_ARGS_ ((SHA_CTX* c));
@@ -91,7 +89,17 @@ typedef struct Sha1Functions {
   void (* final)  _ANSI_ARGS_ ((unsigned char* digest, SHA_CTX* c));
 } sha1Functions;
 
-EXTERN sha1Functions sha1f;
+/* Global variables containing the vectors declared above. 99% of the time they
+ * are read, but during load a write is required, which has to be protected by
+ * a mutex in case of a thread-enabled Tcl.
+ */
+
+EXTERN md2Functions  md2f;  /* THREADING: serialize initialization */
+EXTERN sha1Functions sha1f; /* THREADING: serialize initialization */
+
+
+EXTERN int
+TrfLoadMD2 _ANSI_ARGS_ ((Tcl_Interp *interp));
 
 EXTERN int
 TrfLoadSHA1 _ANSI_ARGS_ ((Tcl_Interp *interp));
@@ -100,5 +108,7 @@ TrfLoadSHA1 _ANSI_ARGS_ ((Tcl_Interp *interp));
 #undef TCL_STORAGE_CLASS
 #define TCL_STORAGE_CLASS DLLIMPORT
 
+#ifdef __cplusplus
+}
+#endif /* C++ */
 #endif /* TRF_LOADMANAGER_H */
-

@@ -67,7 +67,7 @@ static void CountLength  _ANSI_ARGS_ ((ripemd_context* ctx,
  * Generator definition.
  */
 
-static Trf_MessageDigestDescription mdDescription = {
+static Trf_MessageDigestDescription mdDescription = { /* THREADING: constant, read-only => safe */
   "ripemd160",
   sizeof (ripemd_context),
   DIGEST_SIZE,

@@ -97,8 +97,8 @@ static void             ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 static Trf_TypeDefinition reflectDefinition =
 {
   "transform",
-  NULL, /* filled later (TrfInit_XXX) */
-  NULL, /* filled later (TrfInit_XXX) */
+  NULL, /* filled later (TrfInit_Transform) */ /* THREADING: serialize initialization */
+  NULL, /* filled later (TrfInit_Transform) */ /* THREADING: serialize initialization */
   {
     CreateEncoder,
     DeleteEncoder,
@@ -182,7 +182,9 @@ int
 TrfInit_Transform (interp)
 Tcl_Interp* interp;
 {
+  TrfLock; /* THREADING: serialize initialization */
   reflectDefinition.options = TrfTransformOptions ();
+  TrfUnlock;
 
   return Trf_Register (interp, &reflectDefinition);
 }

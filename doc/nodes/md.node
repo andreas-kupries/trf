@@ -16,8 +16,8 @@ node trf_md {
 	    resp."
 
 	    li "The adler-checksum, taken from [zlib] too."
-	    li "MD2, MD5"
-	    li "SHA (or SHS), SHA-1"
+	    li "MD2, MD5, the OTP variant of MD5"
+	    li "SHA (or SHS), SHA-1, the OTP variant of SHA1"
 	    li "HAVAL"
 	    li "[rmd], -128"
 	}

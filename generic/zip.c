@@ -89,7 +89,7 @@ static Trf_TypeDefinition convDefinition =
 {
   "zip",
   NULL, /* client data not used       */
-  NULL, /* filled later (TrfInit_ZIP) */
+  NULL, /* filled later (TrfInit_ZIP) */ /* THREADING: serialize initialization */
   {
     CreateEncoder,
     DeleteEncoder,
@@ -162,7 +162,9 @@ int
 TrfInit_ZIP (interp)
 Tcl_Interp* interp;
 {
+  TrfLock; /* THREADING: serialize initialization */
   convDefinition.options = TrfZIPOptions ();
+  TrfUnlock;
 
   return Trf_Register (interp, &convDefinition);
 }

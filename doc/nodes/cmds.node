@@ -85,12 +85,13 @@ node trf_cmds {
 		    table {
 			tr valign=top [list Command Type Location]
 			thline 3
-			tr valign=top [list ascii85 [cv]		[trf]]
-			tr valign=top [list base64  [cv]		[trf]]
-			tr valign=top [list bin	  [cv]			[trf]]
-			tr valign=top [list hex	  [cv]			[trf]]
-			tr valign=top [list oct	  [cv]			[trf]]
-			tr valign=top [list uuencode [cv]		[trf]]
+			tr valign=top [list ascii85	[cv]		[trf]]
+			tr valign=top [list base64	[cv]		[trf]]
+			tr valign=top [list bin		[cv]		[trf]]
+			tr valign=top [list hex		[cv]		[trf]]
+			tr valign=top [list oct		[cv]		[trf]]
+			tr valign=top [list otp_words	[cv]		[trf]]
+			tr valign=top [list uuencode	[cv]		[trf]]
 			thline 3
 			tr valign=top [list [link binioT] {Binary I/O} [trf]]
 			tr valign=top [list [link rsEccT] {Error correcting coder} [trf]]
@@ -110,10 +111,12 @@ node trf_cmds {
 			tr valign=top [list haval     [md]	[trf]]
 			tr valign=top [list md2	      [md]	[SSLeay]]
 			tr valign=top [list md5	      [md]	[trf]]
+			tr valign=top [list otp_md5   [md]	[trf]]
 			tr valign=top [list ripemd160 [md]	[trf]]
 			tr valign=top [list ripemd128 [md]	[trf]]
 			tr valign=top [list sha	      [md]	[trf]]
 			tr valign=top [list sha1      [md]	[SSLeay]]
+			tr valign=top [list otp_sha1  [md]	[SSLeay]]
 			thline 3
 		    }
 		}

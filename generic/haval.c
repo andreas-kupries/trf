@@ -54,7 +54,7 @@ static void MD_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
  * Generator definition.
  */
 
-static Trf_MessageDigestDescription mdDescription = {
+static Trf_MessageDigestDescription mdDescription = { /* THREADING: constant, read-only => safe */
   "haval",
   sizeof (CTX_TYPE),
   DIGEST_SIZE,
@@ -204,4 +204,4 @@ VOID* digest;
  * External code from here on.
  */
 
-#include "haval.1996/haval.c"
+#include "haval.1996/haval.c" /* THREADING: import of one constant var, read-only => safe */

@@ -89,7 +89,7 @@ static Trf_TypeDefinition convDefinition =
 {
   "hex",
   NULL, /* clientData not sed by converters */
-  NULL, /* set later by TrfInit_Hex */
+  NULL, /* set later by TrfInit_Hex */ /* THREADING: serialize initialization */
   {
     CreateEncoder,
     DeleteEncoder,
@@ -150,7 +150,9 @@ int
 TrfInit_Hex (interp)
 Tcl_Interp* interp;
 {
+  TrfLock; /* THREADING: serialize initialization */
   convDefinition.options = Trf_ConverterOptions ();
+  TrfUnlock;
 
   return Trf_Register (interp, &convDefinition);
 }
@@ -265,7 +267,7 @@ ClientData clientData;
    * Use table lookup
    */
 
-  static const char* code [] = {
+  static const char* code [] = { /* THREADING: constant, read-only => safe */
     "00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0A", "0B", "0C", "0D", "0E", "0F",
     "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1A", "1B", "1C", "1D", "1E", "1F",
     "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "2A", "2B", "2C", "2D", "2E", "2F",

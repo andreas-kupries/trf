@@ -69,7 +69,7 @@ static Trf_MessageDigestDescription mdDescription = {
  * Additional declarations
  */
 
-static crcword CrcTable [256];
+static crcword CrcTable [256]; /* THREADING: serialize initialization */
 
 static void
 GenCrcLookupTable _ANSI_ARGS_ ((crcword polynomial));
@@ -262,6 +262,9 @@ crcword poly;
   /* -*- PGP -*-, was 'mk_crctbl' */
   int i;
   crcword t, *p, *q;
+
+  TrfLock; /* THREADING: serialize initialization */
+
   p = q = CrcTable;
 
   *q++ = 0;
@@ -283,5 +286,7 @@ crcword poly;
 	  *q++ = t ^ poly;
 	}
     }
+
+  TrfUnlock;
   /* -*- PGP -*- */
 }

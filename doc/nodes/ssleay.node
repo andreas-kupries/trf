@@ -25,10 +25,11 @@ node trf_ssleay {
 	version."
 
 	p "
-	A binary distribution for [win] is available, at the master
-	location and the associated mirrors. The shared library
+	A binary distribution for [win] is currently not available, but the
+	OpenSSL sources contain a makefile for Windows, allowing its
+	compilation on that platform. The generated shared library
 	[afile crypto32.dll] contains the required MD2 / SHA-1 functionality."
 
-	p "I have no information about its availability on MacIntoshes."
+	p "I have no information about its availability on MacIntosh'es."
     }
 }

@@ -219,8 +219,9 @@ CVT_ALG_SRC	=	$(GENERIC_DIR)/bincode.c	\
 			$(GENERIC_DIR)/uucode.c		\
 			$(GENERIC_DIR)/b64code.c	\
 			$(GENERIC_DIR)/asc85code.c	\
+			$(GENERIC_DIR)/otpcode.c	\
 			$(GENERIC_DIR)/reflect.c
-CVT_ALG_OBJ	=	bincode.o hexcode.o octcode.o uucode.o b64code.o asc85code.o reflect.o
+CVT_ALG_OBJ	=	bincode.o hexcode.o octcode.o uucode.o b64code.o asc85code.o otpcode.o reflect.o
 
 
 #		message digests, base & algorithms
@@ -235,10 +236,13 @@ MD_SRC		=	$(GENERIC_DIR)/dig_opt.c	\
 			$(GENERIC_DIR)/md2.c		\
 			$(GENERIC_DIR)/sha1.c		\
 			$(GENERIC_DIR)/rmd160.c		\
-			$(GENERIC_DIR)/rmd128.c
-MD_OBJ		=	dig_opt.o digest.o crc.o md5.o haval.o sha.o	\
-			adler.o crc_zlib.o md2.o sha1.o rmd160.o rmd128.o
+			$(GENERIC_DIR)/rmd128.c		\
+			$(GENERIC_DIR)/otpmd5.c		\
+			$(GENERIC_DIR)/otpsha1.c
 
+MD_OBJ		=	dig_opt.o digest.o crc.o md5.o haval.o sha.o	\
+			adler.o crc_zlib.o md2.o sha1.o rmd160.o rmd128.o \
+			otpmd5.o otpsha1.o
 
 
 #		error correction
@@ -411,6 +415,9 @@ b64code.o: $(GENERIC_DIR)/b64code.c
 asc85code.o: $(GENERIC_DIR)/asc85code.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/asc85code.c -o $@
 
+otpcode.o: $(GENERIC_DIR)/otpcode.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/otpcode.c -o $@
+
 dig_opt.o: $(GENERIC_DIR)/dig_opt.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/dig_opt.c -o $@
 
@@ -440,6 +447,12 @@ rmd160.o: $(GENERIC_DIR)/rmd160.c
 
 rmd128.o: $(GENERIC_DIR)/rmd128.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/rmd128.c -o $@
+
+otpmd5.o: $(GENERIC_DIR)/otpmd5.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/otpmd5.c -o $@
+
+otpsha1.o: $(GENERIC_DIR)/otpsha1.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/otpsha1.c -o $@
 
 adler.o: $(GENERIC_DIR)/adler.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/adler.c -o $@

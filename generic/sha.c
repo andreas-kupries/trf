@@ -73,7 +73,7 @@ static void MD_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
  * Generator definition.
  */
 
-static Trf_MessageDigestDescription mdDescription = {
+static Trf_MessageDigestDescription mdDescription = { /* THREADING: constant, read-only => safe */
   "sha",
   sizeof (CTX_TYPE),
   DIGEST_SIZE,

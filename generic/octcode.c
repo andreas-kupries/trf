@@ -90,7 +90,7 @@ static Trf_TypeDefinition convDefinition =
 {
   "oct",
   NULL, /* clientData not used by converters */
-  NULL, /* set later by TrfInit_Oct */
+  NULL, /* set later by TrfInit_Oct */ /* THREADING: serialize initialization */
   {
     CreateEncoder,
     DeleteEncoder,
@@ -151,7 +151,9 @@ int
 TrfInit_Oct (interp)
 Tcl_Interp* interp;
 {
+  TrfLock; /* THREADING: serialize initialization */
   convDefinition.options = Trf_ConverterOptions ();
+  TrfUnlock;
 
   return Trf_Register (interp, &convDefinition);
 }
@@ -265,7 +267,7 @@ ClientData clientData;
    * Use table lookup
    */
 
-  static const char* code [] = {
+  static const char* code [] = { /* THREADING: constant, read-only => safe */
     "000", "001", "002", "003", "004", "005", "006", "007",
     "010", "011", "012", "013", "014", "015", "016", "017",
     "020", "021", "022", "023", "024", "025", "026", "027",

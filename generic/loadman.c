@@ -57,8 +57,8 @@ static char* ssl_symbols [] = {
  * Global variables containing the vectors to DES, MD2, ...
  */
 
-md2Functions  md2f  = {0};
-sha1Functions sha1f = {0};
+md2Functions  md2f  = {0}; /* THREADING: serialize initialization */
+sha1Functions sha1f = {0}; /* THREADING: serialize initialization */
 
 
 /*
@@ -66,7 +66,7 @@ sha1Functions sha1f = {0};
  *                            contains all vectors loaded from 'libdes' library.
  */
 
-static sslLibFunctions ssl;
+static sslLibFunctions ssl; /* THREADING: serialize initialization */
 
 /*
  *------------------------------------------------------*
@@ -96,8 +96,12 @@ TrfLoadMD2 (interp)
 {
   int res;
 
-  if (md2f.loaded)
+  TrfLock; /* THREADING: serialize initialization */
+
+  if (md2f.loaded) {
+    TrfUnlock;
     return TCL_OK;
+  }
 
   res = Trf_LoadLibrary (interp, SSL_LIB_NAME, (VOID**) &ssl, ssl_symbols, 0);
 
@@ -105,13 +109,17 @@ TrfLoadMD2 (interp)
       (ssl.md2_init   != NULL) &&
       (ssl.md2_update != NULL) &&
       (ssl.md2_final  != NULL)) {
+
+    md2f.loaded = 1;
     md2f.init   = ssl.md2_init;
     md2f.update = ssl.md2_update;
     md2f.final  = ssl.md2_final;
-    md2f.loaded      = 1;
+
+    TrfUnlock;
     return TCL_OK;
   }
 
+  TrfUnlock;
   return TCL_ERROR;
 }
 
@@ -144,8 +152,12 @@ TrfLoadSHA1 (interp)
 {
   int res;
 
-  if (sha1f.loaded)
+  TrfLock; /* THREADING: serialize initialization */
+
+  if (sha1f.loaded) {
+    TrfUnlock;
     return TCL_OK;
+  }
 
   res = Trf_LoadLibrary (interp, SSL_LIB_NAME, (VOID**) &ssl, ssl_symbols, 0);
 
@@ -153,13 +165,17 @@ TrfLoadSHA1 (interp)
       (ssl.sha1_init   != NULL) &&
       (ssl.sha1_update != NULL) &&
       (ssl.sha1_final  != NULL)) {
+
+    sha1f.loaded = 1;
     sha1f.init   = ssl.sha1_init;
     sha1f.update = ssl.sha1_update;
     sha1f.final  = ssl.sha1_final;
-    sha1f.loaded = 1;
+
+    TrfUnlock;
     return TCL_OK;
   }
 
+  TrfUnlock;
   return TCL_ERROR;
 }
 

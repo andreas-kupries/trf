@@ -38,3 +38,8 @@ proc personMH {code name email home} {
     # it is placed on the homepage somewhere
     personH $code $name $home
 }
+
+
+proc rfc {n} {
+    link _ [man "RFC $n"] http://www.rfc-editor.org/rfc/rfc$n.txt
+}

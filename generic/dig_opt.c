@@ -80,7 +80,7 @@ static int         DigestMode _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* mode
 Trf_OptionVectors*
 TrfMDOptions ()
 {
-  static Trf_OptionVectors optVec =
+  static Trf_OptionVectors optVec = /* THREADING: constant, read-only => safe */
     {
       CreateOptions,
       DeleteOptions,
@@ -297,11 +297,7 @@ ClientData             clientData;
 	}
       }
     } else {
-#if GT81
       Tcl_Panic ("unknown mode given to dig_opt.c::CheckOptions");
-#else
-      panic ("unknown mode given to dig_opt.c::CheckOptions");
-#endif
     }
   }
 
