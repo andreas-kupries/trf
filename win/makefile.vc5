@@ -1,0 +1,291 @@
+# Visual C++ 2.x and 4.0 makefile for Trf @mFullVersion@ (@mDate@)
+#
+# See the file "doc/license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# CVS:	$Id$
+# 
+
+# Does not depend on the presence of any environment variables in
+# order to compile tcl; all needed information is derived from 
+# location of the compiler directories.
+
+#
+# Project directories
+#
+# ROOT    = top of source tree
+#
+# TMPDIR  = location where .obj files should be stored during build
+#
+# TOOLS32 = location of VC++ 32-bit development tools. Note that the
+#	    VC++ 2.0 header files are broken, so you need to use the
+#	    ones that come with the developer network CD's, or later
+#	    versions of VC++.
+#
+# TCL     = location where Tcl is installed.
+#
+# PKZIP	  =	name and path to pkzip archiver application
+#		(required for generation of binary distribution only)
+#
+# TCLSH/TCLLIB
+#	choose the correct location of the installed files at your site.
+#
+
+ROOT		= ..
+TMPDIR		= .
+TOOLS32		= c:\progra~1\devstu~1\vc
+TOOLS32_rc	= c:\progra~1\devstu~1\shared~1
+TCL		= ..\..\tcl8.0
+TCL_INCLUDES	= ..\..\tcl8.0\generic
+TCL_SHORTVERS	= 80
+
+TCLSH		= $(TCL)\win\Release\tclsh$(TCL_SHORTVERS).exe
+TCLLIB		= $(TCL)\win\Release\tcl$(TCL_SHORTVERS).lib
+PKZIP		= pkzip.exe
+MSVCRT		= msvcrt.dll
+MSVCRT_SYS	= c:\windows\system\msvcrt.dll
+
+
+# Set this to the appropriate value of /MACHINE: for your platform
+MACHINE	= IX86
+
+# Comment the following line to compile with symbols
+NODEBUG=1
+
+# uncomment the following line to include the command 'binio'.
+#BINIO=-DENABLE_BINIO
+
+
+######################################################################
+# Do not modify below this line
+######################################################################
+
+TRF		=	trf@mShortDosVersion@
+TRFLIB		=	$(TRF)$(TCL_SHORTVERS).lib
+TRFDLL		=	$(TRF)$(TCL_SHORTVERS).dll
+INSTALLDIR	=	$(TCL)\lib\$(TRF)
+
+
+TRFOBJS = \
+	$(TMPDIR)\adler.obj \
+	$(TMPDIR)\asc85code.obj \
+	$(TMPDIR)\b64code.obj \
+	$(TMPDIR)\bincode.obj \
+	$(TMPDIR)\binio.obj \
+	$(TMPDIR)\convert.obj \
+	$(TMPDIR)\crc.obj \
+	$(TMPDIR)\crc_zlib.obj \
+	$(TMPDIR)\dig_opt.obj \
+	$(TMPDIR)\digest.obj \
+	$(TMPDIR)\haval.obj \
+	$(TMPDIR)\hexcode.obj \
+	$(TMPDIR)\init.obj \
+	$(TMPDIR)\load.obj \
+	$(TMPDIR)\loadman.obj \
+	$(TMPDIR)\md5.obj \
+	$(TMPDIR)\md2.obj \
+	$(TMPDIR)\octcode.obj \
+	$(TMPDIR)\registry.obj \
+	$(TMPDIR)\rs_ecc.obj \
+	$(TMPDIR)\sha.obj \
+	$(TMPDIR)\sha1.obj \
+	$(TMPDIR)\rmd160.obj \
+	$(TMPDIR)\rmd128.obj \
+	$(TMPDIR)\unstack.obj \
+	$(TMPDIR)\util.obj \
+	$(TMPDIR)\uucode.obj \
+	$(TMPDIR)\zip.obj \
+	$(TMPDIR)\zip_opt.obj \
+	$(TMPDIR)\zlib.obj \
+	$(TMPDIR)\reflect.obj \
+	$(TMPDIR)\ref_opt.obj \
+	$(TMPDIR)\tclLoadWin.obj
+
+
+PATH=$(TOOLS32)\bin;$(PATH)
+
+cc32		= $(TOOLS32)\bin\cl.exe
+link32		= $(TOOLS32)\bin\link.exe
+rc32		= $(TOOLS32_rc)\bin\rc.exe
+include32	= -I$(TOOLS32)\include
+CP      	= copy
+RM      	= del
+
+WINDIR          = $(ROOT)\win
+GENERICDIR	= $(ROOT)\generic
+
+TRF_INCLUDES	= -I$(WINDIR) -I$(GENERICDIR) -I$(ROOT) -I$(TCL_INCLUDES)
+TRF_DEFINES	= -nologo -D__WIN32__ -DHAVE_STDLIB_H $(BINIO)
+
+#!include <ntwin32.mak> # thats this for?
+
+
+TRF_CFLAGS	=	$(cdebug) $(cflags) $(cvarsdll) $(include32) \
+			$(TRF_INCLUDES) $(TRF_DEFINES)
+CON_CFLAGS	=	$(cdebug) $(cflags) $(cvars) $(include32) -DCONSOLE
+DOS_CFLAGS	=	$(cdebug) $(cflags) $(include16) -AL 
+
+######################################################################
+# Link flags
+######################################################################
+
+!IFDEF NODEBUG
+ldebug = /RELEASE
+!ELSE
+ldebug = -debug:full -debugtype:cv
+!ENDIF
+
+# declarations common to all linker options
+lcommon = /NODEFAULTLIB /RELEASE /NOLOGO
+
+# declarations for use on Intel i386, i486, and Pentium systems
+!IF "$(MACHINE)" == "IX86"
+DLLENTRY = @12
+lflags   = $(lcommon) -align:0x1000 /MACHINE:$(MACHINE)
+!ELSE
+lflags   = $(lcommon) /MACHINE:$(MACHINE)
+!ENDIF
+
+conlflags = $(lflags) -subsystem:console -entry:mainCRTStartup
+guilflags = $(lflags) -subsystem:windows -entry:WinMainCRTStartup
+dlllflags = $(lflags) -entry:_DllMainCRTStartup$(DLLENTRY) -dll
+
+!IF "$(MACHINE)" == "PPC"
+libc = libc.lib
+libcdll = crtdll.lib
+!ELSE
+libc = libc.lib oldnames.lib
+libcdll = msvcrt.lib oldnames.lib
+!ENDIF
+
+baselibs   = kernel32.lib $(optlibs) advapi32.lib
+winlibs    = $(baselibs) user32.lib gdi32.lib comdlg32.lib winspool.lib
+
+guilibs	   = $(libc) $(winlibs)
+conlibs	   = $(libc) $(baselibs)
+guilibsdll = $(libcdll) $(winlibs)
+conlibsdll = $(libcdll) $(baselibs)
+
+######################################################################
+# Compile flags
+######################################################################
+
+!IFDEF NODEBUG
+cdebug = -Ox
+!ELSE
+cdebug = -Z7 -Od -WX
+!ENDIF
+
+# declarations common to all compiler options
+ccommon = -c -W3 -nologo -YX -Dtry=__try -Dexcept=__except
+
+!IF "$(MACHINE)" == "IX86"
+cflags = $(ccommon) -D_X86_=1
+!ELSE
+!IF "$(MACHINE)" == "MIPS"
+cflags = $(ccommon) -D_MIPS_=1
+!ELSE
+!IF "$(MACHINE)" == "PPC"
+cflags = $(ccommon) -D_PPC_=1
+!ELSE
+!IF "$(MACHINE)" == "ALPHA"
+cflags = $(ccommon) -D_ALPHA_=1
+!ENDIF
+!ENDIF
+!ENDIF
+!ENDIF
+
+cvars      = -DWIN32 -D_WIN32
+cvarsmt    = $(cvars) -D_MT
+cvarsdll   = $(cvarsmt) -D_DLL
+
+######################################################################
+# Project specific targets
+######################################################################
+
+release:    $(TRFDLL)
+all:	    $(TRFDLL)
+test:	    $(TRFDLL)
+	$(TCLSH) <<
+		load $(TRFDLL)
+		cd ../tests
+		source all
+<<
+install:	$(TRFDLL)
+	-@md $(INSTALLDIR)
+	$(CP) $(TRFDLL)              $(INSTALLDIR)\$(TRFDLL)
+	$(CP) $(WINDIR)\pkgIndex.tcl $(INSTALLDIR)\pkgIndex.tcl
+
+
+$(TRFDLL): $(TRFOBJS) $(TMPDIR)\trf.res
+	$(link32) $(ldebug) $(dlllflags) $(TCLLIB) \
+		$(guilibsdll) $(TMPDIR)\trf.res -out:$(TRFDLL) $(TRFOBJS)
+
+bindist:      $(TRFDLL)
+	-@md	$(TRF)
+	-@md	$(TRF)\patches
+	-@md	$(TRF)\patches\v7.6
+	-@md	$(TRF)\patches\v8.0
+	-@$(CP)	$(TRFDLL)		$(TRF)\$(TRFDLL)
+	-@$(CP)	$(WINDIR)\pkgIndex.tcl	$(TRF)\pkgIndex.tcl
+	-@$(CP)	$(WINDIR)\README.VC	$(TRF)\README.VC
+	-@$(CP) $(MSVCRT_SYS)		$(TRF)\$(MSVCRT)
+	-@$(CP) $(ROOT)\patches\v7.6\byteorder.patch	$(TRF)\patches\v7.6
+	-@$(CP) $(ROOT)\patches\v7.6\standard.patch	$(TRF)\patches\v7.6
+	-@$(CP) $(ROOT)\patches\v7.6\tcl.h		$(TRF)\patches\v7.6
+	-@$(CP) $(ROOT)\patches\v7.6\tclIO.c		$(TRF)\patches\v7.6
+	-@$(CP) $(ROOT)\patches\v7.6p2\byteorder.patch	$(TRF)\patches\v7.6p2
+	-@$(CP) $(ROOT)\patches\v7.6p2\standard.patch	$(TRF)\patches\v7.6p2
+	-@$(CP) $(ROOT)\patches\v7.6p2\tcl.h		$(TRF)\patches\v7.6p2
+	-@$(CP) $(ROOT)\patches\v7.6p2\tclIO.c		$(TRF)\patches\v7.6p2
+	-@$(CP) $(ROOT)\patches\v8.0\byteorder.patch	$(TRF)\patches\v8.0
+	-@$(CP) $(ROOT)\patches\v8.0\standard.patch	$(TRF)\patches\v8.0
+	-@$(CP) $(ROOT)\patches\v8.0\tcl.h		$(TRF)\patches\v8.0
+	-@$(CP) $(ROOT)\patches\v8.0\tclIO.c		$(TRF)\patches\v8.0
+	$(PKZIP) -r $(TRF)-win32.zip $(TRF)\*.*
+	-@$(RM)	$(TRF)\$(TRFDLL)
+	-@$(RM)	$(TRF)\pkgIndex.tcl
+	-@$(RM)	$(TRF)\README.VC
+	-@$(RM) $(TRF)\$(MSVCRT)
+	-@$(RM) $(TRF)\patches\v7.6\byteorder.patch
+	-@$(RM) $(TRF)\patches\v7.6\standard.patch
+	-@$(RM) $(TRF)\patches\v7.6\tcl.h
+	-@$(RM) $(TRF)\patches\v7.6\tclIO.c
+	-@rd	$(TRF)\patches\v7.6
+	-@$(RM) $(TRF)\patches\v7.6p2\byteorder.patch
+	-@$(RM) $(TRF)\patches\v7.6p2\standard.patch
+	-@$(RM) $(TRF)\patches\v7.6p2\tcl.h
+	-@$(RM) $(TRF)\patches\v7.6p2\tclIO.c
+	-@rd	$(TRF)\patches\v7.6p2
+	-@$(RM) $(TRF)\patches\v8.0\byteorder.patch
+	-@$(RM) $(TRF)\patches\v8.0\standard.patch
+	-@$(RM) $(TRF)\patches\v8.0\tcl.h
+	-@$(RM) $(TRF)\patches\v8.0\tclIO.c
+	-@rd	$(TRF)\patches\v8.0
+	-@rd	$(TRF)\patches
+	-@rd	$(TRF)
+
+#
+# Implicit rules
+#
+
+{$(WINDIR)}.c{$(TMPDIR)}.obj:
+    $(cc32) $(TRF_CFLAGS) -Fo$(TMPDIR)\ $<
+
+{$(GENERICDIR)}.c{$(TMPDIR)}.obj:
+    $(cc32) $(TRF_CFLAGS) -Fo$(TMPDIR)\ $<
+
+{$(ROOT)\compat}.c{$(TMPDIR)}.obj:
+    $(cc32) $(TRF_CFLAGS) -Fo$(TMPDIR)\ $<
+
+{$(WINDIR)}.rc{$(TMPDIR)}.res:
+	$(rc32) -fo $@ -r -i $(GENERICDIR) -i $(WINDIR) -D__WIN32__ \
+	 $<
+
+clean:
+        -@del *.exp 
+	-@del *.lib 
+	-@del *.dll 
+	-@del *.pch
+        -@del $(TMPDIR)\*.obj
+

@@ -13,7 +13,7 @@ In order to compile Trf for Windows, you need the following items:
 	Tcl 7.6, 8.0* Source distribution
 	A version of 'patch' running under Windows.
 
-	Visual C++ 2.x/4.x
+	Visual C++ 2.x/4.x/5.x
 
 
 First you have to patch and recompile your Tcl distribution. Please read
