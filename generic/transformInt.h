@@ -327,6 +327,7 @@ EXTERN int TrfInit_BLOWFISH  _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_DES       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_RC4       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_RC2       _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_ROT       _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int TrfInit_RS_ECC    _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_ZIP       _ANSI_ARGS_ ((Tcl_Interp* interp));

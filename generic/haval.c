@@ -28,7 +28,7 @@
  */
 
 #include "transformInt.h"
-#include "haval/haval.h"
+#include "haval.1996/haval.h"
 
 /*
  * Generator description
@@ -204,4 +204,4 @@ VOID* digest;
  * External code from here on.
  */
 
-#include "haval/haval.c"
+#include "haval.1996/haval.c"
