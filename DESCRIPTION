@@ -38,11 +38,6 @@ extension trf {
 	ftp://ftp.westend.com/pub/aku/trf@mShortDosVersion@-win32.zip
     }
 
-    secondary-urls {
-	ftp://ftp.kisters.de/pub/lang/tcl/ext/<ARCH>
-	ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mShortDosVersion@-win32.zip
-    }
-
     development-platform {Linux 2.0.29, gcc 2.7.2.1}
     platforms {
 	Linux 2.0.29	(gcc 2.7.2.1)	Development system
