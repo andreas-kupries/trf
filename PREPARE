@@ -9,6 +9,10 @@ set date       [date now]
 set long_date  [clock format [clock scan $date] -format {%B %d, %Y}]
 set short_date [string toupper [clock format [clock scan $date] -format {%d-%b-%Y}]]
 
+# generate version number without dots.
+regsub -all {\.} ${the-version} {} nodot_version
+
+
 replace_in_file LSM                  @DATE@ $short_date
 replace_in_file DESCRIPTION          @DATE@ $long_date
 replace_in_file README               @DATE@ $long_date
@@ -22,6 +26,11 @@ replace_in_file README               @VERSION@ ${the-patchlevel}
 replace_in_file ANNOUNCE             @VERSION@ ${the-patchlevel}
 replace_in_file LSM                  @VERSION@ ${the-patchlevel}
 replace_in_file DESCRIPTION          @VERSION@ ${the-patchlevel}
+
+replace_in_file README               @NODOT_VERSION@ $nodot_version
+replace_in_file ANNOUNCE             @NODOT_VERSION@ $nodot_version
+replace_in_file LSM                  @NODOT_VERSION@ $nodot_version
+replace_in_file DESCRIPTION          @NODOT_VERSION@ $nodot_version
 
 replace_in_file generic/transform.h  @VERSION@       ${the-version}
 replace_in_file generic/transform.h  @MAJOR_VERSION@ $major
@@ -42,16 +51,13 @@ replace_in_file win/README           @VERSION@ ${the-patchlevel}
 replace_in_file unix/README          @DATE@    $long_date
 replace_in_file unix/README          @VERSION@ ${the-patchlevel}
 
-# generate version number without dots.
-regsub -all {\.} ${the-version} {} _
-
 file copy generic/pkgIndex.tcl.in win/pkgIndex.tcl
 replace_in_file win/pkgIndex.tcl @configure_input@ "Distributed at $long_date"
 replace_in_file win/pkgIndex.tcl @TRF_VERSION@  ${the-version}
-replace_in_file win/pkgIndex.tcl @TRF_LIB_FILE@ "trf${_}.dll"
+replace_in_file win/pkgIndex.tcl @TRF_LIB_FILE@ "trf${nodot_version}.dll"
 
 replace_in_file win/makefile.vc @TRF_VERSION@       ${the-version}
-replace_in_file win/makefile.vc @TRF_nodotVERSION@  $_
+replace_in_file win/makefile.vc @TRF_nodotVERSION@  $nodot_version
 replace_in_file win/makefile.vc @DATE@              $long_date
 
 

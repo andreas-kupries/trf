@@ -11,6 +11,7 @@ Keywords:       tcl, conversion, encryption, message digests,
 Author:         a.kupries@westend.com  (Andreas Kupries)
 Maintained-by:  a.kupries@westend.com  (Andreas Kupries)
 Primary-URL:	ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.tar.gz (~500 K)
+		ftp.kisters.de/pub/lang/tcl/ext/trf@NODOT_VERSION@.zip (~500 K)
 		ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.readme (~2 K)
 Platforms:	Linux 1.2.13	(gcc 2.7.0)	Development sytem
 		IRIX 6.2	(cc only)

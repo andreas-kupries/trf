@@ -1,3 +1,30 @@
+Sat Feb 15 22:58:32 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* generic/b64code.c: see below, same thing.
+
+	* generic/uucode.c: added explicit casts to all array
+	  initializers, MSVC was not unable to comprehend that they are
+	  'char's or to convert them into such, at least silently.
+
+	* generic/blowfish.c (BC_Schedule): added explicit casts from 'int'
+	  to 'short'.
+
+	* generic/sha/sha.h: avoid 2nd definition of 'typedef unsigned
+	  long LONG' under windows.
+
+	* generic/init.c: moved TRF_EXPORT definition and usage to
+	  'transform.h'.
+
+	* generic/unstack.c: same as below.
+
+	* generic/binio.c: 'BinioCmd' static now, with proper
+	  declaration.
+
+	* win/makefile.vc: integrated todays experiences with 'nmake'.
+
+	* compat/tclLoadWin.c: added declaration to supress warning about
+	  unknown 'TclWinConvertError'. This procedure is internal to tcl.
+
 Fri Feb 14 19:15:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* win/makefile.vc: first stab at Makefile for windows. Constructed

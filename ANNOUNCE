@@ -1,8 +1,7 @@
 Hello world,
 
-well, after Jan Nijtmans pre-announcement, here comes
-the 2nd beta release of Tcl-Trf, the transformer package enabling
-you to do
+Hereby I announce the transformer package Tcl-Trf @VERSION@
+enabling you to do
 
 *	encryption
 *	data compression,
@@ -23,14 +22,16 @@ Changes from b1 to b2:
 The package compiles cleanly with tcl 8.0a1/2.
 
 It can be found at
-        <ftp://ftp.kisters.de/pub/lang/tcl/ext/trf1.0b2.tar.gz>
-        <ftp://ftp.kisters.de/pub/lang/tcl/ext/trf1.0b2.readme>
+        <ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.tar.gz>
+        <ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@NODOT_VERSION@.zip>
+        <ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.readme>
 
 For convenience some supporting libraries are provided as well:
 
+        <ftp://ftp.kisters.de/pub/lang/tcl/ext/memchan1.2.tar.gz>
+or      <ftp://ftp.kisters.de/pub/lang/tcl/ext/memchan12.zip>
         <ftp://ftp.kisters.de/pub/lang/tcl/ext/zlib-1.0.4.tar.gz>
         <ftp://ftp.kisters.de/pub/lang/tcl/ext/libdes-3.23.tar.gz>
-        <ftp://ftp.kisters.de/pub/lang/tcl/ext/memchan1.1.tar.gz>
 
         The package does contain the README-files of zlib and libdes, these
         then contain pointers to the locations of the associated packages.

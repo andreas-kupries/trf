@@ -48,6 +48,7 @@ describing commands (-> latex) and c-level interfaces (-> man-pages).
 Primary ftp-site is
 
 	<ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.tar.gz>
+	<ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@NODOT_VERSION@.zip>
 	<ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.readme>
 	<ftp://ftp.kisters.de/pub/lang/tcl/ext/memchan1.1.tar.gz>
 
