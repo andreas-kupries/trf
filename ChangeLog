@@ -1,3 +1,8 @@
+2002-10-02  Andreas Kupries  <andreask@pliers.activestate.com>
+
+	* configure.in (crypt): Check for crypt forced to false on
+	  Windows.
+
 2002-10-01  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* configure.in: Readded check for 'eprintf'.
