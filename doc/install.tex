@@ -78,12 +78,18 @@ are list of them:
 	encryption facility. It will be loaded at runtime, if
 	required. It is therefore optional. See chapter \ref {libdes}
 	for more info.
+
+\item	\strong {SSLeay}. Another implementation of 'des',
+	additionally used to implement 'rc2', 'md2' and 'sha-1'. Has
+	priority over 'libdes' because of this. It will be loaded at
+	runtime, if required. It is therefore optional. See chapter
+	\ref {libdes} for more info.
 \end{itemize}
 
 
 \chapter  {Patching the core}\label {scalpel}
 
-There is nothing to do, if you are using a \tclsh{} or \wish{}
+There is nothing to do if you are using a \tclsh{} or \wish{}
 containing the plus-patches (as provided by Jan Nijtmans (\url {nijtmans@nici.kun.nl})).
 For version 7.6plus please check that your patch was younger then Dec 12, 1996.
 A plus-patch older than this does not contain the required modifications.
@@ -104,7 +110,7 @@ Now you have two choices.
 	and \file {configure} to the appropriate locations, as given
 	in the table below\footnote {People using \win{} should do
 	this. They can safely ignore the files \file {configure} and \file
-	{configure.in}} 
+	{configure.in}, these are unix specific.} 
 
 	\begin {tabular} {|l|l|} \hline
 	tcl.h		& tcl$<$version$>$/generic/tcl.h	\\ \hline
@@ -154,7 +160,7 @@ without such \strong {don't} loose however.
 
 	Because of this the subdirectory \file {zlib.vc} contains
 	everything to compile zlib as shared library (with MSVC++
-	4.2). Just copy its contents in a zlib source distribution,
+	4.2). Just copy its contents into a zlib source distribution,
 	copy \file {makefile.vc} to \file {makefile}, adapt the paths
 	to your directory structure, then type \cmd {nmake}.
 
@@ -169,14 +175,19 @@ without such \strong {don't} loose however.
 
 \chapter {libdes, DES encryption}\label {libdes}
 
-\cmd {DES} support is based upon libdes, a freely available
+\cmd {DES} support was originally based upon \lib{libdes}, a freely available
 implementation of this algorithm, written by Eric A. Young (\url
-{eay@mincom.com}). I used version 3.23 directly. Higher versions are
-part of \cmd {SSLeay}, Erics implementation of the \strong{S}ecure
-\strong{S}ockets \strong{L}ayer.
+{eay@mincom.com}). I used version 3.23 directly.
 
-The official FAQ page is \url
-{http://www.psy.uq.edu.au:8080/~ftp/Crypto/}. 
+Higher versions are now part of \lib {SSLeay}, Erics implementation of
+the \strong{S}ecure \strong{S}ockets \strong{L}ayer. Because of this I
+have revamped the \cmd{des} loader code to use \lib {libcrypto.so} or
+\lib {libdes.so}, in this order. This had the additional benefit of
+being able to glue in even more crypto algorithms. These are
+\cmd{md2}, \cmd{sha1} and \cmd{rc2}.
+
+
+The official FAQ page is \url {http://www.psy.uq.edu.au:8080/~ftp/Crypto/}. 
 
 Master locations are\vspace {1em}
 
@@ -187,7 +198,7 @@ Master locations are\vspace {1em}
      http://www.psy.uq.oz.au/~ftp/Crypto/ssl.html & Programmer Reference \\ \hline
 \end {tabular}}\vspace {1em}
 
-The list of mirror sites is too long to be included here, the FAQ
+The list of mirror sites is too long to be included here, but the FAQ
 contains them all.
 
 
@@ -215,13 +226,18 @@ without such \strong {don't} loose however.
 \item	I have no information about its availability on Macintoshes.
 \end   {itemize}
 
+I'm sorry, but \lib {SSLeay} was to big to be included in the
+Makefile. Instructions on how make a shared library for linux, sun,
+solaris and irix are part of it however (as of version 0.6.6).
+
+
 
 \chapter {Compilation and installation}
 \section {Macintosh}
 
 	This is a short section (therefore the first).
 
-	I don't have a Mac, nor do I have access one. Because
+	I don't have a Mac, nor do I have access to one. Because
 	of this I am unable to provide a Mac port of this
 	extension.  I will most happily integrate any required
 	changes, makefiles, et cetera into the distribution,
@@ -244,13 +260,10 @@ autoconf}, is provided to handle them all together.
 
 The makefile will then check number and names of the files in the
 package, generate dependency information, compile them and at last
-build the library.  The tool \cmd {get-manifest} used during file
-check requires the directory \file {/tmp}.
-
+build the library.
 
 \item	For a shared library add the \opt {--enable-shared} to \cmd
 	{configure}. 
-
 
 \item	To check the extension, type \cmd {make test} or \cmd
 	{make check}. This will build a tclsh containing just tcl and
@@ -347,4 +360,3 @@ mechanism of the tcl-core.
 Use \cmd {nmake test} to execute a selftest of the generated library.
 
 \end {document}
-

@@ -214,21 +214,23 @@ Cipher characteristics:
 	DES		& 8			& 8 (without MSB!) \\ \hline
 	IDEA		& 8			& 16 \\ \hline
 	Blowfish	& 8			& 1 - 56 \\ \hline\hline
+	RC2		& 8			& 1 - 1024\footnotemark{a} \\ \hline
 	RC4		& -			& 1 - 256 \\ \hline
 	\end   {tabular}
 \end   {center}
-
+\footnotedef{a}{The upper limit is artificially imposed, due to the
+implementation of some operations in the framework.}
 
 \section {Message digests}
 
-6 message digests are implemented:
+8 message digests are implemented:
 
 \begin {enumerate}
 \item	2 crc checkers, taken from PGP and library \lib {zlib}, under
 	the names \cmd {crc} and \cmd {crc-zlib} resp.
 \item	The adler-checksum, taken from \lib {zlib} too.
-\item	MD5
-\item	SHA (or SHS)
+\item	MD2, MD5
+\item	SHA (or SHS), SHA-1
 \item	HAVAL
 \end   {enumerate}
 
