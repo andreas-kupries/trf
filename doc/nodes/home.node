@@ -31,6 +31,9 @@ node trf_home {
 
 	#  indexing is required
 
+	p "This is the [strong [cem last]] version of Trf supporting Tcl 7.6.
+	"
+
 	p "
 	[trf] is an extension library to the script language [tcl], as created
 	by [jo]. It extends the language at the C-level with so-called
