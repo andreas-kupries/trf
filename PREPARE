@@ -118,9 +118,9 @@ mLatex2html \
 # The software page is 'software.html'
 
 # compact the pages a little
-eval exec html_crunch [glob doc/html/install/*.html]
-eval exec html_crunch [glob doc/html/capi/*.html]
-eval exec html_crunch [glob doc/html/man/*.html]
+eval exec html_crunch [glob html/install/*.html]
+eval exec html_crunch [glob html/capi/*.html]
+eval exec html_crunch [glob html/man/*.html]
 
 
 # remove temp files from latex runs
