@@ -71,6 +71,7 @@ eval mExclude \
 mExclude \
 	unix/bdist/ak.1 unix/bdist/ak.2 \
 	unix/bdist/ak.3 unix/bdist/ak.4 \
+	unix/bdist/ak.5                 \
 	win/bdist/cygwin.jan.17.1 win/bdist/jan.2
 
 cd win/bdist
