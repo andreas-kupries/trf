@@ -16,7 +16,7 @@ node trf_ssleay {
 
 	p "
 	The official homepage can be found at [sslhome]. A [ssleayfaq] is
-	available. An alternative is the [url OpenSLL] project,	which took
+	available. An alternative is the [OpenSLL] project, which took
 	the torch from Eric as he no longer works on SLLeay."
 
 	p "
