@@ -8,13 +8,46 @@ node trf_where {
     parent      trf_home
 
     contents {
-	p "This library is available for download at the following urls:"
+	p "The extension is distributed in several variants, as listed
+	below. The given links allow an immediate download.
+	"
 
-	bullet_list {
-	    li "Sources, [link trf_src_tgz]"
-	    li "or [link trf_src_zip]"
-	    li "The [link trf_readme] with a short explanation"
-	    #li "A [link trf_win32bin] for Windows"
+	table border=1 cellspacing=0 cellpadding=2 bgcolor=black width=100% {
+	    table_row {
+		table_data {
+		    cgi_puts [strong [font color=white Distributions]]
+		}
+	    }
+	    table_row bgcolor=#ffffcc {
+		table_data {
+		    p "The [link trf_readme] with a short explanation"
+		}
+	    }
+	    table_row bgcolor=#ffffcc {
+		table_data {
+		    cgi_puts [link trf_src_tgz]
+		}
+	    }
+	    table_row bgcolor=#ffffcc {
+		table_data {
+		    cgi_puts [link trf_doc_tgz]
+		}
+	    }
+	    table_row bgcolor=#ffffcc {
+		table_data {
+		    cgi_puts [link trf_src_zip]
+		}
+	    }
+	    table_row bgcolor=#ffffcc {
+		table_data {
+		    cgi_puts [link trf_doc_zip]
+		}
+	    }
+	    table_row bgcolor=#ffffcc {
+		table_data {
+		    cgi_puts [link trf_win32bin]
+		}
+	    }
 	}
     }
 }
