@@ -1,5 +1,10 @@
 Sun May 30 10:49:42 1999  Andreas Kupries  <a.kupries@westend.com>
 
+	* patches/v8.1*/standard.patch: Fixed bug in the handling of
+ 	  encodings. Caused the system to lose references to the system
+ 	  encoding, which crashed the interpreter after some time
+	  (testsuite, ________.text (digests, tools/md) seg.faulted).
+
 	* tests/otp_words.test, otpsha1.test, otpmd5.test: Added testsuite
 	  for new OTP commands (See May 27).
 
