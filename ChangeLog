@@ -1,3 +1,10 @@
+Wed Sep 22 22:35:38 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* --- Version 2.0 ready for release ---
+
+	* generic/sha/sha.h: Protected BYTE typedef, BYTE is defined as
+	  macro on Windows platforms. Sent in by Jan Nijtmans.
+
 Tue Sep 21 20:10:37 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/trf.decls: Extended the stub table to cover all public
