@@ -11,6 +11,7 @@
 \def\capi{      \htmladdnormallink {C-level} {../capi/capi.html}}
 \def\capiref{   \htmladdnormallink {online reference} {../capi/capi.html}}
 \def\manps{     \htmladdnormallink{postscript version}{man.ps.gz}}
+\def\strterm{$\backslash 0$}
 
 % remove this for the official release.
 \def\unoff{
@@ -475,7 +476,7 @@ This is more than a table of the format specifiers available to
 
 \begin {tabular}{|l|l|l|}\hline
 Format & Meaning		& Meaning in 8.0b1 \\ \hline\hline
-a & --				& string, '\\0'-padded			\\ \hline
+a & --				& string, '\strterm'-padded		\\ \hline
 A & --				& string, space-padded			\\ \hline
 b & --				& binary digits, low-2-high		\\ \hline
 B & --				& binary digits, high-2-low		\\ \hline
@@ -493,11 +494,11 @@ l & signed int, 64 bit		& --					\\ \hline
 L & unsigned int, 64 bit	& --					\\ \hline
 o & signed int, 32 bit, octal	& --					\\ \hline
 O & signed int, 16 bit, octal	& --					\\ \hline
-s & string, '\\0'-terminated	& signed int, 16 bit, little-endian	\\ \hline
+s & string, '\strterm'-terminated & signed int, 16 bit, little-endian	\\ \hline
 S & --				& signed int, 16 bit, big-endian	\\ \hline
 u & unsigned int, 32 bit	& --					\\ \hline
 U & unsigned int, 32 bit	& --					\\ \hline
-x & signed int, 32 bit, hex	& '\\0'					\\ \hline
+x & signed int, 32 bit, hex	& '\strterm'				\\ \hline
 X & signed int, 16 bit, hex	& Set cursor relative			\\ \hline
 @ & --				& Set cursor absolute			\\ \hline
 \end {tabular}
