@@ -1,4 +1,4 @@
-/*
+*
  * zlib.c --
  *
  *	Loader for 'zlib' compression library.
@@ -61,7 +61,7 @@ int
 TrfLoadZlib (interp)
     Tcl_Interp* interp;
 {
-#ifdef ZLIB_STATIC_BUILD
+#ifndef ZLIB_STATIC_BUILD
   int res;
 
   TrfLock; /* THREADING: serialize initialization */

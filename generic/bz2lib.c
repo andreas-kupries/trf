@@ -53,7 +53,7 @@ int
 TrfLoadBZ2lib (interp)
     Tcl_Interp* interp;
 {
-#ifdef BZLIB_STATIC_BUILD
+#ifndef BZLIB_STATIC_BUILD
   int res;
 
   TrfLock; /* THREADING: serialize initialization */
