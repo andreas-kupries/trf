@@ -165,12 +165,9 @@ proc tclLdAout {{cc {}} {shlib_suffix {}} {shlib_cflags none}} {
 
   set f [open $nmCommand r]
   while {[gets $f l] >= 0} {
-    if [regexp {[0-9A-Fa-f]* T[ 	]*(_?[a-zA-Z0-9_]*)} $l trash symbol] {
-      if {![regexp {(_?[a-zA-Z0-9_]*)} $symbol s]} {
-	set s $symbol
-      }
+    if [regexp {[0-9A-Fa-f]+ T[ 	]*([a-zA-Z0-9_]*)} $l trash symbol] {
       append entryProtos {extern int } $symbol { (); } \n
-      append entryPoints {  } \{ { "} $s {", } $symbol { } \} , \n
+      append entryPoints {  } \{ { "} $symbol {", } $symbol { } \} , \n
     }
   }
   close $f
@@ -234,7 +231,9 @@ proc tclLdAout {{cc {}} {shlib_suffix {}} {shlib_cflags none}} {
     lappend ldCommand $item
   }
   puts stderr $ldCommand
-  eval exec $ldCommand
+  if [catch "exec $ldCommand" msg] {
+    puts stderr $msg
+  }
   if {$shlib_suffix == ".a"} {
     exec ranlib $outputFile
   }

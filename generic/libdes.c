@@ -12,7 +12,7 @@
 
 #include "transformInt.h"
 
-#ifdef __WIN32__
+#if !defined (LIBDES_LIB_NAME) && defined (__WIN32__)
 #define LIBDES_LIB_NAME "libdes.dll"
 #endif
 

@@ -66,13 +66,14 @@ replace_in_file win/makefile.vc @DATE@              $long_date
 verbose {remove inofficial documents}
 
 eval file delete -force mails [glob patches/nijtmans.*]
+file delete -force patches/v8.0a1
 
 cd doc/speed
 exec /bin/ln -s		../../tests/sha.test.vec f1000000
 cd ..
 
 # pwd = doc
-file delete FUN ascii.man ascii85 scratch-pad code34 Notes ToDo trf.def hash.operation
+file delete FUN ascii.man ascii85 scratch-pad code34 Notes ToDo trf.def hash.operation INSTALL INSTALL.optional
 
 # I.b  generate official manual, diverse variants (dvi, ps)
 verbose {generate official manual}
@@ -83,6 +84,12 @@ catch {exec latex man}
 catch {exec latex man}
 catch {exec dvips man.dvi -o man.ps}
 file delete man.aux man.log man.toc
+
+catch {exec latex install}
+catch {exec latex install}
+catch {exec latex install}
+catch {exec dvips install.dvi -o install.ps}
+file delete install.aux install.log install.toc
 
 
 

@@ -63,10 +63,10 @@ VOID *dlopen(path, mode)
     LibraryList *ptr;
     static int initialized = 0;
 
-    /* DEBUG */
+    /* DEBUG * /
     printf ("dlopen (%p='%s', %d)\n", path, path, mode);
     printf ("\tinitialized = %d\n", initialized);
-    /* DEBUG */
+    / * DEBUG */
 
     if (!initialized) {
 	initialized = 1;
@@ -75,9 +75,9 @@ VOID *dlopen(path, mode)
     }
     handle = (VOID *) LoadLibrary(path);
 
-    /* DEBUG */
+    /* DEBUG * /
     printf ("\thandle = %p\n", handle);
-    /* DEBUG */
+    / * DEBUG */
 
     if (handle != NULL) {
 	    ptr = (LibraryList*) ckalloc(sizeof(LibraryList));
@@ -85,9 +85,9 @@ VOID *dlopen(path, mode)
 	    ptr->nextPtr = libraryList;
 	    libraryList = ptr;
 
-	    /* DEBUG */
+	    /* DEBUG * /
 	    printf ("\tlibraryList = %p\n", libraryList);
-	    /* DEBUG */
+	    / * DEBUG */
     }
     return handle;
 }
@@ -118,16 +118,16 @@ dlclose(handle)
 {
     LibraryList *ptr, *prevPtr;
 
-    /* DEBUG */
+    /* DEBUG * /
     printf ("dlclose (%p)\n", handle);
-    /* DEBUG */
+    / * DEBUG */
 
     ptr = libraryList; prevPtr = NULL;
     while (ptr != NULL) {
 	if (ptr->handle == (HINSTANCE) handle) {
-	  /* DEBUG */
+	  /* DEBUG * /
 	  printf ("\tfreeing library\n");
-	  /* DEBUG */
+	  / * DEBUG */
 	    FreeLibrary((HINSTANCE) handle);
 	    if (prevPtr) {
 		prevPtr->nextPtr = ptr->nextPtr;
@@ -140,9 +140,9 @@ dlclose(handle)
 	prevPtr = ptr;
 	ptr = ptr->nextPtr;
     }
-    /* DEBUG */
+    /* DEBUG * /
     printf ("\thandle not found\n");
-    /* DEBUG */
+    / * DEBUG */
     return -1;
 }
 
@@ -171,11 +171,11 @@ VOID *dlsym(handle, symbol)
   /* DEBUG */
   VOID* res;
 
-  printf ("dlsym (%p,%p='%s')\n", handle, symbol, symbol);
+  /*  printf ("dlsym (%p,%p='%s')\n", handle, symbol, symbol); */
 
   res =  (VOID *) GetProcAddress((HINSTANCE) handle, symbol);
 
-  printf ("\taddress = %p\n", res);
+  /*  printf ("\taddress = %p\n", res); */
   return res;
 
   /* DEBUG */
@@ -228,9 +228,9 @@ UnloadLibraries(clientData)
     LibraryList *ptr;
     LibraryList *list = *((LibraryList **) clientData);
 
-    /* DEBUG */
+    /* DEBUG * /
     printf ("UnloadLibraries\n");
-    /* DEBUG */
+    / * DEBUG */
 
     while (list != NULL) {
 	FreeLibrary(list->handle);

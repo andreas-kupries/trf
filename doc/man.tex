@@ -12,12 +12,17 @@
 \def\opt#1{{\tt #1}}
 \def\man#1{{\tt #1}}
 \def\lib#1{{\tt #1}}
+\def\url#1{{\tt #1}}
 
 \def\version{1.0}
 \begin {document}
 \tableofcontents
 
 \chapter {Introduction}
+This is the installation manual of Tcl-Trf @VERSION@, as distributed
+at @DATE@. For instructions on how to compile and install it see \file
+{install.tex} or one of its derivatives (\file {install.dvi}, \file {install.ps}).
+
 After torturing the world with 2 extensions releated to binary support
 in tcl (\blob{} and \blobx{}) I could not resist and wrote another
 one :-). It can be seen as a merger of features from these 2, but in
@@ -33,15 +38,15 @@ in tcl8.0, aka
 \strong {This is not true in the current implementation}. We need
 
 \begin{itemize}
-\item	plain tcl 7.6 or higher and the appropriate patch-file from
-	subdirectory \file {patches} or
+\item	plain tcl 7.6 or higher (and the appropriate patch-file from
+	subdirectory \file {patches}) or
 
 \item	a tcl patched with Jan Nijtmans (nijtmans@nici.kun.nl)
 	plus-patches as of 12/05/1996 or later.
 
 \item	libz (compression library, optional, some functionality depends on it)
 \item	libdes (DES encryption library, optional, some functionality depends on it)
-\item	memchan 1.0 (optional)
+\item	memchan 1.0 or higher
 \end{itemize}
 
 
@@ -64,10 +69,6 @@ implemented by myself, they are all from other persons. See chapter
 \ref {copyright} for more information.
 
 
-\chapter {Installation}
-See files \file {INSTALL}, \file {INSTALL.optional} (in directory \file {doc}).
-
-
 \chapter {Danger ahead}
 
 First some remarks regarding the work with binary data (and this
@@ -82,7 +83,7 @@ package) in general:
 	CR as well!
 
 \item	Using transformation procedures (as in this package)
-	introduces an additional level of buffering, because they are
+	introduces an additional level of buffering because they are
 	permitted to buffer all characters they are unable to process
 	immediately. This may mess up especially
 	interprocess communication, a notoriously problematic field. A
@@ -100,7 +101,7 @@ package) in general:
 		encrypted, nor transmitted.
 	\item	The receiver decrypts the blocks it got, then waits
 		for the EOL character.
-	\item	DEADLOCK.
+	\item	\strong {DEADLOCK}.
 	\end   {itemize}
 
 	The solution here would be the usage of a blockcipher in CFB
@@ -452,6 +453,8 @@ Things to be done in future.
 \item	Random-byte generator (as real channeltype, no transformation!)
 \item	Identity-transformation with ability to gather statistics
 	about the information flowing through it.
+\item	Anybody out there wishing more ? Feel free to send me
+	suggestions (\url {a.kupries@westend.com}).
 \end   {itemize}
 
 \end {document}
