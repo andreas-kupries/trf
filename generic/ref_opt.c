@@ -379,7 +379,6 @@ SeekQueryOptions (interp, options, seekInfo, clientData)
      ClientData           clientData;
 {
   TrfTransformOptionBlock* o = (TrfTransformOptionBlock*) options;
-  int                      res;
   ReflectControl           rc;
 
   START (SeekQueryOptions);
