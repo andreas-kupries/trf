@@ -109,7 +109,7 @@ cd doc
 eval file delete -force [glob html/*.html]
 
 
-file delete -force nodes/up.def
+file delete -force nodes/a_up.def
 exec nodeCompile     plain html          nodes
 exec nodeMakeSitemap plain html trf_home nodes
 
