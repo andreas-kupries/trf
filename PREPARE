@@ -72,7 +72,6 @@ mExclude \
 
 mHandleBinaryDistributions \
 	doc/license.terms README \
-	win/msvcrt.dll \
 	win/bdist/crypt.dll \
 	unix/bdist/libcrypt.so
 
