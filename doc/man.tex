@@ -102,7 +102,7 @@ to name only a few.
 
 As proof of concept several such algorithms were implemented and are
 provided as user-commands at the \tcl{}-level. As most of them are
-related to cryptography in one way or naother, this library might be
+related to cryptography in one way or another, this library might be
 seen as cryptographic toolkit too.
 
 
@@ -339,7 +339,7 @@ digests have two submodes available:
 		of the comparison to the tcl-level (``ok'' or ``failed'').
 
 		In the second submode read or written data goes into
-		nirwana, their digests are computed as
+		nirvana, their digests are computed as
 		side effect. After the channel is closed the computed
 		digests are written to the channels specified with
 		'-read/write-dest'.
@@ -401,9 +401,84 @@ input.
 
 \section {Misc.}
 
-4 other commands are available, not fitting into the categories above:
+5 other commands are available, not fitting into the categories above:
 
 \begin	{enumerate}
+\item	\cmd {transform}. This implements a general transformation.
+	The underlying functionality is made available to the script
+	level. Options understood are:
+
+	\begin	{itemize}
+	\item[-mode]	Allowed arguments are ``read'', ``write'' and
+			all unique abbreviations of these. This option
+			is relevant and required only for immediate
+			operation. It determines the operations to
+			execute.
+
+	\item[-command]	Its specification is always required, and
+			interpreted as the script to execute on behalf
+			of the transformation channel.
+
+			The system will append two arguments to the
+			script before execution, the name of the
+			operation and a buffer to operate on.
+	\end	{itemize}
+
+	The operations and their meaning are:
+	\begin {center}
+	\begin {tabular}{l|p{8cm}}
+	Operation	& Meaning					\\ \hline
+	create/write	& Initialize state of transformation for
+			  writing into channel. The buffer is
+			  irrelevant, and empty. A return value is
+			  ignored. First call for writing part. 	\\
+	delete/write	& Cleanup state of transformation for
+			  writing into channel. The buffer is
+			  irrelevant, and empty. A return value is
+			  ignored. Last call for writing part.		\\
+	write		& Execute write transformation on the given
+			  buffer. The return value is interpreted as
+			  transformation result.			\\
+	flush/write	& Flush out all buffers internal to the
+			  transformation. The given buffer is
+			  empty. The return value is interpreted as
+			  transformation result.			\\
+	clear/write	& Cleanup state of transformation for
+			  writing into channel. The buffer is
+			  irrelevant, and empty. A return value is
+			  ignored.					\\ \hline
+
+	create/read	& Initialize state of transformation for
+			  read from channel. The buffer is
+			  irrelevant, and empty. A return value is
+			  ignored. First call for reading part. 	\\
+	delete/read	& Cleanup state of transformation for
+			  read from channel. The buffer is
+			  irrelevant, and empty. A return value is
+			  ignored. Last call for reading part.		\\
+	read		& Execute read transformation on the given
+			  buffer. The return value is interpreted as
+			  transformation result. Normally the inverse
+			  of the write transformation.			\\
+	flush/read	& Flush out all buffers internal to the
+			  transformation. The given buffer is
+			  empty. The return value is interpreted as
+			  transformation result. Required to get
+			  buffered partial results at EOF of the
+			  underlying channel.	 			\\
+	clear/read	& Cleanup state of transformation for
+			  read from channel. The buffer is
+			  irrelevant, and empty. A return value is
+			  ignored. Called during seeks on the channel. \\ \hline
+	\end   {tabular}
+	\end   {center}
+
+	\strong {Danger:} If this transformation is used in
+	conjunction with \tcl{} 7.6, then please make sure that the
+	data to operate on does not contain embedded '$\backslash$0's.
+	The named version is unable to cope with them.
+	
+
 \item	A reed-solomon error correcting coder is available under the
 	name \cmd {rs\_ecc}. The one and only option understood is
 	``-mode''. It is equivalent to the option understood by the
@@ -417,7 +492,7 @@ input.
 
 	\begin	{itemize}
 	\item[-mode]	Allowed arguments are ``compress'',
-			``'decompress' and all unique abbreviations of
+			``decompress'' and all unique abbreviations of
 			these.
 	\item[-level]	Possible arguments are ``default'' and integer
 			numbers in the range 1 \dots{} 9. It specifies
@@ -468,6 +543,7 @@ available to \cmd {binio} can be found in a separate table afterward.
 	rs\_ecc		& Error correcting coder	& \trf	\\ \hline
 	sha		& Message digest		& \trf	\\ \hline
 	sha1		& Message digest		& \SSLeay \\ \hline
+	transform	& General transformation	& \trf	\\ \hline
 	unstack		&				& \trf	\\ \hline
 	uuencode	& Conversion			& \trf	\\ \hline
 	zip		& Data compression		& \zlib	\\ \hline
