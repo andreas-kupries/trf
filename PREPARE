@@ -40,7 +40,7 @@ mGenerateANNOUNCE
 
 eval mExclude \
 	mails patches/v8.0a1 patches/v8.0a2 patches/v8.0b1 patches/v8.0b2 \
-	[glob patches/v8.0/*.orig] \
+	[glob patches/*/*.orig] \
 	doc/install.tex doc/man.tex doc/html.sty doc/defs.tex \
 	[glob patches/nijtmans.*] DEPENDS doc/file doc/delete \
 	doc/FUN doc/ascii.man doc/ascii85 doc/scratch-pad \
@@ -152,9 +152,10 @@ mConfigure unix
 
 set bindir  "[::pool::string::cap $mName]${mVersion}"
 
-file mkdir $bindir
+file mkdir $bindir [file join $bindir patches]
 eval file copy [glob win/trf*] $bindir
 file copy      doc/license.terms win/pkgIndex.tcl win/msvcrt.dll README $bindir
+eval file copy [glob patches/*] [file join $bindir patches]
 
 set supfolder [file join .. sup.${mName}${mFullVersion}]
 cd $bindir
