@@ -11,6 +11,9 @@ Changes from 2.1 to 2.1p1
 *	Merged patch from Dave Bodenstab <imdave@mcs.net> to make
 	the error messages better.
 
+*	Uptodate binaries for Windows, via crosscompiling mingw gcc.
+
+
 Changes from 2.0p7 to 2.1
 
 *	Adapted to the rewrite of the stacked channel functionality in

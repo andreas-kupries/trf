@@ -60,8 +60,8 @@ eval mExclude \
 	patches/v8.1b3/getcurrent patches/v8.1b3/setorig \
 	patches/v8.1/gendiff patches/v8.1/getorig patches/v8.1/genstubs \
 	patches/v8.1/getcurrent patches/v8.1/setorig \
-	patches/rc.h patches/patch.mp \
-	[glob win/*.dll] [glob win/*.lib] win/trf1380.README
+	patches/rc.h patches/patch.mp
+
 
 # mHandleBinaryDistributions
 # Remove older distribution (1.x), they are distributed as part of the
