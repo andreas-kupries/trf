@@ -614,7 +614,7 @@ int             preserve;
 
 #if GT81
   if (preserve) {
-    Tcl_SaveResult (ctrl->interp, &ciSave);
+    Tcl_SaveResult (c->interp, &ciSave);
   }
 #endif
 
@@ -650,10 +650,10 @@ int             preserve;
     /* copy error message from 'c->interp' to actual 'interp'. */
 
     if ((interp != (Tcl_Interp*) NULL) &&
-	(ctrl->interp != interp) &&
+	(c->interp != interp) &&
 	!preserve) {
     
-        Tcl_SetObjResult (interp, Tcl_GetObjResult (ctrl->interp));
+        Tcl_SetObjResult (interp, Tcl_GetObjResult (c->interp));
     }
 
     goto cleanup;
@@ -675,7 +675,7 @@ int             preserve;
 
 #if GT81
   if (preserve) {
-    Tcl_RestoreResult (ctrl->interp, &ciSave);
+    Tcl_RestoreResult (c->interp, &ciSave);
   }
 #endif
 
@@ -684,7 +684,7 @@ int             preserve;
 cleanup:
 #if GT81
   if (preserve) {
-    Tcl_RestoreResult (ctrl->interp, &ciSave);
+    Tcl_RestoreResult (c->interp, &ciSave);
   }
 #endif
 
