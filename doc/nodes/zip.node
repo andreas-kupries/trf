@@ -1,0 +1,79 @@
+# -*- tcl -*-
+# zip and zlib
+
+node trf_zip {
+    title       "Trf: The zip command"
+    shortTitle  "Zip"
+    description "Trf commands: zip"
+    parent      trf_misc
+
+    contents {
+	p "Options understood by ``zip''are:"
+
+	table {
+	    defrow -mode {
+		p "
+		Allowed arguments are ``compress'', ``decompress'' and all
+		unique abbreviations of these."
+	    }
+
+	    defrow -level {
+		p "
+		Possible arguments are ``default'' and integer numbers in the
+		range 1 ... 9. It specifies the used compression level."
+	    }
+	}
+
+	hr
+
+	p "[anchor_name zlib]
+	This transformation uses the freely available [zLib] compression
+	library to accomplish its task. It uses the unpatented
+	``deflate''-algorithm employed by [cmd gzip], [cmd pkzip] and others.
+	The current version is 1.1.2, but [trf] will work with any version
+	from 1.0.4 and upward."
+
+	p "
+	The official homepage can be found at [zlib_home]. A downloading page
+	is available there too. Additional sources of information are
+	[afile rfc1950.txt], [afile rfc1951.txt] and [afile rfc1952.txt]."
+
+	p "
+	[trf] requires a shared library version of [zLib]. People without
+	such [strong {don't}] loose however."
+
+	bullet_list {
+	    li "
+	    The unix-specific makefile contains the target ``zlib''. This
+	    will generate a shared library for [zLib]. It assumes that the
+	    [zLib] source distribution is available as subdirectory
+	    [afile zlib] (a sibling to [afile unix] !)."
+
+	    li "
+	    A binary distribution for [win] is available too, just take a
+	    look at [zlib_win].
+
+	    A note of caution: The provided library kept crashing on my
+	    [winnt] system. At least often enough to render it unusable in
+	    my eyes. YMMV however.
+
+	    Because of this the subdirectory [afile zlib.vc] contains
+	    everything to compile [zLib] as shared library (with MSVC++
+	    4.2). Just copy its contents into a [zLib] source distribution,
+	    copy [afile makefile.vc] to [afile makefile], adapt the paths
+	    to your directory structure, then type [cmd nmake] in a dos box.
+
+	    At last copy the newly generated [afile zlib.dll] into the
+	    system directory of your machine."
+
+	    li "I have no information about its availability on MacIntoshes."
+	}
+
+
+	p "
+	[strong Remark]: The current version of [zLib] (1.1.2) uses
+	[cmd configure] from GNU autoconf to configure itself for a variety of
+	unix systems. This includes generation of a shared library too and
+	makes compilation of this library much easier."
+    }
+}

@@ -1,0 +1,19 @@
+# -*- tcl -*-
+# compile base
+
+node trf_compile {
+    title       "Trf: Compilation"
+    shortTitle  "Compilation"
+    description "Compilation of trf"
+    parent      trf_install
+
+    menu {
+	trf_cmac trf_cunix trf_cwin
+    }
+
+    contents {
+	p "
+	The following subsections describe the process of compiling and
+	installing [trf] for the 3 major platforms."
+    }
+}

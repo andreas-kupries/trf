@@ -1,0 +1,118 @@
+# -*- tcl -*-
+# available commands
+
+node trf_cmds {
+    title       "Trf: The available commands"
+    shortTitle  "Commands"
+    description "The available commands"
+    parent      trf_home
+
+    menu {
+	trf_conv trf_md trf_crypto trf_misc
+    }
+
+    contents {
+	p "
+	First a small note: This manual deals with the [tcl]-level commands
+	only. For a description of the C-level API please read the
+	provided manpages or the [link trf_capi] chapter."
+
+	p "
+	All commands are available in 2 modes of operation, ``immediate'' and
+	``attached''.  The generic syntactical forms of these modes are:"
+
+	table {
+	    defrow immediate {
+		p "
+		[cmd command] -option [arg value] ... [arg sourcevalue]"
+
+		p "
+		In this mode the command processes the given
+		[arg sourcevalue] and returns the transformed information as
+		interpreter result. With [tcl] 7.6 this may yield incorrect
+		results due to embedded [strterm] characters, either in
+		source or result."
+
+		p "
+		To allow for correct operation with this version too 2
+		additional options are provided: [opt -in] and [opt -out]."
+
+		p "
+		If option [opt -in] is present, its argument is interpreted as
+		channelhandle and the data to transform is read from it. A
+		[arg sourcevalue] [strong {must not}] be specified in that
+		case."
+
+		p "
+		If option [opt -out] is present, its argument is interpreted as
+		channelhandle and the transformation result will be written
+		into it."
+
+		p "
+		Please note that it is [strong not] necessary to specify both
+		options, each of them can be used alone."
+	    }
+
+	    defrow attached {
+		p [strong "
+		This mode is the one requiring the patches to the
+		core. Without them we would be unable to stack our
+		transforming channel onto the named one."]
+
+		p "
+		[cmd command] -attach [arg channel] -option [arg value] ..."
+
+		p "
+		This creates a channel filter, configured as defined by the
+		options and then attached to the [arg channel]. All data read
+		from or written into the [arg channel] will be transformed
+		accordingly from now on."
+
+		p "
+		Neither [opt -in] nor [opt -out] nor a [arg sourcevalue]
+		must be specified here."
+	    }
+	}
+
+	p "
+	Now a quick reference describing the available commands, their type of
+	algorithm and location of implementation of the underlying
+	algorithm."
+
+	table {
+	    tr [list Command	Type			Location]
+	    thline 3
+	    tr [list ascii85	[cv]			[trf]]
+	    tr [list base64	[cv]			[trf]]
+	    tr [list bin	[cv]			[trf]]
+	    tr [list hex	[cv]			[trf]]
+	    tr [list oct	[cv]			[trf]]
+	    tr [list uuencode	[cv]			[trf]]
+	    thline 3
+	    tr [list adler	[md]			[zlib]]
+	    tr [list crc	[md]			[trf]]
+	    tr [list crc-zlib	[md]			[zlib]]
+	    tr [list haval	[md]			[trf]]
+	    tr [list md2	[md]			[SSLeay]]
+	    tr [list md5	[md]			[trf]]
+	    tr [list ripemd160	[md]			[trf]]
+	    tr [list ripemd128	[md]			[trf]]
+	    tr [list sha	[md]			[trf]]
+	    tr [list sha1	[md]			[SSLeay]]
+	    thline 3
+	    tr [list binio	{Binary I/O}		[trf]]
+	    tr [list rs_ecc	{Error correcting coder} [trf]]
+	    tr [list transform	{General transformation} [trf]]
+	    tr [list unstack	-			[trf]]
+	    tr [list zip	{Data compression}	[zlib]]
+	    thline 3
+	    tr [list blowfish	[bc]			[trf]]
+	    tr [list des	[bc]			[SSLeay]]
+	    tr [list idea	[bc]			[trf]]
+	    tr [list rc2	[bc]			[SSLeay]]
+	    tr [list rc4	[sc]			[trf]]
+	    tr [list rot	[sc]			[trf]]
+	    tr [list safer	[bc]			[trf]]
+	}
+    }
+}

@@ -1,0 +1,47 @@
+# -*- tcl -*-
+# future work
+
+node trf_future {
+    title       "Trf: Future work"
+    shortTitle  "Future work"
+    description "Future work in trf"
+    parent      trf_home
+
+    contents {
+	p "Things to be done in future."
+
+	bullet_list {
+	    ## li	The tests are incomplete, expand them.
+	    ##	done
+
+	    li	"
+	    Add more ciphers ([PGP]!). Take a look at [pgplib]
+	    by [tage]."
+
+	    #	\strong {Hm, better make a separate package. This is
+	    #	primarily a transformer package, not a crypto toolkit}.
+
+	    ##li	Transparent mode for digests.
+	    ##	Mixture of 'absorb' and 'write'.
+
+	    li	"
+	    Channel doing special framing after a fixed (but
+	    user-defined) number of characters"
+
+	    li	"
+	    Random-byte generator (as real channeltype, no
+	    transformation!)."
+	    #	\strong {Better place it with memchan}.
+
+	    ##li	Identity-transformation with ability to gather statistics
+	    ##	about the information flowing through it.
+	    ## not needed anymore, use 'transform' instead!
+
+	    li	"Add the [cmd bzip] compressor."
+
+	    li	"
+	    Anybody out there wishing more ? Feel free to send [link meT]
+	    suggestions."
+	}
+    }
+}

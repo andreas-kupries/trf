@@ -1,0 +1,70 @@
+# -*- tcl -*-
+# dangers of using trf
+
+node trf_danger {
+    title       "Trf: Dangers"
+    shortTitle  "Danger!"
+    description "Possible problems while using Trf"
+    parent      trf_home
+
+    contents {
+	p "
+	Some remarks regarding the work with binary data (and this
+	package) in general:
+	"
+
+	number_list {
+
+	    li "
+	    Whatever you do, don't forget to switch the used channels into
+	    binary mode, i.e. execute
+	    ``[strong "fconfigure [lt]channel[gt] -translation binary"]''.
+
+	    Not doing this will produce all kind of strange
+	    errors, even on unix machines, as the default translation mode
+	    (``auto'') will not only convert CR LF into LF, but a single
+	    CR as well!"
+
+	    li "
+	    Using transformation procedures (as in this package)
+	    introduces an additional level of buffering because they are
+	    permitted to buffer all characters they are unable to process
+	    immediately. This may mess up especially
+	    interprocess communication, a notoriously problematic field. A
+	    not so improbable scenario would be the addition of encryption
+	    to enhance security. Using a blockcipher here may lead to the
+	    following problem (a line-oriented protocol is assumed):
+
+	    [::pool::cgi::getString {
+		bullet_list {
+		    li "
+		    The sender produces a line and writes it into the channel,
+		    waiting for a response from the receiver afterward."
+
+		    li "
+		    The channel system invokes the blockcipher to encrypt
+		    the line, but not all characters are encrypted due to
+		    the length of the line not being a multiple of the
+		    blocksize. Especially the EOL-character is neither
+		    encrypted, nor transmitted."
+
+		    li "
+		    The receiver decrypts the blocks it got, then waits
+		    for the EOL character."
+
+		    li	[strong DEADLOCK]
+		}
+	    }]
+
+		The solution here would be the usage of a blockcipher in CFB
+		mode and shift [eq] 1 or that of a stream cipher, as both of
+		these would encrypt single characters without buffering.
+
+		Data compression is another good candidate for such a situation.
+
+		Because of this I decided to include the number of characters
+		buffered by a certain transformation in its description."
+	    }
+	}
+    }
+

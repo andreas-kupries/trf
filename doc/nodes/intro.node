@@ -1,0 +1,73 @@
+# -*- tcl -*-
+# Introduction to trf
+
+node trf_intro {
+    title       "Trf: Introduction"
+    shortTitle  "Introduction"
+    description "Background of trf, introduction to the documentation"
+
+    parent trf_home
+
+    contents {
+	p "
+	This is the reference manual of [trf] @mFullVersion@, as distributed
+	at @mDate@. For instructions on how to compile and install it see
+	the [link inst_man]."
+
+	p "
+	After torturing the world with 2 extensions related to binary support
+	in tcl ([blob] and [blobx]) I could not resist and wrote another
+	one [smiley]."
+
+	p "
+	This one is based on the idea to add hooks into the IO subsystem of
+	[tcl] allowing us to intercept any read/write call made by the user
+	and to act upon the data before it is given to him (read) or the
+	channel driver (write). This unfortunately requires us to patch the
+	core to get it going."
+
+	p "
+	This requirement for [tcl] 7.6 is no such one for [tcl] 8.x. The
+	possibility to store binary data in normal variables allowed me to
+	rewrite the extension in such a way that its commands operate on
+	standard arguments and simply return their results. Of course, people
+	wanting to use the channel filter mode still need to patch the core."
+
+	p "
+	Hopefully [tcl] 8.1 will contain the necessary hooks as part of the
+	core, obviating the need for patches. The probability is very low
+	however, due to the shift of the development from [sun] to
+	[scriptics]."
+
+	# -W- installman => link to chapter 'install'
+
+	p "
+	Please read the [link inst_man] to gain insight into
+	the complete requirements of this extension."
+
+	p "
+	At the [link trf_capi] level a set of commands is provided for
+	management, implementation and usage of ``transformer''-procedures.
+	These are called by the (patched) generic channel system to pre- or
+	postprocess data just before writing, resp. immediately after reading.
+	This allows transparent implementation of things like:"
+
+	bullet_list {
+	    li "Gathering statistics about the data flowing through a channel."
+	    # This I had in the first implementation, should port it to this
+	    # one too.
+
+	    li "
+	    Converting in and out of printable representations of binary data."
+
+	    li "Decryption, encryption of information read or written."
+	    li "Data de(compression), error correcting coding."
+	}
+
+	p "to name only a few."
+
+	p "
+	As proof of concept several such algorithms were implemented and are
+	provided as user-commands at the [tcl]-level."
+    }
+}

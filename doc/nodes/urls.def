@@ -1,0 +1,75 @@
+# -*- tcl -*-
+# external urls used here
+
+proc url {code text url} {
+    # defines link *and* shortcut procedure for access to it.
+
+    link $code $text $url
+    proc $code {} "return \[link $code\]"
+}
+
+# -------------------------------------------------
+
+url tcl       [lang tcl]               http://sunscript.sun.com
+url sun       Sun                      http://sunscript.sun.com
+url scriptics Scriptics                http://www.scriptics.com
+url PGP       PGP                      http://www.pgp.com/
+url NIST      NIST                     http://www.nist.gov/
+url rsadsi    {RSA Data Security, Inc} http://www.rsa.com/
+url ascom     {Ascom-Tech AG}          http://wwwtech.ascom.ch/
+url pgplib    PGPlib                   ftp://dslab1.cs.uit.no/pub/PGPlib.tar.gz
+
+url rmd       RIPEMD-160 \
+	http://www.esat.kuleuven.ac.be/%7Ebosselae/ripemd160.html
+
+url sfit      {Swiss Federal Institute of Technology} \
+	http://sewww.epfl.ch/
+
+# -------------------------------------------------
+
+url SSLeayLib [lib SSLeay] http://www.ssleay.org/
+url ssleayfaq FAQ          http://www.ssleay.org/faq.html
+url sslhome   http://www.ssleay.org/ http://www.ssleay.org/
+
+# -------------------------------------------------
+
+url zlib_home \
+	http://www.cdrom.com/pub/infozip/zlib/ \
+	http://www.cdrom.com/pub/infozip/zlib/
+
+url zlib_win \
+	http://www.winimage.com/zLibDll \
+	http://www.winimage.com/zLibDll
+
+
+url zLib [lib zlib] http://www.cdrom.com/pub/infozip/zlib/
+
+# -------------------------------------------------
+
+link trf_src_tgz  "Unix tar.gz" \
+	ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.tar.gz
+
+link trf_src_zip  "Windows zip" \
+	ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.zip
+
+link trf_readme   "README"      \
+	ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.README
+
+link trf_win32bin "binary distribution" \
+		ftp://ftp.westend.com/pub/aku/trf@mShortDosVersion@-win32.zip
+
+# -------------------------------------------------
+
+url SSLeay    [lib SSLeay] trf_libdes.html
+
+url libz      [lib libz] trf_zip.html#zlib
+url zlib      [lib zlib] trf_zip.html#zlib
+
+#link trf_capi {c API} ----
+link cmd_ref  {command reference}   trf_cmds.html
+link inst_man {installation manual} trf_install.html
+
+link memchan    Memchan            http://www.westend.com/~kupries/tcltk.html
+link patch      {separate chapter} trf_patch.html
+link patch_next {next section}     trf_compile.html
+

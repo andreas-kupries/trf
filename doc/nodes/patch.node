@@ -1,0 +1,80 @@
+# -*- tcl -*-
+# patching information
+
+node trf_patch {
+    title       "Trf: Patching the tcl core"
+    shortTitle  "Patching"
+    description "Patching the tcl core"
+    parent      trf_install
+
+    contents {
+	p "
+	There is nothing to do if you are using a [tclsh] or [wish]
+	containing the plus-patches (as provided by [jan])."
+
+	p "
+	For version 7.6plus please check that your patch was younger then
+	Dec 12, 1996. A plus-patch older than this does not contain
+	the required modifications. Skip ahead to the [link patch_next]."
+
+	hr
+
+	p "
+	Well, it seems you have to do all the modifications by yourself. The
+	required files reside in the [afile patches]-subdirectory of the
+	source-directory. That is not quite true. They are in one of three
+	subdirectories, named after the version of tcl they belong to. Select
+	one of the directories and use the files in there. [strong {Don't mix
+	files from different subdirectories (= tcl versions)}]."
+
+	p "Now you have two choices."
+
+	set tclv "tcl[strong X.Y]"
+
+	number_list {
+	    li [::pool::cgi::getString {
+		p "
+		Copy the 4 files [afile tcl.h], [afile tclIO.c],
+		[afile configure.in] and [afile configure] to the appropriate
+		locations, as given in the table below. People using [win]
+		should do this. They can safely ignore the files
+		[afile configure] and [afile configure.in], these are specific
+		to unix."
+
+		table {
+		    tr [list tcl.h        "$tclv/generic/tcl.h"]
+		    tr [list tclIO.c      "$tclv/generic/tclIO.c"]
+		    tr [list configure.in "$tclv/unix/configure.in"]
+		    tr [list configure    "$tclv/unix/configure"]
+		}
+
+		p "or,"
+	    }
+	    ]
+
+	    li [::pool::cgi::getString {
+		p "
+		Apply the 2 patches [afile standard.patch] and
+		[afile byteorder.patch]. The appropriate working directories
+		are"
+
+		table {
+		    tr [list {7.6, 7.6p2} "$tclv"]
+		    tr [list 8.x          "$tclv/generic"]
+		}
+
+		p "
+		[strong Remark]: The byteorder patch is required only if the
+		availability of command [cmd binio] is desired. See the OS
+		specific section on how to activate its compilation."
+
+		p "
+		[strong Recommendation]: Unter 7.6 it is a good choice to
+		activate [cmd binio], as there is no equivalent functionality
+		available. Tcl 8.x on the other hand has [cmd fcopy] and
+		[cmd binary], so it is no loss if [cmd binio] is left out."
+	    }
+	    ]
+	}
+    }
+}

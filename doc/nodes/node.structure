@@ -1,0 +1,39 @@
+
+hierarchical node structure for the new Trf documentation
+=========================================================
+
+	home (abstract)				 1	+
+	|
+	+------	intro				 2-1	+
+	+------	where				 3-1	+
+	+------	ack & disclaimer		 4-1	+
+	+------	danger				 5-1	+
+	+------	commands (+ quick reference)	 6-1	+
+	|	|
+	|	+------	encryption		 8-6	+
+	|	+------	message digests		 9-6	+
+	|	+------	conversions		10-6	+
+	|	+------	misc.			11-6	+
+	|		|
+	|		+------	binio		24-6	+
+	|		+------	transform	25-6	+
+	|		+------	zip		26-6	+
+	|
+	+------	copyrights			12-1	+
+	+------	future				13-1	+
+	+------	cAPI				14-1	
+	+------	installation			15-1	+
+		|
+		+------	patching the core	16-15	+
+		+------	libdes, SSLeay		19-15	+
+		+------	compilation		20-15	+
+			|
+			+------	mac		21-20	+
+			+------	unix		22-20	+
+			+------	windows		23-20	+
+
+=========================================================
+Comments:
+			installation/zlib
+was integrated into	commands/misc/zip
+=========================================================

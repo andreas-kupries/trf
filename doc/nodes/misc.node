@@ -1,0 +1,64 @@
+# -*- tcl -*-
+# misc. commands
+
+node trf_misc {
+    title       "Trf: Misc. commands"
+    shortTitle  "Misc commands"
+    description "Trf commands: misc."
+    parent      trf_cmds
+
+    menu {
+	trf_binio
+	trf_transform
+	trf_zip
+    }
+
+    contents {
+	p "
+	5 more commands are available, not fitting into the categories
+	encryption, message digests or conversion:"
+
+	table {
+	    defrow [cmd [link trf_transform]] {
+		p "
+		implements a general transformation. The underlying
+		functionality is made available to the script level."
+	    }
+	    defrow rs_ecc {
+		p "
+		A reed-solomon error correcting coder is available under the
+		name [cmd rs_ecc]. The one and only option understood is
+		``-mode''. It is equivalent to the option understood by the
+		conversion commands. The coder operates on
+		blocks of 248 characters each, therefore buffering 247
+		characters."
+	    }
+
+	    defrow [cmd [link trf_zip]] {
+		p "A compressor based upon the [zlib]-library."
+	    }
+
+	    defrow [cmd unstack] {
+		p "
+		This command must be used to remove a conversion channel. The
+		underlying channel is uncovered and accessible again afterward.
+		It requires a channelhandle as its one and only argument. Its
+		application to a normal channel (file, socket, ...) is identical
+		to [cmd close]."
+	    }
+
+	    defrow [cmd [link trf_binio]] {
+		p "
+		This command is excluded by default, as [tcl] 8.0 now provides
+		equivalent functionality (See commands [cmd binary] and
+		[cmd fcopy]). Inclusion requires application of the byteorder
+		patch. See the [link inst_man] more information."
+
+		p "
+		[strong {Please note}]: Due to the availability of the
+		[cmd binary] command in [tcl] 8.x I have decided to remove
+		the support for [cmd binio] in the next release of Trf."
+	    }
+	}
+    }
+}

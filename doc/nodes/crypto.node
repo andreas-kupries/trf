@@ -1,0 +1,172 @@
+# -*- tcl -*-
+# encryption commands
+
+node trf_crypto {
+    title       "Trf: encryption commands"
+    shortTitle  "Encryption"
+    description "Trf commands: encryption"
+    parent      trf_cmds
+
+    contents {
+	p "The ciphers implemented here are"
+
+	bullet_list {
+	    li	"DES 	(the dinosaur)"
+	    li	"IDEA	(used by [PGP])"
+	    li	Blowfish
+	    li	RC2
+	    li	RC4
+	    li	"Rot (cesar cipher, rot13)"
+	    li	"SAFER ([strong S]ecure [strong A]nd [strong F]ast
+		[strong E]ncryption [strong R]outine)"
+	}
+
+	p "
+	The commands to invoke them are identical to the names, converted to
+	all lowercase. Options common to them all:"
+
+	table {
+	    defrow -direction {
+		p "
+		Allowed values are ``encrypt'', ``decrypt'' and all
+		unique abbreviations. Specifies the operation
+		to be executed in immediate mode or the
+		operation executed upon [strong write] if
+		attached to a channel."
+	    }
+	    defrow -key {
+		p "
+		The argument to this options specifies the key
+		to be used by the cipher. The exact
+		interpretation depends on the value of option
+		[opt -key-type]. Possibilities are:"
+
+		table {
+		    defrow data {
+			p "
+			The argument immediately contains the
+			key. This might yield incorrect data under
+			[tcl] 7.6, due to embedded [strterm]'s."
+		    }
+		    defrow channel {
+			p "The handle of a readable channel."
+		    }
+		}
+
+		p "
+		The minimum and maximum number of bytes to be
+		used/read are cipher dependent and will be
+		described later."
+	    }
+	    defrow -key-type {
+		p "
+		Possible values are [strong data],
+		[strong channel] and all unique abbreviations
+		of these. If this option is not given,
+		[strong data] will be used as default."
+	    }
+	}
+
+	p "
+	The first 4 ciphers are blockciphers, i.e. they do not encrypt single
+	characters, but blocks of 2 or more. Such ciphers can be operated in 4
+	different modes and therefore have additional options defined:"
+
+	table {
+	    defrow -mode {
+		p "The 4 possible argument values (and modes) are:"
+
+		table {
+		    defrow ecb {
+			p "[strong e]lectronic [strong c]ode[strong b]ook"
+		    }
+		    defrow cbc {
+			p "[strong c]ipher [strong b]lock [strong c]haining"
+		    }
+		    defrow cfb {
+			p "[strong c]ipher [strong f]eed[strong b]ack"
+		    }
+		    defrow ofb {
+			p "[strong o]utput [strong f]eed[strong b]ack."
+		    }
+		}
+
+		p "
+		Only ``ecb'' neither requires a shift value nor an
+		initialization vector (see options below). All other
+		(``stream'') modes require the initialization vector,
+		the feedback modes additionally need a shift value."
+
+		p "
+		The number of characters buffered internally depends
+		both on cipher and operation mode. In ``ebc''- and
+		``cbc''-modes blocksize-1 characters are buffered. The
+		feedback modes buffer shift-1 characters."
+	    }
+	    defrow -iv {
+		p "
+		The argument to this options specifies the
+		initialization vector required by the stream modes of
+		the blockcipher. The exact interpretation depends
+		on the value of option [opt -iv-type]. See option
+		[opt -key] above for an explanation of possibilities
+		and their meaning. A complete block must be specified."
+	    }
+	    defrow -iv-type {
+		p "
+		See option [opt -key-type] above for an
+		explananation."
+	    }
+	    defrow -shift {
+		p "
+		Only integer numbers are allowed as values to this
+		option. It defines the number of bytes the feedback
+		register is shifted to the left after every
+		encryption. Only positive values not larger than the
+		blocksize are allowed. They must be a divisor of the
+		blocksize too!"
+	    }
+	}
+
+	p "Cipher characteristics:"
+
+	table border=1 {
+	    tr {Name {Blocksize (in byte)} {Keysize (in byte)}}
+	    tr {DES  8 {8 (without MSB!)}}
+	    tr {IDEA 8 16}
+	    tr {Blowfish 8 {1-56}}
+	    tr {Safer 8 {8, 16}}
+	    tr {RC2 8 {1-infinity}}
+	    tr {RC4 - {1-256}}
+	    tr {Rot - 1}
+	}
+
+	p "The SAFER blockcipher understands 2 additional options:"
+
+	table {
+	    defrow -strong-schedule {
+		p "
+		The argument is a boolean value. It determines wether a
+		stronger keyschedule is used or not. Defaults to
+		[strong no]."
+	    }
+	    defrow -rounds {
+		p "
+		The integer argument specifies the number of rounds used
+		during operation. Must be greater than 0 and smaller than to
+		14. The default value depends on the chosen keyschedule and
+		the length of the key:"
+
+		table {
+		    tr {{Strong schedule} Keylength Default}
+		    thline 3
+		    tr {0  8  6}
+		    tr {0 16 10}
+		    tr {1  8  8}
+		    tr {1 16 10}
+		    thline 3
+		}
+	    }
+	}
+    }
+}

@@ -1,0 +1,85 @@
+# -*- tcl -*-
+# installation home
+
+node trf_install {
+    title       "Trf: Installation manual"
+    shortTitle  "Installation"
+    description "The installation manual"
+    parent      trf_home
+
+    menu {
+	trf_patch
+	zlib
+	trf_libdes
+	trf_compile
+    }
+
+    contents {
+	p "
+	This is the installation manual of Tcl-Trf @mFullVersion@, as of
+	@mDate@. For a documentation of the available commands you should
+	read the [link cmd_ref]."
+
+	p "Before starting the compilation and installation a few notes:"
+
+	bullet_list {
+	    li	"
+	    You have managed to unpack this package in a directory of
+	    your choice, whether it was gzipped tar-archive or a
+	    zip-archive. The path of the file you are reading now is
+	    something like [afile .../trf@mFullVersion@/doc/install.?].
+	    The [afile .../trf@mFullVersion@]-part of it is that we will
+	    call the [strong source-directory] from now on."
+	}
+
+	p "
+	This package depends in its operation on quite a few others. Here
+	is a list of them:"
+
+	table {
+	    defrow [tcl] {
+		p "
+		of course. The package will compile with 7.6, 8.0 and 8.1a2.
+		The versions 8.0a1/a2/b1/b2 cannot be used anymore."
+
+		p "
+		This package requires manipulation of the core for full
+		functionality. If you can live without filter channels no
+		patching is required. In case you want patch [tcl], a
+		[strong {source distribution}] is necessary. Instructions
+		on how to patch it is provided in a [link patch]"
+	    }
+	    defrow [link memchan] {
+		p "
+		Trf can be used without, but the testsuite coming with this
+		distribution requires it."
+
+		p "
+		The current version is 1.5. A binary distribution for Win32
+		is available."
+	    }
+	    defrow [zlib] {
+		p "
+		This package is used to implement the [link trf_zip]
+		compression command/filter. It will be loaded at runtime, if
+		required and is therefore optional. See the description of the
+		[link trf_zip] command for more info."
+	    }
+	    defrow libdes {
+		p "
+		This package is used to implement the 'des' encryption
+		facility. It will be loaded at runtime, if required and is
+		therefore optional. Please read the [link trf_libdes] section
+		for more info."
+	    }
+	    defrow [SSLeay] {
+		p "
+		Another implementation of 'des', additionally used to
+		implement 'rc2', 'md2' and 'sha1'. Has priority over 'libdes'
+		because of this. It will be loaded at runtime, if required and
+		is therefore optional. Please read the [link trf_libdes]
+		section for more info."
+	    }
+	}
+    }
+}

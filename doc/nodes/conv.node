@@ -1,0 +1,60 @@
+# -*- tcl -*-
+# 
+
+node trf_conv {
+    title       "Trf: Conversion commands"
+    shortTitle  "Conversions commands"
+    description "Trf commands: conversion"
+    parent      trf_cmds
+
+    contents {
+	p "
+	All data conversion commands support only one option,
+	[opt -mode]. Allowed values are ``encode'', ``decode'' and
+	all unique abbreviations. It specifies the operation to
+	be executed in immediate mode or the operation executed
+	upon [strong write] if attached to a channel."
+
+	p "
+	Encode converts from binary data into the described
+	representation, decode does the reverse (obviously [smiley])."
+
+	p "Standard conversions are"
+
+	table {
+	    defrow bin {p "Converts bytes into dual representation."}
+	    defrow oct {p "Converts bytes into octal representation."}
+	    defrow hex {p "Converts bytes into hexadecimal representation."}
+	}
+
+	p "None of them buffers characters internally."
+
+	table {
+	    defrow uuencode {
+		p "
+		Blocks of 3 characters are uuencoded/decoded. Will
+		buffer 2 characters internally until a block is complete."
+	    }
+
+	    defrow base64 {
+		p "
+		Blocks of 3 characters are base64-encoded/decoded. This is
+		equivalent to [PGP]'s ASCII armor. Used by MIME too. Will
+		buffer 2 characters internally until a block is complete."
+		# MIME, base64 => RFC reference !
+	    }
+
+	    defrow ascii85 {
+		p "
+		Blocks of 4 characters will be encoded into Ascii85
+		representation as defined in the 'Postscript Reference
+		Manual' (2nd Edition, section 3.13, page 129)."
+	    }
+	}
+
+	p "
+	All of these are able to convert an incomplete block at the
+	end of input."
+
+    }
+}

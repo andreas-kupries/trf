@@ -1,0 +1,61 @@
+# -*- tcl -*-
+# libdes info
+
+node trf_libdes {
+    title       "Trf: SSLeay, libdes"
+    shortTitle  "SSLeay"
+    description "The SSLeay and libdes libraries"
+    parent      trf_install
+
+
+    contents {
+	p "
+	The [cmd DES] support was originally based upon [lib libdes], a freely
+	available implementation of this algorithm, written by [eay]. I used
+	version 3.23 directly."
+
+	p "
+	The higher versions of this library are now part of [SSLeayLib], Erics
+	implementation of the [strong S]ecure [strong S]ockets [strong L]ayer.
+	Because of this I have revamped the [cmd des] loader code to use
+	[lib libcrypto.so] from [SSLeayLib] or [lib libdes.so], in this order.
+	This had the additional benefit of being able to glue in even more
+	crypto algorithms. These are [cmd md2], [cmd sha1] and [cmd rc2]."
+
+	p "
+	The official homepage can be found at [sslhome]. A [ssleayfaq] is
+	available."
+
+	p "
+	[trf] requires a shared library version of [lib libdes]. People
+	without such [strong {don't}] loose however."
+
+	bullet_list {
+
+	    li "
+	    The unix-specific makefile contains the target ``libdes''. This
+	    will generate a shared library for [lib libdes]. It assumes that
+	    the [lib libdes] source distribution is available as subdirectory
+	    [afile libdes] (a sibling to [afile unix] !)."
+
+	    li "
+	    A binary distribution for [win] is available, at the master
+	    location and the associated mirrors. This is not a binary
+	    distribution of [lib libdes] alone, but of [lib SSLeayLib]. The
+	    shared library [afile crypto32.dll] contains the required DES
+	    functionality.
+
+	    Either rename this DLL to [afile libdes.dll] or uncomment the
+	    definition of [var LIBDES] in [afile makefile.vc] before
+	    compilation of [trf]."
+
+	    li "I have no information about its availability on MacIntoshes."
+	}
+
+	p "
+	I'm sorry, but [SSLeayLib] was to big to be included in the
+	Makefile. Instructions on how make a shared library for linux, sun,
+	solaris and irix are part of it however (as of version 0.6.6).
+	"
+    }
+}

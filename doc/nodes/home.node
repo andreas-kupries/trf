@@ -1,0 +1,44 @@
+# -*- tcl -*-
+# entry into the trf documentation
+
+node trf_home {
+    title       "Trf: Main documentation"
+    shortTitle  "Home"
+    description "The Trf documentation"
+    setFile     index.html
+
+    # environment dependent action:
+    # link to my site, or produce stand alone docs
+
+    if {[info exists ::_cgi_link_url(trf_up)]} {
+	parent trf_up
+    }
+
+    menu {
+	trf_intro   trf_where      trf_ack
+	trf_install trf_cmds       trf_capi
+	trf_danger  trf_copyrights trf_future
+    }
+
+    contents {
+	p align=center \
+		[font size=6 "
+	This document accompanies [trf] @mFullVersion@, as
+	distributed at @mDate@"]
+
+	#  indexing is required
+
+	p "
+	[trf] is an extension library to the script language [tcl], as created
+	by [jo]. It extends the language at the C-level with so-called
+	``transformer''-procedures. With the help of some patches to the core
+	the package is able to intercept all read/write operations on
+	designated channels, thus giving it the ability to transform the
+	buffer contents as desired. This allows things like transparent
+	encryption, compression, charset recoding, etc.
+	Build upon this framework (and as proof of concept) a collection of
+	[tcl]-level commands was implemented, most of them related to
+	cryptography. Additionally some binary data support is put in as well.
+	"
+    }
+}
