@@ -136,7 +136,7 @@ mLog log info Generating digests (please wait)...
 set files [exec /usr/bin/find . -type f -print]
 regsub -all "\n" $files { } files
 
-foreach md {crc crc-zlib adler md5 sha haval} {
+foreach md {crc crc-zlib adler md5 sha haval ripemd128 ripemd160} {
     mLog log info $md ...
     catch {eval exec md -a $md $files > digests.$md}
 }

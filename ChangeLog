@@ -1,6 +1,8 @@
 Sat May 31 00:04:27 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
-	* doc/install.tex): brought uptodate, some enhancements.
+	* ---------------- 1.0b3 ready for release ----------------
+
+	* doc/install.tex: brought uptodate, some enhancements.
 
 	* unix/configure.in: Removed references to a2 relase of tcl 8.0.
 
