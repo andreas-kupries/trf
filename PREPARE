@@ -81,6 +81,7 @@ mHandleBinaryDistributions \
 	win/bdist/NOTE.crypt \
 	unix/bdist/libcrypt.so
 
+file mkdir     win/bdist
 file rename xx win/bdist/jan.4
 
 mHandleBinaryDistributions \
