@@ -770,12 +770,6 @@ if test "x$ok" = "xyes" -a "x${SHLIB_SUFFIX}" != "x"; then
     MAKE_LIBDES="${SHLIB_LD_ALL} -o \${LIBDES_LIB_FILE} \${LIBDES_OBJ} ${SHLIB_LD_LIBS}"
 
     install_other=''
-
-    # Stubs & shared, activate provision of own stubs in init.c
-    if test $TRF_USING_STUBS -gt 0
-    then
-	TCL_DEFS="$TCL_DEFS -DUSE_TRF_STUBS"
-    fi
 else
     TRF_SHLIB_CFLAGS=""
     eval "TRF_LIB_FILE=libtrf${TCL_UNSHARED_LIB_SUFFIX}"

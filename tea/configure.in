@@ -202,9 +202,6 @@ SC_ENABLE_SYMBOLS
 
 if test "${SHARED_BUILD}" = "1" ; then
     CFLAGS='${CFLAGS_DEFAULT} ${CFLAGS_WARNING} ${SHLIB_CFLAGS}'
-
-    # Stubs & shared, activate provision of own stubs in init.c
-    AC_DEFINE(USE_TRF_STUBS)
 else
     CFLAGS='${CFLAGS_DEFAULT} ${CFLAGS_WARNING}'
 fi
