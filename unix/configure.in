@@ -104,7 +104,6 @@ AC_CACHE_CHECK(for directory with tcl.h,
 		$prefix/include \
 		../../tcl8.0/generic \
 		../../tcl8.0b*/generic \
-		../../tcl8.0a2/generic \
 		../../tcl7.6/generic \
 		../../tcl/generic \
 		../../tcl \
@@ -166,7 +165,6 @@ AC_CACHE_CHECK(for tcl library,
 	 places="$TCL_LIB_DIR \
 	../../tcl8.0/unix \
 	../../tcl8.0b*/unix \
-	../../tcl8.0a2/unix \
 	../../tcl7.6/unix \
 	../../tcl/unix \
 	../../tcl \
@@ -177,7 +175,7 @@ AC_CACHE_CHECK(for tcl library,
         if test -n "$trf_cv_lib_TCL_LIB"; then
             break
         fi
-        for version in 8.0 8.0a2 7.6 ""; do
+        for version in 8.0 8.0b1 7.6 ""; do
             if test -n "$trf_cv_lib_TCL_LIB"; then
                 break
             fi
