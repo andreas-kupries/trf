@@ -13,9 +13,16 @@
 	(errors may destroy the length byte too !!!)
 	/done/
 
+<>	Rework manual, new installation guide.
+	/done/
+
 <>	add	md5/haval/sha file-digests, sign with pgp
 	=>	place in separate files on ftp-server!
 	/partly done, digests/
 
-----
-<>	Rework manual, new installation guide.
+--------
+<>	Rewrite adaptor code for DES to use SSLeay instead of libdes.
+
+<>	Write code to use Blowfish, IDEA, RC4 from SSLeay as well!
+
+<>	Write code to use RSA functionality of SSLeay
