@@ -278,7 +278,7 @@ ClientData       clientData;
 
     c->block [MSG_LEN-1] = c->charCount; /* == MSG_LEN-1 */
 
-    rsencode ((char*) c->block, out);
+    rsencode (c->block, (unsigned char*) out);
 
     /* not really required: memset (c->block, '\0', MSG_LEN); */
     c->charCount = 0;

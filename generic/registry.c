@@ -1481,7 +1481,7 @@ Trf_Options        optInfo;
       if (Tcl_Eof (source))
 	break;
 
-      actuallyRead = Tcl_Read (source, (unsigned char*) buf, READ_CHUNK_SIZE);
+      actuallyRead = Tcl_Read (source, (char*) buf, READ_CHUNK_SIZE);
 
       if (actuallyRead <= 0)
 	break;
