@@ -662,7 +662,7 @@ TRF_DECLS = \
 trfDecls.h trfIntDecls.h : genstubs
 
 genstubs: $(GENERIC_DIR)/trf.decls $(GENERIC_DIR)/trfInt.decls
-	tclsh $(tools)/genStubs.tcl $(GENERIC_DIR) \
+	tclsh $(tool)/genStubs.tcl $(GENERIC_DIR) \
 		$(GENERIC_DIR)/trf.decls $(GENERIC_DIR)/trfInt.decls
 
 #

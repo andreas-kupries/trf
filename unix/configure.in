@@ -917,10 +917,7 @@ then
 	# (1)
 	MD5_LIB_FILE=libcrypt$SHLIB_SUFFIX
 	TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=\\\"libcrypt$SHLIB_SUFFIX\\\""
-
-echo "@@ (1)"
 else
-echo "@@ (2,3)"
 	# (2,3)
 	if test \( $HAS_LIBCRYPT_MD5 -eq 0 \)
 	then
@@ -928,18 +925,8 @@ echo "@@ (2,3)"
 		MD5_LIB_FILE=libmd5crypt$SHLIB_SUFFIX
 		TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=\\\"libmd5crypt$SHLIB_SUFFIX\\\""
 		SHARED_LIBS="-lcrypt $SHARED_LIBS"
-
-echo "@@ (3)"
 	fi
 fi
-
-echo "@@ has-libcrypt     = $HAS_LIBCRYPT"
-echo "@@ has-libcrypt-md5 = $HAS_LIBCRYPT_MD5"
-echo "@@ md5-lib-file     = $MD5_LIB_FILE"
-echo "@@ trf-defs         = $TRF_DEFS"
-echo "@@ defs             = $DEFS"
-echo "@@ libs             = $LIBS"
-echo "@@ shlib-ld-libs    = $SHLIB_LD_LIBS"
 
 AC_SUBST(MD5_LIB_FILE)
 

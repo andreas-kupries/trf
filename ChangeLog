@@ -1,3 +1,8 @@
+Tue Mar 21 21:22:06 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* unix/Makefile.in (genstubs): Fixed usage of wrong variable
+	  (tools -> tool), with thanks to Oisin Grehan <oisin@online.ie>.
+
 Wed Mar 15 22:57:48 2000  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/reflect.c (Clear(En/De)coder): Darren New

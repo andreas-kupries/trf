@@ -96,6 +96,7 @@ proc gen-hash {} {
     set out stdout
     if {$zip} {
 	fconfigure  stdout -translation binary
+	catch {fconfigure  stdout -encoding binary}
 	zip -attach stdout -mode compress
     }
 
@@ -104,6 +105,7 @@ proc gen-hash {} {
 	if {0 != [string compare stdin $f]} {set f [open $f r]}
 
 	fconfigure  $f -translation binary
+	catch {fconfigure $f -encoding binary}
 	hex -attach [set digest [memchan]] -mode encode
 	$md -attach $f                     -mode write -read-dest $digest -read-type channel
 
@@ -141,7 +143,8 @@ proc check-hash {} {
     puts "performing $md check of incoming digests ($in_name)"
 
     if {$zip} {
-	fconfigure  $check_src -translation binary
+	fconfigure        $check_src -translation binary
+	catch {fconfigure $check_src -encoding    binary}
 	zip -attach $check_src -mode compress
 	#                            on write, aka decompress for read
     }
@@ -164,7 +167,8 @@ proc check-hash {} {
 
 	if {$verbose} {puts -nonewline stdout "checking $fname ... "; flush stdout}
 
-	fconfigure  $f -translation binary
+	fconfigure        $f -translation binary
+	catch {fconfigure $f -encoding    binary}
 	hex -attach [set digest [memchan]] -mode encode
 	$md -attach $f                     -mode write -read-dest $digest -read-type channel
 
