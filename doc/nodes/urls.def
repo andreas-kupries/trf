@@ -52,17 +52,16 @@ url zLib [lib zlib] http://www.cdrom.com/pub/infozip/zlib/
 
 # -------------------------------------------------
 
-link trf_src_tgz  "Unix tar.gz" \
-	http://www.oche.de/~akupries/soft/trf/download/trf@mFullVersion@.tar.gz
+set base http://www.oche.de/~akupries/soft/trf/download
 
-link trf_src_zip  "Windows zip" \
-	http://www.oche.de/~akupries/soft/trf/download/trf@mFullVersion@.zip
+link trf_src_tgz  {Sources, Unix}                  ${base}/trf@mFullVersion@.tar.gz
+link trf_src_zip  {Sources, Win*}                  ${base}/trf@mFullVersion@.zip
+link trf_doc_tgz  {Standalone documentation, Unix} ${base}/trf@mFullVersion@.doc.tar.gz
+link trf_doc_zip  {Standalone documentation, Win*} ${base}/trf@mFullVersion@.doc.zip
+link trf_readme   README                           ${base}/trf@mFullVersion@.README
+link trf_win32bin {Binaries, Win*}                 ${base}/trf@mFullVersion@.win32.zip
 
-link trf_readme   "README"      \
-	http://www.oche.de/~akupries/soft/trf/download/trf@mFullVersion@.README
-
-link trf_win32bin "binary distribution" \
-	http://www.oche.de/~akupries/soft/trf/download/trf@mShortDosVersion@-win32.zip
+unset base
 
 # -------------------------------------------------
 
