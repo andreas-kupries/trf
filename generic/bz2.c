@@ -222,7 +222,7 @@ ClientData     clientData;
     return (ClientData) NULL;
   }
 
-  res = bz.compressInit (&c->state, o->level, 0, 0);
+  res = bz.bcompressInit (&c->state, o->level, 0, 0);
 
   if (res != BZ_OK) {
     if (interp) {
@@ -264,7 +264,7 @@ ClientData clientData;
 
   /* release conversion specific items here (BZ2) */
 
-  bz.compressEnd (&c->state);
+  bz.bcompressEnd (&c->state);
   Tcl_Free ((char*) c->output_buffer);
   Tcl_Free ((char*) c);
 }
@@ -311,7 +311,7 @@ ClientData clientData;
     c->state.next_out  = (unsigned char*) (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
-    res = bz.compress (&c->state, BZ_RUN);
+    res = bz.bcompress (&c->state, BZ_RUN);
 
     if (res < BZ_OK) {
       if (interp) {
@@ -379,7 +379,7 @@ ClientData clientData;
     c->state.next_out  = (unsigned char*) (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
-    res = bz.compress (&c->state, BZ_RUN);
+    res = bz.bcompress (&c->state, BZ_RUN);
 
     if (res < BZ_OK) {
       if (interp) {
@@ -445,7 +445,7 @@ ClientData clientData;
     c->state.next_out  = (unsigned char*) (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
-    res = bz.compress (&c->state, BZ_FINISH);
+    res = bz.bcompress (&c->state, BZ_FINISH);
 
     if (res < BZ_OK) {
       if (interp) {
@@ -498,7 +498,7 @@ ClientData clientData;
 
   /* execute conversion specific code here (BZ2) */
 
-  /* bz.compressReset (&c->state); */
+  /* bz.bcompressReset (&c->state); */
 }
 
 /*
@@ -548,7 +548,7 @@ ClientData     clientData;
     return (ClientData) NULL;
   }
 
-  res = bz.decompressInit (&c->state, 0, 0);
+  res = bz.bdecompressInit (&c->state, 0, 0);
 
   if (res != BZ_OK) {
     if (interp) {
@@ -592,7 +592,7 @@ ClientData clientData;
 
   /* release conversion specific items here (BZ2) */
 
-  bz.decompressEnd (&c->state);
+  bz.bdecompressEnd (&c->state);
 
   Tcl_Free ((char*) c->output_buffer);
   Tcl_Free ((char*) c);
@@ -639,7 +639,7 @@ ClientData clientData;
     c->state.next_out  = (unsigned char*) (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
-    res = bz.decompress (&c->state);
+    res = bz.bdecompress (&c->state);
     c->lastRes = res;
 
     if ((res < BZ_OK) && (res != BZ_STREAM_END)) {
@@ -708,7 +708,7 @@ ClientData clientData;
     c->state.next_out  = (unsigned char*) (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
-    res = bz.decompress (&c->state);
+    res = bz.bdecompress (&c->state);
     c->lastRes = res;
 
     if ((res < BZ_OK) && (res != BZ_STREAM_END)) {
@@ -782,7 +782,7 @@ ClientData clientData;
     c->state.next_out  = (unsigned char*) (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
-    res = bz.decompress (&c->state);
+    res = bz.bdecompress (&c->state);
 
     if ((res < BZ_OK) && (res != BZ_STREAM_END)) {
       if (interp) {
@@ -835,7 +835,7 @@ ClientData clientData;
 
   /* execute conversion specific code here (BZ2) */
 
-  /* bz.decompressReset (&c->state); */
+  /* bz.bdecompressReset (&c->state); */
 }
 
 /*

@@ -249,11 +249,11 @@ ClientData     clientData;
   PRINT ("deflateInit (%d, %s)\n", o->level, ZLIB_VERSION); FL;
 
 #if 0
-  res = zf.deflateInit_ (&c->state, o->level,
+  res = zf.zdeflateInit_ (&c->state, o->level,
 			 ZLIB_VERSION, sizeof(z_stream));
 #endif
 
-  res = zf.deflateInit2_ (&c->state, o->level, Z_DEFLATED,
+  res = zf.zdeflateInit2_ (&c->state, o->level, Z_DEFLATED,
 			 o->nowrap  ?
 			 -MAX_WBITS :
 			 MAX_WBITS,
@@ -307,7 +307,7 @@ ClientData clientData;
   START (ZipDeleteEncoder); 
   PRINT ("deflateEnd ()\n"); FL;
 
-  zf.deflateEnd (&c->state);
+  zf.zdeflateEnd (&c->state);
 
   Tcl_Free ((char*) c->output_buffer);
   Tcl_Free ((char*) c);
@@ -360,7 +360,7 @@ ClientData clientData;
     c->state.avail_out = OUT_SIZE;
 
     PRINT ("deflate (Z_NO_FLUSH)\n"); FL;
-    res = zf.deflate (&c->state, Z_NO_FLUSH);
+    res = zf.zdeflate (&c->state, Z_NO_FLUSH);
 
     IN; PRINTLN (ZlibErrorMsg (&c->state, res)); FL; OT;
 
@@ -438,7 +438,7 @@ ClientData clientData;
     c->state.avail_out = OUT_SIZE;
 
     PRINT ("deflate (Z_NO_FLUSH)\n"); FL;
-    res = zf.deflate (&c->state, Z_NO_FLUSH);
+    res = zf.zdeflate (&c->state, Z_NO_FLUSH);
 
     IN; PRINTLN (ZlibErrorMsg (&c->state, res)); FL; OT;
 
@@ -513,7 +513,7 @@ ClientData clientData;
     c->state.avail_out = OUT_SIZE;
 
     PRINT ("deflate (Z_FINISH)\n"); FL;
-    res = zf.deflate (&c->state, Z_FINISH);
+    res = zf.zdeflate (&c->state, Z_FINISH);
 
     IN; PRINTLN (ZlibErrorMsg (&c->state, res)); FL; OT;
 
@@ -574,7 +574,7 @@ ClientData clientData;
 
   /* execute conversion specific code here (ZIP) */
 
-  zf.deflateReset (&c->state);
+  zf.zdeflateReset (&c->state);
 
   DONE (ZipClearEncoder); 
 }
@@ -635,11 +635,11 @@ ClientData     clientData;
   PRINT ("inflateInit (%s, nowrap=%d)\n", ZLIB_VERSION, o->nowrap); FL;
 
 #if 0
-  res = zf.inflateInit_ (&c->state,
+  res = zf.zinflateInit_ (&c->state,
 			 ZLIB_VERSION, sizeof (z_stream));
 #endif
 
-  res = zf.inflateInit2_ (&c->state,
+  res = zf.zinflateInit2_ (&c->state,
 			 o->nowrap  ?
 			 -MAX_WBITS :
 			 MAX_WBITS,
@@ -692,7 +692,7 @@ ClientData clientData;
   START (ZipDeleteDecoder); 
   PRINT ("inflateEnd ()\n"); FL;
 
-  zf.inflateEnd (&c->state);
+  zf.zinflateEnd (&c->state);
 
   Tcl_Free ((char*) c->output_buffer);
   Tcl_Free ((char*) c);
@@ -751,7 +751,7 @@ ClientData clientData;
     c->state.avail_out = OUT_SIZE;
 
     PRINT ("inflate (Z_NO_FLUSH)\n"); FL;
-    res = zf.inflate (&c->state, Z_NO_FLUSH);
+    res = zf.zinflate (&c->state, Z_NO_FLUSH);
 
     IN; PRINTLN (ZlibErrorMsg (&c->state, res)); FL; OT;
 
@@ -850,7 +850,7 @@ ClientData clientData;
     c->state.avail_out = OUT_SIZE;
 
     PRINT ("inflate (Z_NO_FLUSH)\n"); FL;
-    res = zf.inflate (&c->state, Z_NO_FLUSH);
+    res = zf.zinflate (&c->state, Z_NO_FLUSH);
 
     IN; PRINTLN (ZlibErrorMsg (&c->state, res)); FL; OT;
 
@@ -951,7 +951,7 @@ ClientData clientData;
     }
 
     PRINT ("inflate (Z_FINISH)\n"); FL;
-    res = zf.inflate (&c->state, Z_FINISH);
+    res = zf.zinflate (&c->state, Z_FINISH);
 
     IN; PRINTLN (ZlibErrorMsg (&c->state, res));
     FL; OT;
@@ -1013,7 +1013,7 @@ ClientData clientData;
 
   /* execute conversion specific code here (ZIP) */
 
-  zf.inflateReset (&c->state);
+  zf.zinflateReset (&c->state);
 
   DONE (ZipClearDecoder); 
 }

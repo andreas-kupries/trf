@@ -1,3 +1,17 @@
+2003-01-09  Andreas Kupries  <andreask@activestate.com>
+
+	* ./tclconfig/tcl.m4:       Added code to look for and load
+	* ./Makefile.in:            the package zlibtcl if possible.
+	* ./configure.in:           This makes loading zip functionality
+	* ./generic/adler.c:        considerably easier (if present).
+	* ./generic/zlib.c:         We will fall back to libz.so if
+	* ./generic/transformInt.h: zlibtcl was not present at runtime.
+	* ./generic/crc_zlib.c:     Some declarations were changed to
+	* ./generic/zip.c:          avoid a clashing of names (and
+	* ./generic/bz2.c:          subsequent compiler errors due to
+	* ./configure:              expansion of macros in the wrong
+				    place.
+
 2002-11-22  Andreas Kupries  <andreask@activestate.com>
 
 	* Makefile.in: Deactivated target for MD5 library. HPUX balked

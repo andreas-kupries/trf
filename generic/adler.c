@@ -120,7 +120,7 @@ VOID* context;
 
   /* call md specific initialization here */
 
-  ADLER = zf.adler32 (0L, Z_NULL, 0);
+  ADLER = zf.zadler32 (0L, Z_NULL, 0);
 
   DONE (MDAdler_Start);
 }
@@ -153,7 +153,7 @@ unsigned int   character;
 
   unsigned char buf = character;
 
-  ADLER = zf.adler32 (ADLER, &buf, 1);
+  ADLER = zf.zadler32 (ADLER, &buf, 1);
 }
 
 /*
@@ -183,7 +183,7 @@ int   bufLen;
 {
   /* call md specific update here */
 
-  ADLER = zf.adler32 (ADLER, buffer, bufLen);
+  ADLER = zf.zadler32 (ADLER, buffer, bufLen);
 }
 
 /*

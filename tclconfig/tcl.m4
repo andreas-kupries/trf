@@ -3028,8 +3028,14 @@ AC_DEFUN(TEA_PROG_WISH, [
 #	the ${1} compile flags.  These are used by packages like
 #	[incr Tk] that load *Config.sh files from more than Tcl and Tk.
 #
+#	Normally aborts if the package could not be found. This can be
+#	supressed by specifying a second argument with a value of "optional".
+#
 # Arguments:
-#	none
+#	$1	Name of the package to look for.
+#	$2	Optional: Flag. If present and $2 == "optional"
+#               then the script will _not_ abort when failing to
+#		find the package.
 #
 # Results:
 #
@@ -3039,6 +3045,8 @@ AC_DEFUN(TEA_PROG_WISH, [
 #	Defines the following vars:
 #		$1_BIN_DIR	Full path to the directory containing
 #				the $1Config.sh file
+#                               Contains a shell comment if nothing was found
+#               HAVE_$1_PACKAGE Boolean 1 = Package found.
 #------------------------------------------------------------------------
 
 AC_DEFUN(TEA_PATH_CONFIG, [
@@ -3105,11 +3113,16 @@ AC_DEFUN(TEA_PATH_CONFIG, [
 	if test x"${ac_cv_c_$1config}" = x ; then
 	    $1_BIN_DIR="# no $1 configs found"
 	    AC_MSG_WARN("Cannot find $1 configuration definitions")
-	    exit 0
+	    if test "X$2" != "Xoptional" ; then
+		exit 0
+	    fi
+	    HAVE_$1_PACKAGE=0
 	else
 	    no_$1=
 	    $1_BIN_DIR=${ac_cv_c_$1config}
 	    AC_MSG_RESULT([found $$1_BIN_DIR/$1Config.sh])
+	    HAVE_$1_PACKAGE=1
+	    AC_DEFINE([HAVE_$1_PACKAGE])
 	fi
     fi
 ])

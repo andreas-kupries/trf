@@ -51,10 +51,14 @@ extern "C" {
 #else
 #   include "../compat/dlfcn.h"
 #endif
-#ifdef HAVE_ZLIB_H
-#   include <zlib.h>
+#ifdef HAVE_zlibtcl_PACKAGE
+#   include "zlibtcl.h"
 #else
-#   include "../compat/zlib.h"
+#   ifdef HAVE_ZLIB_H
+#      include <zlib.h>
+#   else
+#      include "../compat/zlib.h"
+#   endif
 #endif
 #endif
 #ifdef HAVE_BZLIB_H
@@ -389,26 +393,26 @@ TrfBZ2Options _ANSI_ARGS_ ((void));
 
 typedef struct ZFunctions {
   VOID *handle;
-  int (ZEXPORT * deflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
-  int (ZEXPORT * deflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
+  int (ZEXPORT * zdeflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
+  int (ZEXPORT * zdeflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
 
-  int (ZEXPORT * deflateInit2_)     _ANSI_ARGS_ ((z_streamp strm, int level,
+  int (ZEXPORT * zdeflateInit2_)     _ANSI_ARGS_ ((z_streamp strm, int level,
 						  int method, int windowBits,
 						  int memLevel, int strategy,
 						  CONST char *version,
 						 int stream_size));
-  int (ZEXPORT * deflateReset)      _ANSI_ARGS_ ((z_streamp strm));
-  int (ZEXPORT * inflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
-  int (ZEXPORT * inflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
-  int (ZEXPORT * inflateInit2_)     _ANSI_ARGS_ ((z_streamp strm,
+  int (ZEXPORT * zdeflateReset)      _ANSI_ARGS_ ((z_streamp strm));
+  int (ZEXPORT * zinflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
+  int (ZEXPORT * zinflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
+  int (ZEXPORT * zinflateInit2_)     _ANSI_ARGS_ ((z_streamp strm,
 						  int windowBits,
 						  CONST char *version,
 						  int stream_size));
-  int (ZEXPORT * inflateReset)      _ANSI_ARGS_ ((z_streamp strm));
-  unsigned long (ZEXPORT * adler32) _ANSI_ARGS_ ((unsigned long adler,
+  int (ZEXPORT * zinflateReset)      _ANSI_ARGS_ ((z_streamp strm));
+  unsigned long (ZEXPORT * zadler32) _ANSI_ARGS_ ((unsigned long adler,
 						  CONST unsigned char *buf,
 						  unsigned int len));
-  unsigned long (ZEXPORT * crc32)   _ANSI_ARGS_ ((unsigned long crc,
+  unsigned long (ZEXPORT * zcrc32)   _ANSI_ARGS_ ((unsigned long crc,
 						  CONST unsigned char *buf,
 						  unsigned int len));
 } zFunctions;
@@ -437,16 +441,16 @@ TrfLoadZlib _ANSI_ARGS_ ((Tcl_Interp *interp));
 
 typedef struct BZFunctions {
   VOID *handle;
-  int (BZEXPORT * compress)           _ANSI_ARGS_ ((bz_stream* strm,
+  int (BZEXPORT * bcompress)           _ANSI_ARGS_ ((bz_stream* strm,
 						    int action));
-  int (BZEXPORT * compressEnd)        _ANSI_ARGS_ ((bz_stream* strm));
-  int (BZEXPORT * compressInit)       _ANSI_ARGS_ ((bz_stream* strm,
+  int (BZEXPORT * bcompressEnd)        _ANSI_ARGS_ ((bz_stream* strm));
+  int (BZEXPORT * bcompressInit)       _ANSI_ARGS_ ((bz_stream* strm,
 						    int blockSize100k,
 						    int verbosity,
 						    int workFactor));
-  int (BZEXPORT * decompress)         _ANSI_ARGS_ ((bz_stream* strm));
-  int (BZEXPORT * decompressEnd)      _ANSI_ARGS_ ((bz_stream* strm));
-  int (BZEXPORT * decompressInit)     _ANSI_ARGS_ ((bz_stream* strm,
+  int (BZEXPORT * bdecompress)         _ANSI_ARGS_ ((bz_stream* strm));
+  int (BZEXPORT * bdecompressEnd)      _ANSI_ARGS_ ((bz_stream* strm));
+  int (BZEXPORT * bdecompressInit)     _ANSI_ARGS_ ((bz_stream* strm,
 						    int verbosity, int small));
 } bzFunctions;
 

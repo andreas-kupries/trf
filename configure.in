@@ -70,6 +70,36 @@ TEA_INIT
 TEA_PATH_TCLCONFIG
 TEA_LOAD_TCLCONFIG
 
+TEA_PATH_CONFIG(zlibtcl,optional)
+if test $HAVE_zlibtcl_PACKAGE -gt 0 ; then
+    TEA_LOAD_CONFIG(zlibtcl)
+
+    #--------------------------------------------------------------------
+    # Compute an absolute path to the src directory of 'zlibtcl'. We
+    # need the special 'zlib.h' header which routes through
+    # 'zlibtcl.h' to splice the stub definitions into the unchanged
+    # sources of png.
+    #--------------------------------------------------------------------
+
+    case $zlibtcl_SRC_DIR in
+    /*)	zlibtcl_SRC_PATH=$zlibtcl_SRC_DIR
+	;;
+    *)	# SRC_DIR relative, splice with BUILD_PATH
+	zlibtcl_SRC_PATH="`dirname $zlibtcl_BUILD_STUB_LIB_PATH`/$zlibtcl_SRC_DIR"
+    esac
+
+    zlibtcl_BUILD_PATH="`dirname $zlibtcl_BUILD_STUB_LIB_PATH`"
+
+    if test "${TEA_PLATFORM}" = "windows" ; then
+	zlibtcl_SRC_PATH="\"`$CYGPATH $zlibtcl_SRC_PATH`\""
+	zlibtcl_BUILD_PATH="\"`$CYGPATH $zlibtcl_BUILD_PATH`\""
+    fi
+fi
+
+AC_SUBST(zlibtcl_SRC_PATH)
+AC_SUBST(zlibtcl_BUILD_PATH)
+AC_SUBST(zlibtcl_VERSION)
+
 #-----------------------------------------------------------------------
 # Handle the --prefix=... option by defaulting to what Tcl gave.
 # Must be called after TEA_LOAD_TCLCONFIG and before TEA_SETUP_COMPILER.
@@ -211,6 +241,7 @@ TEA_ENABLE_SYMBOLS
 #--------------------------------------------------------------------
 
 AC_DEFINE(USE_TCL_STUBS)
+AC_DEFINE(USE_ZLIBTCL_STUBS)
 
 #--------------------------------------------------------------------
 # This macro generates a line to use when building a library.  It
@@ -219,6 +250,20 @@ AC_DEFINE(USE_TCL_STUBS)
 #--------------------------------------------------------------------
 
 TEA_MAKE_LIB
+
+#--------------------------------------------------------------------
+# __CHANGE__
+# Add platform libs to LIBS or SHLIB_LD_LIBS as necessary.
+#--------------------------------------------------------------------
+
+if test $HAVE_zlibtcl_PACKAGE -gt 0 ; then
+    if test "${TEA_PLATFORM}" = "windows" -a "$GCC" != "yes" ; then
+	SHLIB_LD_LIBS="${SHLIB_LD_LIBS} \"`${CYGPATH} ${zlibtcl_STUB_LIB_PATH}`\""
+    else
+	SHLIB_LD_LIBS="${SHLIB_LD_LIBS} ${zlibtcl_STUB_LIB_SPEC}"
+    fi
+fi
+AC_SUBST(SHLIB_SUFFIX)
 
 #--------------------------------------------------------------------
 # Find tclsh so that we can run pkg_mkIndex to generate the pkgIndex.tcl

@@ -16,7 +16,7 @@
 #endif
 
 #ifndef Z_LIB_NAME
-#define Z_LIB_NAME "libz.so"
+#define Z_LIB_NAME LIBZ_DEFAULTNAME
 #endif
 
 
@@ -64,8 +64,32 @@ TrfLoadZlib (interp)
 #ifndef ZLIB_STATIC_BUILD
   int res;
 
-  TrfLock; /* THREADING: serialize initialization */
+#ifdef HAVE_zlibtcl_PACKAGE
+  /* Try to use zlibtcl first. This makes loading much easier.
+   */
 
+  if (Zlibtcl_InitStubs(interp, ZLIBTCL_VERSION, 0) != NULL) {
+    /*
+     * Copy stub information into the table the rest of Trf is using.
+     */
+
+    zf.handle         = 0;
+    zf.zdeflate       = deflate      ;
+    zf.zdeflateEnd    = deflateEnd   ;
+    zf.zdeflateInit2_ = deflateInit2_;
+    zf.zdeflateReset  = deflateReset ;
+    zf.zinflate       = inflate      ;
+    zf.zinflateEnd    = inflateEnd   ;
+    zf.zinflateInit2_ = inflateInit2_;
+    zf.zinflateReset  = inflateReset ;
+    zf.zadler32       = adler32      ;
+    zf.zcrc32         = crc32        ;
+    return TCL_OK;
+  }
+
+#endif
+
+  TrfLock; /* THREADING: serialize initialization */
   res = Trf_LoadLibrary (interp, Z_LIB_NAME, (VOID**) &zf, symbols, 10);
   TrfUnlock;
 
