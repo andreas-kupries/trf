@@ -155,6 +155,8 @@ mConfigure unix
 # creation of trf1481.dll is waiting in the todo pipeline.
 
 file copy win/trf1380.dll win/trf1480.dll
+file copy win/trf1380.lib win/trf1480.lib
+file rename win/trf1380.README win/trf1480.README
 
 set bindir  "[::pool::string::cap $mName]${mVersion}"
 
@@ -172,7 +174,7 @@ cd ..
 
 exec zip -r9 win32.zip $bindir
 mSupport win32.zip
-file delete -force $bindir
+file delete -force $bindir win32.zip
 
 # --------------------------------------------------------------
 
