@@ -1,3 +1,22 @@
+Tue Jun 15 00:00:36 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* tests/*.test: The tests for all commands dependent on external
+ 	  shared libraries now have constraints set on them.
+
+	* unix/Makefile.in (test): Added code to define more constraints,
+	  the variable used is set by the 'configure' script to define,
+	  which external libraries are available and therefore testable.
+
+	* tests/defs: Updated to code from Tcl 8.0.5, copied my
+ 	  definitions from the old 'defs' to it, added code to define more
+ 	  constraints.
+
+	* unix/configure.in (ZLIB_INCLUDE_DIR): Changed error into
+	  warning, allows falling back to compatibility headers.
+	  (SSL_INCLUDE_DIR): See above. (Variable: TRF_DEFS).
+	  (TRF_TESTS): New variable, contains constraint information about
+	  tests to skip.
+
 Mon Jun 14 20:39:21 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/zlib.c, zip.c, crc_zip.c: Renamed 'z' to 'zf', as the

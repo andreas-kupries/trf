@@ -24,11 +24,11 @@ foreach {i in digest} {
     140470DB8BFB6AE5
 } {
     if {[info tclversion] < 8.0} {
-	test otp_sha1-4.$i-7.6 {otp_sha1, immediate} {
+	test otp_sha1-4.$i-7.6 {otp_sha1, immediate} {hasSSL} {
 	    exec_md otp_sha1 [text2hex $in]
 	} [string toupper $digest]
     } else {
-	test otp_sha1-4.$i-8.x {otp_sha1, immediate} {
+	test otp_sha1-4.$i-8.x {otp_sha1, immediate} {hasSSL} {
 	    hex -m e [otp_sha1 $in]
 	} [string toupper $digest]
     }

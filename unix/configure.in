@@ -5,6 +5,8 @@ AC_REVISION($Id$)
 dnl
 AC_INIT(../generic/transform.h)
 
+TRF_DEFS=""
+TRF_TESTS=""
 TRF_VERSION=@mVersion@
 TRF_MAJOR_VERSION=@mMajor@
 TRF_MINOR_VERSION=@mMinor@
@@ -320,7 +322,10 @@ dnl
 ZLIB_INCLUDE_DIR=$trf_cv_path_ZLIB_INCLUDE_DIR
 
 if test -z "$ZLIB_INCLUDE_DIR" ; then
-    AC_MSG_ERROR(not found; use --with-zlib=DIR or --with-zlib-include-dir=DIR)
+    AC_MSG_ERROR(not found; falling back to compat/ headers; use --with-zlib=DIR or --with-zlib-include-dir=DIR)
+else
+    TRF_DEFS="$TRF_DEFS -DHAVE_ZLIB_H"
+    TRF_TESTS="$TRF_TESTS hasZlib"
 fi
 dnl
 
@@ -365,11 +370,10 @@ AC_CACHE_CHECK(for libz library,
 
 ZLIB_LIB_DIR="$trf_cv_lib_ZLIB_LIB_DIR"
 if test -z "$ZLIB_LIB_DIR" ; then
-    AC_MSG_ERROR(not found; use --with-zlib-lib-dir=path)
+    AC_MSG_WARN(not found; use --with-zlib-lib-dir=path)
 fi
 
 AC_SUBST(ZLIB_LIB_DIR)
-
 AC_CACHE_VAL(trf_cv_ZLIB_LIB_DIR, [trf_cv_ZLIB_LIB_DIR="$ZLIB_LIB_DIR"])
 
 
@@ -411,7 +415,10 @@ dnl
 SSL_INCLUDE_DIR=$trf_cv_path_SSL_INCLUDE_DIR
 
 if test -z "$SSL_INCLUDE_DIR" ; then
-    AC_MSG_ERROR(not found; use --with-ssl=DIR or --with-ssl-include-dir=DIR)
+    AC_MSG_WARN(not found; falling back compat/ headers; use --with-ssl=DIR or --with-ssl-include-dir=DIR)
+else
+    TRF_DEFS="$TRF_DEFS -DHAVE_SSL_H -DHAVE_MD2_H -DHAVE_SHA_H"
+    TRF_TESTS="$TRF_TESTS hasSSL"
 fi
 dnl
 
@@ -458,7 +465,7 @@ AC_CACHE_CHECK(for ssl libcrypto library (for message digests),
 
 SSL_LIB_DIR="$trf_cv_lib_SSL_LIB_DIR"
 if test -z "$SSL_LIB_DIR" ; then
-    AC_MSG_ERROR(not found; use --with-ssl-lib-dir=path)
+    AC_MSG_WARN(not found; use --with-ssl-lib-dir=path)
 fi
 
 AC_SUBST(SSL_LIB_DIR)
@@ -734,7 +741,6 @@ if test "x${TCL_SHARED_LIB_SUFFIX}" != 'x${VERSION}.a' -o "x${SHLIB_SUFFIX}" != 
 fi
 
 AC_SUBST(SHARED_LIBS)
-
 AC_SUBST(CC)
 AC_SUBST(DL_LIBS)
 AC_SUBST(DL_OBJS)
@@ -764,6 +770,8 @@ AC_SUBST(TRF_SHLIB_CFLAGS)
 AC_SUBST(TRF_VERSION)
 AC_SUBST(TRF_MAJOR_VERSION)
 AC_SUBST(TRF_MINOR_VERSION)
+AC_SUBST(TRF_TESTS)
+AC_SUBST(TRF_DEFS)
 AC_SUBST(install_other)
 
 AC_SUBST(MAKE_ZLIB)

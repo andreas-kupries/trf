@@ -141,6 +141,7 @@ LIBS = @TRF_LD_SEARCH_FLAGS@ @SHARED_LIBS@
 
 #TRF_LIB_FILE = libtrf.a
 
+TRF_TESTS	=	@TRF_TESTS@
 TRF_LIB_FILE	=	@TRF_LIB_FILE@
 ZLIB_LIB_FILE	=	@ZLIB_LIB_FILE@
 LIBDES_LIB_FILE	=	@LIBDES_LIB_FILE@
@@ -176,14 +177,15 @@ CC		=	@CC@
 CC_SWITCHES	=	$(CFLAGS) $(TRF_SHLIB_CFLAGS) $(CPPFLAGS)	\
 			-DZ_LIB_NAME=\"$(ZLIB_LIB_FILE)\"		\
 			-DLIBDES_LIB_NAME=\"$(LIBDES_LIB_FILE)\"	\
-			$(LIBDES_OPTS) @TCL_DEFS@
+			$(LIBDES_OPTS) @TCL_DEFS@ @TRF_DEFS@
 # $(TCL_CC_SWITCHES)
 CPPFLAGS	=	$(DEFINES) $(INCLUDES)
 
 INCLUDES	=	-I. -I$(srcdir) -I$(GENERIC_DIR) -I$(TOP_DIR)	\
 			-I$(TCL_INCLUDE_DIR) -I$(SSL_INCLUDE_DIR)	\
 			-I$(ZLIB_INCLUDE_DIR)
-DEFINES		=	$(PROTO_FLAGS) $(MEM_DEBUG_FLAGS) @DEFS@ @TCL_DEFS@
+DEFINES		=	$(PROTO_FLAGS) $(MEM_DEBUG_FLAGS)		\
+			@DEFS@ @TCL_DEFS@ @TRF_DEFS@
 
 HEADER		=	$(GENERIC_HDRS)
 GENERIC_HDRS	=	$(GENERIC_DIR)/transform.h $(GENERIC_DIR)/transformInt.h $(GENERIC_DIR)/crc.h
@@ -355,7 +357,7 @@ test:	application
 	TCL_LIBRARY=$(TCL_SRC_DIR)/library; export TCL_LIBRARY; \
 	LD_LIBRARY_PATH="$(srcdir):./unix:$(TCL_LIB_DIR):$(ZLIB_LIB_DIR):$(SSL_LIB_DIR)"; \
 	export LD_LIBRARY_PATH; SHLIB_PATH="$LD_LIBRARY_PATH"; export SHLIB_PATH ; \
-	echo package require Memchan \; cd $(TOP_DIR)/tests \; source all | $(APP)
+	echo package require Memchan \; cd $(TOP_DIR)/tests \; source defs \; defConstraints \"$(TRF_TESTS)\" \; source all | $(APP)
 
 # 'unix' is required to have a path for the
 # recursive call to unix/tclsh in '________.test'.

@@ -253,7 +253,7 @@ typedef struct ZFunctions {
 } zFunctions;
 
 
-EXTERN zFunctions z; /* THREADING: serialize initialization */
+EXTERN zFunctions zf; /* THREADING: serialize initialization */
 
 EXTERN int
 TrfLoadZlib _ANSI_ARGS_ ((Tcl_Interp *interp));

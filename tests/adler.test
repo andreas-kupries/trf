@@ -19,11 +19,11 @@ foreach {i in digest} {
     0 {hello world} 1A0B045D
 } {
     if {[info tclversion] < 8.0} {
-	test adler-4.$i-7.6 {adler, immediate} {
+	test adler-4.$i-7.6 {adler, immediate} {hasZlib} {
 	    exec_md adler [text2hex $in]
 	} $digest
     } else {
-	test adler-4.$i-8.x {adler, immediate} {
+	test adler-4.$i-8.x {adler, immediate} {hasZlib} {
 	    hex -m e [adler $in]
 	} $digest
     }

@@ -19,11 +19,11 @@ foreach {i in digest} {
     0 {hello world} 85114A0D
 } {
     if {[info tclversion] < 8.0} {
-	test crc_zlib-4.$i-7.6 {crc_zlib, immediate} {
+	test crc_zlib-4.$i-7.6 {crc_zlib, immediate} {hasZlib} {
 	    exec_md crc-zlib [text2hex $in]
 	} $digest
     } else {
-	test crc_zlib-4.$i-8.x {crc_zlib, immediate} {
+	test crc_zlib-4.$i-8.x {crc_zlib, immediate} {hasZlib} {
 	    hex -m e [crc-zlib $in]
 	} $digest
     }
