@@ -34,7 +34,9 @@ mExpandUrls
 mGenerateLSM
 mGenerateANNOUNCE
 
-package require MSA ; mGenerateAnnounceMail ; # mSupport AMAIL
+package require MSA
+mGenerateAnnounceMail tcl-announce@mitchell.org lvirden@cas.org
+mSupport AMAIL
 
 
 

@@ -1,5 +1,11 @@
 Sun May 30 10:49:42 1999  Andreas Kupries  <a.kupries@westend.com>
 
+	* tests/otp_words.test, otpsha1.test, otpmd5.test: Added testsuite
+	  for new OTP commands (See May 27).
+
+	* generic/otpcode.c, init.c, b64code.c, rs_ecc.c: Nits (comment in
+	  comment, unused variable, implicit function declarations).
+
 	* Threading: Done.
 
 Sat May 29 22:56:31 1999  Andreas Kupries  <a.kupries@westend.com>

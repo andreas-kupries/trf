@@ -53,5 +53,5 @@ TrfLoadZlib (interp)
   res = Trf_LoadLibrary (interp, Z_LIB_NAME, (VOID**) &z, symbols, 10);
   TrfUnlock;
 
-  return res
+  return res;
 }

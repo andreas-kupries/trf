@@ -308,7 +308,7 @@ Tcl_Interp* interp;
 /*
  *------------------------------------------------------*
  *
- *	Trf(Un)Lock --
+ *	Trf(Un)LockIt --
  *
  *	------------------------------------------------*
  *	Internal functions, used to serialize write-access
@@ -330,15 +330,15 @@ Tcl_Interp* interp;
 TCL_DECLARE_MUTEX(trfInitMutex)
 
 void
-TrfLock ()
+TrfLockIt ()
 {
-  TcL_MutexLock (&trfInitMutex);
+  Tcl_MutexLock (&trfInitMutex);
 }
 
 void
-TrfUnlock ()
+TrfUnlockIt ()
 {
-  TcL_MutexUnlock (&trfInitMutex);
+  Tcl_MutexUnlock (&trfInitMutex);
 }
 
 #endif /* GT81 */

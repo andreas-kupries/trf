@@ -345,7 +345,7 @@ ClientData clientData;
 	      c->buf [0], c->buf [1], c->buf [2],
 	      buf [0], buf [1], buf [2], buf [3]);
     }
-    /**/
+    / **/
 
     TrfApplyEncoding (buf, 4, baseMap);
 
@@ -354,7 +354,7 @@ ClientData clientData;
       printf ("%c%c%c%c\n", buf [0], buf [1], buf [2], buf [3]);
       fflush (stdout);
     }
-    /* dbg - */
+    / * dbg - */
 
     c->charCount = 0;
     memset (c->buf, '\0', 3);

@@ -38,6 +38,7 @@ extension trf {
     date           {@mDate@}
 
     primary-urls {
+	http://www.oche.de/%7Eakupries/tcltk.html
 	http://www.oche.de/%7Eakupries/soft/trf/
 	http://www.oche.de/%7Eakupries/soft/trf/download/<ARCH>
     }

@@ -27,6 +27,7 @@
  * CVS: $Id$
  */
 
+#include <ctype.h>
 #include "transformInt.h"
 
 /*
@@ -2386,8 +2387,7 @@ int bufLen;
 Tcl_Interp* interp;
 ClientData clientData;
 {
-  EncoderControl* c = (EncoderControl*) ctrlBlock;
-
+  /* EncoderControl* c = (EncoderControl*) ctrlBlock; unused */
   /* execute conversion specific code here (otp_words encode) */
 
   int    i = TCL_OK;
@@ -2707,8 +2707,7 @@ int bufLen;
 Tcl_Interp* interp;
 ClientData clientData;
 {
-  DecoderControl* c = (DecoderControl*) ctrlBlock;
-
+  /* DecoderControl* c = (DecoderControl*) ctrlBlock; unused */
   /* execute conversion specific code here (otp_words decode) */
 
   int    i = TCL_OK;

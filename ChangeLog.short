@@ -13,10 +13,14 @@ Changes from 1.6 to 1.7
 *	The patchkit for Tcl 8.1 is usable for Tcl 8.1.1 too.
 	No new patchkit was made.
 
+*	Made **thread-safe** if compiled against a thread-enabled 8.1.
+	(Mutex used to serialize access to all written global variables)
+
 
 Changes from 1.6 to 1.6
 
 *	Added the patch kit for tcl 8.1 final
+
 
 Changes from 1.5 to 1.6
 

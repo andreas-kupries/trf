@@ -334,9 +334,11 @@ EXTERN int TrfInit_Transform _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 #if GT81 && defined (TCL_THREADS) /* THREADING: Lock procedures */
 
-EXTERN void TrfLock   _ANSI_ARGS_ ((void));
-EXTERN void TrfUnlock _ANSI_ARGS_ ((void));
+EXTERN void TrfLockIt   _ANSI_ARGS_ ((void));
+EXTERN void TrfUnlockIt _ANSI_ARGS_ ((void));
 
+#define TrfLock   TrfLockIt ()
+#define TrfUnlock TrfUnlockIt ()
 #else
 /* Either older version of Tcl, or non-threaded 8.1.x.
  * Whatever, locking is not required, undefine the calls.

@@ -792,6 +792,6 @@ ClientData       clientData;
  * External code from here on.
  */
 
-/* #include rs-ecc/*.c: THREADING: import of three constant vars, read-only => safe */
+/* #include rs-ecc / *.c: THREADING: import of three constant vars, read-only => safe */
 #include "rs-ecc/gflib.c"
 #include "rs-ecc/rslib.c"
