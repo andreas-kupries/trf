@@ -243,7 +243,7 @@ clean:
 
 distclean:	clean
 	rm -f config.status config.cache config.log Makefile \
-	$(GENERIC_DIR)/patchlevel.h $(GENERIC_DIR)/pkgIndex.tcl
+	$(GENERIC_DIR)/pkgIndex.tcl
 
 install:	install-lib install-header @install_other@
 

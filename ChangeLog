@@ -1,3 +1,11 @@
+Mon Mar 17 18:18:05 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* unix/Makefile.in (distclean): removed 'patchlevel.h' from
+	  command, is part of distribution now.
+
+	* patches/v8.0a2/tclIO.c (Tcl_GetHostByteorder): Had superfluous
+	  'chan'-argument, despite correction in the patch.
+
 Thu Mar  6 20:13:55 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* Integrated patch send by Jan. Description:

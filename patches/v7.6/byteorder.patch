@@ -26,7 +26,7 @@
       			    Tcl_Channel chan));
 + EXTERN Tcl_ByteOrder	Tcl_GetChannelByteorder _ANSI_ARGS_((
 +     			    Tcl_Channel chan));
-+ EXTERN Tcl_ByteOrder	Tcl_GetHostByteorder _ANSI_ARGS_(());
++ EXTERN Tcl_ByteOrder	Tcl_GetHostByteorder _ANSI_ARGS_((void));
   EXTERN Tcl_File		Tcl_GetChannelFile _ANSI_ARGS_((Tcl_Channel chan,
   	        	    int direction));
   EXTERN ClientData	Tcl_GetChannelInstanceData _ANSI_ARGS_((

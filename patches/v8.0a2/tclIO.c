@@ -3936,9 +3936,7 @@ Tcl_GetChannelByteorder(chan)
  */
 
 Tcl_ByteOrder
-Tcl_GetHostByteorder(chan)
-    Tcl_Channel chan;		/* The channel for which to find the
-                                 * buffer size. */
+Tcl_GetHostByteorder ()
 {
 #ifdef WORDS_BIGENDIAN
   return TCL_BIGENDIAN;
