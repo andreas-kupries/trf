@@ -1,3 +1,23 @@
+2001-03-27  Tcl Project  <a.kupries@westend.com>
+
+	* PREPARE: Moves contents of subdirectory 'tea' into main
+	  directory, they are the main build chain now.
+
+	* tea/mkIndex.tcl.in: Updated to current state from sample
+	  extension. Also added fix for changed Cygwin environment.
+
+	* tea/configure.in:
+	* tea/Makefile.in: Prepared for execution in toplevel
+	  directory. Also updated for usage of new mkIndex.tcl.
+
+	* BUILDINFO:
+	* DEPENDENCIES: New file, integration into the TclPro build system.
+
+	* generic/loadman.h:
+	* generic/reflect.h:
+	* generic/transform.h:
+	* generic/transformInt.h: Changed BUILD_trf to BUILD_Trf
+
 Sun Nov 26 16:53:24 2000  Andreas Kupries  <a.kupries@westend.com>
 
 	* --- Release of 2.1p1 ---

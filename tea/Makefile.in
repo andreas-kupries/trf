@@ -20,7 +20,7 @@
 # from everything else which was predefined by TEA.
 #========================================================================
 
-TRF_TOPDIR	=	$(srcdir)/..
+TRF_TOPDIR	=	$(srcdir)
 TRF_GENSRCDIR	=	$(TRF_TOPDIR)/generic
 TRF_DOCDIR	=	$(TRF_TOPDIR)/doc
 TRF_TESTDIR	=	$(TRF_TOPDIR)/tests
@@ -754,7 +754,7 @@ install-lib-binaries: installdirs
 	  else :; fi; \
 	done
 	if test "x$(MAKE_LIB)" = "x$(MAKE_SHARED_LIB)"; then \
-	  $(TCLSH_PROG) mkIndex.tcl; \
+	  $(TCLSH_PROG) mkIndex.tcl $(lib_BINARIES); \
 	fi
 
 #========================================================================

@@ -234,6 +234,13 @@ exec      chmod u+w unix mac win tests
 eval exec chmod u+x unix/configure [glob tools/*]
 eval exec chmod u+x tea/configure tea/mkinstalldirs tea/testshell tea/install-sh
 
+# Move the files in TEA into the main directory.
+
+file rename         tea/README README.tea
+eval file rename -- [glob tea/*] [pwd]
+
+
+
 
 # should secure digest files and checker application against
 # tampering (-> PGP signature)

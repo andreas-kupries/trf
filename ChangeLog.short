@@ -1,3 +1,7 @@
+Changes from 2.1p1 to 2.1p2
+
+*	Corrected inconsistency BUILD_Trf / BUILD_trf.
+
 Changes from 2.1 to 2.1p1
 
 *	Fixes in some tools used during installation (findinpath,

@@ -14,7 +14,7 @@ AC_REVISION($Id$)
 # this package.
 #--------------------------------------------------------------------
 
-AC_INIT(../generic/transform.h)
+AC_INIT(./generic/transform.h)
 
 #--------------------------------------------------------------------
 # Setting our package name and version numbers.  The NODOT_VERSION is
