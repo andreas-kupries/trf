@@ -2582,6 +2582,9 @@ Tcl_Interp*        interp;
   trans->flags            = 0;
   trans->watchMask        = 0;
 
+  /* 03/28/2000 Added by DNew@Invisible.Net because Purify says so. */
+  trans->lastStored       = 0;
+
   trans->mode             = Tcl_GetChannelMode (baseOpt->attach);
   trans->timer            = (Tcl_TimerToken) NULL;
 

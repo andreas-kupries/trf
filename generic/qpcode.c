@@ -137,7 +137,11 @@ typedef struct _EncoderControl_ {
     /* add conversion specific items here (qp encode) */
 
     int    charCount;
-    unsigned char buf[CPERLIN];
+    unsigned char buf[CPERLIN + 8];
+
+    /* DNew@Invisible.Net added the +8 or FlushEncoder runs off the
+       end when called from the first call point in Encode with a
+       too-long line. */
 
 } EncoderControl;
 

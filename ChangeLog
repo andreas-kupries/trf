@@ -1,3 +1,11 @@
+Sat Apr 29 00:14:23 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* -- Release 2.0p7 --
+
+	* generic/qpcode.c, registry.c: Applied patch from Darren New
+	  <dnew@san.rr.com> fixing a buffer overun in
+	  quoted_printable. Fixed nagging from purify too.
+
 Tue Apr 18 19:01:27 2000  Andreas Kupries  <a.kupries@westend.com>
 
 	* tea/tcl.m4, tea/configure.in: Accepted patch from Jan Nijtmans
