@@ -1,6 +1,12 @@
-Mon Jan 11 22:40:19 1999  Andreas Kupries  <a.kupries@westend.com>
+Tue Jan 12 20:53:36 1999  Andreas Kupries  <a.kupries@westend.com>
 
-	* --- Release 1.3 ---
+	* generic/(binio.c, digest.c, reflect.c, registry.c, load.c,
+	  init.c, loadman.h, transformInt.h, transform.h): See below.
+
+	* Fought against the MS environment today and won. Integrating
+	  the changes made there now into the master.
+
+Mon Jan 11 22:40:19 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* doc/nodes/techintro.node: New node, contains a technical
 	  explanation of the inner working of Trf, with images.
