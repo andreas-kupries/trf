@@ -36,6 +36,15 @@ AC_ARG_WITH(bz2-lib-dir,
 	[BZ2_LIB_DIR=$withval],
 	[])
 
+AC_ARG_ENABLE(static-zlib,
+	[  --enable-static-zlib         link 'zlib' statically],
+	[STATIC_ZLIB=$enableval], [STATIC_ZLIB=no])
+
+AC_ARG_ENABLE(static-bzlib,
+	[  --enable-static-bzlib         link 'bzlib' statically],
+	[STATIC_BZLIB=$enableval], [STATIC_BZLIB=no])
+
+
 dnl ----------------------------------------------------------------
 dnl
 dnl Crossover between --with-zlib-include-dir and --with-zlib-lib-dir
@@ -317,6 +326,19 @@ fi
 
 AC_SUBST(BZ2_LIB_DIR)
 AC_CACHE_VAL(trf_cv_BZ2_LIB_DIR, [trf_cv_BZ2_LIB_DIR="$BZ2_LIB_DIR"])
+
+
+
+
+if test "x$ZLIB_STATIC" = "xyes"
+then
+	eval AC_DEFINE_UNQUOTED(ZLIB_STATIC_BUILD, 1)
+fi
+
+if test "x$BZLIB_STATIC" = "xyes"
+then
+	eval AC_DEFINE_UNQUOTED(BZLIB_STATIC_BUILD, 1)
+fi
 
 
 AC_SUBST(TRF_TESTS)

@@ -16,6 +16,8 @@ TRF_STUB_LIB_FILE   = lib${EXTENSION}stub@mShortDosVersion@.a
 
 SSL_LIBRARY	= -DSSL_LIB_NAME=\"libeay32.dll\"
 BZ2_LIBRARY	= -DBZ2_LIB_NAME=\"bz2.dll\"
+#ZLIB_STATIC	= -DZLIB_STATIC_BUILD
+#BZLIB_STATIC	= -DBZLIB_STATIC_BUILD
 
 #
 #----------------------------------------------------------------
@@ -166,7 +168,7 @@ guilibs	   = $(libc) $(winlibs)
 
 guilibsdll = $(libcdll) $(winlibs)
 
-TRF_DEFINES	= -D__WIN32__ -DSTATIC_BUILD  ${TRF_SHLIB_CFLAGS} -DTRF_VERSION="\"${VERSION}\"" ${SSL_LIBRARY} -DBUGS_ON_EXIT
+TRF_DEFINES	= -D__WIN32__ -DSTATIC_BUILD  ${TRF_SHLIB_CFLAGS} -DTRF_VERSION="\"${VERSION}\"" ${SSL_LIBRARY} ${ZLIB_STATIC} ${BZLIB_STATIC} -DBUGS_ON_EXIT
 
 # $(TCL_CC_SWITCHES)
 INCLUDES	=	-I. -I$(srcdir) -I../generic -I$(TCL_INC_DIR)

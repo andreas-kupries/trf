@@ -386,7 +386,9 @@ CONST Trf_TypeDefinition* type;
 					    (ClientData) entry, TrfDeleteCmd);
 
   /*
-   * Set up channel type
+   * Set up channel type.
+   * The name is the only component changing from transform to transform.
+   * The procedures to call stay the same for all of them.
    */
 
   entry->transType->typeName         = (char*) type->name;

@@ -75,6 +75,7 @@ url tls        [lib TLS]    http://www.sensus.org/tcl/
 set base http://www.oche.de/~akupries/soft/trf/download
 
 link trf_src_tgz  {Sources, Unix}                  ${base}/trf@mFullVersion@.tar.gz
+link trf_src_tbz  {Sources, Unix, bzip compressed} ${base}/trf@mFullVersion@.tar.bz2
 link trf_src_zip  {Sources, Win*}                  ${base}/trf@mFullVersion@.zip
 link trf_doc_tgz  {Standalone documentation, Unix} ${base}/trf@mFullVersion@.doc.tar.gz
 link trf_doc_zip  {Standalone documentation, Win*} ${base}/trf@mFullVersion@.doc.zip
