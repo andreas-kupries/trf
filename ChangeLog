@@ -1,9 +1,20 @@
+Sun Mar 14 19:29:33 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* Generated patches for 8.0.4 and 8.0.5.
+
+Mon Feb 22 18:19:58 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* win/makefile.vc (TRF_DEFINES): Added -DBUILD_trf to the
+	  definition of this variable. Already in makefile.vc5, forgot to
+	  include it here before. Sync problem :-(. Thanks to Stefan
+	  Speidel <speidel@tp-cad.com> for finding this.
+
 Tue Jan 12 20:53:36 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/(binio.c, digest.c, reflect.c, registry.c, load.c,
 	  init.c, loadman.h, transformInt.h, transform.h): See below.
 
-	* Fought against the MS environment today and won. Integrating
+	* Fought against the MS environment today and won. Integrated
 	  the changes made there now into the master.
 
 Mon Jan 11 22:40:19 1999  Andreas Kupries  <a.kupries@westend.com>
