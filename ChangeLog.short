@@ -1,0 +1,49 @@
+Changes from b3 to final:
+
+*	**** WARNING to all users of earlier versions ****
+	The script API was rewritten to take advantage of the Tcl 8.x
+	object API. The ability to operate on channels was retained,
+	albeit under a different syntax. Please reread the manual, at
+	least chapter 5 (Available commands).
+
+*	Extended C-level API allows for (block)cipher specific option
+	processing.
+
+*	A general transformation was added, under the name 'transform'.
+	It reflects the underlying functionality up into the script level.
+
+*	Added ciphers:
+
+	<>	ROT, for the fun of it.
+	<>	SAFER, by the author of IDEA.
+
+
+
+Changes from b2 to b3:
+
+*	'binio' command supported, but not included by default, because
+	of equivalent functionality in 8.0b1, see 'binary' and 'fcopy'.
+	Configure option '--enable-binio'.
+
+*	Reorganized code into generic and os dependent parts.
+
+*	Added Windows port.
+
+*	Some bug fixes.
+
+*	More algorithms: RC2, MD2, SHA-1	(SSLeay required)
+			 RIPEMD-160
+
+*	Commands created use the object-interface of tcl8.0b1 now.
+	Runs with 7.6 nevertheless, BUT NOT with 8.0a1 or a2.
+
+
+Changes from b1 to b2:
+
+*	The patches to the core are enhanced to associate channels
+	with byteorder information.
+
+*	A new command 'binio' to pack and/or unpack binary information and
+	to copy between channels (the latter is essentially 'unsupported0').
+	(Un)packing will reorder bytes as needed, using the information
+	mentioned above.
