@@ -279,12 +279,12 @@ TrfLoadZlib _ANSI_ARGS_ ((Tcl_Interp *interp));
  */
 
 
-EXTERN int TrfInit_Bin      _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_Oct      _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_Hex      _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_UU       _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_B64      _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_Ascii85  _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_Bin       _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_Oct       _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_Hex       _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_UU        _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_B64       _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_Ascii85   _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int TrfInit_CRC       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_MD5       _ANSI_ARGS_ ((Tcl_Interp* interp));
@@ -294,19 +294,20 @@ EXTERN int TrfInit_SHA       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_SHA1      _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_ADLER     _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_CRC_ZLIB  _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_RIPEMD128 _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_RIPEMD160 _ANSI_ARGS_ ((Tcl_Interp* interp));
 
-EXTERN int TrfInit_IDEA     _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_BLOWFISH _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_DES      _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_RC4      _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_RC2      _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_IDEA      _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_BLOWFISH  _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_DES       _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_RC4       _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_RC2       _ANSI_ARGS_ ((Tcl_Interp* interp));
 
-EXTERN int TrfInit_RS_ECC   _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_ZIP      _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_RS_ECC    _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_ZIP       _ANSI_ARGS_ ((Tcl_Interp* interp));
 
-EXTERN int TrfInit_Unstack  _ANSI_ARGS_ ((Tcl_Interp* interp));
-EXTERN int TrfInit_Binio    _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_Unstack   _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_Binio     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 
 /*

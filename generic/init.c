@@ -205,6 +205,11 @@ Tcl_Interp* interp;
     if (res != TCL_OK)
       return res;
 
+    res = TrfInit_RIPEMD128 (interp);
+
+    if (res != TCL_OK)
+      return res;
+
     /*
      * Register standard encodings.
      */
