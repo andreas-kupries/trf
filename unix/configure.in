@@ -91,12 +91,27 @@ AC_ARG_WITH(ssl-lib-dir,
 	[SSL_LIB_DIR=$withval],
 	[])
 
-if test "$binio" = "yes"
+# binio allowed <=> (major < 8)
+
+if test $TCL_MAJOR_VERSION -gt 7
+	# 8.x and beyond, have 'binary' in core, disallow 'binio'.
+	if test "x$binio" = "xyes"
+	then
+		AC_MSG_CHECKING (binio allowed)
+		AC_MSG_RESULT(no, use 'binary' command in core!)
+		binio="no"
+	fi
 then
-	cat >> confdefs.h <<\EOF
+else
+	# 7.6 and below, allow 'binio'.
+	if test "x$binio" = "xyes"
+	then
+		cat >> confdefs.h <<\EOF
 #define ENABLE_BINIO
 EOF
-fi
+	fi
+end if
+
 
 
 dnl ----------------------------------------------------------------
@@ -519,12 +534,53 @@ fi
 eval "TRF_CC_SEARCH_FLAGS=\"$TCL_LD_SEARCH_FLAGS\""
 TRF_LD_SEARCH_FLAGS=`echo ${TRF_CC_SEARCH_FLAGS} |sed -e "s|-Wl,||g" -e "s|,| |g"`
 
+TCL_BASE=`echo ${TCL_LIB_SPEC} |sed -e "s|^.*-l||"`
+TCL_STUB_BASE=`echo ${TCL_STUB_LIB_SPEC} |sed -e "s|^.*-l||"`
+
+
+TCL_LIB_SPEC="-L${TCL_LIB_DIR} -l${TCL_BASE}"
+TCL_STUB_LIB_SPEC="-L${TCL_LIB_DIR} -l${TCL_STUB_BASE}"
+VERSION=""
+eval "TCL_UNSHARED_LIB_FILE=lib${TCL_BASE}${TCL_UNSHARED_LIB_SUFFIX}"
+eval "TCL_SHARED_LIB_FILE=lib${TCL_BASE}${TCL_SHARED_LIB_SUFFIX}"
+
 #--------------------------------------------------------------------
 #	The statements below define a collection of symbols related to
 #	building libtrf as a shared library instead of a static library.
 #--------------------------------------------------------------------
 
-if test "$ok" = "yes" -a "${SHLIB_SUFFIX}" != ""; then
+TCL_SHARED_LIBS=""
+#--------------------------------------------------------------------
+
+# Use stubs <=> (((major == 8) && (minor > 0)) || (major > 8)) && 'trf as shared library'
+
+AC_MSG_CHECKING(for stubs)
+
+if test \( \( $TCL_MAJOR_VERSION -eq 8 -a $TCL_MINOR_VERSION -gt 0 \) -o $TCL_MAJOR_VERSION -gt 8 \) -a "x$ok" = "xyes"
+then
+    AC_MSG_RESULT(yes)
+    TRF_USING_STUBS=1
+    # Stubs
+    TCL_DEFS="$TCL_DEFS -DUSE_TCL_STUBS"
+    TCL_SHARED_LIBS="${TCL_STUB_LIB_SPEC}"
+else
+    AC_MSG_RESULT(no)
+    TRF_USING_STUBS=0
+    # No stubs
+    case "$SHLIB_LD" in
+	*ldAix*)
+	TCL_SHARED_LIBS='${TCL_LIB_SPEC}'
+	;;
+    esac
+fi
+
+case "$SHLIB_LD" in
+    *ldAix*)
+    TCL_SHARED_LIBS="${TCL_SHARED_LIBS}"
+    ;;
+esac
+
+if test "x$ok" = "xyes" -a "x${SHLIB_SUFFIX}" != "x"; then
     TRF_SHLIB_CFLAGS="${SHLIB_CFLAGS}"
     eval "TRF_LIB_FILE=libtrf${TCL_SHARED_LIB_SUFFIX}"
     eval "ZLIB_LIB_FILE=libz${SHLIB_SUFFIX}"
@@ -671,8 +727,6 @@ if test "x${TCL_SHARED_LIB_SUFFIX}" != 'x${VERSION}.a' -o "x${SHLIB_SUFFIX}" != 
 	TCL_LIB_SPEC=""
 fi
 
-
-
 AC_SUBST(SHARED_LIBS)
 
 AC_SUBST(CC)
@@ -693,6 +747,7 @@ AC_SUBST(TCL_SRC_DIR)
 AC_SUBST(TCL_LIB_DIR)
 AC_SUBST(TCL_INCLUDE_DIR)
 AC_SUBST(TCL_VERSION)
+AC_SUBST(TRF_USING_STUBS)
 AC_SUBST(TRF_BUILD_LIB_SPEC)
 AC_SUBST(TRF_LD_SEARCH_FLAGS)
 AC_SUBST(TRF_CC_SEARCH_FLAGS)
@@ -718,4 +773,4 @@ fi
 
 
 dnl
-AC_OUTPUT(Makefile ../generic/pkgIndex.tcl)
+AC_OUTPUT(Makefile pkgIndex.tcl)

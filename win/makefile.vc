@@ -209,6 +209,7 @@ test:	    $(TRFDLL)
 		cd ../tests
 		source all
 <<
+
 install:	$(TRFDLL)
 	-@md $(INSTALLDIR)
 	$(CP) $(TRFDLL)              $(INSTALLDIR)\$(TRFDLL)
@@ -218,6 +219,7 @@ install:	$(TRFDLL)
 $(TRFDLL): $(TRFOBJS)
 	$(link32) $(ldebug) $(dlllflags) $(TCLLIB) \
 		$(guilibsdll) -out:$(TRFDLL) $(TRFOBJS)
+
 
 bindist:      $(TRFDLL)
 	-@md	$(TRF)

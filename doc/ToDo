@@ -1,3 +1,6 @@
+
+<>	Stubs! in Trf, for TrfCrypt.
+
 <>	tools/md5sum
 	=>	make independent of TCL_POOL code!	/done/
 
