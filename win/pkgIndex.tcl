@@ -10,6 +10,6 @@ proc trfifneeded dir {
     } else {
 	regsub {\.} [info tclversion] {} version
     }
-    package ifneeded Trf @mFullVersion@ "load [list [file join $dir trf@mShortDosVersion@$version.dll]] Trf"
+    package ifneeded Trf @mVersion@ "load [list [file join $dir trf@mShortDosVersion@$version.dll]] Trf"
 }
 trfifneeded $dir

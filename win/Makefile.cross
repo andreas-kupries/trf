@@ -11,7 +11,7 @@ EXTENSION		= Trf
 VERSION			= @mFullVersion@
 
 TCL_VERSION		= 84
-TCL_SRC_TOP_DIR 	= /progra~1/tcl
+TCL_SRC_TOP_DIR 	= ../../tcl
 TCL_INSTALL_TOP_DIR	= `pwd`/../install
 DEL			= rm -f
 CROSSPFX		= /usr/local/cross-tools/bin/i386-mingw32msvc-

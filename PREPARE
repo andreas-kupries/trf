@@ -84,6 +84,7 @@ if {0} {
     }
 }
 foreach f {bz2.dll zlib.dll crypt.dll} {
+    file copy   $f aku.1/
     file rename $f jan.3/
 }
 
