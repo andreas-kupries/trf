@@ -18,13 +18,11 @@ if {[string compare test [info procs test]] == 1} then {source defs}
 set text                   "hello, hello!"
 set text_compressed_as_hex "425A68393141592653592C546C72000003110060040244A0002129A3108603690E70A1E2EE48A70A12058A8D8E40"
 
-
-
 # differentiate tcl versions
 if {[info tclversion] < 8.0} {
     # 7.6, use channels to transfer information, we have embedded \0s.
 
-    test bz2-1.0-7.6 {bz2 compression} {hasBz} {
+    test bz2-1.0-7.6 {bz2 compression} {
 	set in  [text2chan $text]
 	set out [memchan]
 
@@ -42,7 +40,7 @@ if {[info tclversion] < 8.0} {
 	set data
     } $text_compressed_as_hex	; #{}
 
-    test bz2-1.1-7.6 {bz2 decompression} {hasBz} {
+    test bz2-1.1-7.6 {bz2 decompression} {
 	set in  [hex2chan $text_compressed_as_hex]
 	set out [memchan]
 
@@ -60,11 +58,11 @@ if {[info tclversion] < 8.0} {
 } else {
     # 8.x is able to work with embedded \0s.
 
-    test bz2-1.0-8.x {bz2 compression} {hasBz} {
+    test bz2-1.0-8.x {bz2 compression} {
 	hex -mode encode [bz2 -mode compress $text]
     } $text_compressed_as_hex	; #{}
 
-    test bz2-1.1-8.x {bz2 decompression} {hasBz} {
+    test bz2-1.1-8.x {bz2 decompression} {
 	bz2 -mode decompress [hex -mode decode $text_compressed_as_hex]
     } $text	; #{}
 }
