@@ -88,6 +88,7 @@ TRFOBJS = \
 	$(TMPDIR)\rs_ecc.obj \
 	$(TMPDIR)\sha.obj \
 	$(TMPDIR)\sha1.obj \
+	$(TMPDIR)\rmd160.obj \
 	$(TMPDIR)\unstack.obj \
 	$(TMPDIR)\util.obj \
 	$(TMPDIR)\uucode.obj \
