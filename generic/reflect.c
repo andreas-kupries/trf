@@ -652,7 +652,22 @@ cleanup:
   Tcl_DStringAppend        (&command, " ", -1);
   Tcl_DStringAppend        (&command, op,  -1);
   Tcl_DStringAppend        (&command, " ", -1);
-  Tcl_DStringAppendElement (&command, buf);
+ 
+  /* force buffer termination, avoid runing into garbage */
+
+  if (buf [bufLen-1] == '\0') {
+    Tcl_DStringAppendElement (&command, buf);
+  } else {
+    unsigned char *t = Tcl_Alloc (bufLen+1);
+  
+    memcpy (t, buf, bufLen);
+
+    t [bufLen] == '\0';
+    Tcl_DStringAppendElement (&command, t);
+
+    Tcl_Free (t);
+  }
+
   Tcl_DStringAppend        (&command, "",   1); /* terminate buffer for sure */
 
   res = Tcl_GlobalEval (c->interp, command.string);
