@@ -91,28 +91,6 @@ AC_ARG_WITH(ssl-lib-dir,
 	[SSL_LIB_DIR=$withval],
 	[])
 
-# binio allowed <=> (major < 8)
-
-if test $TCL_MAJOR_VERSION -gt 7
-	# 8.x and beyond, have 'binary' in core, disallow 'binio'.
-	if test "x$binio" = "xyes"
-	then
-		AC_MSG_CHECKING (binio allowed)
-		AC_MSG_RESULT(no, use 'binary' command in core!)
-		binio="no"
-	fi
-then
-else
-	# 7.6 and below, allow 'binio'.
-	if test "x$binio" = "xyes"
-	then
-		cat >> confdefs.h <<\EOF
-#define ENABLE_BINIO
-EOF
-	fi
-end if
-
-
 
 dnl ----------------------------------------------------------------
 dnl
@@ -543,6 +521,28 @@ TCL_STUB_LIB_SPEC="-L${TCL_LIB_DIR} -l${TCL_STUB_BASE}"
 VERSION=""
 eval "TCL_UNSHARED_LIB_FILE=lib${TCL_BASE}${TCL_UNSHARED_LIB_SUFFIX}"
 eval "TCL_SHARED_LIB_FILE=lib${TCL_BASE}${TCL_SHARED_LIB_SUFFIX}"
+
+
+# binio allowed <=> (major < 8)
+
+if test $TCL_MAJOR_VERSION -gt 7
+then
+	# 8.x and beyond, have 'binary' in core, disallow 'binio'.
+	if test "x$binio" = "xyes"
+	then
+		AC_MSG_CHECKING(binio allowed)
+		AC_MSG_RESULT(no. Use 'binary' command in core instead!)
+		binio="no"
+	fi
+else
+	# 7.6 and below, allow 'binio'.
+	if test "x$binio" = "xyes"
+	then
+		cat >> confdefs.h <<\EOF
+#define ENABLE_BINIO
+EOF
+	fi
+fi
 
 #--------------------------------------------------------------------
 #	The statements below define a collection of symbols related to
