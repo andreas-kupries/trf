@@ -15,8 +15,9 @@
 
 if {[string compare test [info procs test]] == 1} then {source defs}
 
-set text                   "hello, hello!"
-set text_compressed_as_hex "789CCB48CDC9C9D751C800518A0021700496"
+set text                               "hello, hello!"
+set text_compressed_as_hex             "789CCB48CDC9C9D751C800518A0021700496"
+set text_compressed_as_hex_with_nowrap "CB48CDC9C9D751C800518A00"
 
 
 # differentiate tcl versions
@@ -65,6 +66,14 @@ if {[info tclversion] < 8.0} {
 
     test zip-1.1-8.x {zip decompression} {hasZlib} {
 	zip -mode decompress [hex -mode decode $text_compressed_as_hex]
+    } $text	; #{}
+
+    test zip-1.2-8.x {zip compression with nowrap} {
+	hex -mode encode [zip -mode compress -nowrap true $text]
+    } $text_compressed_as_hex_with_nowrap	; #{}
+
+    test zip-1.3-8.x {zip decompression with nowrap} {
+	zip -mode decompress -nowrap true [hex -mode decode $text_compressed_as_hex_with_nowrap]
     } $text	; #{}
 }
 

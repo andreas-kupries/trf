@@ -1,3 +1,25 @@
+Thu Oct 21 00:25:23 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* doc/nodes/home.node: Added Tcl MIME to the list of extensions
+ 	  using Trf or its core feature.
+
+	* doc/nodes/urls.def: Added entry for Tcl MIME.
+
+	* doc/nodes/people.def: Added entries for Matt Newman and Marshall
+	  Rose.
+
+	* Made minor modifications to the patch (formatting, removed 7.6
+	  support, added analogous tests to the TEA part of the distrib.).
+
+	* tea.tests/zip.test: See below.
+
+	* tests/zip.test: See below.
+
+	* generic/zip.c, zip_opt.c, zlib.c: See below.
+
+	* generic/transformInt.h: Finally applied the nowrap patch sent in
+	  by Jan Nijtmans quite some time ago (June 26, 1999).
+
 Tue Oct 19 21:41:26 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/init.c: Added registration of the two new commands.

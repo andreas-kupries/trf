@@ -32,6 +32,8 @@ Changes from 1.8 to 2.0
 	necessary shared library is part of the distribution and
 	compiled if required (glibc2 Linux systems already have it).
 
+*	New commands: md5crypt, crypt, use in password authentication.
+
 
 Changes from 1.7 to 1.8
 

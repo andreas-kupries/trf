@@ -224,7 +224,19 @@ ClientData     clientData;
   }
 
   PRINT ("deflateInit (%d, %s)\n", o->level, ZLIB_VERSION); FL;
-  res = zf.deflateInit_ (&c->state, o->level, ZLIB_VERSION, sizeof(z_stream));
+
+#if 0
+  res = zf.deflateInit_ (&c->state, o->level,
+			 ZLIB_VERSION, sizeof(z_stream));
+#endif
+
+  res = z.deflateInit2_ (&c->state, o->level, Z_DEFLATED,
+			 o->nowrap  ?
+			 -MAX_WBITS :
+			 MAX_WBITS,
+			 MAX_MEM_LEVEL, Z_DEFAULT_STRATEGY,
+			 ZLIB_VERSION, sizeof(z_stream));
+
 
   if (res != Z_OK) {
     if (interp) {
@@ -564,6 +576,7 @@ Tcl_Interp*    interp;
 ClientData     clientData;
 {
   DecoderControl*    c;
+  TrfZipOptionBlock* o = (TrfZipOptionBlock*) optInfo;
   int res;
 
   START (ZipCreateDecoder); 
@@ -587,7 +600,17 @@ ClientData     clientData;
   }
 
   PRINT ("inflateInit (%s)\n", ZLIB_VERSION); FL;
-  res = zf.inflateInit_ (&c->state, ZLIB_VERSION, sizeof (z_stream));
+
+#if 0
+  res = zf.inflateInit_ (&c->state,
+			 ZLIB_VERSION, sizeof (z_stream));
+#endif
+
+  res = z.inflateInit2_ (&c->state,
+			 o->nowrap  ?
+			 -MAX_WBITS :
+			 MAX_WBITS,
+			 ZLIB_VERSION, sizeof (z_stream));
 
   if (res != Z_OK) {
     if (interp) {

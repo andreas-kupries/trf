@@ -119,8 +119,9 @@ ClientData clientData;
 
   o = (TrfZipOptionBlock*) Tcl_Alloc (sizeof (TrfZipOptionBlock));
 
-  o->mode  = TRF_UNKNOWN_MODE;
-  o->level = TRF_DEFAULT_LEVEL;
+  o->mode   = TRF_UNKNOWN_MODE;
+  o->level  = TRF_DEFAULT_LEVEL;
+  o->nowrap = 0;
 
   return (Trf_Options) o;
 }
@@ -236,9 +237,11 @@ ClientData  clientData;
 {
   /* Possible options:
    *
-   * -level <number>
-   * -level default
-   * -mode compress|decompress
+   * -level  <number>
+   * -level  default
+   * -mode   compress|decompress
+   * -nowrap <boolean>
+   * -nowrap default
    */
 
   TrfZipOptionBlock* o = (TrfZipOptionBlock*) options;
@@ -308,6 +311,28 @@ ClientData  clientData;
       return TCL_ERROR;
       break;
     } /* switch optvalue */
+    break;
+
+  case 'n':
+    if (0 != strncmp (optname, "-nowrap", len))
+      goto unknown_option;
+
+    value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
+    
+    len = strlen (value);
+    if (0 == strncmp (value, "default", len)) {
+      o->nowrap = 0;
+    } else {
+      int res, val;
+
+      res = Tcl_GetBooleanFromObj (interp, (Tcl_Obj*) optvalue, &val);
+
+      if (res != TCL_OK) {
+	return res;
+      }
+
+      o->nowrap = val;
+    }
     break;
 
   default:

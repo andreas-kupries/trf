@@ -96,3 +96,12 @@ personMH lvirden \
 	{Larry Virden} \
 	{lvirden@cas.org} \
 	{http://www.purl.org/NET/lvirden/}
+
+personMH mnewman \
+	{Matt Newman} \
+	{matt@sensus.org} \
+	{http://www.sensus.org}
+
+personM mrose \
+	{Marshall Rose} \
+	{mrose@dbc.mtview.ca.us}

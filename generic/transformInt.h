@@ -297,6 +297,7 @@ TrfTransformOptions _ANSI_ARGS_ ((void));
 typedef struct _TrfZipOptionBlock {
   int mode;   /* compressor mode: compress/decompress */
   int level;  /* compression level (1..9, -1 = default) */
+  int nowrap; /* pkzip-compatibility (0..1, 0 = default) */
 } TrfZipOptionBlock;
 
 EXTERN Trf_OptionVectors*
@@ -338,13 +339,17 @@ typedef struct ZFunctions {
   VOID *handle;
   int (* deflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
   int (* deflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
-  int (* deflateInit_)      _ANSI_ARGS_ ((z_streamp strm, int level,
+
+  int (* deflateInit2_)     _ANSI_ARGS_ ((z_streamp strm, int level,
+					  int method, int windowBits,
+					  int memLevel, int strategy,
 					  CONST char *version,
 					  int stream_size));
   int (* deflateReset)      _ANSI_ARGS_ ((z_streamp strm));
   int (* inflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
   int (* inflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
-  int (* inflateInit_)      _ANSI_ARGS_ ((z_streamp strm, CONST char *version,
+  int (* inflateInit2_)     _ANSI_ARGS_ ((z_streamp strm, int windowBits,
+					  CONST char *version,
 					  int stream_size));
   int (* inflateReset)      _ANSI_ARGS_ ((z_streamp strm));
   unsigned long (* adler32) _ANSI_ARGS_ ((unsigned long adler,

@@ -75,6 +75,8 @@ url bzlib_home http://sourceware.cygnus.com/bzip2/index.html \
 url tls        [lib TLS]    http://www.sensus.org/tcl/
 #url tls_source "TLS source" http://www.sensus.org/tcl/tls11.tgz
 
+url tcl_mime [lib {Tcl MIME}] http://www.oche.de/~akupries/soft/mail/index.html
+
 # -------------------------------------------------
 
 set base http://www.oche.de/~akupries/soft/trf/download

@@ -23,11 +23,11 @@
 static char* symbols [] = {
   "deflate",
   "deflateEnd",
-  "deflateInit_",
+  "deflateInit2_",
   "deflateReset",
   "inflate",
   "inflateEnd",
-  "inflateInit_",
+  "inflateInit2_",
   "inflateReset",
   "adler32",
   "crc32",

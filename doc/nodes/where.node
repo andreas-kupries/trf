@@ -75,7 +75,8 @@ node trf_where {
 	p "[strong Upcoming:] Version [strong 2.1]."
 	p "Changes to expect:"
 	bullet_list {
-	    li "... no list yet"
+	    li "clean up of test suite, still contains code for 7.6."
+	    li "..."
 	}
     }
 }
