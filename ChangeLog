@@ -5,7 +5,7 @@ Tue Jun 20 20:49:05 2000  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/reflect.c (RefExecuteCallback): Line 715f
 	  (transmit_down). <Oliver.Stephens@arm.com> spotted that I didn't
-	  make use of Tcl_ByteArrays in ccase of 8.1 or higher.
+	  make use of Tcl_ByteArrays in case of 8.1 or higher.
 
 Sun May 28 19:25:52 2000  Andreas Kupries  <a.kupries@westend.com>
 

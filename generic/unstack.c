@@ -74,7 +74,7 @@ TrfUnstackObjCmd (notUsed, interp, objc, objv)
   }
 #endif
 
-  if ((objc < 1) || (objc > 2)) {
+  if ((objc < 2) || (objc > 2)) {
     Tcl_AppendResult (interp,
 		      "wrong # args: should be \"unstack channel\"",
 		      (char*) NULL);
