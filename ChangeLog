@@ -1,3 +1,9 @@
+2002-11-22  Andreas Kupries  <andreask@activestate.com>
+
+	* Makefile.in: Deactivated target for MD5 library. HPUX balked
+	  with a syntax error because the variable to the left of the
+	  colon is now empty.
+
 2002-11-04  Andreas Kupries  <andreask@activestate.com>
 
 	* The changes below fix the following bug reports:

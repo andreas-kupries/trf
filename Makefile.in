@@ -359,14 +359,14 @@ $($(PACKAGE)stub_LIB_FILE): $($(PACKAGE)stub_OBJECTS)
 	$(RANLIB) $($(PACKAGE)stub_LIB_FILE)
 
 #========================================================================
-# MD5 targets
+# MD5 targets - Not anymore, integrated with main library
 #========================================================================
-
-$(Md5_LIB_FILE): $(Md5_OBJECTS)
-	-rm -f $(Md5_LIB_FILE)
-	${MAKE_LIB}
-	$(RANLIB) $(Md5_LIB_FILE)
-
+##
+## $(Md5_LIB_FILE): $(Md5_OBJECTS)
+##	-rm -f $(Md5_LIB_FILE)
+##	${MAKE_LIB}
+##	$(RANLIB) $(Md5_LIB_FILE)
+##
 #========================================================================
 # We need to enumerate the list of .c to .o lines here.
 #
