@@ -11,14 +11,18 @@ node trf_conv {
 	p "
 	All data conversion commands support only one option,
 	[opt -mode]. Allowed values are ``encode'', ``decode'' and
-	all unique abbreviations. It specifies the operation to
-	be executed in immediate mode or the operation executed
-	upon [strong write] if attached to a channel."
-
-	p "
-	Encode converts from binary data into the described
-	representation, decode does the reverse (obviously [smiley])."
-
+	all unique abbreviations.
+	"
+	p "For [strong immediate] usage it specifies the
+	[strong {operation to use}].
+	"
+	p "For [strong attached] transformations it specifies the
+	[strong operation] to use [strong {for writing}]. Reading
+	will automatically use the reverse operation.
+	"
+	p "Encode converts from binary data into the described
+	representation, decode does the reverse (obviously [smiley]).
+	"
 	p "Standard conversions are"
 
 	table {

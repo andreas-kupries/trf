@@ -55,9 +55,10 @@ node trf_cmds {
 
 	    defrow attached {
 		p [strong "
-		This mode is the one requiring the patches to the
-		core. Without them we would be unable to stack our
-		transforming channel onto the named one."]
+		This mode is the one which required the patches to the
+		older cores. Not so since version 8.2 of [tcl]. Without
+		them we would be unable to stack our transforming channel
+		onto the named one."]
 
 		p "
 		[cmd command] -attach [arg channel] -option [arg value] ..."

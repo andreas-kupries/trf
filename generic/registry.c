@@ -43,6 +43,9 @@
 #define EWOULDBLOCK EAGAIN
 #endif
 
+#ifdef TRF_DEBUG
+int n = 0;
+#endif
 
 /*
  * Possible values for 'flags' field in control structure.
@@ -581,7 +584,7 @@ struct Tcl_Obj* CONST * objv;
 
   optInfo = CREATE_OPTINFO;
 
-  PRINT ("Processing options..."); FL; IN;
+  PRINT ("Processing options...\n"); FL; IN;
 
   while ((objc > 0) && (*Tcl_GetStringFromObj (objv [0], NULL) == '-')) {
     /*
@@ -932,7 +935,7 @@ Tcl_Interp* interp;
 
 
   if (trans->mode & TCL_WRITABLE) {
-    PRINT ("out.flushproc"); FL;
+    PRINT ("out.flushproc\n"); FL;
 
     trans->out.vectors->flushProc (trans->out.control,
 				   (Tcl_Interp*) NULL,
@@ -941,7 +944,7 @@ Tcl_Interp* interp;
 
   if (trans->mode & TCL_READABLE) {
     if (!trans->readIsFlushed) {
-      PRINT ("in_.flushproc"); FL;
+      PRINT ("in_.flushproc\n"); FL;
 
       trans->readIsFlushed = 1;
       trans->in.vectors->flushProc (trans->in.control,
@@ -951,12 +954,12 @@ Tcl_Interp* interp;
   }
 
   if (trans->mode & TCL_WRITABLE) {
-    PRINT ("out.deleteproc"); FL;
+    PRINT ("out.deleteproc\n"); FL;
     trans->out.vectors->deleteProc (trans->out.control, trans->clientData);
   }
 
   if (trans->mode & TCL_READABLE) {
-    PRINT ("in_.deleteproc"); FL;
+    PRINT ("in_.deleteproc\n"); FL;
     trans->in.vectors->deleteProc  (trans->in.control,  trans->clientData);
   }
 
@@ -1058,7 +1061,7 @@ int*       errorCodePtr;
      * information read from the parent channel.
      */
 
-    PRINT ("Get more..."); FL; IN;
+    PRINT ("Get more...\n"); FL; IN;
 
     read = Tcl_Read (parent, buf, toRead);
 
@@ -1104,7 +1107,7 @@ int*       errorCodePtr;
 	  return gotBytes;
 	}
 
-	PRINT ("in_.flushproc"); FL;
+	PRINT ("in_.flushproc\n"); FL;
 
 	trans->readIsFlushed = 1;
 	res = trans->in.vectors->flushProc (trans->in.control,
@@ -1122,14 +1125,14 @@ int*       errorCodePtr;
     /* transform the read chunk */
 
     if (trans->in.vectors->convertBufProc){ 
-      PRINT ("in_.convertbufproc"); FL;
+      PRINT ("in_.convertbufproc\n"); FL;
 
       res = trans->in.vectors->convertBufProc (trans->in.control,
 					       (unsigned char*) buf, read,
 					       (Tcl_Interp*) NULL,
 					       trans->clientData);
     } else {
-      PRINT ("in_.convertproc"); FL;
+      PRINT ("in_.convertproc\n"); FL;
 
       res = TCL_OK;
       for (i=0; i < read; i++) {
@@ -1202,14 +1205,14 @@ int*       errorCodePtr;
 
 
   if (trans->out.vectors->convertBufProc){ 
-    PRINT ("out.convertbufproc"); FL;
+    PRINT ("out.convertbufproc\n"); FL;
 
     res = trans->out.vectors->convertBufProc (trans->out.control,
 					      (unsigned char*) buf, toWrite,
 					      (Tcl_Interp*) NULL,
 					      trans->clientData);
   } else {
-    PRINT ("out.convertproc"); FL;
+    PRINT ("out.convertproc\n"); FL;
 
     res = TCL_OK;
     for (i=0; i < toWrite; i++) {
@@ -1284,14 +1287,14 @@ int*       errorCodePtr;	/* Location of error flag. */
    */
 
   if (trans->mode & TCL_WRITABLE) {
-    PRINT ("out.flushproc"); FL;
+    PRINT ("out.flushproc\n"); FL;
     trans->out.vectors->flushProc (trans->out.control,
 				   (Tcl_Interp*) NULL,
 				   trans->clientData);
   }
 
   if (trans->mode & TCL_READABLE) {
-    PRINT ("out.clearproc"); FL;
+    PRINT ("out.clearproc\n"); FL;
     trans->in.vectors->clearProc  (trans->in.control, trans->clientData);
     trans->readIsFlushed = 0;
   }
@@ -1483,12 +1486,12 @@ Trf_Options        optInfo;
     r.used      = 0;
     r.allocated = 0;
 
-    PRINT ("___.createproc"); FL;
+    PRINT ("___.createproc\n"); FL;
     control = v->createProc ((ClientData) &r, PutInterpResult,
 			     optInfo, interp,
 			     entry->trfType->clientData);
   } else {
-    PRINT ("___.createproc"); FL;
+    PRINT ("___.createproc\n"); FL;
     control = v->createProc ((ClientData) destination, PutDestination,
 			     optInfo, interp,
 			     entry->trfType->clientData);
@@ -1512,8 +1515,11 @@ Trf_Options        optInfo;
 
     /* 8.x, argument 'in' is arbitrary object, its string rep. may contain \0.
      */
+#if GT81
+    buf = (unsigned char*) Tcl_GetByteArrayFromObj (in, &length);
+#else
     buf = (unsigned char*) Tcl_GetStringFromObj (in, &length);
-
+#endif
     if (v->convertBufProc) {
       /* play it safe, use a copy, avoid clobbering the input. */
       unsigned char* tmp;
@@ -1521,7 +1527,7 @@ Trf_Options        optInfo;
       tmp = (unsigned char*) Tcl_Alloc (length);
       memcpy (tmp, buf, length);
 
-      PRINT ("___.convertbufproc"); FL;
+      PRINT ("___.convertbufproc\n"); FL;
 
       res = v->convertBufProc (control, tmp, length, interp,
 			       entry->trfType->clientData);
@@ -1529,7 +1535,7 @@ Trf_Options        optInfo;
     } else {
       unsigned int i, c;
       
-      PRINT ("___.convertproc"); FL;
+      PRINT ("___.convertproc\n"); FL;
 
       for (i=0; i < ((unsigned int) length); i++) {
 	c = buf [i];
@@ -1542,7 +1548,7 @@ Trf_Options        optInfo;
     }
 
     if (res == TCL_OK) {
-      PRINT ("___.flushproc"); FL;
+      PRINT ("___.flushproc\n"); FL;
 
       res = v->flushProc (control, interp, entry->trfType->clientData);
     }
@@ -1565,14 +1571,14 @@ Trf_Options        optInfo;
 	break;
 
       if (v->convertBufProc) {
-	PRINT ("___.convertbufproc"); FL;
+	PRINT ("___.convertbufproc\n"); FL;
 
 	res = v->convertBufProc (control, buf, actuallyRead, interp,
 				 entry->trfType->clientData);
       } else {
 	unsigned int i, c;
 
-	PRINT ("___.convertproc"); FL;
+	PRINT ("___.convertproc\n"); FL;
 
 	for (i=0; i < ((unsigned int) actuallyRead); i++) {
 	  c = buf [i];
@@ -1594,7 +1600,7 @@ Trf_Options        optInfo;
       res = v->flushProc (control, interp, entry->trfType->clientData);
   }
 
-  PRINT ("___.deleteproc"); FL;
+  PRINT ("___.deleteproc\n"); FL;
   v->deleteProc (control, entry->trfType->clientData);
 
 
@@ -1609,8 +1615,11 @@ Trf_Options        optInfo;
       Tcl_ResetResult (interp);
 
       if (r.buf != NULL) {
+#if GT81
+ 	Tcl_Obj* o = Tcl_NewByteArrayObj ((char*) r.buf, r.used);
+#else
 	Tcl_Obj* o = Tcl_NewStringObj ((char*) r.buf, r.used);
-
+#endif
 	Tcl_IncrRefCount (o);
 	Tcl_SetObjResult (interp, o);
 	Tcl_DecrRefCount (o);
@@ -1701,7 +1710,7 @@ Tcl_Interp*        interp;
    */
 
   if (trans->mode & TCL_WRITABLE) {
-    PRINT ("out.convertbufproc"); FL;
+    PRINT ("out.createproc\n"); FL;
 
     trans->out.control = trans->out.vectors->createProc ((ClientData) trans,
 							 PutDestination,
@@ -1716,7 +1725,7 @@ Tcl_Interp*        interp;
   }
 
   if (trans->mode & TCL_READABLE) {
-    PRINT ("in_.convertbufproc"); FL;
+    PRINT ("in_.createproc\n"); FL;
 
     trans->in.control  = trans->in.vectors->createProc  ((ClientData) trans,
 							 PutTrans,
@@ -1813,6 +1822,7 @@ Tcl_Interp*    interp;
   Tcl_Channel parent;
 
   START (PutDestination);
+  PRINT ("Data = {%d, \"%s\"}\n", outLen, outString);
 
 #ifdef USE_TCL_STUBS
   parent = (trans->patchIntegrated ?
@@ -1869,6 +1879,7 @@ Tcl_Interp*    interp;
   TrfTransformationInstance* trans = (TrfTransformationInstance*) clientData;
 
   START (PutTrans);
+  PRINT ("Data = {%d, \"%s\"}\n", outLen, outString);
 
   if ((outLen + trans->result.used) > trans->result.allocated) {
     /*
@@ -1923,11 +1934,7 @@ Tcl_Interp*    interp;
   ResultBuffer* r = (ResultBuffer*) clientData;
 
   START (PutInterpResult);
-
-#if 0
-  printf ("-- %d '%s'\n", outLen, outString);
-  fflush (stdout);
-#endif
+  PRINT ("Data = {%d, \"%s\"}\n", outLen, outString);
 
   if ((outLen+1 + r->used) > r->allocated) {
     /*

@@ -67,3 +67,20 @@ if {[info tclversion] < 8.0} {
 	zip -mode decompress [hex -mode decode $text_compressed_as_hex]
     } $text	; #{}
 }
+
+
+set data  [info commands]
+set zdata [zip -mode compress $data]
+
+test zip-2.0 {(De)compression while reading/writing from/to a file} {hasZlib} {
+    write_zip zip $data
+    read_zip  zip
+} $data
+
+
+test zip-2.1 {(De)compression of binary information} {hasZlib} {
+    write_file zip $zdata
+    zip -mode decompress [read_file zip]
+} $data
+
+unset data zdata

@@ -331,6 +331,6 @@ TRF_FIND_ZLIB_SSL
 # Finally, substitute all of the various values into the Makefile.
 #--------------------------------------------------------------------
 
-AC_OUTPUT([Makefile mkIndex.tcl])
+AC_OUTPUT([Makefile mkIndex.tcl test.setup])
 
 #--------------------------------------------------------------------

@@ -12,9 +12,16 @@ node trf_zip {
 
 	table {
 	    defrow -mode {
-		p "
-		Allowed arguments are ``compress'', ``decompress'' and all
-		unique abbreviations of these."
+		p "Allowed arguments are ``compress'', ``decompress'' and all
+		unique abbreviations of these.
+		"
+		p "For [strong immediate] usage it specifies the
+		[strong {operation to use}].
+		"
+		p "For [strong attached] transformations it specifies the
+		[strong operation] to use [strong {for writing}]. Reading
+		will automatically use the reverse operation.
+		"
 	    }
 
 	    defrow -level {

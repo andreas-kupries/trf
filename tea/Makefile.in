@@ -410,8 +410,8 @@ tcheck:
 ttest:
 	$(testshell)	\
 		-constraints '$(TRF_TESTS)'	\
-		-load 'package require Memchan ; load ./$(Trf_LIB_FILE)'	\
-		-testdir $(TRF_TEATESTDIR) 
+		-loadfile $(srcdir)/test.setup	\
+		-testdir  $(TRF_TEATESTDIR) 
 
 
 #	LD_LIBRARY_PATH="$(srcdir):$(TCL_LIB_DIR)"; export \

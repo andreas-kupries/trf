@@ -86,7 +86,7 @@ extern "C" {
 #endif
 
 #ifdef TRF_DEBUG
-static int n = 0;
+extern int n;
 #define BLNKS {int i; for (i=0;i<n;i++) printf (" "); }
 #define IN n+=4
 #define OT n-=4 ; if (n<0) {n=0;}
