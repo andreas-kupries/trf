@@ -1,14 +1,55 @@
 % -*- latex -*-
 \documentclass {report}
+\usepackage{makeidx}
 \usepackage {html}
 \include {defs}
+\makeindex
 
 % external, but distributed here too
 \def\install{	\htmladdnormallink {install.tex}	 {../install/install.html}}
 \def\installman{\htmladdnormallink {installation manual} {../install/install.html}}
+\def\capi{      \htmladdnormallink {C-level} {../capi/capi.html}}
+\def\capiref{   \htmladdnormallink {online reference} {../capi/capi.html}}
 
+% remove this for the official release.
+\def\unoff{
+	\strong{Beware:} This is an unofficial and unannounced
+	release, just to have a complete web site. The official
+	distribution will be made as soon as tcl 8.0b1 is out. Because
+	of this no binary release for \win{} was made, too.}
 
 \begin {document}
+
+\title{The \trf {} (transformer) extension to \tcl}
+\author{Andreas Kupries \\ Aachen}
+\date{\today}
+\maketitle 
+
+\begin{htmlonly}
+\begin{center}\large
+	This document accompanies \trf{} Version @mFullVersion@, as
+	distributed at @mDate@.
+
+	\unoff
+\end{center}
+
+A \htmladdnormallink{postscript version}{man.ps} is available.
+\index{postscript version}
+
+\strong{Warning:} The contents of this document are likely to change.
+It is advisable not to use links to any pages other than the first
+page (this page).
+\end{htmlonly}
+
+\begin{abstract} 
+\trf {} is an extension library to the script language \tcl, as created
+by \jo. It extends the language at the C-level with so-called
+``transformer''-procedures. Build upon this framework (and as proof of
+concept) a collection of \tcl{}-level commands was implemented, most
+of them related to cryptography. Additionally some binary data support
+is put in as well.
+\end{abstract} 
+\pagebreak
 \tableofcontents
 
 \chapter {Introduction}
@@ -16,6 +57,8 @@ This is the reference manual of Tcl-Trf @mFullVersion@, as distributed
 at @mDate@. For instructions on how to compile and install it see
 \file {\install} or one of its derivatives (\file {install.dvi},
 \file {install.ps}).
+
+\unoff
 
 After torturing the world with 2 extensions related to binary support
 in tcl (\blob{} and \blobx{}) I could not resist and wrote another
@@ -32,6 +75,49 @@ in tcl8.0, aka
 \strong {This is not true in the current implementation}. Please read
 the \installman{} to gain insight into the requirements of this
 extension.
+
+To repeat the abstract: \trf {} is an extension library to the script
+language \tcl, as created by \jo.
+
+At the \capi{} a set of commands is provided for management,
+implementation and usage of ``transformer''-procedures. These are
+called by the generic channel system to pre- or postprocess data just
+before writing, resp. immediately after reading. This allows
+transparent implementation of things like:
+
+\begin {itemize}
+\item	Gathering statistics about the data flowing through a channel.
+\item	Converting in and out of printable representations of binary
+	data.
+\item	Decryption, encryption of information read or written.
+\item	Data de(compression), error correcting coding.
+\end   {itemize}
+to name only a few.
+
+As proof of concept several such algorithms were implemented and are
+provided as user-commands at the \tcl{}-level. As most of them are
+related to cryptography in one way or naother, this library might be
+seen as cryptographic toolkit too.
+
+
+\chapter {Where to get}
+
+This library is available at
+\begin {itemize}
+\item[] Primary urls:
+\begin {itemize}
+\item[Sources:] \url {ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.tar.gz} (~800 K)
+\item[Same, different archiver:] \url {ftp://ftp.westend.com/pub/aku/trf@mDosVersion@.zip} (~800 K)
+\item[Short documentation:] \url {ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.README} (~2 K)
+\end {itemize}
+
+\item[] Secondary urls:
+\begin {itemize}
+\item \url {ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz}
+\item \url {ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip}
+\item \url {ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme}
+\end {itemize}
+\end {itemize}
 
 
 \chapter {Acknowledgements}
@@ -100,6 +186,11 @@ package) in general:
 
 
 \chapter {The available commands}
+
+First a small note: This manual deals with the \tcl{}-level commands
+only. For a description of the C-level API please read the
+manpages\html{ or the \capiref{}}.
+
 
 All commands are available in 2 modes of operation, ``immediate'' and
 ``attached''. The generic syntactical forms of these modes are:
@@ -331,6 +422,41 @@ input.
 	for more information.
 \end	{enumerate}
 
+
+\section {Quick Reference}
+Now a quick reference describing the available commands, their type of
+algorithm and location of implementation.
+
+\begin {tabular}{|l|l|l|}\hline
+	Command		& Type				& Location \\ \hline\hline
+	adler		& Message digest		& \zlib	\\ \hline
+	ascii85		& Conversion			& \trf	\\ \hline
+	base64		& Conversion			& \trf	\\ \hline
+	bin		& Conversion			& \trf	\\ \hline
+	binio		& Binary I/O			& \trf	\\ \hline
+	blowfish	& Blockcipher			& \trf	\\ \hline
+	crc		& Message digest		& \trf	\\ \hline
+	crc-zlib	& Message digest		& \zlib	\\ \hline
+	des		& Blockcipher			& \SSLeay \\ \hline
+	haval		& Message digest		& \trf	\\ \hline
+	hex		& Conversion			& \trf	\\ \hline
+	idea		& Blockcipher			& \trf	\\ \hline
+	md2		& Message digest		& \SSLeay \\ \hline
+	md5		& Message digest		& \trf	\\ \hline
+	oct		& Conversion			& \trf	\\ \hline
+	rc2		& Blockcipher			& \SSLeay \\ \hline
+	rc4		& Cipher			& \trf	\\ \hline
+	ripemd-160	& Message digest		& \trf	\\ \hline
+	ripemd-128	& Message digest		& \trf	\\ \hline
+	rs\_ecc		& Error correcting coder	& \trf	\\ \hline
+	sha		& Message digest		& \trf	\\ \hline
+	sha1		& Message digest		& \SSLeay \\ \hline
+	unstack		&				& \trf	\\ \hline
+	uuencode	& Conversion			& \trf	\\ \hline
+	zip		& Data compression		& \zlib	\\ \hline
+\end {tabular}
+
+
 \chapter {Copyrights}\label {copyright}
 
 Copyright notes and acknowledgements for the different ciphers,
@@ -439,4 +565,6 @@ Things to be done in future.
 	suggestions.
 \end   {itemize}
 
+
+\printindex
 \end {document}
