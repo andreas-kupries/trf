@@ -18,7 +18,6 @@
 #define LIBDES_LIB_NAME "libdes.so"
 #endif
 
-
 #ifdef __WIN32__
 #define SSL_LIB_NAME "crypto32.dll"
 #endif
@@ -101,9 +100,28 @@ sha1Functions sha1f = {0};
 
 static sslLibFunctions ssl;
 static libDesFunctions ld;
-
-
-
+
+/*
+ *------------------------------------------------------*
+ *
+ *	TrfLoadDes --
+ *
+ *	------------------------------------------------*
+ *	Makes DES functionality available.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		Loads the required shared library and
+ *		makes the addresses of DES functionality
+ *		available. In case of failure an error
+ *		message is left in the result area of
+ *		the specified interpreter.
+ *
+ *	Result:
+ *		A standard tcl error code.
+ *
+ *------------------------------------------------------*
+ */
 
 int
 TrfLoadDes (interp)
@@ -139,8 +157,28 @@ TrfLoadDes (interp)
 
   return TCL_ERROR;
 }
-
-
+
+/*
+ *------------------------------------------------------*
+ *
+ *	TrfLoadMD2 --
+ *
+ *	------------------------------------------------*
+ *	Makes MD2 functionality available.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		Loads the required shared library and
+ *		makes the addresses of MD2 functionality
+ *		available. In case of failure an error
+ *		message is left in the result area of
+ *		the specified interpreter.
+ *
+ *	Result:
+ *		A standard tcl error code.
+ *
+ *------------------------------------------------------*
+ */
 
 int
 TrfLoadMD2 (interp)
@@ -166,8 +204,29 @@ TrfLoadMD2 (interp)
 
   return TCL_ERROR;
 }
-
-
+
+/*
+ *------------------------------------------------------*
+ *
+ *	TrfLoadSHA1 --
+ *
+ *	------------------------------------------------*
+ *	Makes SHA-1 functionality available.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		Loads the required shared library and
+ *		makes the addresses of SHA-1 functionality
+ *		available. In case of failure an error
+ *		message is left in the result area of
+ *		the specified interpreter.
+ *		
+ *
+ *	Result:
+ *		A standard tcl error code.
+ *
+ *------------------------------------------------------*
+ */
 
 int
 TrfLoadSHA1 (interp)
@@ -193,8 +252,28 @@ TrfLoadSHA1 (interp)
 
   return TCL_ERROR;
 }
-
-
+
+/*
+ *------------------------------------------------------*
+ *
+ *	TrfLoadRC2 --
+ *
+ *	------------------------------------------------*
+ *	Makes RC2 functionality available.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		Loads the required shared library and
+ *		makes the addresses of RC2 functionality
+ *		available. In case of failure an error
+ *		message is left in the result area of
+ *		the specified interpreter.
+ *
+ *	Result:
+ *		A standard tcl error code.
+ *
+ *------------------------------------------------------*
+ */
 
 int
 TrfLoadRC2 (interp)
