@@ -2654,6 +2654,8 @@ Tcl_Interp*        interp;
   /* Initialize the seek subsystem.
    */
 
+  PRINTLN ("Initialize Seeking");
+
   trans->seekCfg.natural.numBytesTransform =
     entry->trfType->naturalSeek.numBytesTransform;
 
@@ -3369,6 +3371,8 @@ SeekCalculatePolicies (trans)
 
   int stopped = 0;
 
+  START (SeekCalculatePolicies);
+
   while (self != (Tcl_Channel) NULL) {
 #if GT81
     next = Tcl_GetStackedChannel (self);
@@ -3390,11 +3394,26 @@ SeekCalculatePolicies (trans)
 	break;
       }
     } else {
+      /* 'next' points to a transformation. In case of 8.1 and higher we can
+       * use the (integrated or patched) 'Tcl_GetStackedChannel' to find the
+       * next transform in a general way. Else we have to check the type of
+       * 'next' itself before trying to peek into its structure. If it is no
+       * Trf transform we cannot go deeper into the stack. But that is not
+       * necessary, as the result of 'unseekable' will not change anymore.
+       */
+
       Tcl_Channel nextAfter;
 
 #if GT81
       nextAfter = Tcl_GetStackedChannel (next);
-#else
+#else      
+      if (Tcl_GetChannelType (next)->seekProc != TrfSeek) {
+	TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
+	trans->seekCfg.overideAllowed = 0;
+	stopped = 1;
+	break;
+      }
+
       nextAfter = ((TrfTransformationInstance*) 
 		   Tcl_GetChannelInstanceData (next))->parent;
 #endif
@@ -3457,6 +3476,8 @@ SeekCalculatePolicies (trans)
 
   trans->seekState.allowed                =
     !TRF_IS_UNSEEKABLE (trans->seekState.used);
+
+  DONE (SeekCalculatePolicies);
 }
 
 /*
