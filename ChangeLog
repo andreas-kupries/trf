@@ -1,5 +1,17 @@
 Tue Jul 22 00:07:21 1997  Andreas Kupries  <a.kupries@westend.com>
 
+	* generic/registry.c (TransformImmediate): Add \0 behind internal
+	  result buffer to prevent using a longer buffer than really given
+	  (7.6 only).
+
+	* Checked distributions. 8.0(b2) working, 7.6 not. Things done to
+	  get that state:
+
+	  > tests/*.test: The md's had 'text' as command. Corrected.
+	  > README: Changed reference to 8.0b1 to 8.0. Removed package
+	    references.
+	  > PREPARE: Crunching .html files below doc/html/ now.
+
 	* tools/md: Small adaptions to new syntax. All operations were
 	  attach'ed, no change there. Had to define '-read-type channel'
 	  nevertheless, because of default geared towards 8.x.

@@ -32,7 +32,7 @@ Example applications distributed with the package are:
 
 Tcl-Trf is developed for Tcl 7.6 or higher.  It is a pure Tcl extension, Tk is
 not required.  The extension requires a patched core. Patch files for 7.6 and
-8.0b1 are part of the distribution.  The plus-patches maintained by Jan
+8.0 are part of the distribution.  The plus-patches maintained by Jan
 Nijtmans (nijtmans@nici.kun.nl) contain this patch too .  Supporting (optional)
 packages are:
 
@@ -44,26 +44,6 @@ packages are:
 
 This distribution contains the source code for Tcl-Trf + documentation
 describing commands (-> latex) and c-level interfaces (-> man-pages).
-
-Primary ftp-site is
-
-	ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.tar.gz
-	ftp://ftp.westend.com/pub/aku/trf@mDosVersion@.zip
-	ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.readme
-
-Secondary ftp-site is
-
-	ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz
-	ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip
-	ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme
-
-And for convenience:
-        ftp://ftp.westend.com/pub/aku/zlib-1.0.4.tar.gz
-        ftp://ftp.westend.com/pub/aku/libdes-3.23.tar.gz
-
-or
-        ftp://ftp.kisters.de/pub/lang/tcl/ext/zlib-1.0.4.tar.gz
-        ftp://ftp.kisters.de/pub/lang/tcl/ext/libdes-3.23.tar.gz
 
 
 There will be NO upload to the official ftp-archive at ftp.neosoft.com

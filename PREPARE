@@ -10,7 +10,6 @@ mExclude PREPARE
 
 set mInfo(@TRF_VERSION@)     $mInfo(@mVersion@)
 set mInfo(@configure_input@) "Distributed at $mInfo(@mDate@)"
-set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mShortDosVersion@).dll"
 
 file copy generic/pkgIndex.tcl.in win/pkgIndex.tcl
 
@@ -19,7 +18,10 @@ mInsertInfo \
 	doc/install.tex doc/man.tex                 \
 	generic/transform.h generic/patchlevel.h     \
 	mac/README                                    \
-	unix/README unix/configure.in unix/Makefile.in \
+	unix/README unix/configure.in unix/Makefile.in
+
+set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mShortDosVersion@).dll"
+mInsertInfo \
 	win/README  win/pkgIndex.tcl  win/makefile.vc
 
 mGetDescription
@@ -34,6 +36,7 @@ mGenerateANNOUNCE
 
 eval mExclude \
 	mails patches/v8.0a1 patches/v8.0a2 patches/v8.0b1 \
+	[glob patches/v8.0b2/*.orig] \
 	[glob patches/nijtmans.*] DEPENDS doc/file doc/delete \
 	doc/FUN doc/ascii.man doc/ascii85 doc/scratch-pad \
 	doc/code34 doc/Notes doc/ToDo doc/trf.def \
@@ -113,6 +116,12 @@ mLatex2html \
 # hierarchy at http://www.westend.com/~kupries
 # It resides at '.../doc/trf/man/man.html'
 # The software page is 'software.html'
+
+# compact the pages a little
+eval exec html_crunch [glob doc/html/install/*.html]
+eval exec html_crunch [glob doc/html/capi/*.html]
+eval exec html_crunch [glob doc/html/man/*.html]
+
 
 # remove temp files from latex runs
 file delete install.aux install.log install.toc

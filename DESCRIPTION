@@ -55,11 +55,11 @@ extension trf {
     }
 
     dependencies {
-	tcl (7.6 or higher (8.0b1, NOT a1, a2))
-	plus-patches as of Dec 5, 1996 or later (optional)
-	memchan 1.0  or higher (required by testsuite)
-	zlib-1.0.4   or higher (optional)
-	libdes-3.21  or higher (optional)
+	tcl 7.6, 8.0 or higher,
+	plus-patches as of Dec 5, 1996 or later (optional),
+	memchan 1.0  or higher (required by testsuite),
+	zlib-1.0.4   or higher (optional),
+	libdes-3.21  or higher (optional),
 	SSLeay-0.6.6 or higher (optional)
     }
 
