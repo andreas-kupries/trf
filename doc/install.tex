@@ -1,0 +1,303 @@
+% -*- latex -*-
+\documentstyle {report}
+\def\strong#1{{\bf #1}}
+\def\lang#1{{\tt #1}}
+\def\file#1{{\tt #1}}
+\def\arg#1{{\tt $<$#1$>$}}
+\def\trf{\strong {trf}}
+\def\blob{\strong {blob}}
+\def\blobx{\strong {blobX}}
+\def\tcl{\lang {tcl}}
+\def\tclsh{\cmd {tclsh}}
+\def\wish{\cmd {wish}}
+\def\cmd#1{{\tt #1}}
+\def\opt#1{{\tt #1}}
+\def\man#1{{\tt #1}}
+\def\lib#1{{\tt #1}}
+\def\url#1{{\tt #1}}
+\def\tm{$^{(tm)}$}
+\def\ra{$\rightarrow$}
+\def\eq{$\equiv$}
+
+\def\version{1.0}
+\begin {document}
+\tableofcontents
+
+\chapter {Introduction}
+This is the installation manual of Tcl-Trf @VERSION@, as distributed
+at @DATE@. For a documentation of the available commands see \file
+{man.tex} or one of its derivatives (\file {man.dvi}, \file {man.ps}).
+
+
+\chapter {Common info}
+
+Before starting compilation and installation a few notes:
+
+\begin{itemize}
+\item	You have managed to unpack this package in a directory of
+	your choice, wether it was gzipped tar-archive or a
+	zip-archive. The path of the file you are reading now is
+	something like \file {\dots{}/trf@VERSION@/doc/install.?}.
+	The \file {\dots{}/trf@VERSION@}-part of it is that we will
+	call the \strong {source-directory} from now on.
+\end{itemize}
+
+This package depends in its operation on quite a few others. Here's
+are list of them:
+
+\begin{itemize}
+\item	\strong {Tcl}, of course. The package will compile with 7.6
+	and 8.0a2. Version 8.0a1 cannot be used anymore due to the
+	differences in the object API for commands.
+
+	This package requires manipulation of the core, hence a
+	\strong {source distribution} is required. Instruction on how
+	to patch it is provided in a separate chapter (\ra {} \ref {scalpel}).
+
+\item	\strong {Memchan}. Trf can be used without, but the
+	testsuite coming with this distribution requires it.
+
+	Current version is 1.2. A binary distribution for Win32 is
+	available.
+
+	\begin {tabular} {|l|l|} \hline
+	src & \url {ftp://ftp.westend.com/pub/aku/memchan1.2.tar.gz} \\ \hline
+	src (win) & \url {ftp://ftp.westend.com/pub/aku/memchan12.zip} \\ \hline
+	bin (win32) & \url {ftp://ftp.westend.com/pub/aku/mchan12b.zip} \\ \hline
+	\end {tabular}
+	
+\item	\strong {zlib}. This package is used to implement the 'zip'
+	compression command/filter. It will be loaded at runtime, if
+	required. It is therefore optional. See chapter \ref {zlib} for
+	more info.
+
+\item	\strong {libdes}. This package is used to implement the 'des'
+	encryption facility. It will be loaded at runtime, if
+	required. It is therefore optional. See chapter \ref {libdes}
+	for more info.
+\end{itemize}
+
+
+\chapter  {Patching the core}\label {scalpel}
+
+There is nothing to do, if you are using a \tclsh{} or \wish{}
+containing the plus-patches (as provided by Jan Nijtmans (\url {nijtmans@nici.kun.nl})).
+For version 7.6plus please check that your patch was younger then Dec 12, 1996.
+A plus-patch older than this does not contain the required modifications.
+Skip ahead to the next section.
+
+
+Well, it seems you have to do all the modifications by yourself. The
+required files reside in the \file {patches}-subdirectory of the
+source-directory. That is not quite true. They are in one of three
+subdirectories, named after the version of tcl they belong to. Select
+one of the directories and use the files in there. \strong {Don't mix
+files from different subdirectories (\eq{} tcl versions)}.
+
+Now you have two choices.
+
+\begin {enumerate}
+\item	Copy the 4 files \file {tcl.h}, \file {tclIO.c}, \file
+	{configure.in} and \file {configure} to the appropriate
+	locations, as given in the table below\footnote {People using
+	Windows\tm{} should do this. They can safely ignore the files \file
+	{configure} and \file {configure.in}}
+
+	\begin {tabular} {|l|l|} \hline
+	tcl.h		& tcl$<$version$>$/generic/tcl.h	\\ \hline
+	tclIO.c		& tcl$<$version$>$/generic/tclIO.c	\\ \hline
+	configure.in	& tcl$<$version$>$/unix/configure.in	\\ \hline
+	configure	& tcl$<$version$>$/unix/configure	\\ \hline
+	\end {tabular}
+
+	or,
+
+\item	Apply the 2 patches \file {standard.patch} and \file
+	{byteorder.patch}. The appropriate working directories are
+
+	\begin {tabular} {|l|l|} \hline
+	standard.patch	& tcl$<$version$>$/generic	\\ \hline
+	byteorder.patch	& tcl$<$version$>$/		\\ \hline
+	\end {tabular}
+\end   {enumerate}
+
+
+\chapter {zlib, zip compression library}\label{zlib}
+
+\lib {zlib} is a freely available compression library using the
+unpatented ``deflate''-algorithm employed by \cmd {gzip}, \cmd
+{pkzip} and others. Current version is 1.0.4.
+
+The official homepage is located at \url
+{http://quest.jpl.nasa.gov/zlib/}. A downloading page is available
+there too. Other sourcess of information are \file {rfc1950.txt},
+\file {rfc1951.txt} and \file {rfc1952.txt}
+
+\trf{} requires a shared library version of \lib {zlib}. People
+without such \strong {don't} loose however.
+
+\begin {itemize}
+\item	The unix-specific makefile contains the target ``zlib''. This
+	will generate a shared library for zlib. It assumes that the
+	\lib {zlib} source distribution is available as subdirectory
+	\file {zlib} (a sibling to \file {unix} !).
+
+\item	A binary distribution for windows is available, see \url {}.
+
+	A note of caution: The library provided contains a
+	hand-optimized assembler version of the compression
+	algorithm. At least for me it crashes often enough to be
+	unusable. YMMV however.
+
+	Because of this the subdirectory \file {zlib.vc} contains
+	everything to compile zlib as shared library (with MSVC++
+	4.2). Just copy \file {makefile.vc} to \file {makefile}, adapt
+	the paths to your directory structure, then type \cmd {nmake}.
+
+	At last copy the newly generated \file {zlib.dll} into the
+	windows system directory of your machine.
+
+\item	I have no information about its availability on Macintoshes.
+\end   {itemize}
+
+
+
+
+\chapter {libdes, DES encryption}\label {libdes}
+
+ The home page of \strong
+	{SSLeay} is \url {} (libdes is part of SSLeay).
+libdes\_lib\_name = crypto32.dll on windows to use ssleay
+
+\chapter {Compilation and installation}
+\section {Macintosh}
+
+	This is a short section (therefore the first).
+
+	I don't have a Mac, nor do I have access one. Because
+	of this I am unable to provide a Mac port of this
+	extension.  I will most happily integrate any required
+	changes, makefiles, et cetera into the distribution,
+	if they are send to me (\url {a.kupries@westend.com}).
+
+
+\section {Unix}
+
+There are several different flavors of Un*x out there in this small
+world. A \strong {configure} script, as generated by \strong {GNU
+autoconf}, is provided to handle them all together.
+
+\begin {itemize}
+\item	Simply type:
+
+\begin{verbatim}
+	> configure
+	> make
+\end{verbatim}
+
+The makefile will then check number and names of the files in the
+package, generate dependency information, compile them and at last
+build the library.  The tool \cmd {get-manifest} used during file
+check requires the directory \file {/tmp}.
+
+
+\item	For a shared library add the \opt {--enable-shared} to \cmd
+	{configure}. 
+
+
+\item	To check the extension, type \cmd {make test} or \cmd
+	{make check}. This will build a tclsh containing just tcl and
+	trf and then runs some test-scripts checking the behaviour of
+	the created library. 
+
+\item	At last type \cmd {make install} to install the generated
+	library and the exported header. This installation conforms to
+	the rules set by the package loader mechanism of the tcl-core. 
+\end {itemize}
+
+You do have a non-standard setup (tcl not installed at \file
+{/usr/local}) ?
+
+Don't fret, there are some tuning options for \cmd {configure} to help
+you. 
+
+\begin {itemize}
+\item	The configure script searches the core header \file {tcl.h} in
+	the following places:
+
+	\begin {enumerate}
+	\item	\$(TCL\_INCLUDE\_DIR)
+	\item	\file {../tcl8.0/generic}
+	\item	\file {../tcl8.0b*/generic}
+	\item	\file {../tcl8.0a2/generic}
+	\item	\file {../tcl7.6/generic}
+	\item	\file {../tcl/generic}
+	\item	\file {../tcl}
+	\item	\$(prefix)
+	\item	\file {/usr/local/include}
+	\item	\file {/usr/include}
+	\end {enumerate}
+
+	By default \$(TCL\_INCLUDE\_DIR) is empty and \$(prefix) points
+	to the location of an installed 'tclsh' or is \file {/usr/local} if
+	tclsh could not be found via \$PATH.
+
+	There are three options to overide this defaults:
+
+	\begin {itemize}
+	\item[]	\opt {--prefix}=DIR		   \ra {} \$(prefix)=DIR
+	\item[]	\opt {--with-tcl}=DIR		   \ra {} \$(TCL\_INCLUDE\_DIR)=DIR/include
+	\item[]	\opt {--with-tcl-include-dir}=DIR  \ra {} \$(TCL\_INCLUDE\_DIR)=DIR
+	\end {itemize}
+
+
+\item	To find \file {libtcl.a} (or \file {libtcl.so.??}) the paths
+
+	\begin {enumerate}
+	\item	\$(TCL\_LIB\_DIR)
+	\item	\file {../tcl8.0/unix}
+	\item	\file {../tcl8.0b*/unix}
+	\item	\file {../tcl8.0a2/unix}
+	\item	\file {../tcl7.6/unix}
+	\item	\file {../tcl/unix}
+	\item	\file {../tcl}
+	\item	\$(exec\_prefix)
+	\item	\file {/usr/local/include}
+	\item	\file {/usr/include}
+	\end {enumerate}
+
+	are searched. \$(TCL\_LIB\_DIR) is empty by default, but
+	can be set via
+
+	\begin {itemize}
+	\item[]	\opt {--with-tcl}=DIR	      \ra {} \$(TCL\_LIB\_DIR)=DIR/lib
+	\item[]	\opt {--with-tcl-lib-dir}=DIR \ra {} \$(TCL\_LIB\_DIR)=DIR
+	\end {itemize}
+
+	\$(exec\_prefix) contains the same value as \$(prefix) by
+	default, but can be set explicitly via \opt {--exec-prefix}.
+\end {itemize}
+
+
+
+\section {Windows}
+
+A single file \file {makefile.vc} is provided. It is designed to
+work with \cmd {MSVC++ 4.2}. Just rename it to \file {makefile}, adapt
+the paths\footnote {The available variables are described in the
+makefile} at the top of it as required by your setup (aka directory
+structure), then type
+
+\begin{verbatim}
+	>	nmake
+	>	nmake install
+\end{verbatim}
+
+
+The installation conforms to the rules set by the package loader
+mechanism of the tcl-core.
+
+Use \cmd {nmake test} to execute a selftest of the generated library.
+
+\end {document}
+
