@@ -187,7 +187,7 @@ if {[info tclversion] < 8.0} {
 	    set has_out 1
 	}
 
-puts "<<$bc $bc_args -key-type channel>>"
+	#puts "<<$bc $bc_args -key-type channel>>"
 
 	if {$iv == {}} {
 	    eval $bc $bc_args -key-type channel
