@@ -1,10 +1,12 @@
 # -*- tcl -*-
 # links to various places (and more shortcuts)
 
-link md {Message digest} trf_md.html
-link cv Conversion       trf_conv.html
-link bc Blockcipher      trf_crypto.html
-link sc Cipher           trf_crypto.html
+link md   {Message digest}        trf_md.html
+link cv   Conversion              trf_conv.html
+link bc   Blockcipher             trf_crypto.html
+link sc   Cipher                  trf_crypto.html
+link tech {technical explanation} trf_techintro.html
+
 
 proc md {} {return [link md]}
 proc cv {} {return [link cv]}

@@ -17,8 +17,12 @@ proc eq    {} {return =}
 proc strterm {} {return "\\0"}
 proc smiley {} {return [imglink smiley]} ; # -W- use a picture
 
-::webTemplate::image smiley   img/smiley16.gif
-::webTemplate::image trf_logo img/logo-120x181.gif
+
+::webTemplate::image smiley     img/smiley16.gif
+::webTemplate::image trf_logo   img/logo-120x181.gif
+::webTemplate::image trf_chan_1 img/chan.gif
+::webTemplate::image trf_chan_2 img/trfchan.gif
+::webTemplate::image trf_chan_3 img/trfchan2.gif
 
 
 proc defrow {string desc} {

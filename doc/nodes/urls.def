@@ -10,8 +10,8 @@ proc url {code text url} {
 
 # -------------------------------------------------
 
-url tcl       [lang tcl]               http://sunscript.sun.com/
-url sun       Sun                      http://sunscript.sun.com/
+url tcl       [lang tcl]               http://www.scriptics.com/
+#url sun       Sun                      http://www.scriptics.com/
 url scriptics Scriptics                http://www.scriptics.com/
 url consortium "Tcl/Tk Consortium"     http://www.tclconsortium.org/
 
@@ -92,10 +92,10 @@ if {[info exists ::westend]} {
 
 } else {
     link trfcrypt   TrfCrypt \
-	    http://www.westend.com/~kupries/doc/trfcrypt/index.html
+	    http://www.oche.de/~akupries/soft/trfcrypt/index.html
 
     link memchan    Memchan \
-            http://www.westend.com/~kupries/tcltk.html
+            http://www.oche.de/~akupries/tcltk.html
 }
 
 

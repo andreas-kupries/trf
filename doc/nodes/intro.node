@@ -8,6 +8,10 @@ node trf_intro {
 
     parent trf_home
 
+    menu {
+	trf_techintro
+    }
+
     contents {
 	p "
 	This is the reference manual of [trf] @mFullVersion@, as distributed
@@ -24,7 +28,9 @@ node trf_intro {
 	[tcl] allowing us to intercept any read/write call made by the user
 	and to act upon the data before it is given to him (read) or the
 	channel driver (write). This unfortunately requires us to patch the
-	core to get it going."
+	core to get it going. See the [link tech] of the concept for more
+	information about this.
+	"
 
 	p "
 	This requirement for [tcl] 7.6 is no such one for [tcl] 8.x. The
@@ -36,7 +42,7 @@ node trf_intro {
 	p "
 	Hopefully [tcl] 8.1 will contain the necessary hooks as part of the
 	core, obviating the need for patches. The probability is very low
-	however, due to the shift of the development from [sun] to
+	however, due to the shift of the development from Sun to
 	[scriptics]."
 
 	# -W- installman => link to chapter 'install'
@@ -68,6 +74,7 @@ node trf_intro {
 
 	p "
 	As proof of concept several such algorithms were implemented and are
-	provided as user-commands at the [tcl]-level."
+	provided as user-commands at the [tcl]-level.
+	"
     }
 }

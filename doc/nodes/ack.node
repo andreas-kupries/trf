@@ -24,6 +24,9 @@ node trf_ack {
 	    usability (load-on-demand of [libz], ...) of this package.
 	    "
 
+	    li "[lvirden] for friendship and extensive bug/problem reports.
+	    "
+
 	    li "
 	    In no particular order: [gookkimn], [rvaldez], [gvvaughan]
 	    and [fmeyer].
