@@ -76,6 +76,10 @@ TrfLoadZlib (interp)
     return TCL_OK;
   }
 
+  /* DEBUG */
+  printf ("TrfLoadZlib (interp=%p)\n", interp);
+  /* DEBUG */
+
   buf = (char *) Tcl_Alloc (strlen (Z_LIB_NAME) + 3);
   strcpy (buf, Z_LIB_NAME);
   strcat (buf, ".1");
@@ -88,6 +92,9 @@ TrfLoadZlib (interp)
   }
 
   if (handle == NULL) {
+    /* DEBUG */
+    printf ("\terror: %s\n", dlerror ());
+    /* DEBUG */
     if (interp != NULL) {
       Tcl_AppendResult (interp,
 			"cannot open ", Z_LIB_NAME,
@@ -102,6 +109,14 @@ TrfLoadZlib (interp)
    * Get the addresses of the relevant symbols and
    * place them into the global vector structure
    */
+
+  /* DEBUG */
+  for (q=symbols; q->sym_name; q++) {
+    printf ("\tsymbol '%s':\t%d\n", q->sym_name, q->sym_offset);
+  }
+  q = symbols;
+  /* DEBUG */
+
 
   while (q->sym_name) {
 
