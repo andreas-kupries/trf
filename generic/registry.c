@@ -3377,7 +3377,25 @@ SeekCalculatePolicies (trans)
 #if GT81
     next = Tcl_GetStackedChannel (self);
 #else
-    next = trans->parent;
+    /* In case of 8.1 and higher we can use the (integrated or patched)
+     * 'Tcl_GetStackedChannel' to find the next transform in a general
+     * way. Else we have to check the type of 'next' itself before trying
+     * to peek into its structure. If it is no Trf transform we cannot go
+     * deeper into the stack. But that is not necessary, as the result of
+     * 'unseekable' will not change anymore.
+     */
+
+    if (Tcl_GetChannelType (self)->seekProc != TrfSeek) {
+      PRINTLN ("Can't go further down, unseekable, disallow overide");
+
+      TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
+      trans->seekCfg.overideAllowed = 0;
+      stopped = 1;
+      break;
+    }
+
+    next = ((TrfTransformationInstance*) 
+		   Tcl_GetChannelInstanceData (self))->parent;
 #endif
 
     if (next == (Tcl_Channel) NULL) {
@@ -3388,18 +3406,15 @@ SeekCalculatePolicies (trans)
 	/* Base is unseekable.
 	 */
 
+	PRINTLN ("Base is unseekable");
+
 	TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
 	trans->seekCfg.overideAllowed = 0;
 	stopped = 1;
 	break;
       }
     } else {
-      /* 'next' points to a transformation. In case of 8.1 and higher we can
-       * use the (integrated or patched) 'Tcl_GetStackedChannel' to find the
-       * next transform in a general way. Else we have to check the type of
-       * 'next' itself before trying to peek into its structure. If it is no
-       * Trf transform we cannot go deeper into the stack. But that is not
-       * necessary, as the result of 'unseekable' will not change anymore.
+      /* 'next' points to a transformation.
        */
 
       Tcl_Channel nextAfter;
@@ -3407,13 +3422,6 @@ SeekCalculatePolicies (trans)
 #if GT81
       nextAfter = Tcl_GetStackedChannel (next);
 #else      
-      if (Tcl_GetChannelType (next)->seekProc != TrfSeek) {
-	TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
-	trans->seekCfg.overideAllowed = 0;
-	stopped = 1;
-	break;
-      }
-
       nextAfter = ((TrfTransformationInstance*) 
 		   Tcl_GetChannelInstanceData (next))->parent;
 #endif
@@ -3425,6 +3433,8 @@ SeekCalculatePolicies (trans)
 	 */
 
 	if (Tcl_GetChannelType (next)->seekProc != TrfSeek) {
+	  PRINTLN ("Unknown type of transform, unseekable, no overide");
+
 	  TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
 	  trans->seekCfg.overideAllowed = 0;
 	  stopped = 1;
@@ -3433,6 +3443,8 @@ SeekCalculatePolicies (trans)
 	    (TrfTransformationInstance*) Tcl_GetChannelInstanceData (next);
 	  
 	  if (!down->seekState.allowed) {
+	    PRINTLN ("Trf transform, unseekable");
+
 	    TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
 	    trans->seekCfg.overideAllowed = 0;
 	    stopped = 1;
@@ -3448,15 +3460,21 @@ SeekCalculatePolicies (trans)
   }
 
   if (!stopped) {
+    PRINTLN ("Search went through, check natural policy");
+
     if (TRF_IS_UNSEEKABLE (trans->seekCfg.natural)) {
       /* Naturally unseekable (iii)
        */
+
+      PRINTLN ("Naturally unseekable");
 
       TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
       trans->seekCfg.overideAllowed = 1;
     } else {
       /* Take the natural ratio.
        */
+
+      PRINTLN ("naturally seekable");
 
       trans->seekCfg.chosen.numBytesTransform =
 	trans->seekCfg.natural.numBytesTransform;
