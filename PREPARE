@@ -151,6 +151,11 @@ mConfigure unix
 # --------------------------------------------------------------
 # make that a procedure, later.
 
+# trf1480.dll is a copy of trf1380.dll, due to no change in functionality.
+# creation of trf1481.dll is waiting in the todo pipeline.
+
+file copy win/trf1380.dll win/trf1480.dll
+
 set bindir  "[::pool::string::cap $mName]${mVersion}"
 
 file mkdir $bindir [file join $bindir patches]
