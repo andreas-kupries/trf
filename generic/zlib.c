@@ -21,16 +21,16 @@
 
 
 static char* symbols [] = {
-  "_deflate",
-  "_deflateEnd",
-  "_deflateInit_",
-  "_deflateReset",
-  "_inflate",
-  "_inflateEnd",
-  "_inflateInit_",
-  "_inflateReset",
-  "_adler32",
-  "_crc32",
+  "deflate",
+  "deflateEnd",
+  "deflateInit_",
+  "deflateReset",
+  "inflate",
+  "inflateEnd",
+  "inflateInit_",
+  "inflateReset",
+  "adler32",
+  "crc32",
   (char *) NULL
 };
 

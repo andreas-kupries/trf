@@ -197,8 +197,9 @@ CVT_ALG_OBJ	=	bincode.o hexcode.o octcode.o uucode.o b64code.o asc85code.o
 MD_SRC		=	$(GENERIC_DIR)/dig_opt.c $(GENERIC_DIR)/digest.c			\
 			$(GENERIC_DIR)/crc.c $(GENERIC_DIR)/md5.c   $(GENERIC_DIR)/haval.c	\
 			$(GENERIC_DIR)/sha.c $(GENERIC_DIR)/adler.c $(GENERIC_DIR)/crc_zlib.c	\
-			$(GENERIC_DIR)/md2.c $(GENERIC_DIR)/sha1.c
-MD_OBJ		=	dig_opt.o digest.o crc.o md5.o haval.o sha.o adler.o crc_zlib.o md2.o sha1.o
+			$(GENERIC_DIR)/md2.c $(GENERIC_DIR)/sha1.c  $(GENERIC_DIR)/rmd160.c
+MD_OBJ		=	dig_opt.o digest.o crc.o md5.o haval.o sha.o	\
+			adler.o crc_zlib.o md2.o sha1.o rmd160.o
 
 
 #		encryption, base & algorithms
@@ -386,6 +387,9 @@ sha.o: $(GENERIC_DIR)/sha.c
 
 sha1.o: $(GENERIC_DIR)/sha1.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/sha1.c -o $@
+
+rmd160.o: $(GENERIC_DIR)/rmd160.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/rmd160.c -o $@
 
 adler.o: $(GENERIC_DIR)/adler.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/adler.c -o $@
