@@ -18,6 +18,8 @@
 
 /* This is almost copied from strncpy.c, written by Torbjorn Granlund.  */
 
+#include <tcl.h>
+
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif

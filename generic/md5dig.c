@@ -289,13 +289,14 @@ static int
 MDmd5_Check (interp)
 Tcl_Interp* interp;
 {
-#ifdef MD5_STATIC_BUILD
-  return TCL_OK;
-#else
   return TrfLoadMD5 (interp);
+#ifdef MD5_STATIC_BUILD
+  /*return TCL_OK;*/
+#else
 #endif
 }
 
+#if 0
 /* Import the MD5 code in case of static linkage.
  */
 #ifdef MD5_STATIC_BUILD
@@ -315,4 +316,5 @@ md5Functions md5f = {
   0, /* no crypt code! */
 };
 
+#endif
 #endif

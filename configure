@@ -5232,36 +5232,39 @@ MD5_LIB_FILE=""
 if test \( $HAS_LIBCRYPT -eq 0 \)
 then
 	# (1)
-	MD5_LIB_FILE=libcrypt$TCL_SHLIB_SUFFIX
-	TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=\\\"libcrypt$TCL_SHLIB_SUFFIX\\\""
-
+	## MD5_LIB_FILE=libcrypt$TCL_SHLIB_SUFFIX
+	## TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=\\\"NONE\\\""
 	eval cat >> confdefs.h <<EOF
-#define CRYPT_LIB_NAME "libcrypt$TCL_SHLIB_SUFFIX"
+#define MD5_STATIC_BUILD 1
 EOF
 
+
+	EXTRA_SOURCES="\$(Md5_SOURCES)"
 else
 	# (2,3)
 	if test \( $HAS_LIBCRYPT_MD5 -eq 0 \)
 	then
 		# (3)
-		MD5_LIB_FILE=libmd5crypt$TCL_SHLIB_SUFFIX
-		TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=\\\"libmd5crypt$TCL_SHLIB_SUFFIX\\\""
+		## MD5_LIB_FILE=libmd5crypt$TCL_SHLIB_SUFFIX
+		## TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=\\\"NONE\\\""
 
 		# Sun Solaris is special, we may not use -lcrypt !
 		# Verified for: SunOS 5.5.1 (Solaris 2.5)
 		#		SunOS 5.6   (Solaris 2.6)
 
-		case "`uname -s`" in
-		SunOS*)	;;
-		*)	LIBS="-lcrypt $LIBS"
-			SHLIB_LD_LIBS="-lcrypt $SHLIB_LD_LIBS"
-			;;
-		esac
+		## case "`uname -s`" in
+		## SunOS*)	;;
+		## *)	LIBS="-lcrypt $LIBS"
+		##	SHLIB_LD_LIBS="-lcrypt $SHLIB_LD_LIBS"
+		##	;;
+		## esac
 
 		eval cat >> confdefs.h <<EOF
-#define CRYPT_LIB_NAME "libmd5crypt$TCL_SHLIB_SUFFIX"
+#define MD5_STATIC_BUILD 1
 EOF
 
+
+		EXTRA_SOURCES="\$(Md5_SOURCES)"
 	fi
 fi
 

@@ -80,11 +80,11 @@ static char* crypt_symbols [] = {
 
 md2Functions  md2f  = {0}; /* THREADING: serialize initialization */
 sha1Functions sha1f = {0}; /* THREADING: serialize initialization */
-
-#ifndef MD5_STATIC_BUILD
 md5Functions  md5f  = {0}; /* THREADING: serialize initialization */
-#endif
 
+#ifdef MD5_STATIC_BUILD
+#include "../md5-crypt/md5.h" /* THREADING: import of one constant var, read-only => safe */
+#endif
 
 /*
  * Internal global var's, contains all vectors loaded from SSL's 'cryptlib'.
@@ -169,11 +169,18 @@ TrfLoadMD2 (interp)
  *
  *------------------------------------------------------*
  */
-#ifndef MD5_STATIC_BUILD
 int
 TrfLoadMD5 (interp)
     Tcl_Interp* interp;
 {
+#ifdef MD5_STATIC_BUILD
+  md5f.loaded = 1;
+  md5f.init   = md5_init_ctx;
+  md5f.update = md5_process_bytes;
+  md5f.final  = md5_finish_ctx;
+  md5f.crypt  = NULL;
+  return TCL_OK;
+#else
   int res;
 
   TrfLock; /* THREADING: serialize initialization */
@@ -182,8 +189,8 @@ TrfLoadMD5 (interp)
   TrfUnlock;
 
   return res;
-}
 #endif
+}
 
 /*
  *------------------------------------------------------*

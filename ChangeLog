@@ -1,3 +1,29 @@
+2002-11-04  Andreas Kupries  <andreask@activestate.com>
+
+	* The changes below fix the following bug reports:
+	  ActiveState Bugzilla 21643.
+	  ActiveState Bugzilla 21628.
+	  SourceForge 619404.
+
+	* md5-crypt/md5.c: (HAVE_MEMCPY): Enforce usage on Windows.
+
+	* md5-crypt/md5.c: 
+	* compat/stpncpy.c: Added tcl header on Win32 to get definitions
+	  like size_t.
+
+	* md5-crypt/md5-crypt.c: Excluded header not known on Win32.
+
+	* generic/loadman.c:
+	* generic/md5dig.c:
+	* generic/otpmd5.c:
+	* configure.in: Changed code to compile md5 functionality directly
+	  into the trf library if 'md5crypt' is not accessible via
+	  '-lcrypt'. This eliminates any trouble with a missing md5crypt
+	  library and is easier to do than creating and installing a
+	  second (helper) library.
+
+	* configure: Regenerated.
+
 2002-10-15  Andreas Kupries  <andreask@pliers.activestate.com>
 
 	* Makefile.in (Trf_INCLUDES): Continuation to empty line followed

@@ -20,6 +20,8 @@
 
 /* Written by Ulrich Drepper <drepper@gnu.ai.mit.edu>, 1995.  */
 
+#include <tcl.h>
+
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
@@ -30,6 +32,9 @@
 # include <stdlib.h>
 # include <string.h>
 #else
+#ifdef WIN32
+#define HAVE_MEMCPY
+#endif
 # ifndef HAVE_MEMCPY
 #  define memcpy(d, s, n) bcopy ((s), (d), (n))
 # endif

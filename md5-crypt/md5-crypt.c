@@ -22,7 +22,9 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef WIN32
 #include <sys/param.h>
+#endif
 
 #include "md5.h"
 
