@@ -14,16 +14,36 @@ node trf_danger {
 	"
 
 	number_list {
-
 	    li "
-	    Whatever you do, don't forget to switch the used channels into
-	    binary mode, i.e. execute
+	    Whatever you do, [strong {do not}] forget to switch the used
+	    channels into binary mode, i.e. execute
 	    ``[strong "fconfigure [lt]channel[gt] -translation binary"]''.
 
 	    Not doing this will produce all kind of strange
 	    errors, even on unix machines, as the default translation mode
 	    (``auto'') will not only convert CR LF into LF, but a single
 	    CR as well!"
+
+	    li "
+	    If you want to use [strong fileevents] in combination with stacked
+	    channels make sure that [strong all] channels in the stack are
+	    nonblocking, i.e. execute
+	    ``[strong "fconfigure [lt]channel[gt] -blocking 0"]''
+	    for them. Not doing so may cause the system to hang in a read/gets
+	    procedure. This is independent of client or server. The reason is
+	    that a transform uses internally 'Tcl_Read', even if the user
+	    called 'gets', thus waiting for more information usually not
+	    coming. Especially in a line oriented protocol. See the remarks
+	    about buffering below too.
+	    "
+
+	    li "
+	    [strong This] version of Trf generates artificial 'readable'
+	    events to flush out any information waiting in the various buffers
+	    of the stack. For older versions a 'gets' or 'read' in a fileevent
+	    script has to be wrapped into a loop reading data until exhaustion
+	    (\[gets [lt]channel[gt] line\] <0).
+	    "
 
 	    li "
 	    Using transformation procedures (as in this package)
@@ -56,15 +76,14 @@ node trf_danger {
 		}
 	    }]
 
-		The solution here would be the usage of a blockcipher in CFB
-		mode and shift [eq] 1 or that of a stream cipher, as both of
-		these would encrypt single characters without buffering.
+	    The solution here would be the usage of a blockcipher in CFB
+	    mode and shift [eq] 1 or that of a stream cipher, as both of
+	    these would encrypt single characters without buffering.
 
-		Data compression is another good candidate for such a situation.
+	    Data compression is another good candidate for such a situation.
 
-		Because of this I decided to include the number of characters
-		buffered by a certain transformation in its description."
-	    }
+	    Because of this I decided to include the number of characters
+	    buffered by a certain transformation in its description."
 	}
     }
-
+}

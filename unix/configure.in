@@ -178,13 +178,9 @@ AC_CACHE_CHECK(for directory with tcl.h,
 	[trf_cv_path_TCL_INCLUDE_DIR=""
 	 places="$TCL_INCLUDE_DIR \
 		../../tcl8.1/generic \
-		../../tcl8.1b2/generic \
-		../../tcl8.1b1/generic \
-		../../tcl8.1a2/generic \
-		../../tcl8.1a1/generic \
-		../../tcl8.0.5/generic \
-		../../tcl8.0.4/generic \
-		../../tcl8.0.3/generic \
+		../../tcl8.1b*/generic \
+		../../tcl8.1a*/generic \
+		../../tcl8.0.*/generic \
 		../../tcl8.0/generic \
 		../../tcl7.6/generic \
 		../../tcl/generic \
@@ -249,13 +245,9 @@ AC_CACHE_CHECK(for tcl library,
 	[trf_cv_lib_TCL_LIB=""
 	 places="$TCL_LIB_DIR \
 	../../tcl8.1/unix \
-	../../tcl8.1b2/unix \
-	../../tcl8.1b1/unix \
-	../../tcl8.1a2/unix \
-	../../tcl8.1a1/unix \
-	../../tcl8.0.5/unix \
-	../../tcl8.0.4/unix \
-	../../tcl8.0.3/unix \
+	../../tcl8.1b*/unix \
+	../../tcl8.1a*/unix \
+	../../tcl8.0.*/unix \
 	../../tcl8.0/unix \
 	../../tcl7.6/unix \
 	../../tcl/unix \
@@ -268,7 +260,7 @@ AC_CACHE_CHECK(for tcl library,
         if test -n "$trf_cv_lib_TCL_LIB"; then
             break
         fi
-        for version in 8.1 8.0.3 8.0 7.6 81 803 80 76 ""; do
+        for version in 8.1 8.0.6 8.0.5 8.0.4 8.0.3 8.0 7.6 81 806 805 804 803 80 76 ""; do
             if test -n "$trf_cv_lib_TCL_LIB"; then
                 break
             fi

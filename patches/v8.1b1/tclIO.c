@@ -1562,7 +1562,7 @@ Tcl_ReplaceChannel(interp, typePtr, instanceData, mask, prevChan)
    * The superceded channel is effectively unregistered
    */
 
-  chanPtr->supercedes->refCount --;
+  /*chanPtr->supercedes->refCount --;*/
 
   return (Tcl_Channel) chanPtr;
 }
@@ -1618,7 +1618,7 @@ Tcl_Channel chan;   /* The channel to unstack */
      * The superceded channel is effectively registered again
      */
 
-    chanPtr->supercedes->refCount ++;
+    /*chanPtr->supercedes->refCount ++;*/
   }
 
   /*
@@ -2341,7 +2341,7 @@ CloseChannel(interp, chanPtr, errorCode)
 
       chanPtr->supercedes->nextChanPtr = tsdPtr->firstChanPtr;
       tsdPtr->firstChanPtr             = chanPtr->supercedes;
-
+      chanPtr->supercedes->refCount --; /* is deregistered */
       Tcl_Close (interp, (Tcl_Channel) chanPtr->supercedes);
     }
 

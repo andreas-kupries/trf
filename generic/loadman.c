@@ -11,13 +11,17 @@
 
 #include "loadman.h"
 
-
-#ifdef __WIN32__
-#define SSL_LIB_NAME "crypto32.dll"
-#endif
+/*
+ * Allow the Makefile to define this value
+ */
 #ifndef SSL_LIB_NAME
-#define SSL_LIB_NAME "libcrypto.so"
-#endif
+#    ifdef __WIN32__
+#    define SSL_LIB_NAME "crypto32.dll"
+#    endif /* __WIN32__ */
+#    ifndef SSL_LIB_NAME
+#    define SSL_LIB_NAME "libcrypto.so"
+#    endif /* SSL_LIB_NAME */
+#endif /* SSL_LIB_NAME */
 
 
 typedef struct SslLibFunctions {

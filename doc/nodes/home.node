@@ -18,8 +18,9 @@ node trf_home {
 
     menu {
 	trf_intro   trf_where      trf_ack
+	trf_danger
 	trf_install trf_cmds       trf_capi
-	trf_danger  trf_copyrights trf_future
+	trf_copyrights trf_future
     }
 
     contents {

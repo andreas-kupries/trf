@@ -4,7 +4,7 @@
  *	Implements the C level procedures handling the registry
  *
  *
- * Copyright (c) 1996 Andreas Kupries (a.kupries@westend.com)
+ * Copyright (c) 1996-1999 Andreas Kupries (a.kupries@westend.com)
  * All rights reserved.
  *
  * Permission is hereby granted, without written agreement and without
@@ -35,6 +35,28 @@
 
 #define ASSOC "binTrf"
 
+/* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
+ * Normally defined in tcl*Port.h
+ */
+
+#ifndef EWOULDBLOCK
+#define EWOULDBLOCK EAGAIN
+#endif
+
+/*
+ * Possible values for 'flags' field in control structure.
+ */
+#define CHANNEL_ASYNC		(1<<0) /* non-blocking mode */
+
+/*
+ * Number of milliseconds to wait before firing an event to flush
+ * out information waiting in buffers (fileevent support).
+ *
+ * Relevant for only Tcl 8.0 and beyond.
+ */
+
+#define DELAY (5)
+
 /*
  * Structures used by an attached transformation procedure
  *
@@ -57,17 +79,25 @@ typedef struct _ResultBuffer_ {
 
 
 typedef struct _TrfTransformationInstance_ {
+  /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com> */
+  Tcl_Channel self;  /* Our own Channel handle */
   Tcl_Channel parent; /* The channel superceded by this one */
 
   int readIsFlushed; /* flag to note wether in.flushProc was called or not */
+
+  /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com> */
+  int flags;         /* currently CHANNEL_ASYNC or zero */
+  int watchMask;     /* current TrfWatch mask */
 
   int mode;          /* mode of parent channel,
 		      * OR'ed combination of
 		      * TCL_READABLE, TCL_WRITABLE */
 
-  /* Tcl_Transformation standard;   data required for all transformation instances */
-  DirectionInfo      in;         /* information for transformation of read data */
-  DirectionInfo      out;        /* information for transformation of written data */
+  /* Tcl_Transformation standard; data required for all transformation
+   * instances.
+   */
+  DirectionInfo      in;   /* information for transformation of read data */
+  DirectionInfo      out;  /* information for transformation of written data */
   ClientData         clientData; /* copy from entry->trfType->clientData */
 
   /*
@@ -77,6 +107,14 @@ typedef struct _TrfTransformationInstance_ {
    */
 
   ResultBuffer result;
+
+#if (TCL_MAJOR_VERSION >= 8)
+  /* Timer for automatic push out of information sitting in various channel
+   * buffers. Used by the fileevent support. See 'ChannelHandler'.
+   */
+
+  Tcl_TimerToken timer;
+#endif
 
 } TrfTransformationInstance;
 
@@ -103,6 +141,11 @@ TrfExecuteCmd _ANSI_ARGS_((ClientData clientData, Tcl_Interp* interp,
 
 static void
 TrfDeleteCmd _ANSI_ARGS_((ClientData clientData));
+
+/* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
+ */
+static int
+TrfBlock _ANSI_ARGS_ ((ClientData instanceData, int mode));
 
 static int
 TrfClose _ANSI_ARGS_ ((ClientData instanceData, Tcl_Interp* interp));
@@ -138,7 +181,8 @@ TransformImmediate _ANSI_ARGS_ ((Tcl_Interp* interp, Trf_RegistryEntry* entry,
 
 #else
 static int
-TrfGetFile _ANSI_ARGS_ ((ClientData instanceData, int direction, ClientData* handlePtr));
+TrfGetFile _ANSI_ARGS_ ((ClientData instanceData, int direction,
+			 ClientData* handlePtr));
 
 static int
 TransformImmediate _ANSI_ARGS_ ((Tcl_Interp* interp, Trf_RegistryEntry* entry,
@@ -168,6 +212,13 @@ static int
 PutInterpResult _ANSI_ARGS_ ((ClientData clientData,
 			      unsigned char* outString, int outLen,
 			      Tcl_Interp* interp));
+/* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
+ */
+static void
+ChannelHandler _ANSI_ARGS_ ((ClientData clientData, int mask));
+
+static void
+ChannelHandlerTimer _ANSI_ARGS_ ((ClientData clientData));
 
 /*
  *------------------------------------------------------*
@@ -203,7 +254,8 @@ Tcl_Interp* interp;
 
     Tcl_InitHashTable (hTablePtr, TCL_STRING_KEYS);
 
-    Tcl_SetAssocData (interp, ASSOC, TrfDeleteRegistry, (ClientData) hTablePtr);
+    Tcl_SetAssocData (interp, ASSOC, TrfDeleteRegistry,
+		      (ClientData) hTablePtr);
   }
 
   return hTablePtr;
@@ -300,30 +352,35 @@ CONST Trf_TypeDefinition* type;
 
   assert (type->encoder.createProc);
   assert (type->encoder.deleteProc);
-  assert ((type->encoder.convertProc != NULL) || (type->encoder.convertBufProc != NULL));
+  assert ((type->encoder.convertProc != NULL) ||
+	  (type->encoder.convertBufProc != NULL));
   assert (type->encoder.flushProc);
   assert (type->encoder.clearProc);
 
   assert (type->decoder.createProc);
   assert (type->decoder.deleteProc);
-  assert ((type->decoder.convertProc != NULL) || (type->decoder.convertBufProc != NULL));
+  assert ((type->decoder.convertProc != NULL) ||
+	  (type->decoder.convertBufProc != NULL));
   assert (type->decoder.flushProc);
   assert (type->decoder.clearProc);
 
   /*
-   * Generate command to execute transformations immediately or to generate filters.
+   * Generate command to execute transformations immediately or to generate
+   * filters.
    */
 
-  entry             = (Trf_RegistryEntry*) Tcl_Alloc (sizeof (Trf_RegistryEntry));
-  entry->transType  = (Tcl_ChannelType*)   Tcl_Alloc (sizeof (Tcl_ChannelType)); 
-  entry->trfType    = (Trf_TypeDefinition*) type;
-  entry->interp     = interp;
+  entry            = (Trf_RegistryEntry*)Tcl_Alloc (sizeof(Trf_RegistryEntry));
+  entry->transType = (Tcl_ChannelType*)  Tcl_Alloc (sizeof(Tcl_ChannelType));
+  entry->trfType   = (Trf_TypeDefinition*) type;
+  entry->interp    = interp;
 #if (TCL_MAJOR_VERSION >= 8)
-  entry->trfCommand = Tcl_CreateObjCommand (interp, (char*) type->name, TrfExecuteObjCmd,
+  entry->trfCommand = Tcl_CreateObjCommand (interp, (char*) type->name,
+					    TrfExecuteObjCmd,
 					    (ClientData) entry, TrfDeleteCmd);
 #else
-  entry->trfCommand = Tcl_CreateCommand (interp, (char*) type->name, TrfExecuteCmd,
-					 (ClientData) entry, TrfDeleteCmd);
+  entry->trfCommand = Tcl_CreateCommand (interp, (char*) type->name,
+					 TrfExecuteCmd, (ClientData) entry,
+					 TrfDeleteCmd);
 #endif
 
   /*
@@ -331,7 +388,11 @@ CONST Trf_TypeDefinition* type;
    */
 
   entry->transType->typeName         = (char*) type->name;
-  entry->transType->blockModeProc    = NULL;
+
+  /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
+   */
+  entry->transType->blockModeProc    = TrfBlock;
+
   entry->transType->closeProc        = TrfClose;
   entry->transType->inputProc        = TrfInput;
   entry->transType->outputProc       = TrfOutput;
@@ -530,7 +591,8 @@ char**      argv;
 	if (0 != strncmp (option, "-attach", len))
 	  goto check_for_trans_option;
 
-	baseOpt.attach = Tcl_GetChannel (interp, (char*) optarg, &baseOpt.attach_mode);
+	baseOpt.attach = Tcl_GetChannel (interp, (char*) optarg,
+					 &baseOpt.attach_mode);
 	if (baseOpt.attach == (Tcl_Channel) NULL)
 	  goto cleanup_after_error;
 	break;
@@ -544,7 +606,8 @@ char**      argv;
 	  goto cleanup_after_error;
 
 	if (! (mode & TCL_READABLE)) {
-	  Tcl_AppendResult (interp, cmd, ": source-channel not readable", (char*) NULL);
+	  Tcl_AppendResult (interp, cmd, ": source-channel not readable",
+			    (char*) NULL);
 	  goto cleanup_after_error;
 	}
 	break;
@@ -558,7 +621,8 @@ char**      argv;
 	  goto cleanup_after_error;
 
 	if (! (mode & TCL_WRITABLE)) {
-	  Tcl_AppendResult (interp, cmd, ": destination-channel not writable", (char*) NULL);
+	  Tcl_AppendResult (interp, cmd, ": destination-channel not writable",
+			    (char*) NULL);
 	  goto cleanup_after_error;
 	}
 	break;
@@ -583,7 +647,7 @@ char**      argv;
       ((baseOpt.source      != (Tcl_Channel) NULL) ||
        (baseOpt.destination != (Tcl_Channel) NULL))) {
     Tcl_AppendResult (interp, cmd,
-		      ": inconsistent options, -in/-out not allowed with -attach",
+	      ": inconsistent options, -in/-out not allowed with -attach",
 		      (char*) NULL);
     goto cleanup_after_error;
   }
@@ -757,7 +821,8 @@ struct Tcl_Obj* CONST * objv;
 	  goto check_for_trans_option;
 
 	baseOpt.destination = Tcl_GetChannel (interp,
-					      Tcl_GetStringFromObj (optarg, NULL),
+					      Tcl_GetStringFromObj (optarg,
+								    NULL),
 					      &mode);
 	if (baseOpt.destination == (Tcl_Channel) NULL)
 	  goto cleanup_after_error;
@@ -793,7 +858,7 @@ struct Tcl_Obj* CONST * objv;
       ((baseOpt.source      != (Tcl_Channel) NULL) ||
        (baseOpt.destination != (Tcl_Channel) NULL))) {
     Tcl_AppendResult (interp, cmd,
-		      ": inconsistent options, -in/-out not allowed with -attach",
+	      ": inconsistent options, -in/-out not allowed with -attach",
 		      (char*) NULL);
     goto cleanup_after_error;
   }
@@ -878,6 +943,97 @@ ClientData clientData;
   Trf_Unregister (entry->interp, entry);
 }
 
+/* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
+ */
+/*
+ *------------------------------------------------------*
+ *
+ *	TrfBlock --
+ *
+ *	------------------------------------------------*
+ *	Trap handler. Called by the generic IO system
+ *	during option processing to change the blocking
+ *	mode of the channel.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		Forwards the request to the underlying
+ *		channel.
+ *
+ *	Result:
+ *		0 if successful, errno when failed.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+TrfBlock (instanceData, mode)
+ClientData  instanceData;
+int mode;
+{
+
+#if 0
+  /* Internal definitions from tclIO.c. Would hep to implement convenience
+   * functionality. Switched off, decision that it is not worth it.
+   * Possible the moment these definitions (or setblockmode) goes public.
+   */
+
+#define CHANNEL_NONBLOCKING	(1<<3)	/* Channel is currently in
+					 * nonblocking mode. */
+#define BG_FLUSH_SCHEDULED	(1<<7)	/* A background flush of the
+					 * queued output buffers has been
+                                         * scheduled. */
+  typedef struct Channel {
+    void *channelName;		/* The name of the channel instance in Tcl
+                                 * commands. Storage is owned by the generic IO
+                                 * code,  is dynamically allocated. */
+    int	flags;			/* ORed combination of the flags defined
+                                 * below. */
+  } Channel;
+
+  Tcl_ChannelType* ctype;
+  int res;
+#endif
+
+  TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
+
+  if (mode == TCL_MODE_NONBLOCKING) {
+    trans->flags |= CHANNEL_ASYNC;
+  } else {
+    trans->flags &= ~(CHANNEL_ASYNC);
+  }
+
+  /* Forwarding of this action to underlying channel by myself, not Matt.
+   * This should make it easier to generate a consistent blocking mode across
+   * the whole stack of channels.
+   */
+
+#if 0
+  /* not yet, need 'tclIO.c/SetBlockMode', which is internal, and interp
+   * Or some other internal definitions from TclInt.h
+   */
+
+  ctype = Tcl_GetChannelType (trans->parent);
+
+  res = 0;
+  if (ctype->blockModeProc != (Tcl_DriverBlockModeProc *) NULL) {
+    res = ctype->blockModeProc (Tcl_GetChannelInstanceData (trans->parent),
+				 mode);
+  }
+  if (res != 0) {
+    Tcl_SetErrno(res);
+    return res;
+  }
+  if (mode == TCL_MODE_BLOCKING) {
+    ((Channel*)trans->parent)->flags &= (~(CHANNEL_NONBLOCKING | BG_FLUSH_SCHEDULED));
+  } else {
+    ((Channel*)trans->parent)->flags |= CHANNEL_NONBLOCKING;
+  }
+
+#endif
+  return 0;
+}
+
 /*
  *------------------------------------------------------*
  *
@@ -909,6 +1065,23 @@ Tcl_Interp* interp;
    */
 
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
+
+  /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
+   * Remove event handler to underlying channel, this could
+   * be because we are closing for real, or being "unstacked".
+   */
+
+  Tcl_DeleteChannelHandler (trans->parent, ChannelHandler, (ClientData) trans);
+
+
+  if (trans->timer != (Tcl_TimerToken) NULL) {
+    /* Delete an existing flush-out timer,
+     * prevent it from firing on removed channel.
+     */
+
+    Tcl_DeleteTimerHandler (trans->timer);
+    trans->timer = (Tcl_TimerToken) NULL;
+  }
 
   /*
    * Flush data waiting in transformation buffers to output.
@@ -1005,7 +1178,8 @@ int*       errorCodePtr;
 
       } else {
 	/*
-	 * Not enough in buffer to satisfy the caller, take all, then try to read more.
+	 * Not enough in buffer to satisfy the caller, take all, then try to
+	 * read more.
 	 */
 
 	memcpy ((VOID*) buf, (VOID*) trans->result.buf, trans->result.used);
@@ -1034,16 +1208,26 @@ int*       errorCodePtr;
     }
 
     if (read == 0) {
-      /* check wether we hit on EOF in 'trans->parent' or
-       * not. If not we are in non-blocking mode and ran
-       * temporarily out of data. Return the part we got
-       * and let the caller wait for more. On the other
-       * hand, if we got an Eof we have to convert and
-       * flush all waiting partial data.
+      /* Check wether we hit on EOF in 'trans->parent' or
+       * not. If not differentiate between blocking and
+       * non-blocking modes. In non-blocking mode we ran
+       * temporarily out of data. Signal this to the caller
+       * via EWOULDBLOCK and error return (-1). In the other
+       * cases we simply return what we got and let the
+       * caller wait for more. On the other hand, if we got
+       * an EOF we have to convert and flush all waiting
+       * partial data.
        */
 
+      /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
+       */
       if (! Tcl_Eof (trans->parent)) {
-	return gotBytes;
+	if (gotBytes == 0 && trans->flags & CHANNEL_ASYNC) {
+	  *errorCodePtr = EWOULDBLOCK;
+	  return -1;
+	} else {
+	  return gotBytes;
+	}
       } else {
 	if (trans->readIsFlushed) {
 	  /* already flushed, nothing to do anymore */
@@ -1232,18 +1416,61 @@ TrfWatch (instanceData, mask)
 ClientData instanceData;	/* Channel to watch */
 int        mask;		/* Events of interest */
 {
-  /*
-   * Forward request to channel we are stacked upon.
+  /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
+   * Added the comments.
+   */
+  /* The caller expressed interest in events occuring for this
+   * channel. Instead of forwarding the call to the underlying
+   * channel we now express our interest in events on that
+   * channel. This will ripple through all stacked channels to
+   * the bottom-most real one actually able to generate events
+   * (files, sockets, pipes, ...). The improvement beyond the
+   * simple forwarding is that the generated events will ripple
+   * back up to us, until they reach the channel the user
+   * expressed his interest in (via fileevent). This way the
+   * low-level events are propagated upward to the place where
+   * the real event script resides, something which does not
+   * happen in the simple forwarding model. It loses these events.
    */
 
-  TrfTransformationInstance* trans      = (TrfTransformationInstance*) instanceData;
-  Tcl_ChannelType*           p_type     = Tcl_GetChannelType         (trans->parent);
-  ClientData                 p_instance = Tcl_GetChannelInstanceData (trans->parent);
+  TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
+#if 0
+  Tcl_ChannelType*     p_type     = Tcl_GetChannelType         (trans->parent);
+  ClientData           p_instance = Tcl_GetChannelInstanceData (trans->parent);
+#endif
 
+  if (mask == trans->watchMask) {
+    /* No changes in the expressed interest, skip this call.
+     */
+    return;
+  }
+
+  if (trans->watchMask) {
+    /*
+     * Remove event handler to underlying channel, this could
+     * be because we are closing for real, or being "unstacked".
+     */
+    Tcl_DeleteChannelHandler (trans->parent, ChannelHandler,
+			      (ClientData) trans);
+  }
+
+  trans->watchMask = mask;
+
+  if (trans->watchMask) {
+    /* Setup active monitor for events on underlying Channel */
+    Tcl_CreateChannelHandler (trans->parent, trans->watchMask,
+			      ChannelHandler, (ClientData) trans);
+  }
+
+#if 0
+  /* ** OLD CODE DISABLED **
+   * Forward request to channel we are stacked upon.
+   */
 #if (TCL_MAJOR_VERSION < 8)
   p_type->watchChannelProc (p_instance, mask);
 #else
   p_type->watchProc (p_instance, mask);
+#endif
 #endif
 }
 
@@ -1278,9 +1505,9 @@ int        mask;		/* Mask of queried events */
    * Forward request to channel we are stacked upon.
    */
 
-  TrfTransformationInstance* trans      = (TrfTransformationInstance*) instanceData;
-  Tcl_ChannelType*           p_type     = Tcl_GetChannelType         (trans->parent);
-  ClientData                 p_instance = Tcl_GetChannelInstanceData (trans->parent);
+  TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
+  Tcl_ChannelType*         p_type = Tcl_GetChannelType         (trans->parent);
+  ClientData           p_instance = Tcl_GetChannelInstanceData (trans->parent);
 
   return p_type->channelReadyProc (p_instance, mask);
 }
@@ -1576,7 +1803,6 @@ Tcl_Channel        attach;
 Trf_Options        optInfo;
 Tcl_Interp*        interp;
 {
-  Tcl_Channel                new;
   TrfTransformationInstance* trans;
 
   trans = (TrfTransformationInstance*) Tcl_Alloc (sizeof (TrfTransformationInstance));
@@ -1585,23 +1811,38 @@ Tcl_Interp*        interp;
   trans->clientData       = entry->trfType->clientData;
   trans->parent           = attach;
   trans->readIsFlushed    = 0;
+
+  /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
+   */
+  trans->flags            = 0;
+  trans->watchMask        = 0;
+
   trans->mode             = Tcl_GetChannelMode (attach);
+  trans->timer            = (Tcl_TimerToken) NULL;
 
   if (ENCODE_REQUEST (entry, optInfo)) {
     /* ENCODE on write
      * DECODE on read
      */
 
-    trans->out.vectors = ((trans->mode & TCL_WRITABLE) ? &entry->trfType->encoder : NULL);
-    trans->in.vectors  = ((trans->mode & TCL_READABLE) ? &entry->trfType->decoder : NULL);
+    trans->out.vectors = ((trans->mode & TCL_WRITABLE) ?
+			  &entry->trfType->encoder     :
+			  NULL);
+    trans->in.vectors  = ((trans->mode & TCL_READABLE) ?
+			  &entry->trfType->decoder     :
+			  NULL);
 
   } else /* mode == DECODE */ {
     /* DECODE on write
      * ENCODE on read
      */
 
-    trans->out.vectors = ((trans->mode & TCL_WRITABLE) ? &entry->trfType->decoder : NULL);
-    trans->in.vectors  = ((trans->mode & TCL_READABLE) ? &entry->trfType->encoder : NULL);
+    trans->out.vectors = ((trans->mode & TCL_WRITABLE) ?
+			  &entry->trfType->decoder     :
+			  NULL);
+    trans->in.vectors  = ((trans->mode & TCL_READABLE) ?
+			  &entry->trfType->encoder     :
+			  NULL);
   }
 
   /* 'PutDestination' is ok for write, only read
@@ -1637,22 +1878,24 @@ Tcl_Interp*        interp;
   trans->result.used      = 0;
 
   /*
-   * Build channel from converter definition and stack it upon the one we shall attach to.
+   * Build channel from converter definition and stack it upon the one we
+   * shall attach to.
    */
 
-  new = Tcl_ReplaceChannel (interp,
-			    entry->transType, (ClientData) trans,
-			    trans->mode, attach);
+  trans->self = Tcl_ReplaceChannel (interp, entry->transType,
+				    (ClientData) trans, trans->mode,
+				    attach);
 
 
-  if (new == (Tcl_Channel) NULL) {
+  if (trans->self == (Tcl_Channel) NULL) {
     Tcl_Free ((char*) trans);
-    Tcl_AppendResult (interp, "internal error in Tcl_ReplaceChannel", (char*) NULL);
+    Tcl_AppendResult (interp, "internal error in Tcl_ReplaceChannel",
+		      (char*) NULL);
     return TCL_ERROR;
   }
 
   /*  Tcl_RegisterChannel (interp, new); */
-  Tcl_AppendResult (interp, Tcl_GetChannelName (new), (char*) NULL);
+  Tcl_AppendResult (interp, Tcl_GetChannelName (trans->self), (char*) NULL);
 
   return TCL_OK;
 }
@@ -1690,10 +1933,10 @@ Tcl_Interp*    interp;
 
   if (res < 0) {
     if (interp) {
-      Tcl_AppendResult (interp, "error writing \"",               (char*) NULL);
-      Tcl_AppendResult (interp, Tcl_GetChannelName (destination), (char*) NULL);
-      Tcl_AppendResult (interp, "\": ",                           (char*) NULL);
-      Tcl_AppendResult (interp, Tcl_PosixError (interp),          (char*) NULL);
+      Tcl_AppendResult (interp, "error writing \"",               (char*)NULL);
+      Tcl_AppendResult (interp, Tcl_GetChannelName (destination), (char*)NULL);
+      Tcl_AppendResult (interp, "\": ",                           (char*)NULL);
+      Tcl_AppendResult (interp, Tcl_PosixError (interp),          (char*)NULL);
     }
     return TCL_ERROR;
   }
@@ -1737,11 +1980,11 @@ Tcl_Interp*    interp;
 
     if (trans->result.allocated == 0) {
       trans->result.allocated = outLen + INCREMENT;
-      trans->result.buf    = (unsigned char*) Tcl_Alloc (trans->result.allocated);
+      trans->result.buf = (unsigned char*) Tcl_Alloc (trans->result.allocated);
     } else {
       trans->result.allocated += outLen + INCREMENT;
-      trans->result.buf     = (unsigned char*) Tcl_Realloc ((char*) trans->result.buf,
-							    trans->result.allocated);
+      trans->result.buf = (unsigned char*)Tcl_Realloc((char*)trans->result.buf,
+						      trans->result.allocated);
     }
   }
 
@@ -1806,4 +2049,98 @@ Tcl_Interp*    interp;
   r->used += outLen;
 
   return TCL_OK;
+}
+
+/* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
+ */
+/*
+ *------------------------------------------------------*
+ *
+ *	ChannelHandler --
+ *
+ *	------------------------------------------------*
+ *	Handler called by Tcl as a result of
+ *	Tcl_CreateChannelHandler - to inform us of activity
+ *	on the underlying channel.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		May generate subsequent calls to
+ *		Tcl_NotifyChannel.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static void
+ChannelHandler (clientData, mask)
+ClientData     clientData;
+int            mask;
+{
+  /* An event occured in the underlying channel. Forward it
+   * to ourself. This will either execute an attached event
+   * script (fileevent) or an intermediate handler like this
+   * one propagating the event further upward.
+   */
+
+  TrfTransformationInstance* trans = (TrfTransformationInstance*) clientData;
+
+  Tcl_NotifyChannel (trans->self, mask);
+
+#if (TCL_MAJOR_VERSION >= 8)
+  /* Check the I/O-Buffers of this channel for waiting information.
+   * Setup a timer generating an artificial event for us if we have
+   * such. A timer is used to prevent starvation of other even sources.
+   */
+
+  if (trans->timer != (Tcl_TimerToken) NULL) {
+    /* First delete an existing timer. It was not fired, yet we are
+     * here, so the bottom-most channel generated such an event.
+     */
+
+    Tcl_DeleteTimerHandler (trans->timer);
+    trans->timer = (Tcl_TimerToken) NULL;
+  }
+
+  if ((mask & TCL_READABLE) &&
+      (Tcl_InputBuffered (trans->self) > 0)) {
+    /* Data is waiting, flush it out in short time
+     */
+
+    trans->timer = Tcl_CreateTimerHandler (DELAY, ChannelHandlerTimer,
+					   (ClientData) trans);
+  }
+#endif
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	ChannelHandlerTimer --
+ *
+ *	------------------------------------------------*
+ *	Called by the notifier (-> timer) to flush out
+ *	information waiting in channel buffers.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		As of 'ChannelHandler'.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
+
+static void
+ChannelHandlerTimer (clientData)
+ClientData clientData; /* Transformation to query */
+{
+  TrfTransformationInstance* trans = (TrfTransformationInstance*) clientData;
+
+  trans->timer = (Tcl_TimerToken) NULL;
+
+  ChannelHandler (clientData, trans->watchMask);
 }

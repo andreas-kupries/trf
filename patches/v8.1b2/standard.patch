@@ -383,7 +383,7 @@
 +    * The superceded channel is effectively unregistered
 +    */
 + 
-+   chanPtr->supercedes->refCount --;
++   /*chanPtr->supercedes->refCount --;*/
 + 
 +   return (Tcl_Channel) chanPtr;
 + }
@@ -439,7 +439,7 @@
 +      * The superceded channel is effectively registered again
 +      */
 + 
-+     chanPtr->supercedes->refCount ++;
++     /*chanPtr->supercedes->refCount ++;*/
 +   }
 + 
 +   /*
@@ -498,7 +498,7 @@
 + 
 +       chanPtr->supercedes->nextChanPtr = tsdPtr->firstChanPtr;
 +       tsdPtr->firstChanPtr             = chanPtr->supercedes;
-+ 
++       chanPtr->supercedes->refCount --; /* is deregistered */
 +       Tcl_Close (interp, (Tcl_Channel) chanPtr->supercedes);
       }
   

@@ -1,9 +1,44 @@
+Sun Apr 18 14:59:05 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* doc/nodes/danger.node: Added comments about usage of trf with
+	  respect to 'filevent's.
+
+	* patches/*: With the exception of the patchess for 8.0a* and
+	  8.0b* all kits were modified to fix a bug with my changes to the
+	  refcounting code which tripped attaching a transform inside of a
+	  socket acceptor script. Detected by Matt Newman. Modified files
+	  are 'standard.patch' and 'tclIO.c'. Fix was delayed to wait for
+	  possible problems with it, but got none.
+
+Tue Apr 13 08:28:10 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/registry.c: Added code to flush out information waiting
+ 	  in various channels buffers. Timers are used to create
+ 	  artificial 'readable'-events. The socket/file/pipe might not
+ 	  generate them as all data could have been sucked already
+ 	  completely into the stack of transforms. Completes the fileevent
+	  support begun with the patch from Matt, see below.
+	
+	* generic/registry.c: Accepted patch from Matt Newman
+	  <matt@novadigm.com> (<matt@sensus.org>) fixing problems with
+	  blocking mode and handling of fileevents.
+
+	* win/makefile.vc(5): Added definition of SSL_LIB_NAME to
+	  configuration section.
+
+	* generic/loadman.c: Changed to allow the makefile to define the
+	  value of SSL_LIB_NAME.
+
 Sat Apr 10 16:05:04 1999  Andreas Kupries  <a.kupries@westend.com>
 
+	* --------------- 1.4 released, again --------------------
+	
 	* Added patchkit for 8.1b3. 
 
 Thu Mar 25 12:40:20 1999  Andreas Kupries  <a.kupries@westend.com>
 
+	* --------------- 1.4 released --------------------
+	
 	* --------------- Ready to release 1.4 --------------------
 
 	* generic/init.c: Added initialization of stubs, for 8.1.
