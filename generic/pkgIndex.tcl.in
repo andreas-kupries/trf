@@ -3,4 +3,5 @@
 # @configure_input@
 #
 
-package ifneeded Trf @TRF_VERSION@ "package require Trf; [list load [file join $dir @TRF_LIB_FILE@] Trf]"
+package ifneeded Trf @TRF_VERSION@ \
+	"[list load [file join $dir @TRF_LIB_FILE@] Trf]"
