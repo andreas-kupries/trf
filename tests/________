@@ -14,9 +14,11 @@
 cd ..
 
 foreach md {crc crc-zlib adler md5 sha haval ripemd128 ripemd160} {
-    catch {
+    set fail [catch {
 	exec unix/tclsh tools/md -a $md -c digests.$md | sed -e {s/^/	/} >@ stdout
-    }
+    } msg];#{}
+
+    if {$fail} {puts "$md: $msg"}
 }
 
 cd tests
