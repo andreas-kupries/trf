@@ -28,29 +28,40 @@
  * CVS: $Id$
  */
 
-#include "transformInt.h"
+#include "reflect.h"
 
 /*
  * forward declarations of all internally used procedures.
  */
 
-static Trf_Options CreateOptions _ANSI_ARGS_ ((ClientData clientData));
-static void        DeleteOptions _ANSI_ARGS_ ((Trf_Options options,
-					       ClientData clientData));
-static int         CheckOptions  _ANSI_ARGS_ ((Trf_Options options,
-					       Tcl_Interp* interp,
-					       CONST Trf_BaseOptions* baseOptions,
-					       ClientData clientData));
+static Trf_Options
+CreateOptions _ANSI_ARGS_ ((ClientData clientData));
 
-static int         SetOption     _ANSI_ARGS_ ((Trf_Options options,
-					       Tcl_Interp* interp,
-					       CONST char* optname,
-					       CONST Tcl_Obj* optvalue,
-					       ClientData clientData));
+static void
+DeleteOptions _ANSI_ARGS_ ((Trf_Options options,
+			    ClientData  clientData));
+static int
+CheckOptions  _ANSI_ARGS_ ((Trf_Options            options,
+			    Tcl_Interp*            interp,
+			    CONST Trf_BaseOptions* baseOptions,
+			    ClientData             clientData));
 
-static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
-					       ClientData clientData));
+static int
+SetOption     _ANSI_ARGS_ ((Trf_Options    options,
+			    Tcl_Interp*    interp,
+			    CONST char*    optname,
+			    CONST Tcl_Obj* optvalue,
+			    ClientData     clientData));
 
+static int
+QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
+			    ClientData  clientData));
+
+static void
+SeekQueryOptions  _ANSI_ARGS_ ((Tcl_Interp*          interp,
+				Trf_Options          options,
+				Trf_SeekInformation* seekInfo,
+				ClientData           clientData));
 
 /*
  *------------------------------------------------------*
@@ -74,7 +85,7 @@ static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
 Trf_OptionVectors*
 TrfTransformOptions ()
 {
-  static Trf_OptionVectors optVec = /* THREADING: constant, read-only => safe */
+  static Trf_OptionVectors optVec = /* THREADING: const, read-only => safe */
     {
       CreateOptions,
       DeleteOptions,
@@ -82,7 +93,7 @@ TrfTransformOptions ()
       NULL,      /* no string procedure for 'SetOption' */
       SetOption,
       QueryOptions,
-      NULL       /* unseekable, unchanged by options FOR NOW - TODO - */
+      SeekQueryOptions /* Tcl level can change/define the ratio */
     };
 
   return &optVec;
@@ -339,4 +350,62 @@ ClientData clientData;
 
   return (o->mode == TRF_WRITE_MODE ? 1 : 0);
 }
+
+/*
+ *------------------------------------------------------*
+ *
+ *	SeekQueryOptions --
+ *
+ *	------------------------------------------------*
+ *	Modifies the natural seek policy according to the
+ *	configuration of the transformation (queries the
+ *	tcl level).
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		May modify 'seekInfo'.
+ *
+ *	Result:
+ *		None.
+ *
+ *------------------------------------------------------*
+ */
 
+static void
+SeekQueryOptions (interp, options, seekInfo, clientData)
+     Tcl_Interp*          interp;
+     Trf_Options          options;
+     Trf_SeekInformation* seekInfo;
+     ClientData           clientData;
+{
+  TrfTransformOptionBlock* o = (TrfTransformOptionBlock*) options;
+  int                      res;
+  ReflectControl           rc;
+
+  START (SeekQueryOptions);
+
+  rc.interp                         = interp;
+  rc.naturalRatio.numBytesTransform = seekInfo->numBytesTransform;
+  rc.naturalRatio.numBytesDown      = seekInfo->numBytesDown;
+  rc.command                        = o->command;
+  Tcl_IncrRefCount (rc.command);
+
+
+  PRINT ("in  = (%d, %d)\n",
+	 seekInfo->numBytesTransform, seekInfo->numBytesDown); FL;
+
+  RefExecuteCallback (&rc, (Tcl_Interp*) interp,
+		      (unsigned char*) "query/ratio",
+		      NULL, 0, TRANSMIT_RATIO /* -> naturalRatio */, 1);
+
+  seekInfo->numBytesTransform = rc.naturalRatio.numBytesTransform;
+  seekInfo->numBytesDown      = rc.naturalRatio.numBytesDown;
+
+  Tcl_DecrRefCount (rc.command);
+
+
+  PRINT ("out = (%d, %d)\n",
+	 seekInfo->numBytesTransform, seekInfo->numBytesDown); FL;
+
+  DONE (SeekQueryOptions);
+}

@@ -1,7 +1,8 @@
 /*
  * b64code.c --
  *
- *	Implements and registers conversion from and to base64-encoded representation.
+ *	Implements and registers conversion from and to base64-encoded
+ *	representation.
  *
  *
  * Copyright (c) 1996 Andreas Kupries (a.kupries@westend.com)
@@ -92,21 +93,23 @@ static Trf_TypeDefinition convDefinition =
 {
   "base64",
   NULL, /* clientData not used by conversions. */
-  NULL, /* set later by Trf_InitB64 */ /* THREADING: serialize initialization */
+  NULL, /* set later by Trf_InitB64, THREADING: serialize initialization */
   {
     CreateEncoder,
     DeleteEncoder,
     Encode,
     NULL,
     FlushEncoder,
-    ClearEncoder
+    ClearEncoder,
+    NULL /* no MaxRead */
   }, {
     CreateDecoder,
     DeleteDecoder,
     Decode,
     NULL,
     FlushDecoder,
-    ClearDecoder
+    ClearDecoder,
+    NULL /* no MaxRead */
   },
   TRF_RATIO (3, 4)
 };

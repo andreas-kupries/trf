@@ -31,7 +31,7 @@
  * CVS: $Id$
  */
 
-#include "transformInt.h"
+#include "reflect.h"
 
 /*
  * Converter description
@@ -43,52 +43,55 @@
  * Declarations of internal procedures.
  */
 
-static Trf_ControlBlock CreateEncoder  _ANSI_ARGS_ ((ClientData writeClientData,
-						     Trf_WriteProc* fun,
-						     Trf_Options optInfo,
-						     Tcl_Interp*   interp,
-						     ClientData clientData));
-static void             DeleteEncoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     ClientData clientData));
-/*static int              Encode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     int character,
-						     Tcl_Interp* interp,
-						     ClientData clientData));*/
-static int              EncodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     unsigned char*   buffer,
-						     int              bufLen,
-						     Tcl_Interp*      interp,
-						     ClientData       clientData));
-static int              FlushEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     Tcl_Interp* interp,
-						     ClientData clientData));
-static void             ClearEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     ClientData clientData));
+static Trf_ControlBlock
+CreateEncoder  _ANSI_ARGS_ ((ClientData     writeClientData,
+			     Trf_WriteProc* fun,
+			     Trf_Options    optInfo,
+			     Tcl_Interp*    interp,
+			     ClientData     clientData));
+static void
+DeleteEncoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     ClientData       clientData));
+static int
+EncodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     unsigned char*   buffer,
+			     int              bufLen,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static int
+FlushEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static void
+ClearEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     ClientData       clientData));
 
-static Trf_ControlBlock CreateDecoder  _ANSI_ARGS_ ((ClientData writeClientData,
-						     Trf_WriteProc* fun,
-						     Trf_Options optInfo,
-						     Tcl_Interp*   interp,
-						     ClientData clientData));
-static void             DeleteDecoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     ClientData clientData));
-/*static int              Decode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     int character,
-						     Tcl_Interp* interp,
-						     ClientData clientData));*/
-static int              DecodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     unsigned char* buffer,
-						     int bufLen,
-						     Tcl_Interp* interp,
-						     ClientData clientData));
-static int              FlushDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     Tcl_Interp* interp,
-						     ClientData clientData));
-static void             ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     ClientData clientData));
+static Trf_ControlBlock
+CreateDecoder  _ANSI_ARGS_ ((ClientData     writeClientData,
+			     Trf_WriteProc* fun,
+			     Trf_Options    optInfo,
+			     Tcl_Interp*    interp,
+			     ClientData     clientData));
+static void
+DeleteDecoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     ClientData       clientData));
+static int
+DecodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     unsigned char*   buffer,
+			     int              bufLen,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static int
+FlushDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     Tcl_Interp*      interp,
+			     ClientData       clientData));
+static void
+ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     ClientData       clientData));
 
-/*#define CreateDecoder CreateEncoder*/
-/*#define DeleteDecoder DeleteEncoder*/
+static int
+MaxRead        _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+			     ClientData       clientData));
 
 /*
  * Converter definition.
@@ -97,56 +100,27 @@ static void             ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 static Trf_TypeDefinition reflectDefinition =
 {
   "transform",
-  NULL, /* filled later (TrfInit_Transform) */ /* THREADING: serialize initialization */
-  NULL, /* filled later (TrfInit_Transform) */ /* THREADING: serialize initialization */
+  NULL, /* filled by TrfInit_Transform, THREAD: serialize initialization */
+  NULL, /* filled by TrfInit_Transform, THREAD: serialize initialization */
   {
     CreateEncoder,
     DeleteEncoder,
     NULL,
     EncodeBuffer,
     FlushEncoder,
-    ClearEncoder
+    ClearEncoder,
+    MaxRead
   }, {
     CreateDecoder,
     DeleteDecoder,
     NULL,
     DecodeBuffer,
     FlushDecoder,
-    ClearDecoder
+    ClearDecoder,
+    MaxRead
   },
   TRF_UNSEEKABLE
 };
-
-/*
- * Definition of the control blocks for en- and decoder.
- */
-
-typedef struct _EncoderControl_ {
-  Trf_WriteProc* write;
-  ClientData     writeClientData;
-  Tcl_Obj*       command; /* tcl code to execute for a buffer */
-  Tcl_Interp*    interp;  /* interpreter creating the channel */
-} EncoderControl;
-
-
-typedef EncoderControl DecoderControl;
-
-/*
-typedef struct _DecoderControl_ {
-  Trf_WriteProc* write;
-  ClientData     writeClientData;
-  Tcl_Obj*       command; / * tcl code to execute for a buffer * /
-} DecoderControl;
-*/
-
-
-/*
- * Execute callback for buffer and operation.
- */
-static int Execute _ANSI_ARGS_ ((EncoderControl* ctrl, Tcl_Interp* interp,
-				 unsigned char* op,
-				 unsigned char* buf, int bufLen,
-				 int transmit, int preserve));
 
 
 
@@ -206,11 +180,11 @@ Trf_Options    optInfo;
 Tcl_Interp*    interp;
 ClientData     clientData;
 {
-  EncoderControl*          c;
+  ReflectControl*          c;
   TrfTransformOptionBlock* o = (TrfTransformOptionBlock*) optInfo;
   int                    res;
 
-  c = (EncoderControl*) Tcl_Alloc (sizeof (EncoderControl));
+  c = (ReflectControl*) Tcl_Alloc (sizeof (ReflectControl));
   c->write           = fun;
   c->writeClientData = writeClientData;
   c->interp          = interp;
@@ -219,7 +193,13 @@ ClientData     clientData;
   c->command      = o->command;
   Tcl_IncrRefCount (c->command);
 
-  res = Execute (c, interp, (unsigned char*) "create/write", NULL, 0, 0, 0);
+  c->maxRead = -1;
+  c->naturalRatio.numBytesTransform = 0;
+  c->naturalRatio.numBytesDown = 0;
+
+  res = RefExecuteCallback (c, interp,
+			    (unsigned char*) "create/write",
+			    NULL, 0, TRANSMIT_DONT, 0);
 
   if (res != TCL_OK) {
     Tcl_DecrRefCount (c->command);
@@ -253,9 +233,10 @@ DeleteEncoder (ctrlBlock, clientData)
 Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {
-  EncoderControl* c = (EncoderControl*) ctrlBlock;
+  ReflectControl* c = (ReflectControl*) ctrlBlock;
 
-  Execute (c, NULL, (unsigned char*) "delete/write", NULL, 0, 0, 0);
+  RefExecuteCallback (c, NULL, (unsigned char*) "delete/write",
+		      NULL, 0, TRANSMIT_DONT, 0);
 
   Tcl_DecrRefCount (c->command);
   Tcl_Free ((VOID*) c);
@@ -288,9 +269,11 @@ int bufLen;
 Tcl_Interp* interp;
 ClientData clientData;
 {
-  EncoderControl* c = (EncoderControl*) ctrlBlock;
+  ReflectControl* c = (ReflectControl*) ctrlBlock;
 
-  return Execute (c, interp, (unsigned char*) "write", buffer, bufLen, 1, 1);
+  return RefExecuteCallback (c, interp,
+			     (unsigned char*) "write",
+			     buffer, bufLen, TRANSMIT_DOWN, 1);
 }
 
 /*
@@ -318,9 +301,11 @@ Trf_ControlBlock ctrlBlock;
 Tcl_Interp* interp;
 ClientData clientData;
 {
-  EncoderControl* c = (EncoderControl*) ctrlBlock;
+  ReflectControl* c = (ReflectControl*) ctrlBlock;
 
-  return Execute (c, interp, (unsigned char*) "flush/write", NULL, 0, 1, 1);
+  return RefExecuteCallback (c, interp,
+			     (unsigned char*) "flush/write",
+			     NULL, 0, TRANSMIT_DOWN, 1);
 }
 
 /*
@@ -346,10 +331,11 @@ ClearEncoder (ctrlBlock, clientData)
 Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {
-  EncoderControl* c = (EncoderControl*) ctrlBlock;
+  ReflectControl* c = (ReflectControl*) ctrlBlock;
 
-  Execute (c, (Tcl_Interp*) NULL, (unsigned char*) "clear_write",
-	   NULL, 0, 0, 0);
+  RefExecuteCallback (c, (Tcl_Interp*) NULL,
+		      (unsigned char*) "clear_write",
+		      NULL, 0, TRANSMIT_DONT, 0);
 }
 
 /*
@@ -379,20 +365,28 @@ Trf_Options    optInfo;
 Tcl_Interp*    interp;
 ClientData     clientData;
 {
-  DecoderControl*          c;
+  ReflectControl*          c;
   TrfTransformOptionBlock* o = (TrfTransformOptionBlock*) optInfo;
+  int                      res;
 
-  c = (DecoderControl*) Tcl_Alloc (sizeof (DecoderControl));
+  c = (ReflectControl*) Tcl_Alloc (sizeof (ReflectControl));
   c->write           = fun;
   c->writeClientData = writeClientData;
   c->interp          = interp;
+
+  c->maxRead = -1;
+  c->naturalRatio.numBytesTransform = 0;
+  c->naturalRatio.numBytesDown = 0;
 
   /* Store reference, tell the interpreter about it. */
   c->command      = o->command;
   Tcl_IncrRefCount (c->command);
 
-  if (TCL_OK != Execute (c, interp, (unsigned char*) "create/read",
-			 NULL, 0, 0, 0)) {
+  res = RefExecuteCallback (c, interp,
+			    (unsigned char*) "create/read",
+			    NULL, 0, TRANSMIT_DONT, 0);
+
+  if (res != TCL_OK) {
     Tcl_DecrRefCount (c->command);
 
     Tcl_Free ((VOID*) c);
@@ -425,9 +419,10 @@ DeleteDecoder (ctrlBlock, clientData)
 Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {
-  DecoderControl* c = (DecoderControl*) ctrlBlock;
+  ReflectControl* c = (ReflectControl*) ctrlBlock;
 
-  Execute (c, NULL, (unsigned char*) "delete/read", NULL, 0, 0, 0);
+  RefExecuteCallback (c, NULL, (unsigned char*) "delete/read",
+		      NULL, 0, TRANSMIT_DONT, 0);
 
   Tcl_DecrRefCount (c->command);
   Tcl_Free ((VOID*) c);
@@ -460,9 +455,11 @@ int bufLen;
 Tcl_Interp* interp;
 ClientData clientData;
 {
-  DecoderControl* c = (DecoderControl*) ctrlBlock;
+  ReflectControl* c = (ReflectControl*) ctrlBlock;
 
-  return Execute (c, interp, (unsigned char*) "read", buffer, bufLen, 1, 1);
+  return RefExecuteCallback (c, interp,
+			     (unsigned char*) "read",
+			     buffer, bufLen, TRANSMIT_DOWN, 1);
 }
 
 /*
@@ -490,9 +487,11 @@ Trf_ControlBlock ctrlBlock;
 Tcl_Interp* interp;
 ClientData clientData;
 {
-  DecoderControl* c = (DecoderControl*) ctrlBlock;
+  ReflectControl* c = (ReflectControl*) ctrlBlock;
 
-  return Execute (c, interp, (unsigned char*) "flush/read", NULL, 0, 1, 1);
+  return RefExecuteCallback (c, interp,
+			     (unsigned char*) "flush/read",
+			     NULL, 0, TRANSMIT_DOWN, 1);
 }
 
 /*
@@ -518,16 +517,52 @@ ClearDecoder (ctrlBlock, clientData)
 Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {
-  DecoderControl* c = (DecoderControl*) ctrlBlock;
+  ReflectControl* c = (ReflectControl*) ctrlBlock;
 
-  Execute (c, (Tcl_Interp*) NULL, (unsigned char*) "clear_read",
-	   NULL, 0, 0, 0);
+  RefExecuteCallback (c, (Tcl_Interp*) NULL,
+		      (unsigned char*) "clear_read",
+		      NULL, 0, TRANSMIT_DONT, 0);
 }
 
 /*
  *------------------------------------------------------*
  *
- *	Execute --
+ *	MaxRead --
+ *
+ *	------------------------------------------------*
+ *	Query the tcl level of the transformation about
+ *      the max. number of bytes to read next time.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		As of the tcl level.
+ *
+ *	Result:
+ *		The max. number of bytes to read.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+MaxRead (ctrlBlock, clientData) 
+Trf_ControlBlock ctrlBlock;
+ClientData       clientData;
+{
+  ReflectControl* c = (ReflectControl*) ctrlBlock;
+
+  c->maxRead = -1; /* unbounded consumption */
+
+  RefExecuteCallback (c, (Tcl_Interp*) NULL,
+		      (unsigned char*) "query/maxRead",
+		      NULL, 0, TRANSMIT_NUM /* -> maxRead */, 1);
+
+  return c->maxRead;
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	RefExecuteCallback --
  *
  *	------------------------------------------------*
  *	Execute callback for buffer and operation.
@@ -545,64 +580,108 @@ ClientData clientData;
  *------------------------------------------------------*
  */
 
-static int
-Execute (c, interp, op, buf, bufLen, transmit, preserve)
-EncoderControl* c;
-Tcl_Interp*     interp;
-unsigned char*  op;
-unsigned char*  buf;
-int             bufLen;
-int             transmit;
-int             preserve;
+int
+RefExecuteCallback (c, interp, op, buf, bufLen, transmit, preserve)
+ReflectControl* c;        /* Transformation instance */
+Tcl_Interp*     interp;   /* Interpreter we are running in, possibly NULL */
+unsigned char*  op;       /* Operation to perform by the tcl-level */
+unsigned char*  buf;      /* Data for the operation */
+int             bufLen;   /* Length of data above */
+int             transmit; /* What to do with the result, see TRANSMIT_xxx */
+int             preserve; /* Preserve result of transformation interp ? y/n */
 {
-  /* Generate the real command from -command by appending name of
-   * operation and buffer to operate upon, evaluate it at the global
-   * level, then use its result as data to write (in case of transmit != 0).
+  /*
+   * Step 1, create the complete command to execute. Do this by appending
+   * operation and buffer to operate upon to a copy of the callback
+   * definition. We *cannot* create a list containing 3 objects and then use
+   * 'Tcl_EvalObjv', because the command may contain additional prefixed
+   * arguments. Feathers curried commands would come in handy here.
    */
 
-  int res;
-
-  Tcl_Obj* command;
+  int             res = TCL_OK;
+  Tcl_Obj*        resObj; /* See below, switch (transmit) */
+  Tcl_Obj**       listObj;
+  int             resLen;
+  unsigned char*  resBuf;
 #if GT81
   Tcl_SavedResult ciSave;
 #endif
+  Tcl_Obj* command;
+  Tcl_Obj* temp;
+
+  START (RefExecuteCallback);
+  PRINT ("args = (%s | %d | %d | %d)\n", op, bufLen, transmit, preserve); FL;
 
   command = Tcl_DuplicateObj (c->command);
-  Tcl_IncrRefCount (command);
 
 #if GT81
   if (preserve) {
+    PRINTLN ("preserve");
     Tcl_SaveResult (c->interp, &ciSave);
   }
 #endif
 
   if (command == (Tcl_Obj*) NULL) {
+    /* Memory allocation problem */
+    res = TCL_ERROR;
+    PRINT ("command not duplicated @ %d\n", __LINE__);
+    goto cleanup;
+  }
+
+  Tcl_IncrRefCount (command);
+
+  temp = Tcl_NewStringObj ((char*) op, -1);
+
+  if (temp == (Tcl_Obj*) NULL) {
+    /* Memory allocation problem */
+    PRINT ("op object not allocated @ %d\n", __LINE__);
     res = TCL_ERROR;
     goto cleanup;
   }
 
-  res = Tcl_ListObjAppendElement (interp, command,
-				  Tcl_NewStringObj ((char*) op, -1));
+  res = Tcl_ListObjAppendElement (interp, command, temp);
+
   if (res != TCL_OK)
     goto cleanup;
+
+  /*
+   * Use a byte-array to prevent the misinterpretation of binary data
+   * coming through as UTF while at the tcl level.
+   */
 
 #if GT81
-  res = Tcl_ListObjAppendElement (interp, command,
-				  Tcl_NewByteArrayObj ((char*) buf, bufLen));
+  temp = Tcl_NewByteArrayObj ((char*) buf, bufLen);
 #else
-  res = Tcl_ListObjAppendElement (interp, command,
-				  Tcl_NewStringObj ((char*) buf, bufLen));
+  temp = Tcl_NewStringObj    ((char*) buf, bufLen);
 #endif
+
+  if (temp == (Tcl_Obj*) NULL) {
+    /* Memory allocation problem */
+#if GT81
+    PRINT ("bytearray not allocated @ %d\n", __LINE__);
+#else
+    PRINT ("string not allocated @ %d\n", __LINE__);
+#endif
+    res = TCL_ERROR;
+    goto cleanup;
+  }
+
+  res = Tcl_ListObjAppendElement (interp, command, temp);
+
   if (res != TCL_OK)
     goto cleanup;
 
-  /*#if GT81
-    res = Tcl_EvalObj (c->interp, command, TCL_EVAL_GLOBAL);
-    #else*/
-  res = Tcl_GlobalEvalObj (c->interp, command);
-  /*#endif*/
+  /*
+   * Step 2, execute the command at the global level of the interpreter
+   * used to create the transformation. Destroy the command afterward.
+   * If an error occured, the current interpreter is defined and not equal
+   * to the interpreter for the callback, then copy the error message into
+   * current interpreter. Don't copy if in preservation mode.
+   */
 
+  res = Tcl_GlobalEvalObj (c->interp, command);
   Tcl_DecrRefCount (command);
+  command = (Tcl_Obj*) NULL;
 
   if (res != TCL_OK) {
     /* copy error message from 'c->interp' to actual 'interp'. */
@@ -614,41 +693,93 @@ int             preserve;
         Tcl_SetObjResult (interp, Tcl_GetObjResult (c->interp));
     }
 
+    PRINTLN ("!error"); FL;
     goto cleanup;
   }
 
-  if (transmit) {
+  /*
+   * Step 3, transmit a possible conversion result to the underlying
+   * channel, or ourselves
+   */
+
+  switch (transmit) {
+  case TRANSMIT_DONT:
+    /* nothing to do */
+    break;
+
+  case TRANSMIT_DOWN:
     /* Caller said to expect data in interpreter result area.
      * Take it, then write it out to the channel system.
      */
+    resObj = Tcl_GetObjResult (c->interp);
+    resBuf = (unsigned char*) Tcl_GetStringFromObj (resObj, &resLen);
 
-    unsigned char* newbuf;
-    int newbufLen;
+    res = c->write (c->writeClientData, resBuf, resLen, interp);
+    break;
 
-    newbuf = (unsigned char*) Tcl_GetStringFromObj (Tcl_GetObjResult (c->interp), &newbufLen);
+  case TRANSMIT_NUM:
+    /* Interpret result as integer number */
+    resObj = Tcl_GetObjResult (c->interp);
 
-    res = c->write (c->writeClientData, newbuf, newbufLen, interp);
-    Tcl_ResetResult (c->interp);
+    Tcl_GetIntFromObj (c->interp, resObj, &c->maxRead);
+    break;
+
+  case TRANSMIT_RATIO:
+    /* Result should be 2-element list. Ignore superfluous list elements.
+     */
+    resObj = Tcl_GetObjResult (c->interp);
+    resLen = -1;
+    res = Tcl_ListObjLength(c->interp, resObj, &resLen);
+
+    c->naturalRatio.numBytesTransform = 0;
+    c->naturalRatio.numBytesDown      = 0;
+
+    if ((res != TCL_OK) || (resLen < 2)) {
+      PRINT ("TRANSMIT_RATIO problem (%d, %d)\n",
+	     res == TCL_OK, resLen);
+      PRINTLN ("reset result");
+
+      Tcl_ResetResult (c->interp);
+      goto cleanup;
+    }
+
+    res = Tcl_ListObjGetElements(c->interp, resObj, &resLen, &listObj);
+
+    Tcl_GetIntFromObj (c->interp, listObj [0],
+		       &c->naturalRatio.numBytesTransform);
+    Tcl_GetIntFromObj (c->interp, listObj [1],
+		       &c->naturalRatio.numBytesDown);
+    break;
   }
+
+  PRINTLN ("reset result");
+  Tcl_ResetResult (c->interp);
 
 #if GT81
   if (preserve) {
+    PRINTLN ("restore");
     Tcl_RestoreResult (c->interp, &ciSave);
   }
 #endif
 
+  DONE (RefExecuteCallback);
   return res;
 
 cleanup:
+  PRINTLN ("cleanup...");
+
 #if GT81
   if (preserve) {
+    PRINTLN ("restore");
     Tcl_RestoreResult (c->interp, &ciSave);
   }
 #endif
 
   if (command != (Tcl_Obj*) NULL) {
+    PRINTLN ("decr-ref command");
     Tcl_DecrRefCount (command);
   }
 
+  DONE (RefExecuteCallback);
   return res;
 }

@@ -116,21 +116,23 @@ static Trf_TypeDefinition convDefinition =
 {
   "oct",
   NULL, /* clientData not used by converters */
-  NULL, /* set later by TrfInit_Oct */ /* THREADING: serialize initialization */
+  NULL, /* set later by TrfInit_Oct, THREADING: serialize initialization */
   {
     CreateEncoder,
     DeleteEncoder,
     Encode,
     EncodeBuffer,
     FlushEncoder,
-    ClearEncoder
+    ClearEncoder,
+    NULL /* no MaxRead */
   }, {
     CreateDecoder,
     DeleteDecoder,
     Decode,
     DecodeBuffer,
     FlushDecoder,
-    ClearDecoder
+    ClearDecoder,
+    NULL /* no MaxRead */
   },
   TRF_RATIO (1, 3)
 };

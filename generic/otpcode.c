@@ -101,21 +101,23 @@ static Trf_TypeDefinition convDefinition =
 {
   "otp_words",
   NULL, /* clientData not used by conversions. */
-  NULL, /* set later by TrfInit_OTP_WORDS */ /* THREADING: serialize initialization */
+  NULL, /* set later by TrfInit_OTP_WORDS, THREAD: serialize initialization */
   {
     CreateEncoder,
     DeleteEncoder,
     Encode,
     EncodeBuffer,
     FlushEncoder,
-    ClearEncoder
+    ClearEncoder,
+    NULL /* no MaxRead */
   }, {
     CreateDecoder,
     DeleteDecoder,
     Decode,
     DecodeBuffer,
     FlushDecoder,
-    ClearDecoder
+    ClearDecoder,
+    NULL /* no MaxRead */
   },
   TRF_UNSEEKABLE
 };

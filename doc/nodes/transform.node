@@ -105,6 +105,26 @@ node trf_transform {
 		    Called during seeks on the channel.
 		}
 	    }
+	    tr valign=top {
+		query/maxRead {
+		    The transformation is queried for the maximum number of
+		    bytes to read. This call is done just before reading more
+		    data from the underlying. The return value has to be an
+		    integer number. A negative value signal acceptance of
+		    whatever number of characters the trf layer decides to
+		    read.
+		}
+	    }
+	    tr valign=top {
+		query/ratio {
+		    The transformation is queried for its natural seek ratio.
+		    Called once after the creation of the transformation (and
+		    its attachment to a channel). The return value has to be
+		    a list containing at least 2 elements. The first two
+		    elements of the list are interpreted as the natural ratio
+		    of the transformation.
+		}
+	    }
 	}
 
 	p "

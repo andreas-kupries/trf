@@ -34,24 +34,32 @@
  * forward declarations of all internally used procedures.
  */
 
-static Trf_Options CreateOptions _ANSI_ARGS_ ((ClientData clientData));
-static void        DeleteOptions _ANSI_ARGS_ ((Trf_Options options,
-					       ClientData clientData));
-static int         CheckOptions  _ANSI_ARGS_ ((Trf_Options options,
-					       Tcl_Interp* interp,
-					       CONST Trf_BaseOptions* baseOptions,
-					       ClientData clientData));
-static int         SetOption     _ANSI_ARGS_ ((Trf_Options options,
-					       Tcl_Interp* interp,
-					       CONST char* optname,
-					       CONST Tcl_Obj* optvalue,
-					       ClientData clientData));
-static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
-					       ClientData clientData));
+static Trf_Options
+CreateOptions _ANSI_ARGS_ ((ClientData clientData));
 
-static void        SeekQueryOptions  _ANSI_ARGS_ ((Trf_Options options,
-						   Trf_SeekInformation* seekInfo,
-						   ClientData clientData));
+static void
+DeleteOptions _ANSI_ARGS_ ((Trf_Options options,
+			    ClientData  clientData));
+static int
+CheckOptions  _ANSI_ARGS_ ((Trf_Options            options,
+			    Tcl_Interp*            interp,
+			    CONST Trf_BaseOptions* baseOptions,
+			    ClientData             clientData));
+static int
+SetOption     _ANSI_ARGS_ ((Trf_Options    options,
+			    Tcl_Interp*    interp,
+			    CONST char*    optname,
+			    CONST Tcl_Obj* optvalue,
+			    ClientData     clientData));
+static int
+QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
+			    ClientData  clientData));
+
+static void
+SeekQueryOptions  _ANSI_ARGS_ ((Tcl_Interp*          interp,
+				Trf_Options          options,
+				Trf_SeekInformation* seekInfo,
+				ClientData           clientData));
 
 
 /*
@@ -324,10 +332,11 @@ ClientData clientData;
  */
 
 static void
-SeekQueryOptions (options, seekInfo, clientData)
-     Trf_Options options;
+SeekQueryOptions (interp, options, seekInfo, clientData)
+     Tcl_Interp*          interp;
+     Trf_Options          options;
      Trf_SeekInformation* seekInfo;
-     ClientData clientData;
+     ClientData           clientData;
 {
   Trf_ConverterOptionBlock* o = (Trf_ConverterOptionBlock*) options;
 

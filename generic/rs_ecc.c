@@ -33,11 +33,14 @@
  * Forward declaractions of internally used procedures.
  */
 
-#define MSG_LEN  (249) /* 248 bytes usable, 1 byte length information (always at end of block) */
+#define MSG_LEN  (249) /* 248 bytes usable, 1 byte length information
+			* (always at end of block) */
 #define CODE_LEN (255)
 
-void rsencode _ANSI_ARGS_ ((unsigned char m [MSG_LEN],  unsigned char c [CODE_LEN]));
-void rsdecode _ANSI_ARGS_ ((unsigned char c [CODE_LEN], unsigned char m [MSG_LEN], int* errcode));
+void rsencode _ANSI_ARGS_ ((unsigned char m [MSG_LEN],
+			    unsigned char c [CODE_LEN]));
+void rsdecode _ANSI_ARGS_ ((unsigned char c [CODE_LEN],
+			    unsigned char m [MSG_LEN], int* errcode));
 
 /*
  * Declarations of internal procedures.
@@ -93,7 +96,7 @@ static void             ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 static Trf_TypeDefinition convDefinition =
 {
   "rs_ecc",
-  NULL, /* filled later by TrfInit_RS_ECC */ /* THREADING: serialize initialization */
+  NULL, /* filled by TrfInit_RS_ECC, THREADING: serialize initialization */
   NULL, /* not used */
   {
     CreateEncoder,
@@ -101,14 +104,16 @@ static Trf_TypeDefinition convDefinition =
     Encode,
     EncodeBuffer,
     FlushEncoder,
-    ClearEncoder
+    ClearEncoder,
+    NULL /* no MaxRead */
   }, {
     CreateDecoder,
     DeleteDecoder,
     Decode,
     DecodeBuffer,
     FlushDecoder,
-    ClearDecoder
+    ClearDecoder,
+    NULL /* no MaxRead */
   },
   TRF_RATIO (248, 255)
 };

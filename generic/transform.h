@@ -337,12 +337,20 @@ typedef struct _Trf_SeekInformation_ Trf_SeekInformation;
  */
 
 #ifdef __C2MAN__
-typedef void Trf_SeekQueryOptions  (Trf_Options options,   /* option container to query */
+typedef void Trf_SeekQueryOptions  (Tcl_Interp* interp /* Interpreter to use
+							* for reflecting the
+							* query up into tcl,
+							* if necessary */,
+				    Trf_Options options, /* option container
+							  * to query */
 				    Trf_SeekInformation* seekInfo, /* The policy to modify */
-				    ClientData  clientData /* arbitrary information, as defined in
+				    ClientData  clientData /* arbitrary
+							    * information, as
+							    * defined in
 							    * Trf_TypeDefinition.clientData */);
 #else
-typedef void Trf_SeekQueryOptions  _ANSI_ARGS_ ((Trf_Options options,
+typedef void Trf_SeekQueryOptions  _ANSI_ARGS_ ((Tcl_Interp* interp,
+						 Trf_Options options,
 						 Trf_SeekInformation* seekInfo,
 						 ClientData  clientData));
 #endif
@@ -519,13 +527,17 @@ typedef int Trf_FlushTransformation _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 /*
  * Interface for procedures to reset the internal state of an encoder/decoder.
  * The generic io layer of tcl sometimes discards its input buffer. A procedure
- * of this type will be called in such a case to reset the internal state of the
- * control structure and to discard buffered characters.
+ * of this type will be called in such a case to reset the internal state of
+ * the control structure and to discard buffered characters.
  */
 
 #ifdef __C2MAN__
-typedef void Trf_ClearCtrlBlock (Trf_ControlBlock ctrlBlock /* state of encoder/decoder */,
-				 ClientData       clientData /* arbitrary information, as defined in
+typedef void Trf_ClearCtrlBlock (Trf_ControlBlock ctrlBlock /* state of
+							     * encoder/decoder
+							     */,
+				 ClientData       clientData /* arbitrary
+							      * information,
+							      * as defined in
 							      * Trf_TypeDefinition.clientData */);
 #else
 typedef void Trf_ClearCtrlBlock _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
@@ -533,19 +545,47 @@ typedef void Trf_ClearCtrlBlock _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 #endif
 
 /*
+ * Interface for procedures to query a transformation about the max. number of bytes to read in the next call to the down channel.
+ * This procedure will be called by the generic trf layer just before reading
+ * data from the channel below the transformation. This way a transformation
+ * is able to control its consumption of characters. An example would be
+ * 'identity with stop after n characters'. This would transfer at most n
+ * characters and then basically fake higher transformations into believing
+ * that EOF occured. Then popping it would reveal the truth. Pattern matching
+ * could be used here too (internet protocols !).
+ */
+
+#ifdef __C2MAN__
+typedef int Trf_QueryMaxRead (Trf_ControlBlock ctrlBlock /* state of
+							  * encoder/decoder */,
+			      ClientData       clientData /* arbitrary
+							   * information, as
+							   * defined in
+							   * Trf_TypeDefinition.clientData */);
+#else
+typedef int Trf_QueryMaxRead _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+					   ClientData       clientData));
+#endif
+
+/*
  * Structure to hold all vectors describing a specific encoder/decoder.
  * The 5 vectors are ussed to create and delete the controlblock of the
- *encoder/coder, to transform a single character, to flush all internal
+ * encoder/coder, to transform a single character, to flush all internal
  * buffers and to reset the control.
  */
 
 typedef struct _Trf_Vectors_ {
-  Trf_CreateCtrlBlock*     createProc;  /* create control structure              */
-  Trf_DeleteCtrlBlock*     deleteProc;  /* delete control structure              */
-  Trf_TransformCharacter*  convertProc; /* process a single character            */
-  Trf_TransformBuffer*     convertBufProc; /* process a buffer of characters     */
-  Trf_FlushTransformation* flushProc;   /* flush possibly buffered characters    */
-  Trf_ClearCtrlBlock*      clearProc;   /* reset internal control, clear buffers */
+  Trf_CreateCtrlBlock*     createProc;     /* create control structure       */
+  Trf_DeleteCtrlBlock*     deleteProc;     /* delete control structure       */
+  Trf_TransformCharacter*  convertProc;    /* process a single character     */
+  Trf_TransformBuffer*     convertBufProc; /* process a buffer of characters */
+  Trf_FlushTransformation* flushProc;      /* flush possibly buffered
+					    * characters */
+  Trf_ClearCtrlBlock*      clearProc;      /* reset internal control, clear
+					    * buffers */
+  Trf_QueryMaxRead*        maxReadProc;    /* Query max. number of characters
+					    * to read next time. Possibly NULL.
+					    */
 } Trf_Vectors;
 
 

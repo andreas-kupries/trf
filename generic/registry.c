@@ -1343,7 +1343,7 @@ int        toRead;
 int*       errorCodePtr;
 {
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
-  int       gotBytes, read, i, res, copied;
+  int       gotBytes, read, i, res, copied, maxRead;
   Tcl_Channel parent;
 
   START (TrfInput);
@@ -1382,7 +1382,7 @@ int*       errorCodePtr;
 
     if (trans->seekState.upLoc > trans->seekState.upBufStartLoc) {
       ResultDiscardAtStart (&trans->result,
-			    trans->seekState.upLoc - trans->seekState.upBufStartLoc);
+		    trans->seekState.upLoc - trans->seekState.upBufStartLoc);
     }
 
     /* Assertion: UpLoc == UpBufStartLoc now. */
@@ -1418,17 +1418,22 @@ int*       errorCodePtr;
      * Length (trans->result) == 0, toRead > 0 here  Use 'buf'! as target
      * to store the intermediary information read from the parent channel.
      *
-     * Ask the transsform how much data it allows us to read from
+     * Ask the transform how much data it allows us to read from
      * the underlying channel. This feature allows the transform to
      * signal EOF upstream although there is none downstream. Useful
-     * to control an unbounded 'fcopy', either through counting bytes,
-     * or by pattern matching.
+     * to control an unbounded 'fcopy' for example, either through counting
+     * bytes, or by pattern matching.
      */
 
-#if 0
-    if (ctrl->maxRead >= 0) {
-      if (ctrl->maxRead < toRead) {
-	toRead = ctrl->maxRead;
+    if (trans->in.vectors->maxReadProc == (Trf_QueryMaxRead*) NULL)
+      maxRead = -1;
+    else
+      maxRead = trans->in.vectors->maxReadProc (trans->in.control,
+						trans->clientData);
+
+    if (maxRead >= 0) {
+      if (maxRead < toRead) {
+	toRead = maxRead;
       }
     } /* else: 'maxRead < 0' == Accept the current value of toRead */
 
@@ -1437,7 +1442,6 @@ int*       errorCodePtr;
       DONE  (TrfInput);
       return gotBytes;
     }
-#endif
 
     PRINT ("Read from parent %p\n", parent);
     IN; IN;
@@ -2629,7 +2633,7 @@ Tcl_Interp*        interp;
     entry->trfType->naturalSeek.numBytesDown;
 
   if (optInfo && (*OPT->seekQueryProc != (Trf_SeekQueryOptions*) NULL)) {
-    (*OPT->seekQueryProc) (optInfo, &trans->seekCfg.natural, CLT);
+    (*OPT->seekQueryProc) (interp, optInfo, &trans->seekCfg.natural, CLT);
   }
 
   SeekCalculatePolicies (trans);

@@ -45,7 +45,7 @@ test transform-2.0 {transform behaviour, attached write} {
     close             $out
 
     set tracevar
-} {create/write-0 create/read-0 write-17 flush/write-0 flush/read-0 delete/write-0 delete/read-0}
+} {create/write-0 create/read-0 query/ratio-0 write-17 flush/write-0 flush/read-0 delete/write-0 delete/read-0}
 
 
 test transform-2.1 {transform behaviour, attached read} {
@@ -58,7 +58,7 @@ test transform-2.1 {transform behaviour, attached read} {
     close             $in
 
     set tracevar
-} {create/write-0 create/read-0 read-17 flush/read-0 flush/write-0 delete/write-0 delete/read-0}
+} {create/write-0 create/read-0 query/ratio-0 query/maxRead-0 read-17 query/maxRead-0 flush/read-0 flush/write-0 delete/write-0 delete/read-0}
 
 
 ::tcltest::cleanupTests

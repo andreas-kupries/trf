@@ -92,21 +92,23 @@ static Trf_TypeDefinition convDefinition =
 {
   "uuencode",
   NULL, /* clientData not used by converters */
-  NULL, /* set later by Trf_InitUU */ /* THREADING: serialize initialization */
+  NULL, /* set later by Trf_InitUU, THREADING: serialize initialization */
   {
     CreateEncoder,
     DeleteEncoder,
     Encode,
     NULL,
     FlushEncoder,
-    ClearEncoder
+    ClearEncoder,
+    NULL /* no MaxRead */
   }, {
     CreateDecoder,
     DeleteDecoder,
     Decode,
     NULL,
     FlushDecoder,
-    ClearDecoder
+    ClearDecoder,
+    NULL /* no MaxRead */
   },
   TRF_RATIO (3, 4)
 };

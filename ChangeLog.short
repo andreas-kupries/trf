@@ -16,8 +16,12 @@ Changes from 1.8 to 2.0
 *	Revamped the way Trf is handling seek requests for
 	transforms.
 	**BEHAVIOURAL INCOMPATIBILITY**
+	**BINARY INCOMPATIBILITY**   (Trf_TypeDefinition's extended)
 
 	See	doc/html/trf_seek.html
+
+*	Added vector for querying the max number of bytes to read.
+	**BINARY INCOMPATIBILITY**   (Trf_TypeDefinition's extended)
 
 *	Squashed the bug in the 'bzip' (de)compressor.
 	Squashed other bugs reported by Matt Newman <matt@sensus.org>
@@ -32,6 +36,8 @@ Changes from 1.8 to 2.0
 
 *	New commands:	md5crypt, crypt, use in password authentication.
 	New option:	-nowrap for 'zip' transformation. See documentation.
+
+*	'transform': Added operations 'query/maxRead' and 'query/ratio'.
 
 
 Changes from 1.7 to 1.8

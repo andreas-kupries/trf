@@ -89,21 +89,23 @@ static Trf_TypeDefinition convDefinition =
 {
   "bz2",
   NULL, /* client data not used       */
-  NULL, /* filled later (TrfInit_ZB2) */ /* THREADING: serialize initialization */
+  NULL, /* filled by TrfInit_ZB2, THREADING: serialize initialization */
   {
     CreateEncoder,
     DeleteEncoder,
     Encode,
     EncodeBuffer,
     FlushEncoder,
-    ClearEncoder
+    ClearEncoder,
+    NULL /* no MaxRead */
   }, {
     CreateDecoder,
     DeleteDecoder,
     Decode,
     DecodeBuffer,
     FlushDecoder,
-    ClearDecoder
+    ClearDecoder,
+    NULL /* no MaxRead */
   },
   TRF_UNSEEKABLE
 };

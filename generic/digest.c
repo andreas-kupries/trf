@@ -93,14 +93,16 @@ static Trf_TypeDefinition mdDefinition = /* THREADING: constant, read-only => sa
     Encode,
     EncodeBuffer,
     FlushEncoder,
-    ClearEncoder
+    ClearEncoder,
+    NULL /* no MaxRead */
   }, {
     CreateDecoder,
     DeleteDecoder,
     Decode,
     DecodeBuffer,
     FlushDecoder,
-    ClearDecoder
+    ClearDecoder,
+    NULL /* no MaxRead */
   },
   TRF_UNSEEKABLE
 };

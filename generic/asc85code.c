@@ -1,7 +1,8 @@
 /*
  * asc85code.c --
  *
- *	Implements and registers conversion from and to ASCII 85 representation.
+ *	Implements and registers conversion from and to ASCII 85
+ *	representation.
  *
  *
  * Copyright (c) 1996 Andreas Kupries (a.kupries@westend.com)
@@ -104,14 +105,16 @@ static Trf_TypeDefinition convDefinition =
     Encode,
     NULL,
     FlushEncoder,
-    ClearEncoder
+    ClearEncoder,
+    NULL /* no MaxRead */
   }, {
     CreateDecoder,
     DeleteDecoder,
     Decode,
     NULL,
     FlushDecoder,
-    ClearDecoder
+    ClearDecoder,
+    NULL
   },
   TRF_UNSEEKABLE
 };
