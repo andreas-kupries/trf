@@ -4613,13 +4613,6 @@ EOF
     fi
 
 
-if test "${SHARED_BUILD}" = "1" ; then
-    CFLAGS="${CFLAGS} \${CFLAGS_DEFAULT} \${CFLAGS_WARNING} \${SHLIB_CFLAGS}"
-else
-    CFLAGS="${CFLAGS} \${CFLAGS_DEFAULT} \${CFLAGS_WARNING}"
-fi
-
-
 #--------------------------------------------------------------------
 # Everyone should be linking against the Tcl stub library.  If you
 # can't for some reason, remove this definition.  If you aren't using
@@ -4715,7 +4708,7 @@ EOF
 
 
     echo $ac_n "checking for tclsh""... $ac_c" 1>&6
-echo "configure:4719: checking for tclsh" >&5
+echo "configure:4712: checking for tclsh" >&5
 
     if eval "test \"`echo '$''{'ac_cv_path_tclsh'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -4887,7 +4880,7 @@ fi
 
 
 echo $ac_n "checking for directory with zlib.h""... $ac_c" 1>&6
-echo "configure:4891: checking for directory with zlib.h" >&5
+echo "configure:4884: checking for directory with zlib.h" >&5
 if eval "test \"`echo '$''{'trf_cv_path_ZLIB_INCLUDE_DIR'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4924,7 +4917,7 @@ fi
 
 
 echo $ac_n "checking for libz library""... $ac_c" 1>&6
-echo "configure:4928: checking for libz library" >&5
+echo "configure:4921: checking for libz library" >&5
 if eval "test \"`echo '$''{'trf_cv_lib_ZLIB_LIB_DIR'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -4971,7 +4964,7 @@ fi
 
 
 echo $ac_n "checking for directory with ssl.h""... $ac_c" 1>&6
-echo "configure:4975: checking for directory with ssl.h" >&5
+echo "configure:4968: checking for directory with ssl.h" >&5
 if eval "test \"`echo '$''{'trf_cv_path_SSL_INCLUDE_DIR'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -5045,7 +5038,7 @@ fi
 
 
 echo $ac_n "checking for ssl libcrypto library (for message digests)""... $ac_c" 1>&6
-echo "configure:5049: checking for ssl libcrypto library (for message digests)" >&5
+echo "configure:5042: checking for ssl libcrypto library (for message digests)" >&5
 if eval "test \"`echo '$''{'trf_cv_lib_SSL_LIB_DIR'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -5093,7 +5086,7 @@ fi
 
 
 echo $ac_n "checking for bz2 compressor library""... $ac_c" 1>&6
-echo "configure:5097: checking for bz2 compressor library" >&5
+echo "configure:5090: checking for bz2 compressor library" >&5
 if eval "test \"`echo '$''{'trf_cv_lib_BZ2_LIB_DIR'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -5189,17 +5182,17 @@ for ac_hdr in dlfcn.h stdlib.h features.h
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
-echo "configure:5193: checking for $ac_hdr" >&5
+echo "configure:5186: checking for $ac_hdr" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
   cat > conftest.$ac_ext <<EOF
-#line 5198 "configure"
+#line 5191 "configure"
 #include "confdefs.h"
 #include <$ac_hdr>
 EOF
 ac_try="$ac_cpp conftest.$ac_ext >/dev/null 2>conftest.out"
-{ (eval echo configure:5203: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
+{ (eval echo configure:5196: \"$ac_try\") 1>&5; (eval $ac_try) 2>&5; }
 ac_err=`grep -v '^ *+' conftest.out | grep -v "^conftest.${ac_ext}\$"`
 if test -z "$ac_err"; then
   rm -rf conftest*
