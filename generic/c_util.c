@@ -76,7 +76,7 @@ TrfGetChannelData _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* dataName,
  *------------------------------------------------------*
  */
 #if (TCL_MAJOR_VERSION < 8)
-int
+static int
 TrfGetImmediateData (interp, dataName, data, min_bytes, max_bytes, buf, length)
 Tcl_Interp*     interp;
 CONST char*     dataName;
@@ -104,7 +104,7 @@ int*            length;
   return TCL_OK;
 }
 #else
-int
+static int
 TrfGetImmediateData (interp, dataName, data, min_bytes, max_bytes, buf, length)
 Tcl_Interp*     interp;
 CONST char*     dataName;
@@ -149,7 +149,7 @@ int*            length;
  *
  *------------------------------------------------------*
  */
-int
+static int
 TrfGetChannelData (interp, dataName, dataChan, min_bytes, max_bytes, buf, length)
 Tcl_Interp*     interp;
 CONST char*     dataName;
@@ -194,9 +194,9 @@ int*            length;
      */
 
     *buf       = Tcl_Alloc (max_bytes);
-    read_bytes = Tcl_Read  (key, *buf, max_bytes);
+    *length    = Tcl_Read  (key, *buf, max_bytes);
 
-    if (read_bytes < 0) {
+    if (*length < 0) {
       Tcl_Free (*buf);
       *buf = NULL;
 
@@ -207,9 +207,10 @@ int*            length;
       return TCL_ERROR;
     }
 
-    if (read_bytes < min_bytes) {
+    if (*length < min_bytes) {
       Tcl_Free (*buf);
-      *buf = NULL;
+      *buf    = NULL;
+      *length = 0;
       Tcl_AppendResult (interp, dataName, " to short", (char*) NULL);
       return TCL_ERROR;
     }
