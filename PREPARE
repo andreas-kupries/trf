@@ -97,5 +97,10 @@ foreach md {crc crc-zlib adler md5 sha haval} {
     catch {eval exec md -a $md $files > digests.$md}
 }
 
+
+# generate standard permissions.
+mNormalPermissions [pwd]
+
+
 # should secure digest files and checker application against
 # tampering (-> PGP signature)
