@@ -2,7 +2,7 @@
 # prepare module 'Trf' for distribution
 
 # do it ourself, must not be included into digest files!
-mExclude PREPARE customers
+mExclude PREPARE customers zlib.vc
 
 
 # O. insert various information into some files
@@ -59,7 +59,8 @@ eval mExclude \
 	patches/v8.1/gendiff patches/v8.1/getorig patches/v8.1/genstubs \
 	patches/v8.1/getcurrent patches/v8.1/setorig \
 	patches/rc.h patches/patch.mp \
-	[glob win/*.dll] [glob win/*.lib] win/trf1380.README
+	[glob win/*.dll] [glob win/*.lib] win/trf1380.README \
+	win/bdist/jan.4/SETUP.ISS
 
 # mHandleBinaryDistributions
 # Remove older distribution (1.x), they are distributed as part of the

@@ -16,7 +16,8 @@
 #
 # **************************************************************************
 
-VERSION = "@mFullVersion@"
+VERSION		= "@mFullVersion@"
+SHORTVERSION	= "@mShortDosVersion@"
 
 # =======================================================================
 # Specify the root directory of the source distribution of this extension
@@ -151,13 +152,13 @@ STUBS_FLAG=-DUSE_TCL_STUBS
 
 # The interpreters.
 
-TCLSH		= $(TCL_BINARIES)\tclsh$(TCL_SHORTVERS).exe
-TCLLIB		= $(TCL_LIBRARIES)\tclstub$(TCL_SHORTVERS).lib
+TCLSH		= "$(TCL_BINARIES)\tclsh$(TCL_SHORTVERS).exe"
+TCLLIB		= "$(TCL_LIBRARIES)\tclstub$(TCL_SHORTVERS).lib"
 
 # Base name of the generated library, full names for DLL and its stub,
 # and complete installation directory for the package.
 
-TRF		=	trf@mShortDosVersion@
+TRF		=	trf$(SHORTVERSION)
 TRFLIB		=	$(TRF)$(TCL_SHORTVERS).lib
 TRF_STUB_LIB_FILE=	$(TRF)stub$(TCL_SHORTVERS).lib
 TRFDLL		=	$(TRF).dll
@@ -186,7 +187,7 @@ TRFOBJS = \
 	$(TMPDIR)\load.obj \
 	$(TMPDIR)\crypt.obj \
 	$(TMPDIR)\loadman.obj \
-	$(TMPDIR)\md5.obj \
+	$(TMPDIR)\md5dig.obj \
 	$(TMPDIR)\md2.obj \
 	$(TMPDIR)\octcode.obj \
 	$(TMPDIR)\otpcode.obj \
@@ -218,10 +219,10 @@ TRFOBJS = \
 
 # Shorthands for the tools we need from MSVC
 
-cc32		= $(TOOLS32)\bin\cl.exe
-link32		= $(TOOLS32)\bin\link.exe
-rc32		= $(TOOLS32_rc)\bin\rc.exe
-include32	= -I$(TOOLS32)\include
+cc32		= "$(TOOLS32)\bin\cl.exe"
+link32		= "$(TOOLS32)\bin\link.exe"
+rc32		= "$(TOOLS32_rc)\bin\rc.exe"
+include32	= -I"$(TOOLS32)\include"
 lib32		= "$(TOOLS32)\bin\lib.exe"
 CP      	= copy
 RM      	= del
@@ -277,13 +278,13 @@ libc = libc.lib
 libcdll = crtdll.lib
 !ELSE
 libc	= libc.lib oldnames.lib
-libcdll = $(MS_LIBPATH)\msvcrt.lib $(MS_LIBPATH)\oldnames.lib
+libcdll = "$(MS_LIBPATH)\msvcrt.lib" "$(MS_LIBPATH)\oldnames.lib"
 !ENDIF
 
-baselibs   =	$(MS_LIBPATH)\kernel32.lib $(optlibs)	\
-		$(MS_LIBPATH)\advapi32.lib
-winlibs    =	$(baselibs) $(MS_LIBPATH)\user32.lib $(MS_LIBPATH)\gdi32.lib \
-		$(MS_LIBPATH)\comdlg32.lib $(MS_LIBPATH)\winspool.lib
+baselibs   =	"$(MS_LIBPATH)\kernel32.lib" $(optlibs)	\
+		"$(MS_LIBPATH)\advapi32.lib"
+winlibs    =	$(baselibs) "$(MS_LIBPATH)\user32.lib" "$(MS_LIBPATH)\gdi32.lib" \
+		"$(MS_LIBPATH)\comdlg32.lib" "$(MS_LIBPATH)\winspool.lib"
 
 guilibs	   = $(libc) $(winlibs)
 conlibs	   = $(libc) $(baselibs)
@@ -420,7 +421,7 @@ bindist:      $(TRFDLL)
     $(cc32) $(TRF_CFLAGS) -Fo$(TMPDIR)\ $<
 
 {$(WINDIR)}.rc{$(TMPDIR)}.res:
-	$(rc32) -fo $@ -r -i $(GENERICDIR) -i $(WINDIR) -D__WIN32__ \
+	$(rc32) -fo $@ -r -i "$(GENERICDIR)" -i "$(WINDIR)" -D__WIN32__ \
 	 $<
 
 clean:
@@ -429,5 +430,3 @@ clean:
 	-@del *.dll 
 	-@del *.pch
         -@del $(TMPDIR)\*.obj
-
-

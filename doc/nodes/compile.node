@@ -14,6 +14,11 @@ node trf_compile {
     contents {
 	p "
 	The following subsections describe the process of compiling and
-	installing [trf] for the 3 major platforms."
+	installing [trf] for the 3 major platforms.
+	"
+
+	p "[strong {Please note}] that the testsuite requires a working
+	implementation of the Unix 'echo' command.
+	"
     }
 }

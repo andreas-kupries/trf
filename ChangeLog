@@ -1,3 +1,11 @@
+Mon Nov  8 20:43:24 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* win/makefile.vc: Jan Nijtmans expanded the original makefile.vc
+	  and makefile.vc to allow the usage of MS VC++ 2.0 up to 6.0.
+
+	  Got a new binary distribution of 2.0 as well, usable for
+	  tcl 8.0. and 8.1.x.
+
 Wed Oct 27 21:05:07 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* tests/common_seek.test/transform.test: Slight differences for
