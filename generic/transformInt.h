@@ -337,8 +337,10 @@ TrfBZ2Options _ANSI_ARGS_ ((void));
 #endif
 
 #ifdef ZLIB_STATIC_BUILD
+#undef  ZEXPORT
 #define ZEXPORT
 #else
+#undef  ZEXPORT
 #define ZEXPORT WINAPI
 #endif
 
@@ -391,8 +393,10 @@ TrfLoadZlib _ANSI_ARGS_ ((Tcl_Interp *interp));
  */
 
 #ifdef BZLIB_STATIC_BUILD
+#undef  BZEXPORT
 #define BZEXPORT
 #else
+#undef  BZEXPORT
 #define BZEXPORT WINAPI
 #endif
 
