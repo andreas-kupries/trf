@@ -96,6 +96,10 @@ AC_ARG_WITH(ssl-lib-dir,
 	[SSL_LIB_DIR=$withval],
 	[])
 
+AC_ARG_WITH(bz2-lib-dir,
+	[  --with-bz2-lib-dir=DIR	libbz2 resides in DIR],
+	[BZ2_LIB_DIR=$withval],
+	[])
 
 dnl ----------------------------------------------------------------
 dnl

@@ -150,6 +150,12 @@ cd ..
 # remove crypto directories
 mExclude generic/blowfish generic/idea generic/rc4 generic/safer
 
+# update files dependent on stub declarations.
+
+cd generic
+exec tclsh ../tools/genStubs.tcl . trf.decls trfInt.decls
+cd ..
+
 
 # II. security measures
 mLog info Security measures

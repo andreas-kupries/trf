@@ -32,6 +32,11 @@ TrfStubs trfStubs = {
     Trf_ConverterOptions, /* 2 */
     Trf_LoadLibrary, /* 3 */
     Trf_LoadFailed, /* 4 */
+    Trf_RegisterMessageDigest, /* 5 */
+    Trf_XorBuffer, /* 6 */
+    Trf_ShiftRegister, /* 7 */
+    Trf_FlipRegisterLong, /* 8 */
+    Trf_FlipRegisterShort, /* 9 */
 };
 
 /* !END!: Do not edit above this line. */

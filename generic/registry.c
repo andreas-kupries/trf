@@ -129,6 +129,10 @@ typedef struct _TrfTransformationInstance_ {
  * forward declarations of all internally used procedures.
  */
 
+static int
+TrfUnregister _ANSI_ARGS_ ((Tcl_Interp*       interp;
+			   Trf_RegistryEntry* entry));
+
 static void
 TrfDeleteRegistry _ANSI_ARGS_ ((ClientData clientData, Tcl_Interp *interp));
 
@@ -420,8 +424,8 @@ CONST Trf_TypeDefinition* type;
  *------------------------------------------------------*
  */
 
-int
-Trf_Unregister (interp, entry)
+static int
+TrfUnregister (interp, entry)
 Tcl_Interp*        interp;
 Trf_RegistryEntry* entry;
 {
@@ -742,7 +746,7 @@ ClientData clientData;
 
   entry = (Trf_RegistryEntry*) clientData;
 
-  Trf_Unregister (entry->interp, entry);
+  TrfUnregister (entry->interp, entry);
 }
 
 /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>

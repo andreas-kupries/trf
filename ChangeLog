@@ -1,3 +1,8 @@
+Tue Sep 21 20:10:37 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/trf.decls: Extended the stub table to cover all public
+	  procedures. 
+
 Mon Sep 20 21:53:56 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* Added checks into 'configure' to search for the bz2 library. The

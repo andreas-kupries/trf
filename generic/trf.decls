@@ -35,3 +35,18 @@ declare 3 generic {
 declare 4 generic {
     void Trf_LoadFailed(VOID** handlePtr)
 }
+declare 5 generic {
+    int Trf_RegisterMessageDigest (Tcl_Interp* interp, CONST Trf_MessageDigestDescription* md_desc)
+}
+declare 6 generic {
+    void Trf_XorBuffer (VOID* buffer, VOID* mask, int length)
+}
+declare 7 generic {
+    void Trf_ShiftRegister (VOID* buffer, VOID* in, int shift, int buffer_length)
+}
+declare 8 generic {
+    void Trf_FlipRegisterLong (VOID* buffer, int length)
+}
+declare 9 generic {
+    void Trf_FlipRegisterShort (VOID* buffer, int length)
+}
