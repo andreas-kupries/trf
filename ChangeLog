@@ -1,5 +1,11 @@
 Wed Jul 23 00:02:03 1997  Andreas Kupries  <a.kupries@westend.com>
 
+	* tests/transform.test: New file, check behaviour of
+	  transformation using scripts to do the work.
+
+	* generic/registry.c (TransformImmediate): checking for empty
+	  results now.
+
 	* generic/c_util.c (TrfGetChannelData): Missing assignment to
 	  *length in bound case caused blockcipher blowup.
 
