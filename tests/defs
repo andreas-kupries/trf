@@ -6,7 +6,9 @@
 #
 # Copyright (c) 1990-1994 The Regents of the University of California.
 # Copyright (c) 1994 Sun Microsystems, Inc.
+#
 # Modified      1995 Andreas Kupries (a.kupries@westend.com)
+# Modified      1997 Andreas Kupries (a.kupries@westend.com)
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -113,65 +115,6 @@ proc dotests {file args} {
 
 # -- attention procs --
 
-proc attention-a {} {
-    puts {-- ATTENTION --
-    Due to the inportability of binary data these tests
-    may fail on some machines although the extension was
-    compiled successfully and correctly.  The tests will
-    account for endianess in prediction of tests-results,
-    but not different type sizes. Assumed are:
-
-	char   = 1 byte
-	short  = 2 byte
-	int    = 4 byte
-	long   = 4 byte
-	float  = 4 byte
-	double = 8 byte
-
-    ----------------------------------------------------
-}
-rename attention-a {}
-}
-
-
-proc attention-b {} {
-    global known_machines
-
-    puts "-- ATTENTION again --\n\
-    Testing float, double now. The results depend\n\
-    completely upon processor architecture.\n\
-    Tested for \{$known_machines\} only!\n\
-"
-rename attention-b {}
-}
-
-
-proc use {little big} {
-    if {"little" == [blob endian]} {
-	return $little
-    } else {
-	return $big
-    }
-}
-
-proc m_use {def} {
-    global tcl_platform
-    set m $tcl_platform(machine)
-    array set x $def
-    return $x($m)
-}
-
-# list of machines we have floating point tests for.
-set known_machines {i486 IP20 IP22}
-
-
-proc known_machine? {} {
-    global tcl_platform known_machines
-    set m $tcl_platform(machine)
-    return [expr {[lsearch -exact $known_machines $m] >= 0}]
-}
-
-
 # utilities for easy specification and use of constant values (hex)
 
 proc defblock {name hexdata} {
@@ -187,13 +130,10 @@ proc defblock {name hexdata} {
 
 proc hex2chan {hexdata} {
     set               x [memchan]
-
     fconfigure       $x -translation binary
     hex  -attach     $x -mode decode
     puts -nonewline  $x $hexdata
-#
     unstack          $x
-
     seek             $x 0
     return           $x
 }
@@ -205,7 +145,6 @@ proc text2hex {data} {
     hex  -attach     $x -mode encode
     puts -nonewline  $x $data
     unstack	     $x
-
     seek             $x 0
     set data   [read $x]
     close            $x
@@ -219,44 +158,79 @@ proc text2chan {data} {
     fconfigure       $x -translation binary
     puts -nonewline  $x $data
     seek             $x 0
-
     return           $x
 }
 
+if {[info tclversion] < 8.0} {
+    proc exec_cipher {bc key iv in bc_args} {
+	set _key [hex2chan $key]
+	set _iv  [hex2chan $iv]
+	set _in  [hex2chan $in]
+	set has_out 0
+	set text ""
 
-proc exec_bc {bc key iv in bc_args} {
-    set _key [hex2chan $key]
-    set _iv  [hex2chan $iv]
-    set _in  [hex2chan $in]
-    set has_out 0
-    set text ""
+	regsub -all {@key} $bc_args $_key bc_args
+	regsub -all {@iv}  $bc_args "-in $_iv"  bc_args
+	regsub -all {@in}  $bc_args $_in  bc_args
 
-    regsub -all {@key} $bc_args $_key bc_args
-    regsub -all {@iv}  $bc_args $_iv  bc_args
-    regsub -all {@in}  $bc_args $_in  bc_args
+	if {[regexp -- {@out} $bc_args]} {
+	    set _out [memchan]
+	    hex -attach $_out -mode encode
+	    regsub -all {@out}  $bc_args "-out $_out" bc_args
+	    
+	    set has_out 1
+	}
 
-    if {[regexp -- {@out} $bc_args]} {
-	set _out [memchan]
-	hex -attach $_out -mode encode
-	regsub -all {@out}  $bc_args $_out bc_args
+	if {$iv == {}} {
+	    eval $bc $bc_args -key-type channel
+	} else {
+	    eval $bc $bc_args -key-type channel -iv-type channel
+	}
 
-	set has_out 1
+	close $_key
+	close $_iv
+	close $_in
+
+	if {$has_out} {
+	    unstack $_out
+	    seek $_out 0
+	    set text [read $_out]
+	    close $_out
+	}
+
+	return $text
     }
 
-    eval $bc $bc_args
 
-    close $_key
-    close $_iv
-    close $_in
+    proc exec_md {md hexinput} {
+	set              in [memchan]
+	hex -attach     $in -m d
+	puts -nonewline $in $hexinput
+	unstack         $in
+	seek            $in 0
 
-    if {$has_out} {
-	unstack $_out
-	seek $_out 0
-	set text [read $_out]
-	close $_out
+	set       out [memchan]
+	hex -m e $out
+
+	$md -in $in -out $out
+
+	close   $in
+	unstack          $out
+	seek             $out 0
+
+	set res [read -nonewline $out]
+	close $out
+	set res
     }
 
-    return $text
+} else {
+    proc exec_cipher {bc key iv in bc_args} {
+	error "don't use exec_cipher with tcl 8.x and higher"
+    }
+
+    proc exec_md {md hexinput} {
+	error "don't use exec_md with tcl 8.x and higher"
+    }
 }
 
 
@@ -278,4 +252,21 @@ proc xx_cmp {a b blocksize} {
 
 	puts stdout "$af  $bf"
     }
+}
+
+
+proc string_rep {n text} {
+    # @comment Replicates <a n> times the string <a text>.
+    # @argument text: string to be replicated
+    # @argument n:    number of replications
+    # @result <a text> replicated <a n> times
+
+    # no replication required ?
+    if {$n <= 0} {return ""}
+
+    # use iteration to build up the result
+    set result ""
+    for {} {$n > 0} {incr n -1} {append result $text}
+
+    return $result
 }

@@ -15,48 +15,16 @@
 if {[string compare test [info procs test]] == 1} then {source defs}
 
 
-test crc-1.0 {argument errors} {
-    catch {crc} msg
-    set msg
-} {crc: source, destination missing}
-
-
-test crc-1.1 {argument errors} {
-    catch {crc x} msg
-    set msg
-} {crc: wrong # args}
-
-
-
-test crc-2.0 {crc} {
-    puts -nonewline [set ma [memchan]] {hello world}
-    seek $ma 0
-
-    crc  $ma [set mb [memchan]]
-    seek $mb 0
-
-    hex  -mode encode $mb [set mc [memchan]]
-    seek $mc 0
-
-    set res [read -nonewline $mc]
-
-    close $ma
-    close $mb
-    close $mc
-
-    set res
-} {B03CB7}
-
-
-# -- irrelevant now
-# -- see ftp://ftp.rocksoft.com/pub/clients/papers/crc_v3.txt
-#puts {
-#    Do you posess a generic crc generation package (or know about such)?
-#    Please mail me, so that i can integrate it, greatly enhancing the
-#    functionality provided here.  Commercial packs are of less interest
-#    to me, sorry.
-#}
-
-# remove globals
-#rename x {}
-
+foreach {i in digest} {
+    1 {hello world} B03CB7
+} {
+    if {[info tclversion] < 8.0} {
+	text crc-4.$i-7.6 {crc, immediate} {
+	    exec_md crc [text2hex $in]
+	} $digest
+    } else {
+	test crc-4.$i-8.x {crc, immediate} {
+	    hex -m e [crc $in]
+	} $digest
+    }
+}

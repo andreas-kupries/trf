@@ -15,34 +15,16 @@
 if {[string compare test [info procs test]] == 1} then {source defs}
 
 
-test crc-zlib-1.0 {argument errors} {
-    catch {crc-zlib} msg
-    set msg
-} {crc-zlib: source, destination missing}
-
-
-test crc-zlib-1.1 {argument errors} {
-    catch {crc-zlib x} msg
-    set msg
-} {crc-zlib: wrong # args}
-
-
-
-test crc-zlib-2.0 {crc-zlib} {
-    puts -nonewline [set ma [memchan]] {hello world}
-    seek $ma 0
-
-    crc-zlib  $ma [set mb [memchan]]
-    seek $mb 0
-
-    hex  -mode encode $mb [set mc [memchan]]
-    seek $mc 0
-
-    set res [read -nonewline $mc]
-
-    close $ma
-    close $mb
-    close $mc
-
-    set res
-} {85114A0A}
+foreach {i in digest} {
+    0 {hello world} 85114A0D
+} {
+    if {[info tclversion] < 8.0} {
+	text crc_zlib-4.$i-7.6 {crc_zlib, immediate} {
+	    exec_md crc-zlib [text2hex $in]
+	} $digest
+    } else {
+	test crc_zlib-4.$i-8.x {crc_zlib, immediate} {
+	    hex -m e [crc-zlib $in]
+	} $digest
+    }
+}

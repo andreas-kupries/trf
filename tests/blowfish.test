@@ -2,7 +2,7 @@
 # Commands covered:	BLOWFISH
 #
 # This file contains a collection of tests for one or more of the commands
-# the BLOB-X extension. Sourcing this file into Tcl runs the
+# the Trf extension. Sourcing this file into Tcl runs the
 # tests and generates output for errors.  No output means no errors were
 # found.
 #
@@ -35,39 +35,53 @@ if {[string compare test [info procs test]] == 1} then {source defs}
 #define CR 0x8022f684l
 
 catch {unset key}
-set key(1) [text2hex "abcdefghijklmnopqrstuvwxyz"]
-set key(2) [text2hex "Who is John Galt?"]
-
-
 catch {unset in}
+catch {unset out}
+
+if {[info tclversion] < 8.0} {
+    set key(1) [text2hex "abcdefghijklmnopqrstuvwxyz"]
+    set key(2) [text2hex "Who is John Galt?"]
+} else {
+    set key(1) "abcdefghijklmnopqrstuvwxyz"
+    set key(2) "Who is John Galt?"
+}
+
 array set in {
     1	424c4f5746495348
     2	fedcba9876543210
 }
 
-
-catch {unset out}
 array set out {
     1	324ed0fef413a203
     2	cc91732b8022f684
 }
 
 
-foreach i [lsort [array names key]] {
+if {[info tclversion] < 8.0} {
+    foreach i [lsort [array names key]] {
+	test blowfish-1.$i-7.6 {blowfish encryption} {
+	    exec_bc blowfish $key($i) {} $in($i) {-dir encrypt -mode ecb -key @key @in @out}
+	} [string toupper $out($i)] ; # {}
+    }
 
-    test blowfish-1.$i {blowfish encryption} {
-	exec_bc blowfish $key($i) {} $in($i) {-dir encrypt -mode ecb -key @key @in @out}
-    } [string toupper $out($i)]
+    foreach i [lsort [array names key]] {
+	test blowfish-2.$i-7.6 {blowfish decryption} {
+	    exec_bc blowfish $key($i) {} $out($i) {-dir decrypt -mode ecb -key @key @in @out}
+	} [string toupper $in($i)] ; # {}
+    }
+} else {
+    foreach i [lsort [array names key]] {
+	test blowfish-1.$i-8.x {blowfish encryption} {
+	    hex -m e [blowfish -dir encrypt -mode ecb -key $key($i) [hex -m d $in($i)]]
+	} [string toupper $out($i)] ; # {}
+    }
+
+    foreach i [lsort [array names key]] {
+	test blowfish-2.$i-8.x {blowfish decryption} {
+	    hex -m e [blowfish -dir decrypt -mode ecb -key $key($i) [hex -m d $out($i)]]
+	} [string toupper $in($i)] ; # {}
+    }
 }
-
-
-foreach i [lsort [array names key]] {
-
-    test blowfish-2.$i {blowfish decryption} {
-	exec_bc blowfish $key($i) {} $out($i) {-dir decrypt -mode ecb -key @key @in @out}
-    } [string toupper $in($i)]
-}
-
 
 # remove globals
 unset in out key

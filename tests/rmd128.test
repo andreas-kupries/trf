@@ -15,44 +15,38 @@
 if {[string compare test [info procs test]] == 1} then {source defs}
 
 
-test ripemd128-1.0 {argument errors} {
-    catch {ripemd128} msg
-    set msg
-} {ripemd128: source, destination missing}
+foreach {i in digest} {
+    0 {}
+    cdf26213a150dc3ecb610f18f6b38b46
 
+    1 a
+    86be7afa339d0fc7cfc785e72f578d33
 
-test ripemd128-1.1 {argument errors} {
-    catch {ripemd128 x} msg
-    set msg
-} {ripemd128: wrong # args}
+    2 abc
+    c14a12199c66e4ba84636b0f69144c77
 
+    3 {message digest}
+    9e327b3d6e523062afc1132d7df9d1b8
 
-foreach {i in out} {
-    0 {}                                                                               cdf26213a150dc3ecb610f18f6b38b46
-    1 a                                                                                86be7afa339d0fc7cfc785e72f578d33
-    2 abc                                                                              c14a12199c66e4ba84636b0f69144c77
-    3 {message digest}                                                                 9e327b3d6e523062afc1132d7df9d1b8
-    4 abcdefghijklmnopqrstuvwxyz                                                       fd2aa607f71dc8f510714922b371834e
-    5 abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq                         a1aa0689d0fafa2ddc22e88b49133a06
-    6 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789                   d1e959eb179c911faea4624c60c5c702
-    7 12345678901234567890123456789012345678901234567890123456789012345678901234567890 3f45ef194732c2dbb2c4a2c769795fa3
+    4 abcdefghijklmnopqrstuvwxyz
+    fd2aa607f71dc8f510714922b371834e
+
+    5 abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq
+    a1aa0689d0fafa2ddc22e88b49133a06
+
+    6 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
+    d1e959eb179c911faea4624c60c5c702
+
+    7 12345678901234567890123456789012345678901234567890123456789012345678901234567890
+    3f45ef194732c2dbb2c4a2c769795fa3
 } {
-    test ripemd128-2.$i {ripemd128} {
-	puts -nonewline [set ma [memchan]] $in
-	seek $ma 0
-
-	ripemd128  $ma [set mb [memchan]]
-	seek $mb 0
-
-	hex  -mode encode $mb [set mc [memchan]]
-	seek $mc 0
-
-	set res [read -nonewline $mc]
-
-	close $ma
-	close $mb
-	close $mc
-
-	set res
-    } [string toupper $out]	;#{}
+    if {[info tclversion] < 8.0} {
+	text ripemd128-4.$i-7.6 {ripemd128, immediate} {
+	    exec_md ripemd128 [text2hex $in]
+	} [string toupper $digest]
+    } else {
+	test ripemd128-4.$i-8.x {ripemd128, immediate} {
+	    hex -m e [ripemd128 $in]
+	} [string toupper $digest]
+    }
 }

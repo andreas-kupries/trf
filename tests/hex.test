@@ -20,144 +20,33 @@ set text_c	{hello  @ helloP}
 set text_hex	{68656C6C6F2020402068656C6C6F40}
 set text_hex_b	{68656c6c6f2020402068656c6c6f40}
 set text_hex_c	{68656c6c6f2020402068656c6c6f5}
-set wrong_hex	{68656c6c6f2020402068656c6c6k40}
-
-
-test hex-1.0 {hexadecimal representation, convert into} {
-    puts -nonewline [set ma [memchan]] $text
-    seek $ma 0
-
-    hex -mode encode $ma [set mb [memchan]]
-    seek $mb 0
-
-    set result [list [fconfigure $mb -length] [read -nonewline $mb]]
-
-    close $ma
-    close $mb
-
-    set result
-} [list 30 $text_hex]
-
-
-test hex-1.1 {hexadecimal representation, convert from} {
-    puts -nonewline [set ma [memchan]] $text_hex_b
-    seek $ma 0
-
-    hex -mode decode $ma [set mb [memchan]]
-    seek $mb 0
-
-    set result [list [fconfigure $mb -length] [read -nonewline $mb]]
-
-    close $ma
-    close $mb
-
-    set result
-} [list 15 $text]
 
 
 
-
-test hex-2.0 {hex argument errors} {
-    catch {hex} msg
-    set msg
-} {mode not defined}
-
-
-test hex-2.1 {hex argument errors} {
-    catch {hex -mode} msg
-    set msg
-} {hex: wrong # args}
-
-
-test hex-2.2 {hex argument errors} {
-    catch {hex -o x} msg
-    set msg
-} {unknown option '-o'}
-
-
-test hex-2.3 {hex argument errors} {
-    catch {hex -m x} msg
-    set msg
-} {unknown mode 'x'}
-
-
-test hex-2.4 {hex argument errors} {
-    catch {hex -m decode} msg
-    set msg
-} {hex: source, destination missing}
-
-
-test hex-2.5 {hex argument errors} {
-    catch {hex -m decode xx} msg
-    set msg
-} {hex: wrong # args}
-
-
-test hex-2.6 {hex argument errors} {
-    catch {hex -m decode xx zz} msg
-    set msg
-} {can not find channel named "xx"}
-
-
-test hex-2.7 {hex argument errors} {
-    set ma [open __xx w]
-    set mb [memchan]
-
-    catch {hex -m decode $ma $mb} msg
-
-    close $ma
-    close $mb
-
-    set msg
-} {hex: source-channel not readable}
-
-
-test hex-2.8 {hex argument errors} {
-    set ma [memchan]
-    set mb [open __xx r]
-
-    catch {hex -m decode $ma $mb} msg
-
-    close $ma
-    close $mb
-
-    set msg
-} {hex: destination-channel not writable}
-
-
-test hex-2.9 {hex argument errors} {
-    catch {hex -a x} msg
-    set msg
-} {can not find channel named "x"}
-
-
-test hex-3.0 {hex conversion errors} {
-    puts -nonewline [set ma [memchan]] $wrong_hex
-    seek $ma 0
-
-    catch {hex -mode decode $ma [set mb [memchan]]} msg
-
-    close $ma
-    close $mb
-
+test hex-2.0 {hex, conversion errors} {
+    catch {hex -mode decode 68656c6c6f2020402068656c6c6k40} msg
     set msg
 } {illegal character 'k' found in input}
 
 
-test hex-4.0 {hexadecimal representation, partial conversion} {
-    puts -nonewline [set ma [memchan]] $text_hex_c
-    seek $ma 0
+foreach {index string fullencode encode} {
+    1 {hello  @ hello@} 68656C6C6F2020402068656C6C6F40 68656C6C6F2020402068656C6C6F40
+    2 {hello  @ helloP} 68656C6C6F2020402068656C6C6F50 68656C6C6F2020402068656C6C6F5
+} {
+    test hex-3.$index {hex, encode string} {
+	hex -mode encode $string
+    } $fullencode	;#{}
 
-    hex -mode decode $ma [set mb [memchan]]
-    seek $mb 0
+    test hex-4.$index {hex, decode string} {
+	hex -mode decode $encode
+    } $string	;#{}
 
-    set result [list [fconfigure $mb -length] [read -nonewline $mb]]
+    # redundant tests following
+    test hex-5.$index {hex, encode/decode identity} {
+	hex -mode decode [hex -mode encode $string]
+    } $string	;#{}
 
-    close $ma
-    close $mb
-
-    set result
-} [list 15 $text_c]
-
-
-unset text text_c text_hex text_hex_b text_hex_c wrong_hex
+    test hex-6.$index {hex, decode/encode identity} {
+	hex -mode encode [hex -mode decode $fullencode]
+    } $fullencode	;#{}
+}

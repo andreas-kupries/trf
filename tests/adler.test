@@ -15,34 +15,16 @@
 if {[string compare test [info procs test]] == 1} then {source defs}
 
 
-test adler-1.0 {argument errors} {
-    catch {adler} msg
-    set msg
-} {adler: source, destination missing}
-
-
-test adler-1.1 {argument errors} {
-    catch {adler x} msg
-    set msg
-} {adler: wrong # args}
-
-
-
-test adler-2.0 {adler} {
-    puts -nonewline [set ma [memchan]] {hello world}
-    seek $ma 0
-
-    adler  $ma [set mb [memchan]]
-    seek $mb 0
-
-    hex  -mode encode $mb [set mc [memchan]]
-    seek $mc 0
-
-    set res [read -nonewline $mc]
-
-    close $ma
-    close $mb
-    close $mc
-
-    set res
-} {1A0B045D}
+foreach {i in digest} {
+    0 {hello world} 1A0B045D
+} {
+    if {[info tclversion] < 8.0} {
+	text adler-4.$i-7.6 {adler, immediate} {
+	    exec_md adler [text2hex $in]
+	} $digest
+    } else {
+	test adler-4.$i-8.x {adler, immediate} {
+	    hex -m e [adler $in]
+	} $digest
+    }
+}

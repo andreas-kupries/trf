@@ -15,48 +15,55 @@
 
 if {[string compare test [info procs test]] == 1} then {source defs}
 
-
-# (de) compress "hello, hello!"
-
-set text   "hello, hello!"
-set text_c "789CCB48CDC9C9D751C800518A0021700496"
-set text_h [text2hex $text]
-
-test zip-1.0 {compress} {
-
-    set in  [text2chan $text]
-    set out [memchan]
-
-    fconfigure   $out -translation binary
-    hex  -attach $out -mode encode
-
-    zip -mode compress $in $out
-
-    unstack $out
-    seek             $out 0
-    set data   [read $out]
-    close            $out
-    close $in
-
-    list $text_h $data
-} [list $text_h $text_c]
+set text                   "hello, hello!"
+set text_compressed_as_hex "789CCB48CDC9C9D751C800518A0021700496"
 
 
-test zip-1.1 {decompress} {
-    set in  [hex2chan $text_c]
-    set out [memchan]
+# differentiate tcl versions
+if {[info tclversion] < 8.0} {
+    # 7.6, use channels to transfer information, we have embedded \0s.
 
-    #    fconfigure   $out -translation binary
-    #    hex  -attach $out -mode decode
+    test zip-1.0-7.6 {zip compression} {
+	set in  [text2chan $text]
+	set out [memchan]
 
-seek $in 0
-    zip -mode decompress $in $out
+	fconfigure   $out -translation binary
+	hex  -attach $out -mode encode
 
-    #    unstack $out
-    seek             $out 0
-    set data   [read $out]
-    close            $out
-    close $in
+	zip -mode compress -in $in -out $out
 
-    set data
-} $text
+	unstack $out
+	seek             $out 0
+	set data   [read $out]
+	close            $out
+	close $in
+
+	set data
+    } $text_compressed_as_hex	; #{}
+
+    test zip-1.1-7.6 {zip decompression} {
+	set in  [hex2chan $text_compressed_as_hex]
+	set out [memchan]
+
+	seek $in 0
+	zip -mode decompress -in $in -out $out
+
+	seek             $out 0
+	set data   [read $out]
+	close            $out
+	close $in
+
+	set data
+    } $text	; #{}
+
+} else {
+    # 8.x is able to work with embedded \0s.
+
+    test zip-1.0-8.x {zip compression} {
+	hex -mode encode [zip -mode compress $text]
+    } $text_compressed_as_hex	; #{}
+
+    test zip-1.1-8.x {zip decompression} {
+	zip -mode decompress [hex -mode decode $text_compressed_as_hex]
+    } $text	; #{}
+}

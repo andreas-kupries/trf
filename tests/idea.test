@@ -143,146 +143,81 @@ defblock outE {
 }
 
 
-# test section --
+# -- test section --
 
-test idea-1.0 {argument errors} {
-    catch {idea} msg
-    set msg
-} {direction not specified}
+if {[info tclversion] < 8.0} {
+    test idea-2.0-7.6 {idea ecb encryption} {
+	exec_bc idea $keyA {} $in {-dir encrypt -key @key -mode ecb @in @out}
+    } [string toupper $outA] ; # {}
 
+    test idea-2.1-7.6 {idea ecb encryption} {
+	exec_bc idea $keyB {} $in {-dir encrypt -key @key -mode ecb @in @out}
+    } [string toupper $outB] ; # {}
 
-test idea-1.1 {argument errors} {
-    catch {idea x y} msg
-    set msg
-} {direction not specified}
+    test idea-3.0-7.6 {idea cbc encryption} {
+	exec_bc idea $keyA $iv $in {-dir encrypt -key @key -mode cbc -iv @iv @in @out}
+    } [string toupper $outC] ; # {}
 
+    test idea-3.1-7.6 {idea cbc decryption} {
+	exec_bc idea $keyA $iv $outC {-dir decrypt -key @key -mode cbc -iv @iv @in @out}
+    } [string toupper $in] ; # {}
 
-test idea-1.2 {argument errors} {
-    catch {idea -direction encrypt x} msg
-    set msg
-} {idea: wrong # args}
+    test idea-4.0-7.6 {idea cfb encryption} {
+	exec_bc idea $keyA $iv $in {-dir encrypt -key @key -mode cfb -shift 8 -iv @iv @in @out}
+    } [string toupper $outD] ; # {}
 
+    test idea-4.1-7.6 {idea cfb decryption} {
+	exec_bc idea $keyA $iv $outD {-dir decrypt -key @key -mode cfb -shift 8 -iv @iv @in @out}
+    } [string toupper $in] ; # {}
 
-test idea-1.3 {argument errors} {
-    catch {idea -direction encrypt -key x} msg
-    set msg
-} {can not find channel named "x"}
+    test idea-5.0-7.6 {idea ofb encryption} {
+	exec_bc idea $keyA $iv $in {-dir encrypt -key @key -mode ofb -shift 8 -iv @iv @in @out}
+    } [string toupper $outE] ; # {}
 
-
-test idea-1.4 {argument errors} {
-    catch {exec_bc idea {AA} {} {} {-dir encrypt -key @key}} msg
-    set msg
-} {key to short (< minimal keysize)}
-
-
-test idea-1.5 {argument errors} {
-    catch {exec_bc idea {00112233445566778899aabbccddeeff} {} {} {-dir encrypt -key @key}} msg
-    set msg
-} {mode not specified}
+    test idea-5.1-7.6 {idea ofb decryption} {
+	exec_bc idea $keyA $iv $outE {-dir decrypt -key @key -mode ofb -shift 8 -iv @iv @in @out}
+    } [string toupper $in] ; # {}
 
 
-test idea-1.6 {argument errors} {
-    catch {exec_bc idea $keyA {} {} {-dir encrypt -mode ecb -key @key}} msg
-    set msg
-} {idea: source, destination missing}
+} else {
+    foreach v {in outA outB outC outD outE keyA keyB iv} {
+	set b$v [hex -mode decode [set $v]]
+    }
 
+    test idea-2.0-8.x {idea ecb encryption} {
+	hex -m e [idea -dir encrypt -key $bkeyA -mode ecb $bin]
+    } [string toupper $outA] ; # {}
 
+    test idea-2.1-8.x {idea ecb encryption} {
+	hex -m e [idea -dir encrypt -key $bkeyB -mode ecb $bin]
+    } [string toupper $outB] ; # {}
 
-test idea-1.7 {argument errors} {
-    catch {exec_bc idea $keyA {} {} {-dir encrypt -key @key -mode cbc}} msg
-    set msg
-} {iv not specified for stream mode}
+    test idea-3.0-8.x {idea cbc encryption} {
+	hex -m e [idea -dir encrypt -key $bkeyA -mode cbc -iv $biv $bin]
+    } [string toupper $outC] ; # {}
 
+    test idea-3.1-8.x {idea cbc decryption} {
+	hex -m e [idea -dir decrypt -key $bkeyA -mode cbc -iv $biv $boutC]
+    } [string toupper $in] ; # {}
 
-test idea-1.8 {argument errors} {
-    catch {exec_bc idea $keyA {aa} {} {-dir encrypt -key  @key -iv @iv -mode cbc}} msg
-    set msg
-} {iv to short (< blocksize)}
+    test idea-4.0-8.x {idea cfb encryption} {
+	hex -m e [idea -dir encrypt -key $bkeyA -mode cfb -shift 8 -iv $biv $bin]
+    } [string toupper $outD] ; # {}
 
+    test idea-4.1-8.x {idea cfb decryption} {
+	hex -m e [idea -dir decrypt -key $bkeyA -mode cfb -shift 8 -iv $biv $boutD]
+    } [string toupper $in] ; # {}
 
-test idea-1.9 {argument errors} {
-    catch {exec_bc idea $keyA $iv {} {-dir encrypt -key @key -iv  @iv -mode cfb}} msg
-    set msg
-} {shift not specified for feedback mode}
+    test idea-5.0-8.x {idea ofb encryption} {
+	hex -m e [idea -dir encrypt -key $bkeyA -mode ofb -shift 8 -iv $biv $bin]
+    } [string toupper $outE] ; # {}
 
+    test idea-5.1-8.x {idea ofb decryption} {
+	hex -m e [idea -dir decrypt -key $bkeyA -mode ofb -shift 8 -iv $biv $boutE]
+    } [string toupper $in] ; # {}
 
-
-test idea-1.10 {argument errors} {
-    catch {exec_bc idea $keyA $iv {} {-dir encrypt -key @key -iv @iv -mode cfb -shift 0}} msg
-    set msg
-} {shift must be > 0}
-
-
-test idea-1.11 {argument errors} {
-    catch {exec_bc idea $keyA $iv {} {-dir encrypt -key @key -iv @iv -mode cfb -shift 3}} msg
-    set msg
-} {shift not a divisor of blocksize}
-
-
-test idea-1.12 {argument errors} {
-    catch {exec_bc idea $keyA $iv {} {-dir encrypt -key @key -iv @iv -mode cfb -shift 9}} msg
-    set msg
-} {shift to large (> blocksize)}
-
-
-
-test idea-2.0 {idea ecb encryption} {
-    exec_bc idea $keyA {} $in {-dir encrypt -key @key -mode ecb @in @out}
-} [string toupper $outA]
-
-
-test idea-2.1 {idea ecb encryption} {
-    exec_bc idea $keyB {} $in {-dir encrypt -key @key -mode ecb @in @out}
-} [string toupper $outB]
-
-
-
-test idea-3.0 {idea cbc encryption} {
-    exec_bc idea $keyA $iv $in {-dir encrypt -key @key -mode cbc -iv @iv @in @out}
-} [string toupper $outC]
-
-
-test idea-3.0a {idea cbc decryption} {
-    exec_bc idea $keyA $iv $outC {-dir decrypt -key @key -mode cbc -iv @iv @in @out}
-} [string toupper $in]
-
-
-test idea-3.1 {idea cbc encryption, interleaved} {
-    set dummy {interleaved cbc operation not available}
-} {interleaved cbc operation not available}
-
-
-test idea-4.0 {idea cfb encryption} {
-    exec_bc idea $keyA $iv $in {-dir encrypt -key @key -mode cfb -shift 8 -iv @iv @in @out}
-} [string toupper $outD]
-
-
-test idea-4.0a {idea cfb decryption} {
-    exec_bc idea $keyA $iv $outD {-dir decrypt -key @key -mode cfb -shift 8 -iv @iv @in @out}
-} [string toupper $in]
-
-
-test idea-4.1 {idea cfb encryption, interleaved} {
-    set dummy {interleaved cfb operation not available}
-} {interleaved cfb operation not available}
-
-
-test idea-5.0 {idea ofb encryption} {
-    exec_bc idea $keyA $iv $in {-dir encrypt -key @key -mode ofb -shift 8 -iv @iv @in @out}
-} [string toupper $outE]
-
-
-test idea-5.0a {idea ofb decryption} {
-    exec_bc idea $keyA $iv $outE {-dir decrypt -key @key -mode ofb -shift 8 -iv @iv @in @out}
-} [string toupper $in]
-
-
-test idea-5.1 {idea ofb encryption, interleaved} {
-    set dummy {interleaved ofb operation not available}
-} {interleaved ofb operation not available}
-
-
+}
 
 
 # remove globals
-unset  in outA outB outC outD outE keyA keyB dummy
+unset  in outA outB outC outD outE keyA keyB iv

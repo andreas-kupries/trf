@@ -15,6 +15,9 @@
 
 if {[string compare test [info procs test]] == 1} then {source defs}
 
+catch {unset in}
+catch {unset out}
+catch {unset key}
 
 array set key {
     1	0000000000000000
@@ -90,7 +93,6 @@ array set in {
     34	FFFFFFFFFFFFFFFF
 }
 
-
 array set out {
     1	8CA64DE9C1B123A7
     2	7359B2163E4EDC58
@@ -129,25 +131,31 @@ array set out {
 }
 
 
-foreach i [lsort [array names key]] {
+if {[info tclversion] < 8.0} {
+    foreach i [lsort [array names key]] {
+	test des-1.$i-7.6 {des encryption} {
+	    exec_bc des $key($i) {} $in($i) {-dir encrypt -mode ecb -key @key @in @out}
+	} $out($i) ; # {}
+    }
 
-    test des-1.$i {des encryption} {
-	exec_bc des $key($i) {} $in($i) {-dir encrypt -mode ecb -key @key @in @out}
-    } $out($i)
+    foreach i [lsort [array names key]] {
+	test des-2.$i-7.6 {des decryption} {
+	    exec_bc des $key($i) {} $out($i) {-dir decrypt -mode ecb -key @key @in @out}
+	} $in($i) ; # {}
+    }
+} else {
+    foreach i [lsort [array names key]] {
+	test des-1.$i-8.x {des encryption} {
+	    hex -m e [des -dir encrypt -mode ecb -key [hex -m d $key($i)] [hex -m d $in($i)]]
+	} $out($i) ; # {}
+    }
+
+    foreach i [lsort [array names key]] {
+	test des-2.$i-8.x {des decryption} {
+	    hex -m e [des -dir decrypt -mode ecb -key [hex -m d $key($i)] [hex -m d $out($i)]]
+	} $in($i) ; # {}
+    }
 }
-
-
-foreach i [lsort [array names key]] {
-
-    test des-2.$i {des decryption} {
-	exec_bc des $key($i) {} $out($i) {-dir decrypt -mode ecb -key @key @in @out}
-    } $in($i)
-}
-
-
-# test stream modes for DES
-
-
 
 # remove globals
 unset in out key

@@ -1,8 +1,8 @@
 # -*- tcl -*-
-# Commands covered:	DES (Data Encryption Standard)
+# Commands covered:	RC4
 #
 # This file contains a collection of tests for one or more of the commands
-# the BLOB-X extension. Sourcing this file into Tcl runs the
+# the Trf extension. Sourcing this file into Tcl runs the
 # tests and generates output for errors.  No output means no errors were
 # found.
 #
@@ -14,6 +14,11 @@
 # $Id$
 
 if {[string compare test [info procs test]] == 1} then {source defs}
+
+
+catch {unset key}
+catch {unset in}
+catch {unset out}
 
 
 array set key {
@@ -32,7 +37,6 @@ array set in {
     4	0101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101010101
 }
 
-
 array set out {
     0	75b7878099e0c596
     1	7494c2e7104b0879
@@ -42,21 +46,33 @@ array set out {
 }
 
 
-foreach i [lsort [array names key]] {
+if {[info tclversion] < 8.0} {
+    foreach i [lsort [array names key]] {
+	test rc4-1.$i {rc4 encryption} {
+	    exec_cipher rc4 $key($i) {} $in($i) {-dir encrypt -key @key @in @out}
+	} [string toupper $out($i)]; #{}
+    }
 
-    test rc4-1.$i {rc4 encryption} {
-	exec_bc rc4 $key($i) {} $in($i) {-dir encrypt -key @key @in @out}
-    } [string toupper $out($i)]
-}
+    foreach i [lsort [array names key]] {
+	test rc4-2.$i {rc4 decryption} {
+	    exec_cipher rc4 $key($i) {} $out($i) {-dir decrypt -key @key @in @out}
+	} [string toupper $in($i)]; # {}
+    }
+} else {
+    foreach i [lsort [array names key]] {
+	test rc4-1.$i {rc4 encryption} {
+	    hex -m e [rc4 -dir encrypt -key [hex -mode decode $key($i)] [hex -mode decode $in($i)]]
+	} [string toupper $out($i)]; #{}
+    }
 
-
-foreach i [lsort [array names key]] {
-
-    test rc4-2.$i {rc4 decryption} {
-	exec_bc rc4 $key($i) {} $out($i) {-dir decrypt -key @key @in @out}
-    } [string toupper $in($i)]
+    foreach i [lsort [array names key]] {
+	test rc4-2.$i {rc4 decryption} {
+	    hex -m e [rc4 -dir decrypt -key [hex -mode decode $key($i)] [hex -mode decode $out($i)]]
+	} [string toupper $in($i)]; # {}
+    }
 }
 
 
 # remove globals
-unset in out key
+catch {unset in out key}
+
