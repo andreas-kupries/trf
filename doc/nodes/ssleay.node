@@ -16,7 +16,8 @@ node trf_ssleay {
 
 	p "
 	The official homepage can be found at [sslhome]. A [ssleayfaq] is
-	available."
+	available. An alternative is the [url OpenSLL] project,	which took
+	the torch from Eric as he no longer works on SLLeay."
 
 	p "
 	[trf] requires a shared library version of [lib libcrypto]. Please

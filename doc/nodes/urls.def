@@ -37,6 +37,8 @@ url SSLeayLib [lib SSLeay] http://www.ssleay.org/
 url ssleayfaq FAQ          http://www.ssleay.org/faq.html
 url sslhome   http://www.ssleay.org/ http://www.ssleay.org/
 
+url OpenSSL   OpenSSL http://www.openssl.org/
+
 # -------------------------------------------------
 
 url zlib_home \
