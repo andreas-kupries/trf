@@ -495,6 +495,55 @@ AC_SUBST(SSL_LIB_DIR)
 
 AC_CACHE_VAL(trf_cv_SSL_LIB_DIR, [trf_cv_SSL_LIB_DIR="$SSL_LIB_DIR"])
 
+dnl ----------------------------------------------------------------
+dnl
+dnl Locate bz2 library
+dnl Searches:
+dnl	BZ2_LIB_DIR		(--with-bz2, --with-bz2-lib-dir)
+dnl	TCL_LIB_DIR		(--with-tcl, --with-tcl-lib-dir)
+dnl	$exec_prefix/lib	(--exec-prefix)
+dnl	$prefix/lib		(--prefix)
+dnl	/usr/local/bz2/lib
+dnl	/usr/local/lib
+dnl	/usr/lib
+dnl
+AC_CACHE_CHECK(for bz2 compressor library,
+	trf_cv_lib_BZ2_LIB_DIR,
+	[trf_cv_lib_BZ2_LIB_DIR=""
+	 places="$BZ2_LIB_DIR \
+	$TCL_LIB_DIR \
+	$exec_prefix/lib \
+	$prefix/lib \
+	/usr/local/bz2/lib \
+	/usr/local/lib \
+	/usr/lib \
+	/lib"
+    for dir in $places; do
+        if test -n "$trf_cv_lib_BZ2_LIB_DIR"; then
+            break
+        fi
+
+        for libsuff in .so ".so.*" .sl .a; do
+	    if test -n "$trf_cv_lib_BZ2_LIB_DIR"; then
+                    break
+            fi
+            if test -f $dir/libbz2$libsuff; then
+                trf_cv_lib_BZ2_LIB_DIR="$dir"
+		    BZ2_LIB_DIR="$dir"
+            fi
+        done
+    done])
+
+BZ2_LIB_DIR="$trf_cv_lib_BZ2_LIB_DIR"
+if test -z "$BZ2_LIB_DIR" ; then
+    AC_MSG_WARN(not found; use --with-bz2-lib-dir=path)
+else
+    TRF_TESTS="$TRF_TESTS hasBz"
+fi
+
+
+AC_SUBST(BZ2_LIB_DIR)
+AC_CACHE_VAL(trf_cv_BZ2_LIB_DIR, [trf_cv_BZ2_LIB_DIR="$BZ2_LIB_DIR"])
 
 
 dnl

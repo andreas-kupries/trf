@@ -6,6 +6,10 @@ Changes from 1.8 to 2.0
 	The old built facilities (unix, win) still exist and are
 	still usable.
 
+*	Added stubs, i.e. Trf now exports its own stub table. Thanks
+	to Jan Nijtmans for providing the basic changes to get me
+	started.
+
 *	Squashed the bug in the 'bzip' (de)compressor.
 
 *	Dropped support for Tcl 7.6.

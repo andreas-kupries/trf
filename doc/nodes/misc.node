@@ -11,6 +11,7 @@ node trf_misc {
 	trf_binio
 	trf_transform
 	trf_zip
+	trf_bz2
     }
 
     contents {
@@ -36,6 +37,10 @@ node trf_misc {
 
 	    defrow [anchor_name zip][cmd [link trf_zip]] {
 		p "A compressor based upon the [zlib]-library."
+	    }
+
+	    defrow [anchor_name bz2][cmd [link trf_bz2]] {
+		p "A compressor based upon the [bzlib]-library."
 	    }
 
 	    defrow [anchor_name unstack][cmd unstack] {

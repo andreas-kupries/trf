@@ -14,9 +14,9 @@ node trf_future {
 	    ## li	The tests are incomplete, expand them.
 	    ##	done
 
-	    li "Define a stub table for this extension.
-	    This will happen in version 2.1.
-	    "
+	    ##li "Define a stub table for this extension.
+	    ##This will happen in version 2.1.
+	    ##"
 
 	    li	"
 	    Implement a channel doing special framing after a fixed (but

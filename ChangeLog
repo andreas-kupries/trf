@@ -1,5 +1,8 @@
 Mon Sep 20 21:53:56 1999  Andreas Kupries  <a.kupries@westend.com>
 
+	* Added checks into 'configure' to search for the bz2 library. The
+	  corresponding tests are skipped if it is not available.
+
 	* Used his changes to win/Makefile.gnu as template for the changes
 	  to unix/Makefile.in, tea/Makefile.in and win/makefile.vc*. Had
 	  to change the configure.in's as well.

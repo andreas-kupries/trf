@@ -1,0 +1,40 @@
+# -*- tcl -*-
+# bz2 and bzlib
+
+node trf_bz2 {
+    title       "Trf: The bz2 command"
+    shortTitle  "bz2"
+    description "Trf commands: bz2"
+    parent      trf_misc
+
+    contents {
+	p "Options understood by ``bz2''are:"
+
+	table {
+	    defrow -mode {
+		p "
+		Allowed arguments are ``compress'', ``decompress'' and all
+		unique abbreviations of these."
+	    }
+
+	    defrow -level {
+		p "
+		Possible arguments are ``default'' and integer numbers in the
+		range 1 ... 9. It specifies the used compression level."
+	    }
+	}
+
+	hr
+
+	p "[anchor_name zlib]
+	This transformation uses the freely available [bzlib] compression
+	library to accomplish its task."
+
+	p "
+	The official homepage can be found at [bzlib_home]. A downloading page
+	is available there too."
+
+	p "
+	[trf] requires a shared library version of [bzlib]."
+    }
+}

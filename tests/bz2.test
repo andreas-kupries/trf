@@ -24,7 +24,7 @@ set text_compressed_as_hex "425A68393141592653592C546C72000003110060040244A00021
 if {[info tclversion] < 8.0} {
     # 7.6, use channels to transfer information, we have embedded \0s.
 
-    test bz2-1.0-7.6 {bz2 compression} {
+    test bz2-1.0-7.6 {bz2 compression} {hasBz} {
 	set in  [text2chan $text]
 	set out [memchan]
 
@@ -42,7 +42,7 @@ if {[info tclversion] < 8.0} {
 	set data
     } $text_compressed_as_hex	; #{}
 
-    test bz2-1.1-7.6 {bz2 decompression} {
+    test bz2-1.1-7.6 {bz2 decompression} {hasBz} {
 	set in  [hex2chan $text_compressed_as_hex]
 	set out [memchan]
 
@@ -60,11 +60,11 @@ if {[info tclversion] < 8.0} {
 } else {
     # 8.x is able to work with embedded \0s.
 
-    test bz2-1.0-8.x {bz2 compression} {
+    test bz2-1.0-8.x {bz2 compression} {hasBz} {
 	hex -mode encode [bz2 -mode compress $text]
     } $text_compressed_as_hex	; #{}
 
-    test bz2-1.1-8.x {bz2 decompression} {
+    test bz2-1.1-8.x {bz2 decompression} {hasBz} {
 	bz2 -mode decompress [hex -mode decode $text_compressed_as_hex]
     } $text	; #{}
 }
