@@ -1,3 +1,25 @@
+Wed Jul  9 20:40:20 1997  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/rot13.c): New cipher: rot. Just fore fun, not for strength.
+
+	* doc/man.tex (chapter {Copyrights}): Updated due to changes in
+	  the copyright of HAVAL. Added info about sabbatical leave in
+	  japan, and associated email address.
+
+	* generic/haval.c: updated.
+
+	* tests/haval.test: updated.
+
+	* generic/haval.1996/havalapp.h, haval.h, haval.c: Changes made to
+	  old haval added in here too. See January 5 and 13. Retained
+	  original files, with suffix '.orig'.
+
+	* generic/haval.1996/*: Added 1996 revision of HAVAL.
+
+	* tests/md2.test: New file, tests from RFC 1319 test suite.
+
+	* tests/md5.test: Added tests from RFC 1321 test suite.
+
 Mon Jul  7 18:14:43 1997  Andreas Kupries  <a.kupries@westend.com>
 
 	* doc/man.tex (chapter {Acknowledgements}): Update.
