@@ -45,8 +45,6 @@ MACHINE	= IX86
 # Comment the following line to compile with symbols
 NODEBUG=1
 
-# Comment out the following to use SSLeay for DES
-#LIBDES=-DLIBDES_LIB_NAME=\"crypto32.dll\"
 
 ######################################################################
 # Do not modify below this line
@@ -82,11 +80,14 @@ TRFOBJS = \
 	$(TMPDIR)\init.obj \
 	$(TMPDIR)\libdes.obj \
 	$(TMPDIR)\md5.obj \
+	$(TMPDIR)\md2.obj \
 	$(TMPDIR)\octcode.obj \
 	$(TMPDIR)\rc4.obj \
+	$(TMPDIR)\rc2.obj \
 	$(TMPDIR)\registry.obj \
 	$(TMPDIR)\rs_ecc.obj \
 	$(TMPDIR)\sha.obj \
+	$(TMPDIR)\sha1.obj \
 	$(TMPDIR)\unstack.obj \
 	$(TMPDIR)\util.obj \
 	$(TMPDIR)\uucode.obj \
