@@ -230,7 +230,7 @@ ClientData     clientData;
 			 ZLIB_VERSION, sizeof(z_stream));
 #endif
 
-  res = z.deflateInit2_ (&c->state, o->level, Z_DEFLATED,
+  res = zf.deflateInit2_ (&c->state, o->level, Z_DEFLATED,
 			 o->nowrap  ?
 			 -MAX_WBITS :
 			 MAX_WBITS,
@@ -606,7 +606,7 @@ ClientData     clientData;
 			 ZLIB_VERSION, sizeof (z_stream));
 #endif
 
-  res = z.inflateInit2_ (&c->state,
+  res = zf.inflateInit2_ (&c->state,
 			 o->nowrap  ?
 			 -MAX_WBITS :
 			 MAX_WBITS,
