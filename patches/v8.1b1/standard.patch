@@ -259,7 +259,7 @@
 +    *     representations, like ASCII.
 +    */
 + 
-+   chanPtr->encoding= Tcl_GetEncoding(interp,((Encoding*)pt->encoding)->name);
++   chanPtr->encoding=Tcl_GetEncoding(interp,Tcl_GetEncodingName(pt->encoding));
 +   chanPtr->inputEncodingState  = pt->inputEncodingState;
 +   chanPtr->inputEncodingFlags  = pt->inputEncodingFlags;
 +   chanPtr->outputEncodingState = pt->outputEncodingState;
