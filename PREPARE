@@ -100,6 +100,7 @@ mLatex2html \
 	-title-man     "Trf Manual" \
 	-title-install "Trf Installation manual" \
 	-up-man        "../../../software.html"  \
+	-up-title-man  "Software page" \
 	-nav           arrows \
 	-htmldir       html \
 	man.tex install.tex
