@@ -10,10 +10,11 @@
 \def\wish{\cmd {wish}}
 \def\cmd#1{{\tt #1}}
 \def\opt#1{{\tt #1}}
+\def\var#1{{\tt #1}}
 \def\man#1{{\tt #1}}
 \def\lib#1{{\tt #1}}
 \def\url#1{{\tt #1}}
-\def\tm{$^\mbox{(tm)}$}
+\def\tm{$^{\mbox{(tm)}}$}
 \def\ra{$\rightarrow$}
 \def\eq{$\equiv$}
 \def\dos{{\tt DOS}}
@@ -99,11 +100,11 @@ files from different subdirectories (\eq{} tcl versions)}.
 Now you have two choices.
 
 \begin {enumerate}
-\item	Copy the 4 files \file {tcl.h}, \file {tclIO.c}, \file
-	{configure.in} and \file {configure} to the appropriate
-	locations, as given in the table below\footnote {People using
-	\win{} should do this. They can safely ignore the files \file
-	{configure} and \file {configure.in}}
+\item	Copy the 4 files \file {tcl.h}, \file {tclIO.c}, \file {configure.in}
+	and \file {configure} to the appropriate locations, as given
+	in the table below\footnote {People using \win{} should do
+	this. They can safely ignore the files \file {configure} and \file
+	{configure.in}} 
 
 	\begin {tabular} {|l|l|} \hline
 	tcl.h		& tcl$<$version$>$/generic/tcl.h	\\ \hline
