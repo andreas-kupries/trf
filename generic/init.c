@@ -87,7 +87,7 @@ Tcl_Interp* interp;
     registry->patchIntegrated = 0;
 #endif
 
-#if GT81
+#if GT81 && defined(USE_TRF_STUBS)
 
     /* register extension as now available package */
     Tcl_PkgProvideEx (interp, "Trf", TRF_VERSION, (ClientData) &trfStubs);

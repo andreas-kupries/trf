@@ -291,15 +291,30 @@ static int
 MD_Check (interp)
 Tcl_Interp* interp;
 {
+#ifdef MD5_STATIC_BUILD
+  return TCL_OK;
+#else
   return TrfLoadMD5 (interp);
+#endif
 }
-
-#if 0
+
+/* Import the MD5 code in case of static linkage.
+ */
+#ifdef MD5_STATIC_BUILD
 /*
  * External code from here on.
  */
 
 #ifndef OTP
-#include "md5/md5.c" /* THREADING: import of one constant var, read-only => safe */
+#include "../md5-crypt/md5.c" /* THREADING: import of one constant var, read-only => safe */
 #endif
+
+md5Functions md5f = {
+  0,
+  md5_init_ctx,
+  md5_process_bytes,
+  md5_finish_ctx,
+  0, /* no crypt code! */
+};
+
 #endif

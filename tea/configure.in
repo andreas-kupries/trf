@@ -86,6 +86,8 @@ AC_C_BIGENDIAN
 # If not, sprintf is used, which is slower and requires more code.
 #--------------------------------------------------------------------
 
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(long int)
 AC_CHECK_FUNCS(ltoa)
 AC_CHECK_LIB(crypt, main,         HAS_LIBCRYPT=1,     HAS_LIBCRYPT=0)
 AC_CHECK_LIB(crypt, md5_init_ctx, HAS_LIBCRYPT_MD5=1, HAS_LIBCRYPT_MD5=0)
@@ -344,6 +346,8 @@ then
 	# (1)
 	MD5_LIB_FILE=libcrypt$TCL_SHLIB_SUFFIX
 	TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=\\\"libcrypt$TCL_SHLIB_SUFFIX\\\""
+
+	eval AC_DEFINE_UNQUOTED(CRYPT_LIB_NAME, "libcrypt$TCL_SHLIB_SUFFIX")
 else
 	# (2,3)
 	if test \( $HAS_LIBCRYPT_MD5 -eq 0 \)
@@ -353,6 +357,8 @@ else
 		TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=\\\"libmd5crypt$TCL_SHLIB_SUFFIX\\\""
 		LIBS="-lcrypt $LIBS"
 		SHLIB_LD_LIBS="-lcrypt $SHLIB_LD_LIBS"
+
+		eval AC_DEFINE_UNQUOTED(CRYPT_LIB_NAME, "libmd5crypt$TCL_SHLIB_SUFFIX")
 	fi
 fi
 

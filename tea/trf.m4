@@ -44,6 +44,10 @@ AC_ARG_ENABLE(static-bzlib,
 	[  --enable-static-bzlib         link 'bzlib' statically],
 	[STATIC_BZLIB=$enableval], [STATIC_BZLIB=no])
 
+AC_ARG_ENABLE(static-md5,
+	[  --enable-static-md5           link 'md5' statically],
+	[STATIC_MD5=$enableval], [STATIC_MD5=no])
+
 AC_ARG_ENABLE(trf_debug,
 	[  --enable-debug              enable debugging output],
 	[trf_debug=$enableval], [trf_debug=no])
@@ -344,6 +348,11 @@ fi
 if test "x$BZLIB_STATIC" = "xyes"
 then
 	eval AC_DEFINE_UNQUOTED(BZLIB_STATIC_BUILD, 1)
+fi
+
+if test "x$MD5_STATIC" = "xyes"
+then
+	eval AC_DEFINE_UNQUOTED(MD5_STATIC_BUILD, 1)
 fi
 
 if test "x$trf_debug" = "xyes"

@@ -1,3 +1,20 @@
+Fri Feb 25 17:27:47 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/registry.c (TransformImmeediate): Thomas Schwarze
+	  <schwarze@gfai.de> catched a little nasty memory leak. The block
+	  from lines 2512-2526 had a call to 'ResultClear' in one branch,
+	  but not the other, leaking memory the size of the result for
+	  each call to a trf command. Ouch. Fixed.
+
+	* generic/init.c (Trf_Init): Little bugfix for compilation of Trf
+	  as static library (line 90, +'&& defined(USE_TRF_STUBS)').
+
+	* generic/loadman.c, md5dig.c: See below. Base changes came from
+	  Jean-Claude Wippler <jcw@equi4.com>.
+
+	* tea/trf.m4, unix/configure.in: Added changes to allow static
+	  compilation of MD5 too.
+
 Mon Jan 24 12:46:11 2000  Andreas Kupries  <a.kupries@westend.com>
 
 	* -- Release 2.0p5 --

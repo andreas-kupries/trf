@@ -1,3 +1,12 @@
+Changes from 2.0p5 to 2.0p6
+
+*	Bugfixes
+
+	-	in the TEA configure related to md5-crypt (Sigh).
+	-	A memory leak.
+
+*	Better/more support for building Trf as static library.
+
 Changes from 2.0p4 to 2.0p5
 
 *	Bugfix in the TEA configure related to md5-crypt.
@@ -10,7 +19,7 @@ Changes from 2.0 to 2.0p3
 
 *	Fixed several small bugs.
 
-*	Fixed some annoying bugs related to the changes made to Md5.
+*	Fixed some annoying bugs related to the changes made to MD5.
 
 
 Changes from 1.8 to 2.0

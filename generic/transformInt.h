@@ -336,6 +336,12 @@ TrfBZ2Options _ANSI_ARGS_ ((void));
 #define WINAPI
 #endif
 
+#ifdef ZLIB_STATIC_BUILD
+#define ZEXPORT
+#else
+#define ZEXPORT WINAPI
+#endif
+
 /*
  * 'zlib' will be dynamically loaded. Following a structure to
  * contain the addresses of all functions required by this extension.
@@ -346,28 +352,28 @@ TrfBZ2Options _ANSI_ARGS_ ((void));
 
 typedef struct ZFunctions {
   VOID *handle;
-  int (WINAPI * deflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
-  int (WINAPI * deflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
+  int (ZEXPORT * deflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
+  int (ZEXPORT * deflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
 
-  int (WINAPI * deflateInit2_)     _ANSI_ARGS_ ((z_streamp strm, int level,
-						 int method, int windowBits,
-						 int memLevel, int strategy,
-						 CONST char *version,
+  int (ZEXPORT * deflateInit2_)     _ANSI_ARGS_ ((z_streamp strm, int level,
+						  int method, int windowBits,
+						  int memLevel, int strategy,
+						  CONST char *version,
 						 int stream_size));
-  int (WINAPI * deflateReset)      _ANSI_ARGS_ ((z_streamp strm));
-  int (WINAPI * inflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
-  int (WINAPI * inflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
-  int (WINAPI * inflateInit2_)     _ANSI_ARGS_ ((z_streamp strm,
-						 int windowBits,
-						 CONST char *version,
-						 int stream_size));
-  int (WINAPI * inflateReset)      _ANSI_ARGS_ ((z_streamp strm));
-  unsigned long (WINAPI * adler32) _ANSI_ARGS_ ((unsigned long adler,
-						 CONST unsigned char *buf,
-						 unsigned int len));
-  unsigned long (WINAPI * crc32)   _ANSI_ARGS_ ((unsigned long crc,
-						 CONST unsigned char *buf,
-						 unsigned int len));
+  int (ZEXPORT * deflateReset)      _ANSI_ARGS_ ((z_streamp strm));
+  int (ZEXPORT * inflate)           _ANSI_ARGS_ ((z_streamp strm, int flush));
+  int (ZEXPORT * inflateEnd)        _ANSI_ARGS_ ((z_streamp strm));
+  int (ZEXPORT * inflateInit2_)     _ANSI_ARGS_ ((z_streamp strm,
+						  int windowBits,
+						  CONST char *version,
+						  int stream_size));
+  int (ZEXPORT * inflateReset)      _ANSI_ARGS_ ((z_streamp strm));
+  unsigned long (ZEXPORT * adler32) _ANSI_ARGS_ ((unsigned long adler,
+						  CONST unsigned char *buf,
+						  unsigned int len));
+  unsigned long (ZEXPORT * crc32)   _ANSI_ARGS_ ((unsigned long crc,
+						  CONST unsigned char *buf,
+						  unsigned int len));
 } zFunctions;
 
 
@@ -384,23 +390,25 @@ TrfLoadZlib _ANSI_ARGS_ ((Tcl_Interp *interp));
  * They will fail, if the library could not be loaded.
  */
 
-#ifndef WINAPI
-#define WINAPI
+#ifdef BZLIB_STATIC_BUILD
+#define BZEXPORT
+#else
+#define BZEXPORT WINAPI
 #endif
 
 typedef struct BZFunctions {
   VOID *handle;
-  int (WINAPI * compress)           _ANSI_ARGS_ ((bz_stream* strm,
-						  int action));
-  int (WINAPI * compressEnd)        _ANSI_ARGS_ ((bz_stream* strm));
-  int (WINAPI * compressInit)       _ANSI_ARGS_ ((bz_stream* strm,
-						  int blockSize100k,
-						  int verbosity,
-						  int workFactor));
-  int (WINAPI * decompress)         _ANSI_ARGS_ ((bz_stream* strm));
-  int (WINAPI * decompressEnd)      _ANSI_ARGS_ ((bz_stream* strm));
-  int (WINAPI * decompressInit)     _ANSI_ARGS_ ((bz_stream* strm,
-						  int verbosity, int small));
+  int (BZEXPORT * compress)           _ANSI_ARGS_ ((bz_stream* strm,
+						    int action));
+  int (BZEXPORT * compressEnd)        _ANSI_ARGS_ ((bz_stream* strm));
+  int (BZEXPORT * compressInit)       _ANSI_ARGS_ ((bz_stream* strm,
+						    int blockSize100k,
+						    int verbosity,
+						    int workFactor));
+  int (BZEXPORT * decompress)         _ANSI_ARGS_ ((bz_stream* strm));
+  int (BZEXPORT * decompressEnd)      _ANSI_ARGS_ ((bz_stream* strm));
+  int (BZEXPORT * decompressInit)     _ANSI_ARGS_ ((bz_stream* strm,
+						    int verbosity, int small));
 } bzFunctions;
 
 

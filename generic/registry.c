@@ -2509,9 +2509,7 @@ Trf_Options        optInfo;
     /* Now write into interpreter result area.
      */
 
-    if (res != TCL_OK) {
-      ResultClear (&r);
-    } else {
+    if (res == TCL_OK) {
       Tcl_ResetResult (interp);
 
       if (r.buf != NULL) {
@@ -2525,6 +2523,7 @@ Trf_Options        optInfo;
 	Tcl_DecrRefCount (o);
       }
     }
+    ResultClear (&r);
   }
 
   DONE (TransformImmediate);
