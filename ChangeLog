@@ -1,8 +1,15 @@
 Fri Dec 10 18:32:48 1999  Andreas Kupries  <a.kupries@westend.com>
+	
+	* (tea|unix)/configure.in: Fixed problem with definition of
+	  CRYPT_LIB_NAME, reported by Tyler Riddle <triddle@iz-inc.com>.
+
+	* Backed out all of the changes below, they cause miscompilation
+	  here. Now the radical approach: Removed all gcc/libc
+	  dependencies from the code.
 
 	* md5-crypt/crypt.h: Now switchable between inclusion of
 	  features.h and trf_features.h. Switch based on infomration
-	  coming from the configure. See below.
+	  coming from the configure. See below. 
 
 	* md5-crypt/trf_features.h: The hacked 'features.h' under a new
 	  name, to avoid name clashes with an existing features.h
