@@ -1,18 +1,18 @@
 
 #----------------------------------------------------------------
-# This file is a Makefile for Trf @mFullVersion@ (as of @mDate@), usable for CygWin B20.1
+# This file is a Makefile for Trf 2.1p2 (as of AUG-26-2002), usable for CygWin B20.1
 # Donated by Jan Nijtmans <jan.nijtmans@cmg.nl> <nijtmans@wxs.nl>
 #----------------------------------------------------------------
 
 EXTENSION	= Trf
-VERSION		= @mFullVersion@
+VERSION		= 2.1p2
 #TCL_VERSION	= 81
 TCL_VERSION	= 82
 
-TRF_DLL_FILE	    = ${EXTENSION}@mShortDosVersion@.dll
-TRF_LIB_FILE	    = lib${EXTENSION}@mShortDosVersion@.a
-TRF_STATIC_LIB_FILE = lib${EXTENSION}@mShortDosVersion@s.a
-TRF_STUB_LIB_FILE   = lib${EXTENSION}stub@mShortDosVersion@.a
+TRF_DLL_FILE	    = ${EXTENSION}21.dll
+TRF_LIB_FILE	    = lib${EXTENSION}21.a
+TRF_STATIC_LIB_FILE = lib${EXTENSION}21s.a
+TRF_STUB_LIB_FILE   = lib${EXTENSION}stub21.a
 
 SSL_LIBRARY	= -DSSL_LIB_NAME=\"libeay32.dll\"
 BZ2_LIBRARY	= -DBZ2_LIB_NAME=\"bz2.dll\"

@@ -1,8 +1,8 @@
 
 		Tcl Data transformations (Tcl-Trf)
-		(Version @mFullVersion@ / @mDate@)
+		(Version 2.1p2 / AUG-26-2002)
 
-		Andreas Kupries	(a.kupries@westend.com)
+		Andreas Kupries	(andreas_kupries@users.sourceforge.net)
 
 This directory contains a freely distributable extension to Tcl/Tk called Tcl
 Data transformations (Tcl-Trf). The collection of provided transformation
@@ -81,7 +81,7 @@ documentation (file: doc/html/trf_compile.html).
 To report bugs, bug fixes, descriptions of interesting Tcl-Trf
 applications, and suggested improvements:
 
-+) Send email to a.kupries@westend.com
++) Send email to andreas_kupries@users.sourceforge.net
 
 or
 

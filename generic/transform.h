@@ -4,7 +4,7 @@
  *
  * transform.h - externally visible facilities of data transformers
  *
- * Distributed at @mDate@.
+ * Distributed at AUG-26-2002.
  *
  * Copyright (c) 1995 Andreas Kupries (a.kupries@westend.com)
  * All rights reserved.
@@ -40,9 +40,9 @@ extern "C" {
  */
 
 /*
-#define TRF_VERSION		"@mVersion@"
-#define TRF_MAJOR_VERSION	@mMajor@
-#define TRF_MINOR_VERSION	@mMinor@
+#define TRF_VERSION		"2.1"
+#define TRF_MAJOR_VERSION	2
+#define TRF_MINOR_VERSION	1
 */
 
 /*

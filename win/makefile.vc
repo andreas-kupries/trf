@@ -1,5 +1,5 @@
 # **************************************************************************
-# Visual C++ 2.x, 4.0, 5.0 and 6.0 makefile for Trf @mFullVersion@ (@mDate@)
+# Visual C++ 2.x, 4.0, 5.0 and 6.0 makefile for Trf 2.1p2 (AUG-26-2002)
 #
 # See the file "doc/license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -16,8 +16,8 @@
 #
 # **************************************************************************
 
-VERSION		= "@mFullVersion@"
-SHORTVERSION	= "@mShortDosVersion@"
+VERSION		= "2.1p2"
+SHORTVERSION	= "21"
 
 # =======================================================================
 # Specify the root directory of the source distribution of this extension

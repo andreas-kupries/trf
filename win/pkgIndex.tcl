@@ -1,6 +1,6 @@
 # Tcl package index file, version 1.0
 #
-# Window package index for Trf @mFullVersion@ (as of @mDate@)
+# Window package index for Trf 2.1p2 (as of AUG-26-2002)
 #
 
 proc trfifneeded dir {
@@ -10,6 +10,6 @@ proc trfifneeded dir {
     } else {
 	regsub {\.} [info tclversion] {} version
     }
-    package ifneeded Trf @mVersion@ "load [list [file join $dir trf@mShortDosVersion@$version.dll]] Trf"
+    package ifneeded Trf 2.1 "load [list [file join $dir trf21$version.dll]] Trf"
 }
 trfifneeded $dir

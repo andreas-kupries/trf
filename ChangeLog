@@ -1,4 +1,9 @@
-2001-08-18  Tcl Project  <andreask@activestate.com>
+2002-08-26  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
+
+	* Big cleanup and restructuring in prepration of moving this CVS
+	  to SourceForge.
+
+2001-08-18  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/transformInt.h: Added definitions for
 	  "Tcl_GetTopChannel" for use by cores older than 8.3.2. See bug
@@ -15,7 +20,7 @@
 	  (reflect.c) for a similar fix. This one is thanks to Adrian
 	  Koren <adrian@synchronicity.com>.
 
-2001-03-27  Tcl Project  <a.kupries@westend.com>
+2001-03-27  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* PREPARE: Moves contents of subdirectory 'tea' into main
 	  directory, they are the main build chain now.
@@ -35,13 +40,13 @@
 	* generic/transform.h:
 	* generic/transformInt.h: Changed BUILD_trf to BUILD_Trf
 
-Sun Nov 26 16:53:24 2000  Andreas Kupries  <a.kupries@westend.com>
+Sun Nov 26 16:53:24 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* --- Release of 2.1p1 ---
 
 	* Removed binary distributions from CVS.
 
-Sat Nov 18 17:55:01 2000  Andreas Kupries  <a.kupries@westend.com>
+Sat Nov 18 17:55:01 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tea.tests/common_all.test: 
 	* tea.tests/common_conv.test: 
@@ -63,7 +68,7 @@ Sat Nov 18 17:55:01 2000  Andreas Kupries  <a.kupries@westend.com>
 	* generic/crypt.c (TrfCryptObjCmd): Added #ifdef to deactivate
 	  crypt when compiled on or for Windows.
 
-Sat Nov 11 13:14:05 2000  Andreas Kupries  <a.kupries@westend.com>
+Sat Nov 11 13:14:05 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/zip.c: Added 'MaxRead' vector to restrict the number of
  	  read characters to at most one (decompressor only). This will
@@ -78,7 +83,7 @@ Sat Nov 11 13:14:05 2000  Andreas Kupries  <a.kupries@westend.com>
  	  again (= higher performance), while also getting the problem
  	  solved. Will have to write a TIP for this.
 
-Wed Oct  4 20:44:40 2000  Andreas Kupries  <a.kupries@westend.com>
+Wed Oct  4 20:44:40 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tools/fixhbline:
 	* tools/findinpath: Fixed problem with tool combo when an
@@ -86,7 +91,7 @@ Wed Oct  4 20:44:40 2000  Andreas Kupries  <a.kupries@westend.com>
  	  must not stop the installation, only 'fixhbline' is able to
  	  decide which of the two interp-apps will be required.
 
-Wed Aug  9 20:52:41 2000  Andreas Kupries  <a.kupries@westend.com>
+Wed Aug  9 20:52:41 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* -- Released 2.1 --
 
@@ -106,19 +111,19 @@ Wed Aug  9 20:52:41 2000  Andreas Kupries  <a.kupries@westend.com>
 	            Y |abcd|
 	            +X-----+
 
-Tue Aug  8 00:19:26 2000  Andreas Kupries  <a.kupries@westend.com>
+Tue Aug  8 00:19:26 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c: Consolidation complete to the point that Trf
 	  compiles against 8.0.5, 8.1.1, 8.2.3 and 8.3.2 without warnings
 	  (-Wall active).
 
-Tue Aug  1 20:08:08 2000  Andreas Kupries  <a.kupries@westend.com>
+Tue Aug  1 20:08:08 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c: Consolidation. Started to merge patch for
  	  8.3.2 and higher into the codebase, should work from 8.0.x to
  	  8.3.2+.
 
-Sat Jul 29 00:53:24 2000  Andreas Kupries  <a.kupries@westend.com>
+Sat Jul 29 00:53:24 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/adler.c:
 	* generic/crc.c:
@@ -138,7 +143,7 @@ Sat Jul 29 00:53:24 2000  Andreas Kupries  <a.kupries@westend.com>
 	* generic/md5dig.c:
 	* generic/crypt.c: Removed unneeded header references.
 
-Tue Jun 20 20:49:05 2000  Andreas Kupries  <a.kupries@westend.com>
+Tue Jun 20 20:49:05 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* md5-crypt/trf_crypt.h: Changed __const to CONST. Thanks to
 	  Robert Karen <robert@namsb.namsi.com>.
@@ -147,7 +152,7 @@ Tue Jun 20 20:49:05 2000  Andreas Kupries  <a.kupries@westend.com>
 	  (transmit_down). <Oliver.Stephens@arm.com> spotted that I didn't
 	  make use of Tcl_ByteArrays in case of 8.1 or higher.
 
-Sun May 28 19:25:52 2000  Andreas Kupries  <a.kupries@westend.com>
+Sun May 28 19:25:52 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* win/makefile.vc5 (TRF_DEFINES): Added missing -DTRF_VERSION.
 
@@ -155,7 +160,7 @@ Sun May 28 19:25:52 2000  Andreas Kupries  <a.kupries@westend.com>
 	  about unsigned long to unsigned char assignement. The operations
 	  causing them are ok.
 
-Sat Apr 29 00:14:23 2000  Andreas Kupries  <a.kupries@westend.com>
+Sat Apr 29 00:14:23 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* -- Release 2.0p7 --
 
@@ -164,38 +169,38 @@ Sat Apr 29 00:14:23 2000  Andreas Kupries  <a.kupries@westend.com>
 	  <dnew@san.rr.com> fixing a buffer overun in
 	  quoted_printable. Fixed nagging from purify too.
 
-Tue Apr 18 19:01:27 2000  Andreas Kupries  <a.kupries@westend.com>
+Tue Apr 18 19:01:27 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tea/tcl.m4:
 	* tea/configure.in: Accepted patch from Jan Nijtmans to enable
  	  usage of tea build with mingw32 environment on Win.
 
-Wed Mar 22 19:48:30 2000  Andreas Kupries  <a.kupries@westend.com>
+Wed Mar 22 19:48:30 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/init.c (Trf_Init, line 90): Removed '&&
 	  defined(USE_TRF_STUBS)', see Feb 25, as it messes up package
 	  initialization for normal compilation (Trfcrypt thinks 'This
 	  implementation of trf does not support stubs', uh).
 
-Tue Mar 21 21:22:06 2000  Andreas Kupries  <a.kupries@westend.com>
+Tue Mar 21 21:22:06 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* unix/Makefile.in (genstubs): Fixed usage of wrong variable
 	  (tools -> tool), with thanks to Oisin Grehan <oisin@online.ie>.
 
-Wed Mar 15 22:57:48 2000  Andreas Kupries  <a.kupries@westend.com>
+Wed Mar 15 22:57:48 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/reflect.c (Clear(En/De)coder): Darren New
 	  <dnew@san.rr.com> pointed out that ClearEncoder and -Decoder use
 	  strings which do not match the docs (clear_read instead of
 	  clear/write). Fixed that.
 
-Sat Mar 11 13:24:33 2000  Andreas Kupries  <a.kupries@westend.com>
+Sat Mar 11 13:24:33 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/nodes/md.node: Added reference to 'TclAH', another extension
 	  providing message digests (a.k.a. authentication hashes). Author
 	  is Greg Retkowski <greg@rage.net>.
 
-Fri Feb 25 17:27:47 2000  Andreas Kupries  <a.kupries@westend.com>
+Fri Feb 25 17:27:47 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* -- Release 2.0p6 --
 
@@ -215,7 +220,7 @@ Fri Feb 25 17:27:47 2000  Andreas Kupries  <a.kupries@westend.com>
  	* unix/configure.in: Added changes to allow static compilation of
  	  MD5 too.
 
-Mon Jan 24 12:46:11 2000  Andreas Kupries  <a.kupries@westend.com>
+Mon Jan 24 12:46:11 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* -- Release 2.0p5 --
 
@@ -224,7 +229,7 @@ Mon Jan 24 12:46:11 2000  Andreas Kupries  <a.kupries@westend.com>
 	  the equivalent problem as described on 'Wed Dec 15', but for TEA
 	  this time.
 
-Sat Jan 15 00:30:22 2000  Andreas Kupries  <a.kupries@westend.com>
+Sat Jan 15 00:30:22 2000  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/crypt.c (Trf[Md5]CryptObjCmd): Fixed argument
 	  checks. Reported by Patrick D'Cruze <pdcruze@orac.iinet.net.au>.
@@ -235,7 +240,7 @@ Sat Jan 15 00:30:22 2000  Andreas Kupries  <a.kupries@westend.com>
 	* Released 2.0p4 without announcement so that JCW can use it for
 	  his static builds of TclKit.
 
-Wed Dec 15 19:27:01 1999  Andreas Kupries  <a.kupries@westend.com>
+Wed Dec 15 19:27:01 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* -- Release 2.0p3 --
 
@@ -245,11 +250,11 @@ Wed Dec 15 19:27:01 1999  Andreas Kupries  <a.kupries@westend.com>
 	  provided the configure and Make logs which allowed me to track
 	  this in detail.
 
-Mon Dec 13 20:08:07 1999  Andreas Kupries  <a.kupries@westend.com>
+Mon Dec 13 20:08:07 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* -- Release 2.0p2 --
 
-Fri Dec 10 18:32:48 1999  Andreas Kupries  <a.kupries@westend.com>
+Fri Dec 10 18:32:48 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 	
 	* tea/configure.in:
 	* unix/configure.in: Fixed problem with definition of
@@ -273,7 +278,7 @@ Fri Dec 10 18:32:48 1999  Andreas Kupries  <a.kupries@westend.com>
  	  present. Required to get both the real 'crypt' and the 'md5
  	  crypt'.
 
-Wed Dec  1 21:07:57 1999  Andreas Kupries  <a.kupries@westend.com>
+Wed Dec  1 21:07:57 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tea/configure.in (MD5_LIB_FILE):
 	* unix/configure.in (MD5_LIB_FILE): Added check to differentiate
@@ -281,13 +286,13 @@ Wed Dec  1 21:07:57 1999  Andreas Kupries  <a.kupries@westend.com>
  	  functionality. Solaris f.e. has a libcrypt without md5 and we
  	  have to make sure that our version does not clash with it.
 
-Mon Nov 29 22:12:34 1999  Andreas Kupries  <a.kupries@westend.com>
+Mon Nov 29 22:12:34 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/digest.c (WriteDigest): Mikhail Teterin noticed that I
 	  had bungled access to array elements. Added TCL_PARSE_PART1 to
 	  the flags of Tcl_ObjSetVar2 to rectify this.
 
-Thu Nov 25 22:14:28 1999  Andreas Kupries  <a.kupries@westend.com>
+Thu Nov 25 22:14:28 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c (TrfClose): Added patch suggested by Mikhail
  	  Teterin <mi@aldan.algebra.com> to avoid a crash of the
@@ -299,12 +304,12 @@ Thu Nov 25 22:14:28 1999  Andreas Kupries  <a.kupries@westend.com>
 	* unix/Makefile.in (install-lib): Added '-' to avoid stop on error
 	  if compiled against 8.0, i.e. without stubs.
 
-Fri Nov 12 18:02:17 1999  Andreas Kupries  <a.kupries@westend.com>
+Fri Nov 12 18:02:17 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tea/configure.in: Added forgotten check for endianess to the TEA
 	  configure. 
 
-Tue Nov  9 22:19:55 1999  Andreas Kupries  <a.kupries@westend.com>
+Tue Nov  9 22:19:55 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* PREPARE: Added generation of 'news' page from ChangeLog.short.
 
@@ -313,7 +318,7 @@ Tue Nov  9 22:19:55 1999  Andreas Kupries  <a.kupries@westend.com>
 	* md5-crypt/crypt.h: Moved structure out of the conditional
 	  (__USE_GNU). 
 
-Mon Nov  8 20:43:24 1999  Andreas Kupries  <a.kupries@westend.com>
+Mon Nov  8 20:43:24 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* ------ 2.0 re-release ------
 	
@@ -323,7 +328,7 @@ Mon Nov  8 20:43:24 1999  Andreas Kupries  <a.kupries@westend.com>
 	  Got a new binary distribution of 2.0 as well, usable for
 	  tcl 8.0. and 8.1.x.
 
-Wed Oct 27 21:05:07 1999  Andreas Kupries  <a.kupries@westend.com>
+Wed Oct 27 21:05:07 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tests/common_seek.test/transform.test: Slight differences for
 	  8.0. 
@@ -332,7 +337,7 @@ Wed Oct 27 21:05:07 1999  Andreas Kupries  <a.kupries@westend.com>
 	  specific code. Added code for 8.0 too. GT81 used to
 	  differentiate.
 
-Mon Oct 25 22:10:01 1999  Andreas Kupries  <a.kupries@westend.com>
+Mon Oct 25 22:10:01 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* ------ 2.0 released ------
 
@@ -345,7 +350,7 @@ Mon Oct 25 22:10:01 1999  Andreas Kupries  <a.kupries@westend.com>
 	  a Z_BUF_ERROR from bothering me. The new code is the official
 	  sanctioned way of making it work (Additional dummy input byte).
 
-Sat Oct 23 00:54:38 1999  Andreas Kupries  <a.kupries@westend.com>
+Sat Oct 23 00:54:38 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tea.tests/transform_bb.test: Adapted traces to changed behaviour
 	  (query/maxRead, query/ratio).
@@ -356,7 +361,7 @@ Sat Oct 23 00:54:38 1999  Andreas Kupries  <a.kupries@westend.com>
 	  trashing the free obj management. gIOt has the same
 	  problem. Corrected there too now.
 
-Fri Oct 22 23:20:34 1999  Andreas Kupries  <a.kupries@westend.com>
+Fri Oct 22 23:20:34 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/*.c: Added NULL initializer for MaxRead to all
 	  Trf_Typedefinitions flying around.
@@ -375,7 +380,7 @@ Fri Oct 22 23:20:34 1999  Andreas Kupries  <a.kupries@westend.com>
 	  'Trf_SeekQueryOptions'.
 	  (Trf_QueryMaxRead): Added this vector to 'Trf_Vectors'. Nullable.
 
-Thu Oct 21 00:25:23 1999  Andreas Kupries  <a.kupries@westend.com>
+Thu Oct 21 00:25:23 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/nodes/zip.node: Added documentation -nowrap.
 
@@ -402,7 +407,7 @@ Thu Oct 21 00:25:23 1999  Andreas Kupries  <a.kupries@westend.com>
 	* generic/transformInt.h: Finally applied the nowrap patch sent in
 	  by Jan Nijtmans quite some time ago (June 26, 1999).
 
-Tue Oct 19 21:41:26 1999  Andreas Kupries  <a.kupries@westend.com>
+Tue Oct 19 21:41:26 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/init.c: Added registration of the two new commands.
 
@@ -410,7 +415,7 @@ Tue Oct 19 21:41:26 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/crypt.c: New file, implements 'crypt' and 'md5crypt'.
 
-Sat Oct 16 00:55:39 1999  Andreas Kupries  <a.kupries@westend.com>
+Sat Oct 16 00:55:39 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* Worked on the MD5 binding in the last days, using md5-crypt now,
  	  coming from glibc (is under LGPL). MD5 shared liib now loaded on
@@ -418,7 +423,7 @@ Sat Oct 16 00:55:39 1999  Andreas Kupries  <a.kupries@westend.com>
  	  libcrypt containing MD5. If none, the code we carry around (see
 	  md5-crypt) is compiled.
 
-Mon Oct 11 18:48:49 1999  Andreas Kupries  <a.kupries@westend.com>
+Mon Oct 11 18:48:49 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tea.tests/common_seek.test: Did the same for the tea test suite.
 
@@ -436,19 +441,19 @@ Mon Oct 11 18:48:49 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* tea.tests/common_all.test: Added test for -in, -out.
 
-Sun Oct 10 21:14:39 1999  Andreas Kupries  <a.kupries@westend.com>
+Sun Oct 10 21:14:39 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c (PutDestinationImm): New, variant of
 	  'PutDestination', specialized for writing into a channel during
 	  an immediate transform. Now necessary, after changing the call
 	  to 'PutDestination' in 'AttachTransform' (clientData).
 
-Sat Oct  9 13:20:58 1999  Andreas Kupries  <a.kupries@westend.com>
+Sat Oct  9 13:20:58 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* Added more tests yesterday. Decided to pack the current state
 	  into a pre-release.
 
-Thu Oct  7 22:56:36 1999  Andreas Kupries  <a.kupries@westend.com>
+Thu Oct  7 22:56:36 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c (TrfGetOption): Fixed some minor problems in
  	  this procedure revealed by the first bunch of tests.
@@ -463,7 +468,7 @@ Thu Oct  7 22:56:36 1999  Andreas Kupries  <a.kupries@westend.com>
 	* generic/registry.c (TrfSeek): Changed code to check new location
  	  for 'modulo numBytesTransform == 0' instead of the offset.
 
-Wed Oct  6 23:22:19 1999  Andreas Kupries  <a.kupries@westend.com>
+Wed Oct  6 23:22:19 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* Next steps no 1 (see below) now done.
 
@@ -473,7 +478,7 @@ Wed Oct  6 23:22:19 1999  Andreas Kupries  <a.kupries@westend.com>
 	* doc/nodes/seek.node: Worked on the documentation of the new
 	  behaviour. Actually started on that yesterday.
 
-Sun Oct  3 01:39:02 1999  Andreas Kupries  <a.kupries@westend.com>
+Sun Oct  3 01:39:02 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/bincode.c,
  	* generic/octcode.c:
@@ -526,7 +531,7 @@ Sun Oct  3 01:39:02 1999  Andreas Kupries  <a.kupries@westend.com>
 	  Result... procedures, if possible (state reference !=
 	  NULL). Some other code simplified.
 
-Sat Oct  2 01:10:21 1999  Andreas Kupries  <a.kupries@westend.com>
+Sat Oct  2 01:10:21 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c (TrfInput): Added new seek handling code.
 	  (SeekDump): New procedure for debugging the seek handling.
@@ -550,7 +555,7 @@ Sat Oct  2 01:10:21 1999  Andreas Kupries  <a.kupries@westend.com>
 	  state.
 	  (AttachTransform): Initialization of seek added.
 
-Fri Oct  1 22:12:24 1999  Andreas Kupries  <a.kupries@westend.com>
+Fri Oct  1 22:12:24 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c: Added runtime configuration and state to the
 	  state structure of a transformation channel.
@@ -562,14 +567,14 @@ Fri Oct  1 22:12:24 1999  Andreas Kupries  <a.kupries@westend.com>
 	  polynomials or other functions. Changed all places already using
 	  the vector (initializations).
 
-Thu Sep 30 22:10:39 1999  Andreas Kupries  <a.kupries@westend.com>
+Thu Sep 30 22:10:39 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c: Copied the procedures operating on the
 	  result buffer from giot. They made the procedures having to deal
 	  with it before much simpler. And easier to read. Especially
 	  'TrfInput'.
 
-Tue Sep 28 22:39:48 1999  Andreas Kupries  <a.kupries@westend.com>
+Tue Sep 28 22:39:48 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c: Added information about chosen/used seek
 	  policy, seek transformations, etc. to transformation instances
@@ -582,7 +587,7 @@ Tue Sep 28 22:39:48 1999  Andreas Kupries  <a.kupries@westend.com>
 	  bz2.c, bincode.c, b64code.c, asc85code.c
 	  Initialized with NULL == 'unseekable', for now.
 
-Mon Sep 27 21:15:50 1999  Andreas Kupries  <a.kupries@westend.com>
+Mon Sep 27 21:15:50 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/transform.h: Added 'Trf_SeekTransformation'
 	  interface. Added vector to 'Trf_TypeDefinition' using it.
@@ -596,7 +601,7 @@ Mon Sep 27 21:15:50 1999  Andreas Kupries  <a.kupries@westend.com>
 	  Reported by Stefan Studer <studer@glue.ch> while trying the
 	  unofficial distribution.
 
-Sat Sep 25 20:24:12 1999  Andreas Kupries  <a.kupries@westend.com>
+Sat Sep 25 20:24:12 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/nodes/: Upgraded the documentation a bit.
 
@@ -605,7 +610,7 @@ Sat Sep 25 20:24:12 1999  Andreas Kupries  <a.kupries@westend.com>
 	  will be done too. Seek handling will be reworked, so state is
 	  not RSN anymore, but ASAP, or 'without date'.
 
-Wed Sep 22 22:35:38 1999  Andreas Kupries  <a.kupries@westend.com>
+Wed Sep 22 22:35:38 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* --- Version 2.0 ready for release ---
 
@@ -615,12 +620,12 @@ Wed Sep 22 22:35:38 1999  Andreas Kupries  <a.kupries@westend.com>
 	* generic/sha/sha.h: Protected BYTE typedef, BYTE is defined as
 	  macro on Windows platforms. Sent in by Jan Nijtmans.
 
-Tue Sep 21 20:10:37 1999  Andreas Kupries  <a.kupries@westend.com>
+Tue Sep 21 20:10:37 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/trf.decls: Extended the stub table to cover all public
 	  procedures. 
 
-Mon Sep 20 21:53:56 1999  Andreas Kupries  <a.kupries@westend.com>
+Mon Sep 20 21:53:56 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* Added checks into 'configure' to search for the bz2 library. The
 	  corresponding tests are skipped if it is not available.
@@ -633,7 +638,7 @@ Mon Sep 20 21:53:56 1999  Andreas Kupries  <a.kupries@westend.com>
 	  it export its own stub table, for usage by extensions like
 	  TrfCrypt.
 
-Sun Sep 19 01:29:23 1999  Andreas Kupries  <a.kupries@westend.com>
+Sun Sep 19 01:29:23 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/zip_opt.c,
  	* generic/registry.c,
@@ -657,11 +662,11 @@ Sun Sep 19 01:29:23 1999  Andreas Kupries  <a.kupries@westend.com>
 	* Worked on a TEA compliant build chain (since yesterday
 	  evening). Now complete.
 
-Tue Sep 14 23:07:50 1999  Andreas Kupries  <a.kupries@westend.com>
+Tue Sep 14 23:07:50 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* Applied patch sent in by Jan Nijtmans.
 
-Fri Sep 10 21:10:55 1999  Andreas Kupries  <a.kupries@westend.com>
+Fri Sep 10 21:10:55 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/nodes/intro.node:
 	* doc/nodes/install.node:
@@ -669,13 +674,13 @@ Fri Sep 10 21:10:55 1999  Andreas Kupries  <a.kupries@westend.com>
 	* doc/nodes/future.node: Updated to include information about Tcl
  	  8.2 and its integration of the Trf patch.
 
-Thu Sep  2 21:23:21 1999  Andreas Kupries  <a.kupries@westend.com>
+Thu Sep  2 21:23:21 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/nodes/md.node: Added reference to Bruce Adams
  	  <brucea@cybernetics.demon.co.uk> Md5 extension at
  	  http:///www.cybernetics.demon.co.uk/projects/md5/md5.html
 
-Sat Jul 17 18:10:28 1999  Andreas Kupries  <a.kupries@westend.com>
+Sat Jul 17 18:10:28 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/reflect.c: Changed to use a byte-array for the buffer
 	  argument in case of compilation against 8.1 or higher.
@@ -683,7 +688,7 @@ Sat Jul 17 18:10:28 1999  Andreas Kupries  <a.kupries@westend.com>
 	* generic/registry.c: Finalized adaption to 8.2, and the runtime
 	  switching too.
 
-Tue Jul 13 18:40:44 1999  Andreas Kupries  <a.kupries@westend.com>
+Tue Jul 13 18:40:44 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c: Changed the registry from a hashtable to a
 	  real structure (containing the old hashtable and some more),
@@ -720,7 +725,7 @@ Tue Jul 13 18:40:44 1999  Andreas Kupries  <a.kupries@westend.com>
 	* generic/qpcode.c: More corrections from Marshall Rose,
 	  quoted-printable this time.
 
-Fri Jul  9 16:51:14 1999  Andreas Kupries  <a.kupries@westend.com>
+Fri Jul  9 16:51:14 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tests/base64.test: Adapted to changes in 'base64'.
 
@@ -735,13 +740,13 @@ Fri Jul  9 16:51:14 1999  Andreas Kupries  <a.kupries@westend.com>
 	* Marshall sent some corrections to his new transform
 	  ('quoted-printable') and to his changes to 'base64'.
 
-Tue Jul  6 20:01:49 1999  Andreas Kupries  <a.kupries@westend.com>
+Tue Jul  6 20:01:49 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/b64code.c: Accepted change from Marshall Rose inserting
 	  a newline after every 76 characters. This makes the encoder MIME
 	  compliant. Newlines in the input are ignored.
 
-Mon Jul  5 23:21:34 1999  Andreas Kupries  <a.kupries@westend.com>
+Mon Jul  5 23:21:34 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/nodes/conv.node: See below.
 
@@ -756,7 +761,7 @@ Mon Jul  5 23:21:34 1999  Andreas Kupries  <a.kupries@westend.com>
  	  one of the encodings for mail and news, as defined by MIME (RFC
  	  2045).
 
-Tue Jun 29 21:20:23 1999  Andreas Kupries  <a.kupries@westend.com>
+Tue Jun 29 21:20:23 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* unix/configure.in: Extended the code to deal with the upcoming
 	  Tcl 8.2.
@@ -767,14 +772,14 @@ Tue Jun 29 21:20:23 1999  Andreas Kupries  <a.kupries@westend.com>
 	  using the compat header could do nasty things. Got a new DLL
 	  too, making the Windows binary distribution usable.
 
-Mon Jun 28 23:17:35 1999  Andreas Kupries  <a.kupries@westend.com>
+Mon Jun 28 23:17:35 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* unix/configure.in:
  	* unix/Makefile.in: Matt Newman <matt@novadigm.com> sent in some
  	  changes to built the extension on HPUX (Basically check for .sl
  	  extension too).
 
-Tue Jun 15 00:00:36 1999  Andreas Kupries  <a.kupries@westend.com>
+Tue Jun 15 00:00:36 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tests/*.test: The tests for all commands dependent on external
  	  shared libraries now have constraints set on them.
@@ -793,7 +798,7 @@ Tue Jun 15 00:00:36 1999  Andreas Kupries  <a.kupries@westend.com>
 	  (TRF_TESTS): New variable, contains constraint information about
 	  tests to skip.
 
-Mon Jun 14 20:39:21 1999  Andreas Kupries  <a.kupries@westend.com>
+Mon Jun 14 20:39:21 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/zlib.c,
  	* generic/zip.c,
@@ -811,7 +816,7 @@ Mon Jun 14 20:39:21 1999  Andreas Kupries  <a.kupries@westend.com>
 	* win/makefile.vc:
 	* win/makefile.vc5 (TRFOBJS): Added 'dllEntry.obj'.
 
-Sun May 30 10:49:42 1999  Andreas Kupries  <a.kupries@westend.com>
+Sun May 30 10:49:42 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* patches/v8.1*/standard.patch: Fixed bug in the handling of
  	  encodings. Caused the system to lose references to the system
@@ -826,7 +831,7 @@ Sun May 30 10:49:42 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* Threading: Done.
 
-Sat May 29 22:56:31 1999  Andreas Kupries  <a.kupries@westend.com>
+Sat May 29 22:56:31 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* The patchkit for Tcl 8.1 is usable for Tcl 8.1.1 too. No new
 	  patchkit was made.
@@ -836,7 +841,7 @@ Sat May 29 22:56:31 1999  Andreas Kupries  <a.kupries@westend.com>
  	  variables). Marked all found places with /* THREADING */ and
  	  some additional explanation.
 
-Thu May 27 00:16:17 1999  Andreas Kupries  <a.kupries@westend.com>
+Thu May 27 00:16:17 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/nodes/md.node:
  	* doc/nodes/conv.node:
@@ -853,18 +858,18 @@ Thu May 27 00:16:17 1999  Andreas Kupries  <a.kupries@westend.com>
 	* generic/sha1.c: Integrated OTP code from Marshall Rose
  	  <mrose@dbc.mtview.ca.us>.
 
-Tue May 25 23:22:21 1999  Andreas Kupries  <a.kupries@westend.com>
+Tue May 25 23:22:21 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/*.h: Added preprocessor definitions allowing the usage
 	  of the headers with a C++ compiler.
 
-Fri May  7 20:47:56 1999  Andreas Kupries  <a.kupries@westend.com>
+Fri May  7 20:47:56 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* --------------- 1.6 re-release ------------------
 
 	* patches/v8.1: Added patch kit for 8.1 final.
 
-Thu Apr 22 21:46:12 1999  Andreas Kupries  <a.kupries@westend.com>
+Thu Apr 22 21:46:12 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* --------------- 1.6 released --------------------
 	
@@ -879,7 +884,7 @@ Thu Apr 22 21:46:12 1999  Andreas Kupries  <a.kupries@westend.com>
 	* generic/transformInt.h (Tcl_UndoReplaceChannel): Fixed spelling
 	  error in the macro.
 
-Wed Apr 21 21:06:02 1999  Andreas Kupries  <a.kupries@westend.com>
+Wed Apr 21 21:06:02 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/unstack.c (TrfUnstackCmd): See item below, the same
 	  check is added here too.
@@ -892,11 +897,11 @@ Wed Apr 21 21:06:02 1999  Andreas Kupries  <a.kupries@westend.com>
 	* generic/transformInt.h (Trf_ReplaceChannelStub): New macro, to
 	  get at the location of 'Tcl_ReplaceChannel' in the stubs-table.
 
-Mon Apr 19 20:25:41 1999  Andreas Kupries  <a.kupries@westend.com>
+Mon Apr 19 20:25:41 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* --------------- 1.5 released --------------------
 
-Sun Apr 18 14:59:05 1999  Andreas Kupries  <a.kupries@westend.com>
+Sun Apr 18 14:59:05 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/nodes/danger.node: Added comments about usage of trf with
 	  respect to 'filevent's.
@@ -908,7 +913,7 @@ Sun Apr 18 14:59:05 1999  Andreas Kupries  <a.kupries@westend.com>
 	  are 'standard.patch' and 'tclIO.c'. Fix was delayed to wait for
 	  possible problems with it, but got none.
 
-Tue Apr 13 08:28:10 1999  Andreas Kupries  <a.kupries@westend.com>
+Tue Apr 13 08:28:10 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c: Added code to flush out information waiting
  	  in various channels buffers. Timers are used to create
@@ -928,13 +933,13 @@ Tue Apr 13 08:28:10 1999  Andreas Kupries  <a.kupries@westend.com>
 	* generic/loadman.c: Changed to allow the makefile to define the
 	  value of SSL_LIB_NAME.
 
-Sat Apr 10 16:05:04 1999  Andreas Kupries  <a.kupries@westend.com>
+Sat Apr 10 16:05:04 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* --------------- 1.4 released, again --------------------
 	
 	* Added patchkit for 8.1b3. 
 
-Thu Mar 25 12:40:20 1999  Andreas Kupries  <a.kupries@westend.com>
+Thu Mar 25 12:40:20 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* --------------- 1.4 released --------------------
 	
@@ -976,23 +981,23 @@ Thu Mar 25 12:40:20 1999  Andreas Kupries  <a.kupries@westend.com>
 	  deprecated from now on, and the associated byteorder patch will
 	  be phased out, no new versions will be made.
 
-Sun Mar 21 16:01:44 1999  Andreas Kupries  <a.kupries@westend.com>
+Sun Mar 21 16:01:44 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* Generated patches for 8.1b2, fixed a bug in the byteorder
 	  patch. 
 
-Sun Mar 14 19:29:33 1999  Andreas Kupries  <a.kupries@westend.com>
+Sun Mar 14 19:29:33 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* Generated patches for 8.0.4 and 8.0.5.
 
-Mon Feb 22 18:19:58 1999  Andreas Kupries  <a.kupries@westend.com>
+Mon Feb 22 18:19:58 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* win/makefile.vc (TRF_DEFINES): Added -DBUILD_trf to the
 	  definition of this variable. Already in makefile.vc5, forgot to
 	  include it here before. Sync problem :-(. Thanks to Stefan
 	  Speidel <speidel@tp-cad.com> for finding this.
 
-Tue Jan 12 20:53:36 1999  Andreas Kupries  <a.kupries@westend.com>
+Tue Jan 12 20:53:36 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/binio.c:
  	* generic/digest.c:
@@ -1007,19 +1012,19 @@ Tue Jan 12 20:53:36 1999  Andreas Kupries  <a.kupries@westend.com>
 	* Fought against the MS environment today and won. Integrated
 	  the changes made there now into the master.
 
-Mon Jan 11 22:40:19 1999  Andreas Kupries  <a.kupries@westend.com>
+Mon Jan 11 22:40:19 1999  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/nodes/techintro.node: New node, contains a technical
 	  explanation of the inner working of Trf, with images.
 
 	* doc/nodes/intro.node: Added reference to technical information.
 
-Mon Dec 14 22:04:35 1998  Andreas Kupries  <a.kupries@westend.com>
+Mon Dec 14 22:04:35 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* patches/v8.1b1: Started yesterday with the trf patches for the
 	  newly announced 8.1b1 version. Completed it today.
 
-Fri Nov 13 18:25:26 1998  Andreas Kupries  <a.kupries@westend.com>
+Fri Nov 13 18:25:26 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/util.c:
  	* bincode.c:
@@ -1032,13 +1037,13 @@ Fri Nov 13 18:25:26 1998  Andreas Kupries  <a.kupries@westend.com>
 	* generic/registry.c: Fixed several char/uchar
 	  mismatches. Reported by Larry.
 
-Thu Oct  1 17:46:49 1998  Andreas Kupries  <a.kupries@westend.com>
+Thu Oct  1 17:46:49 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/reflect.c:
  	* generic/asc85code.c: Fixed several char / unsigned char
  	  mismatches, detected by Larry Virden on his UltraSparc.
 
-Wed Sep 30 15:49:24 1998  Andreas Kupries  <a.kupries@westend.com>
+Wed Sep 30 15:49:24 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* unix/Makefile.in: Added [ZLIB|SSL]_[LIB|INCLUDE]_DIR, analogous
 	  to TCL_[LIB|INCLUDE]_DIR. Extended runtime library search path
@@ -1054,19 +1059,19 @@ Wed Sep 30 15:49:24 1998  Andreas Kupries  <a.kupries@westend.com>
 	  configure options (--with-zlib, --with-ssl, handling analogous
 	  to --with-tcl).
 
-Tue Sep 29 23:20:11 1998  Andreas Kupries  <a.kupries@westend.com>
+Tue Sep 29 23:20:11 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/digest.c: Added fixes for nits discovered by Larry
 	  Virden on his Sun: added explicit comparison to NULL, added
 	  casts for 'char*' to 'unsigned char*'.
 
-Mon Jul 27 22:11:59 1998  Andreas Kupries  <a.kupries@westend.com>
+Mon Jul 27 22:11:59 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* win/: Got a windows dll from Jan Nijtmans (Jan.Nijtmans@wxs.nl)
 	  and assorted goodies (makefile for vc 5.0, rc file, icon file,
 	  better pkgIndex.tcl).
 
-Sun Jul 19 22:24:43 1998  Andreas Kupries  <a.kupries@westend.com>
+Sun Jul 19 22:24:43 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tools/mmencode:
  	* tools/mmdecode: Minimal replacements for the named applications
@@ -1083,7 +1088,7 @@ Sun Jul 19 22:24:43 1998  Andreas Kupries  <a.kupries@westend.com>
 	* doc/nodes/img/logo-64x64.gif: Designed a logo for trf, built in
  	  various sizes.
 
-Sat Jul  4 21:29:26 1998  Andreas Kupries  <a.kupries@westend.com>
+Sat Jul  4 21:29:26 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* unix/configure.in: Fixed a bug noted by David Herron
 	  <davidh@crl.com> in memchan. This package had it too. From its
@@ -1112,19 +1117,19 @@ Sat Jul  4 21:29:26 1998  Andreas Kupries  <a.kupries@westend.com>
 	> since the configure script only looks for "libtcl8.0"
 	> it is not found again because of that.
 
-Thu Jul  2 00:24:59 1998  Andreas Kupries  <a.kupries@westend.com>
+Thu Jul  2 00:24:59 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/nodes/*: Removed the descriptions of the various encryption
 	  algorithms.
 
-Wed Jul  1 20:28:20 1998  Andreas Kupries  <a.kupries@westend.com>
+Wed Jul  1 20:28:20 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/pkgIndex.tcl.in: Changed to load trf immediately upon
 	  request, and not while trying to execute the first
 	  command. Without that the separate crypto package will have
 	  problems attaching itself to the trf core.
 
-Tue Jun 30 22:41:18 1998  Andreas Kupries  <a.kupries@westend.com>
+Tue Jun 30 22:41:18 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* PREPARE: Using the 'webTemplate' system (*) to generate
 	  documentation for linkage into my westend site and for
@@ -1137,7 +1142,7 @@ Tue Jun 30 22:41:18 1998  Andreas Kupries  <a.kupries@westend.com>
 	* doc/: Replaced latex documentation by native HTML. Added 'nodes'
 	  directory.
 
-Mon Jun 29 20:13:55 1998  Andreas Kupries  <a.kupries@westend.com>
+Mon Jun 29 20:13:55 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* Done. System compiles without problems. The only thing
 	  containing references to encryption is the documentation.
@@ -1146,7 +1151,7 @@ Mon Jun 29 20:13:55 1998  Andreas Kupries  <a.kupries@westend.com>
 
 	* ----------------------------------------------------
 	
-Wed Jun 17 21:38:32 1998  Andreas Kupries  <a.kupries@westend.com>
+Wed Jun 17 21:38:32 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/def.tex:
 	* doc/man.tex:
@@ -1159,7 +1164,7 @@ Wed Jun 17 21:38:32 1998  Andreas Kupries  <a.kupries@westend.com>
 	  complete removal of 'binio' and its support in favor of the
 	  official 'binary' command.
 
-Sat Jun 13 13:38:19 1998  Andreas Kupries  <a.kupries@westend.com>
+Sat Jun 13 13:38:19 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* The patch required an adaption to I18N/UTF: A channel X
 	  replacing another channel C via Tcl_ReplaceChannel takes over
@@ -1185,7 +1190,7 @@ Sat Jun 13 13:38:19 1998  Andreas Kupries  <a.kupries@westend.com>
 	  decrementing it, thus trying to free the object a second time.
 	  => transform.test 1.x solved.
 
-Fri Jun 12 16:13:26 1998  Andreas Kupries  <a.kupries@westend.com>
+Fri Jun 12 16:13:26 1998  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* 2 tests failing: transform.test (1.x, 2.1), base64.test (7.1)
 
@@ -1207,7 +1212,7 @@ Fri Jun 12 16:13:26 1998  Andreas Kupries  <a.kupries@westend.com>
 	* generic/registry.c (Trf_Register): Added code special to 8.1:
 	  Initialization of the 'close2Proc' driver procedure (NULL).
 
-Mon Aug 18 21:18:31 1997  Andreas Kupries  <a.kupries@westend.com>
+Mon Aug 18 21:18:31 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* -------------- 1.0 relased -----------------------------
 
@@ -1216,13 +1221,13 @@ Mon Aug 18 21:18:31 1997  Andreas Kupries  <a.kupries@westend.com>
 
 	* patches/v8.0: Added patches for tcl 8.0 final.
 
-Tue Jul 29 00:18:21 1997  Andreas Kupries  <a.kupries@westend.com>
+Tue Jul 29 00:18:21 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* Ready for relase of Tcl 8.0 final now.
 
 	* Distribution running again under 7.6 and 8.x.
 
-Mon Jul 28 20:34:05 1997  Andreas Kupries  <a.kupries@westend.com>
+Mon Jul 28 20:34:05 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/man.tex (section {Message digests}): Added explanation of
 	  transparent mode.
@@ -1239,11 +1244,11 @@ Mon Jul 28 20:34:05 1997  Andreas Kupries  <a.kupries@westend.com>
 	* doc/man.tex (chapter {Copyrights}\label {copyright}): Added
 	  section about SAFER.
 
-Sat Jul 26 18:32:35 1997  Andreas Kupries  <a.kupries@westend.com>
+Sat Jul 26 18:32:35 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tests/safer.test: New file, testing safer implementation.
 
-Fri Jul 25 18:13:12 1997  Andreas Kupries  <a.kupries@westend.com>
+Fri Jul 25 18:13:12 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* unix/Makefile.in (CRYPT_ALG_SRC): Added SAFER.
 
@@ -1275,7 +1280,7 @@ Fri Jul 25 18:13:12 1997  Andreas Kupries  <a.kupries@westend.com>
 
 	* And now the analogouos changes to the blockcipher code.
 
-Thu Jul 24 00:41:05 1997  Andreas Kupries  <a.kupries@westend.com>
+Thu Jul 24 00:41:05 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/cipher.c (InitializeState): Cipher specific option
 	  information is given to the scheduler for incorporation into the
@@ -1308,7 +1313,7 @@ Thu Jul 24 00:41:05 1997  Andreas Kupries  <a.kupries@westend.com>
 
 	* doc/install.tex, man.tex: Brought up to date now.
 
-Wed Jul 23 00:02:03 1997  Andreas Kupries  <a.kupries@westend.com>
+Wed Jul 23 00:02:03 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* Both distributions running now (7.6, 8.x). Go ahead and update
 	  documentation now.
@@ -1334,7 +1339,7 @@ Wed Jul 23 00:02:03 1997  Andreas Kupries  <a.kupries@westend.com>
 
 	* tests/defs: Force usage of Memchan 1.2 for tcl 7.6.
 
-Tue Jul 22 00:07:21 1997  Andreas Kupries  <a.kupries@westend.com>
+Tue Jul 22 00:07:21 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c (TransformImmediate): Added \0 behind internal
 	  result buffer to prevent using a longer buffer than really given
@@ -1370,7 +1375,7 @@ Tue Jul 22 00:07:21 1997  Andreas Kupries  <a.kupries@westend.com>
 	  executed. Each of these may need the result area by
 	  themselves. Example: 'transform'-command.
 
-Mon Jul 21 21:26:17 1997  Andreas Kupries  <a.kupries@westend.com>
+Mon Jul 21 21:26:17 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tests/crc.test,
  	* tests/haval.test,
@@ -1388,13 +1393,13 @@ Mon Jul 21 21:26:17 1997  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/digest.c, dig_opt.c: Rewritten.
 
-Fri Jul 18 00:19:45 1997  Andreas Kupries  <a.kupries@westend.com>
+Fri Jul 18 00:19:45 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tests/idea.test:
  	* tests/des.test:
  	* tests/blowfish.test: Rewritten. Block ciphers are done now.
 
-Thu Jul 17 22:29:49 1997  Andreas Kupries  <a.kupries@westend.com>
+Thu Jul 17 22:29:49 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c (TrfExecuteObjCmd, TrfExecuteCmd): Changed to
 	  check for transformation in case of option not matching one of
@@ -1412,7 +1417,7 @@ Thu Jul 17 22:29:49 1997  Andreas Kupries  <a.kupries@westend.com>
 	  argument to '-xx-type' into a separate procedure, then
 	  simplified the option processors.
 
-Wed Jul 16 23:23:11 1997  Andreas Kupries  <a.kupries@westend.com>
+Wed Jul 16 23:23:11 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/bc_opt.c:  Rewritten according to
 	  'doc/changes.final'. Blockciphers done. Used generic code in
@@ -1423,7 +1428,7 @@ Wed Jul 16 23:23:11 1997  Andreas Kupries  <a.kupries@westend.com>
 	* generic/c_util.c: New file. Contains generic code of rewritten
 	  'c_opt.c', see below.
 
-Tue Jul 15 23:29:16 1997  Andreas Kupries  <a.kupries@westend.com>
+Tue Jul 15 23:29:16 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tests/rot.test: New test.
 
@@ -1432,7 +1437,7 @@ Tue Jul 15 23:29:16 1997  Andreas Kupries  <a.kupries@westend.com>
 	* generic/c_opt.c: Rewritten according to
 	  'doc/changes.final'. Ciphers done.
 
-Mon Jul 14 00:04:52 1997  Andreas Kupries  <a.kupries@westend.com>
+Mon Jul 14 00:04:52 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tests/zip.test:
  	* tests/rs_ecc.test: Rewritten now.
@@ -1458,7 +1463,7 @@ Mon Jul 14 00:04:52 1997  Andreas Kupries  <a.kupries@westend.com>
 	* tests/bin.test: Started rewrite of tests, to handle and take
 	  advantage of new syntax.
 
-Sun Jul 13 22:16:39 1997  Andreas Kupries  <a.kupries@westend.com>
+Sun Jul 13 22:16:39 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tests/common.all.test: New. Checks common behaviour of all
 	  commands, as implemented in 'generic/registry.c'.
@@ -1469,7 +1474,7 @@ Sun Jul 13 22:16:39 1997  Andreas Kupries  <a.kupries@westend.com>
 	* generic/*.c: Removed all occurences of ADD_RES. Using
 	  'Tcl_AppendResult' again. See May 29 too.
 
-Wed Jul  9 20:40:20 1997  Andreas Kupries  <a.kupries@westend.com>
+Wed Jul  9 20:40:20 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/rot13.c: New cipher: rot. Just fore fun, not for strength.
 
@@ -1493,7 +1498,7 @@ Wed Jul  9 20:40:20 1997  Andreas Kupries  <a.kupries@westend.com>
 
 	* tests/md5.test: Added tests from RFC 1321 test suite.
 
-Mon Jul  7 18:14:43 1997  Andreas Kupries  <a.kupries@westend.com>
+Mon Jul  7 18:14:43 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/man.tex (chapter {Acknowledgements}): Update.
 
@@ -1502,11 +1507,11 @@ Mon Jul  7 18:14:43 1997  Andreas Kupries  <a.kupries@westend.com>
 	  (FlushDecoder): removed superfluous '&'-operators (c->digest_buffer).
 	  Both problems found by Hyoung-Gook Kimn <kiss@sunbee.co.kr>.
 
-Tue Jun 17 19:07:42 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Tue Jun 17 19:07:42 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* win/makefile.vc (TRFOBJS): Added reflect.o, ref_opt.o.
 
-Sun Jun 15 12:53:57 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Sun Jun 15 12:53:57 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/man.tex (section {Misc.}): Added documentation of general
 	  transformation command.
@@ -1524,7 +1529,7 @@ Sun Jun 15 12:53:57 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* General transformation: First tests using 'identity'.
 
-Sat Jun 14 21:43:06 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Sat Jun 14 21:43:06 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/ref_opt.c: Option processing for channel defined below.
 
@@ -1533,11 +1538,11 @@ Sat Jun 14 21:43:06 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  The real transformation is done by a script. DANGER: Will have
 	  problems with embedded \0's if used by tcl 7.6.
 
-Sun Jun  8 09:14:24 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Sun Jun  8 09:14:24 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 	
 	* patches/v7.6p2: Added directory and files in it.
 
-Sat Jun  7 18:31:55 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Sat Jun  7 18:31:55 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/install.tex (chapter  {Patching the core}): Corrected
 	  information about working directories of the various patch
@@ -1546,14 +1551,14 @@ Sat Jun  7 18:31:55 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	* patches/v7.6p2/: New directory. The patches are the same, the
 	  prepatched versions of various files not.
 
-Sun Jun  1 12:03:58 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Sun Jun  1 12:03:58 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* ---------------- Release 1.0b3 ----------------
 
 	* Compiled under windows, ok. Added reference to binary
 	  distribution to manual.
 
-Sat May 31 00:04:27 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Sat May 31 00:04:27 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/install.tex: brought uptodate, some enhancements.
 
@@ -1585,7 +1590,7 @@ Sat May 31 00:04:27 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  command. Default: NO compilation. See commands 'binary' and
 	  'fcopy' of 8.0b1 for equivalent functionality.
 
-Fri May 30 23:49:38 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Fri May 30 23:49:38 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c: compiles, only warnings due to unpatched
 	  core remain.
@@ -1600,7 +1605,7 @@ Fri May 30 23:49:38 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  (TrfWatch): Updated to changed notifier ('watchChannelProc' now
 	  named 'watchProc').
 
-Thu May 29 21:16:05 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Thu May 29 21:16:05 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* All files, with exception of 'unstack.c', 'binio.c' and
 	  'registry.c' compile without flaws now. The named files depend
@@ -1621,13 +1626,13 @@ Thu May 29 21:16:05 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  obj). No dependency on version anymore. Definitions left in to
 	  avoid immediate conversion of all affected files.
 
-Wed May 24 22:11:25 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Wed May 24 22:11:25 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/man.tex:
  	* doc/install.tex: Made urls into hyperlinks, at least in the HTML
  	  version of the manuals. Done in the last days.
 
-Wed May 21 18:16:42 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Wed May 21 18:16:42 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* PREPARE: use newly installed 'latex2html' to generate and
 	  distribute html versions of the manuals. The urls inside are
@@ -1636,7 +1641,7 @@ Wed May 21 18:16:42 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  -- switched from custom code to procedure now provided by
 	  'makedist'.
 
-Mon May 19 22:35:19 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Mon May 19 22:35:19 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/man.tex:
  	* doc/install.tex: checked with 'ispell', added new message
@@ -1658,7 +1663,7 @@ Mon May 19 22:35:19 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* generic/rmd128.c: Added message digest RIPEMD-128.
 
-Thu May 15 20:32:49 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Thu May 15 20:32:49 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/ripemd/rmd160.c: see below.
 
@@ -1676,7 +1681,7 @@ Thu May 15 20:32:49 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* generic/rmd160.c: Added message digest RIPEMD-160.
 
-Sun May 11 21:36:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Sun May 11 21:36:46 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* doc/install.tex, man.tex: Adapted to made changes.
 
@@ -1705,7 +1710,7 @@ Sun May 11 21:36:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
  	  libraries. Currently uses 'libcrypto.so' (SSLeay) and
  	  'libdes.so' only.
 
-Sat May 10 21:56:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Sat May 10 21:56:46 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* first step to change from 'libdes' over to 'SSLeay' ('libcrypto').
 
@@ -1717,7 +1722,7 @@ Sat May 10 21:56:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  'imgInit.c' (Img library, Jan Nijtmans) to factor out the common
 	  components of loading a shared library.
 
-Mon Mar 17 18:18:05 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Mon Mar 17 18:18:05 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* unix/Makefile.in (distclean): removed 'patchlevel.h' from
 	  command, is part of distribution now.
@@ -1725,7 +1730,7 @@ Mon Mar 17 18:18:05 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	* patches/v8.0a2/tclIO.c (Tcl_GetHostByteorder): Had superfluous
 	  'chan'-argument, despite correction in the patch.
 
-Thu Mar  6 20:13:55 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Thu Mar  6 20:13:55 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* Integrated patch send by Jan. Description:
 
@@ -1737,7 +1742,7 @@ Thu Mar  6 20:13:55 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  improvements are already in the current Img1.0b1, but they are
 	  useful in Trf as well."
 
-Sun Mar  2 11:27:49 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Sun Mar  2 11:27:49 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* PORTING: new file. database of porting notes, hints, tricks,
 	  etc.
@@ -1748,7 +1753,7 @@ Sun Mar  2 11:27:49 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  overoptimized code will return 0 for many arguments, resulting
 	  in a bad decryption key. The option -O1 is possible though.
 
-Sat Mar  1 15:50:50 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Sat Mar  1 15:50:50 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/binio.c (READ_CHUNK_SIZE): allow redefinition of value
 	  via makefile!. Default bumped up to 16k (4k before).
@@ -1768,7 +1773,7 @@ Sat Mar  1 15:50:50 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	* generic/registry.c (TrfInput): fixed bug regarding calculation
 	  of bytes to move down via 'memmove' (operands were in wrong order).
 
-Wed Feb 26 18:31:50 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Wed Feb 26 18:31:50 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* win/makefile.vc (LIBDES): new configuration variable. allows
 	  usage of win32 binary distribution of SSLeay.
@@ -1784,21 +1789,21 @@ Wed Feb 26 18:31:50 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	* reorganized 'patches' directory. Every version of tcl got its
 	  own subdir.
 
-Tue Feb 25 22:38:18 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Tue Feb 25 22:38:18 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/sha/sha.c:
 	* generic/sha/sha.h: renamed typedef'd LONG to UINT32. Avoids
  	  collision with definition made by Windows. SHA finally ok under
  	  windows (see Feb 15 too).
 
-Sun Feb 23 18:46:33 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Sun Feb 23 18:46:33 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/idea/idea.h: see below.
 
 	* generic/sha/sha.h: Added check for compilation on DEC Alphas,
 	  define LONG accordingly.
 
-Thu Feb 20 21:27:32 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Thu Feb 20 21:27:32 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/zlib.c (Z_LIB_NAME): Default is 'zlib.dll' now.
 
@@ -1807,7 +1812,7 @@ Thu Feb 20 21:27:32 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* tests/binio.test: added 'fconfigure -translation binary' to 1.8
 
-Sat Feb 15 22:58:32 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Sat Feb 15 22:58:32 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tests/sha.test: don't execute 'sha-2.2' under windows. Uses
 	  'cat' to beef up a 1000 character file to 1e6 characters. A more
@@ -1841,7 +1846,7 @@ Sat Feb 15 22:58:32 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	* compat/tclLoadWin.c: added declaration to supress warning about
 	  unknown 'TclWinConvertError'. This procedure is internal to tcl.
 
-Fri Feb 14 19:15:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Fri Feb 14 19:15:46 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* win/makefile.vc: first stab at Makefile for windows. Constructed
 	  from 'ftp://ftp.sunlabs.com/pub/tcl/example.zip(makefile.vc)'
@@ -1856,7 +1861,7 @@ Fri Feb 14 19:15:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  (TrfInput): corrected logical error causing the system to loose
 	  partial data at Eof on underlying channel.
 
-Thu Feb 13 21:40:03 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Thu Feb 13 21:40:03 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* -: The bunch of messages below resulted from my first try to
 	  compile trf under windoof. Some other messages, not recorded
@@ -1895,7 +1900,7 @@ Thu Feb 13 21:40:03 1997  Andreas Kupries  <aku@bluepeak.westend.com>
  	* generic/crc_zlib.c (MD_Final): added casts to stop MS VC++ 4.2
  	  from complaining about conversion problems and loss of data.
 
-Tue Feb 11 18:46:01 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Tue Feb 11 18:46:01 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* 'binio', 'unstack' need conversion too.
 
@@ -1966,14 +1971,14 @@ Tue Feb 11 18:46:01 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  Conditional compilation removes functionality for Tcl below
 	  version 8.x
 
-Thu Feb  6 19:27:41 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Thu Feb  6 19:27:41 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* Reorg. complete, distribution running again (unix).
 
 	* unix/Makefile: corrected MANIFEST check, removed target
 	  'depend'. Removed tests for 'makedepend' from 'configure.in'.
 
-Wed Feb  5 23:35:17 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Wed Feb  5 23:35:17 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* : Reorganization for multiplatform development and use
 	  (unix, mac, win). Shuffled all files around. Adapted unix
@@ -1992,11 +1997,11 @@ Wed Feb  5 23:35:17 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  inofficial and/or internal files, manpage generation, ...). It
 	  is not part of the distribution however.
 
-Wed Feb  4 21:18:15 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Wed Feb  4 21:18:15 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
         * ======================= released 1.0b2 =======================
 
-Fri Jan 31 18:43:29 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Fri Jan 31 18:43:29 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* libdes.c:
 	* zlib.c: use library names without path, use OS facilities for
@@ -2007,7 +2012,7 @@ Fri Jan 31 18:43:29 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* digest.c: had unsigned <-> signed comparison.
 
-Thu Jan 30 22:32:45 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Thu Jan 30 22:32:45 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* compat/tclLoadShl.c (dlopen): improved error messaging for HP-UX
 	  upon failed loads.
@@ -2019,7 +2024,7 @@ Thu Jan 30 22:32:45 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* got patch from Jan fixing some minor things. see above ^.
 
-Sun Jan 26 21:18:56 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Sun Jan 26 21:18:56 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* binio.c (FLIP (in ReorderBytes)): corrected wrong indexing in
 	  first assignment.
@@ -2028,7 +2033,7 @@ Sun Jan 26 21:18:56 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* tests/binio.test: added tests for 'binio'.
 
-Mon Jan 20 23:07:01 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Mon Jan 20 23:07:01 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* binio.c (PackCmd, UnpackCmd): use Tcl_GetChannelByteorder to
 	  determine wether swapping is required or not. See entry at
@@ -2039,7 +2044,7 @@ Mon Jan 20 23:07:01 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  directly and via 'fconfigure'. Setting is possible by 'fconfigure'
 	  only. This is used by 'binio' to swap word information if required.
 
-Wed Jan 15 19:07:12 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Wed Jan 15 19:07:12 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* -- all changes below by Jan Nijtmans. All of Monday, Jan 13 was
 	  covered by his patch too.
@@ -2059,7 +2064,7 @@ Wed Jan 15 19:07:12 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	* zip.c: See Jan 5, (XX). Some remains of same thing, forward
 	  declarations forgotten.
 
-Tue Jan 14 21:57:19 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Tue Jan 14 21:57:19 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* configure.in (line 259): don't bother with -ltclX.Y if not
 	  running under AIX.
@@ -2075,7 +2080,7 @@ Tue Jan 14 21:57:19 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* zip.c: See Jan 5, (XX). Some remains of same thing.
 
-Mon Jan 13 21:41:33 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Mon Jan 13 21:41:33 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* haval/haval.c: Most of conversion was already done (See Jan 5),
 	  with the exception of a single place (haval_tailor).
@@ -2113,7 +2118,7 @@ Mon Jan 13 21:41:33 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
         * ======================= released 1.0b1 =======================
 
-Fri Jan 10 12:48:13 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Fri Jan 10 12:48:13 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* registry.c (TrfInput): fixed error preventing read/gets from
 	  stacked channels to work properly (set trans->used to 0, then!
@@ -2125,12 +2130,12 @@ Fri Jan 10 12:48:13 1997  Andreas Kupries  <aku@bluepeak.westend.com>
  	* doc/INSTALL.optional:
  	* doc/man.tex: updated dependency information.
 
-Mon Jan  6 19:14:20 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Mon Jan  6 19:14:20 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* patches/core7.6.patch, patches/core8.0a1.patch: Added patch files
 	  for tcl-core to remove dependency on plus-patches.
 
-Sun Jan  5 22:26:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+Sun Jan  5 22:26:46 1997  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* --> Jan's patch integrated now.
 
@@ -2168,7 +2173,7 @@ Sun Jan  5 22:26:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	* Back from christmas holiday. --> Integrate patch send by Jan at
 	  Dec 20, 1996. 
 
-Wed Dec 18 18:46:58 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+Wed Dec 18 18:46:58 1996  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
         * ======================= released 1.0a3 =======================
 	
@@ -2176,7 +2181,7 @@ Wed Dec 18 18:46:58 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* Makefile.in (distclean): removed MANIFEST from list.
 
-Tue Dec 17 17:35:13 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+Tue Dec 17 17:35:13 1996  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* transform.h.in:
  	* c_opt.c:
@@ -2221,7 +2226,7 @@ Tue Dec 17 17:35:13 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 	* registry.c (TrfWatch): removed 'return' in void-procedure. Why
 	  did 'gcc -Wall' did not complain?
 
-Mon Dec 16 18:29:27 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+Mon Dec 16 18:29:27 1996  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* des.c:
  	* bc_opt.c:
@@ -2251,7 +2256,7 @@ Mon Dec 16 18:29:27 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 	* configure.in: added code to enable generation of libz as shared
 	  library.
 
-Sat Dec 14 19:17:56 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+Sat Dec 14 19:17:56 1996  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* configure.in:
 	* Makefile.in: Integrated information from patch (*2).  New
@@ -2283,7 +2288,7 @@ Sat Dec 14 19:17:56 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 	* octcode.c:
  	* bincode.c: encode uses table-lookup now, no more bitfiddling.
 
-Wed Dec 11 20:54:10 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+Wed Dec 11 20:54:10 1996  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* zip.c:
 	* rs_ecc.c: Done too.
@@ -2295,7 +2300,7 @@ Wed Dec 11 20:54:10 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* blockcipher.c: Updated to handle character buffers as well.
 
-Tue Dec 10 21:22:02 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+Tue Dec 10 21:22:02 1996  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* md5.c:
 	* crc.c:
@@ -2315,7 +2320,7 @@ Tue Dec 10 21:22:02 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 	  now, instead one by one. Use a procedure to convert a buffer of
 	  characters, if defined by the transformation.
 	  
-Thu Dec  5 20:19:31 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+Thu Dec  5 20:19:31 1996  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
         * ======================= released 1.0a2 =======================
 	
@@ -2340,11 +2345,11 @@ Thu Dec  5 20:19:31 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 	- blowfish/bf_tab.h needs to be devided into 4 blocks with
 	  {}'s around it, otherwise a warning is given (gcc -Wall (aku)).
 
-Wed Dec  4 20:18:20 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+Wed Dec  4 20:18:20 1996  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* registry.c (TrfWatch): now forwards request to parent too.
 
-Tue Dec  3 22:38:05 1996  Andreas Kupries  <aku@bluepeak.westend.com>
+Tue Dec  3 22:38:05 1996  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* digest.c: fixed problem regarding to 'XX->dest'. NULL's were not
 	  handled. Tripped by new 'TrfClose' in registry.c
@@ -2356,13 +2361,13 @@ Tue Dec  3 22:38:05 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 	  Tcl_ReplaceChannel API, as propossed by J.Nijtmans. Now the package
 	  again compiles, links and passes all tests. // This is a branch //
 
-Wed Oct 16 21:59:39 1996  Andreas Kupries  <aku@bluepeak.oche.de>
+Wed Oct 16 21:59:39 1996  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tools/md: new example for generation and check of message
 	  digests. supersedes example 'md5sum'. independent of external
 	  script libraries.
 
-Tue Oct 15 00:06:20 1996  Andreas Kupries  <aku@bluepeak.oche.de>
+Tue Oct 15 00:06:20 1996  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* init.c (Trf_Init): register new digests.
 
@@ -2386,7 +2391,7 @@ Tue Oct 15 00:06:20 1996  Andreas Kupries  <aku@bluepeak.oche.de>
 	  Jean-Loup Gailly (gzip@prep.ai.mit.edu)
           Mark Adler (madler@alumni.caltech.edu)).
 
-Mon Oct  7 22:55:44 1996  Andreas Kupries  <aku@bluepeak.oche.de>
+Mon Oct  7 22:55:44 1996  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* Module ready for delivery. Starting official log now.
 

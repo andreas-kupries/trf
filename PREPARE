@@ -1,52 +1,94 @@
 # -*- tcl -*-
 # prepare module 'Trf' for distribution
 
+## Make this script completely independent of external packages.
+## Assume [pwd] == Toplevel directory of memchan distribution in
+## preparation.
+##
+## This will be run via 'make dist'.
+
+###
+##
+# ### Helper procedures.
+##
+###
+
+proc LastChanges {} {
+    if {
+	[file  exists      ChangeLog.short] &&
+	![file isdirectory ChangeLog.short] &&
+        [file  readable    ChangeLog.short]
+    } {
+        set f [open ChangeLog.short r]
+        set t [read $f]
+        close $f
+
+        set start [string first "Changes from" $t]
+        set end $start
+        incr end
+        set offset [string first "Changes from" [string range $t $end end]]
+
+        if {$offset < 0} {
+            set end end
+        } else {
+            incr end $offset
+            incr end -1
+        }
+
+        return [string trim [string range $t $start $end]]
+        unset t
+    }
+    return {}
+}
+
+proc UpdateAnnounce {} {
+    set            fh [open ANNOUNCE r]
+    set ano [read $fh]
+    close         $fh
+
+    set    fh [open ANNOUNCE w]
+    puts  $fh [string map [list @CHANGES@ [LastChanges]] $ano]
+    close $fh
+    return
+}
+
+proc UpdateAnnounceMail {} {
+    set            fh [open ANNOUNCE.MAIL r]
+    set mail [read $fh]
+    close         $fh
+
+    set            fh [open ANNOUNCE r]
+    set ano [read $fh]
+    close         $fh
+
+    set            fh [open ~/.signature r]
+    set sig [read $fh]
+    close         $fh
+
+    set    fh [open ANNOUNCE.MAIL w]
+    puts  $fh [string map [list @ANO@ [LastChanges] @SIG@ $sig] $mail]
+    close $fh
+    return
+}
+
+
+###
+##
+#
+# ### Eliminate data not required by a source distribution.
+# ### Generate the official documentation in various formats.
+# ### Also create the CHANGES file required by the Neosoft CS Archives.
+# ### Ensure uptodate configure scripts for TEA and UNIX.
+#
+##
+###
+
 # do it ourself, must not be included into digest files!
-mExclude PREPARE customers zlib.vc \
-	md5-crypt/trf_features.h \
-	md5-crypt/trf_features.h.orig
 
-
-# O. insert various information into some files
-#    (version, patchlevel, current date)
-
-
-set mInfo(@TRF_VERSION@)     $mInfo(@mVersion@)
-set mInfo(@configure_input@) "Distributed at $mInfo(@mDate@)"
-
-# no, use the now existing file in win instead!
-#file copy generic/pkgIndex.tcl.in win/pkgIndex.tcl
-
-mInsertInfo \
-	README DESCRIPTION PORTING                 \
-	doc/nodes/home.node doc/nodes/install.node doc/nodes/intro.node \
-	doc/nodes/urls.def generic/transform.h generic/patchlevel.h     \
-	mac/README                                    \
-	unix/README unix/configure.in unix/Makefile.in \
-	tea/README tea/configure.in tea/Makefile.in \
-	patches/v8.1.1/README
-
-set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mShortDosVersion@).dll"
-eval mInsertInfo \
-	win/README      win/pkgIndex.tcl \
-	win/makefile.vc win/makefile.vc5 win/Makefile.gnu win/Makefile.cross \
-	win/trf.rc
-
-mGetDescription
-mExpandUrls
-mGenerateLSM
-mGenerateANNOUNCE
-
-package require MSA
-mGenerateAnnounceMail tcl-announce@mitchell.org lvirden@cas.org
-mSupport    AMAIL
-file delete AMAIL
-
-
-# I.   clean documentation
-# I.a  remove inofficial and old documents
-
-eval mExclude \
+file delete -force PREPARE customers zlib.vc
+file delete -force md5-crypt/trf_features.h
+file delete -force md5-crypt/trf_features.h.orig
+file delete -force \
 	[glob patches/v7*] \
 	mails patches/v8.0a1 patches/v8.0a2 patches/v8.0b1 patches/v8.0b2 \
 	[glob patches/*/*.orig] generic/pkgIndex.tcl.in \
@@ -61,186 +103,47 @@ eval mExclude \
 	patches/v8.1/gendiff patches/v8.1/getorig patches/v8.1/genstubs \
 	patches/v8.1/getcurrent patches/v8.1/setorig \
 	patches/rc.h patches/patch.mp
+file delete -force generic/blowfish generic/idea generic/rc4 generic/safer
 
-
-# mHandleBinaryDistributions
-# Remove older distribution (1.x), they are distributed as part of the
-# 1.8 site from now on.
-
-mHandleBinaryDistributions trf doc/license.terms README
-mGenNews
-mGenChangeLog
-
-# I.b  generate official manual, diverse variants (dvi, ps)
-mLog info generating manual 
+file copy ChangeLog.short CHANGES
 
 cd doc
-file mkdir man html html/capi html/img
-
-
-# I.c  generate official manual of c-level interface
-#verbose {generate manual of c-level interface}
-
-# pwd = doc
-
-# manual pages of C API out of header comments (c2man)
-mLog info generating manpages
-set fail [catch {
-    cd ..
-    set ipath [file join [file dirname [file dirname [info library]]] include]
-    set src   [file join generic transform.h]
-
-    exec c2man -U__GNUC__ -odoc/man -I$ipath -v $src 2>/dev/null >/dev/null
-    #          ~~~~~~~~~~ => remove gcc specific syntax from header files
-    cd doc
-} msg]	;#{}
-if {$fail} {mLog error $msg}
-
-# same as above, but hyperized.
-mLog info generating hyperized manpages
-set fail [catch {
-    cd ..
-    set ipath [file join [file dirname [file dirname [info library]]] include]
-    set src   [file join generic transform.h]
-
-    exec c2man -U__GNUC__ -odoc/html/capi -I$ipath -Th $src 2>/dev/null >/dev/null
-    #          ~~~~~~~~~~ => remove gcc specific syntax from header files
-    cd doc
-} msg]	;#{}
-if {$fail} {mLog error $msg}
-
-# generate base page for c-api documentation
-exec ./capibase > nodes/capi.node
-
-#mExclude capibase
-#file rename html/capi.html html/capi/capi.html
-
-
-# Now generate documentation for linkage into my
-# site and standalone distribution
-
-# -up-man assumes that the document is part of the
-# hierarchy at http://www.westend.com/~kupries
-# It resides at '~kupries/doc/trf/index.html'
-# The tcltk page is '~kupries/tcltk.html'
-
-mLog info generating documentation tree
-
-exec nodeCompile westend html nodes 
-
+exec ../tools/manpage_regen > /dev/null 2>/dev/null
 cd ..
-mDocTGZArchive doc/html
-mDocZIPArchive doc/html
-cd doc
 
-eval file delete -force [glob html/*.html]
+file mkdir                                doc/art/
+file rename        htdocs/art/logo100.gif doc/art/
+file rename        htdocs/art/logo520.jpg doc/art/
+file rename        htdocs/art/logo64.gif  doc/art/
+file delete -force htdocs
 
+cd unix ; exec autoconf
+cd ..   ; exec autoconf
 
-file delete -force nodes/a_up.def
-exec nodeCompile     plain html          nodes
-exec nodeMakeSitemap plain html trf_home nodes
-
-
-mExclude nodes capibase
-
-cd ..
-# pwd = root of distribution
-
-# remove crypto directories
-mExclude generic/blowfish generic/idea generic/rc4 generic/safer
-
-# update files dependent on stub declarations.
+UpdateAnnounce
+UpdateAnnounceMail
+file rename ANNOUNCE.MAIL [file join .. [file tail [pwd]].AMAIL]
 
 cd generic
 exec tclsh ../tools/genStubs.tcl . trf.decls trfInt.decls
 cd ..
 
-
-# II. security measures
-mLog info Security measures
-
-# enable checking at target (do this before generation of manifest)
-#
-## -- disabled temporarily, broken for TEA --
-#
-#cd tests
-#file rename ________ ________.test
-#cd ..
-# pwd = root of distribution
-
-# generate configure script to be used
-mConfigure unix
-mConfigure tea
-
-
-# --------------------------------------------------------------
-# Generate windows binary distribution -------------------------
-# Temp dir Trf@mVersion@ => win32.zip
-# Contents: pkgindex.tcl  (win)
-#           license.terms (doc)
-#           doc/html-tree
-#           *.dll
-# --------------------------------------------------------------
-# make that a procedure, later.
-
-if {0} {
-    # trf1480.dll is a copy of trf1380.dll, due to no change in functionality.
-    # creation of trf1481.dll is waiting in the todo pipeline.
-
-    file copy win/trf1380.dll win/trf1480.dll
-    file copy win/trf1380.lib win/trf1480.lib
-    file copy win/trf1580.dll win/trf1680.dll
-    file copy win/trf1580.lib win/trf1680.lib
-    file rename win/trf1380.README win/trf1680.README
-
-    set bindir  "[::pool::string::cap $mName]${mVersion}"
-
-    file mkdir $bindir [file join $bindir patches]
-    eval file copy [glob win/trf*] $bindir
-    file copy      doc/license.terms win/pkgIndex.tcl win/msvcrt.dll README $bindir
-    eval file copy [glob patches/*] [file join $bindir patches]
-
-    set supfolder [file join .. sup.${mName}${mFullVersion}]
-    cd $bindir
-    exec unzip [file join .. $supfolder doc.zip]
-    file rename ${mName}${mFullVersion}/doc/html doc
-    file delete -force ${mName}${mFullVersion}
-    cd ..
-
-    exec zip -r9 win32.zip $bindir
-    mSupport win32.zip
-    file delete -force $bindir win32.zip
-}
-
 # --------------------------------------------------------------
 
 # generate message digests for all files and several digests
-mLog info Generating digests (please wait)...
+puts Generating digests (please wait)...
 
 set files [exec /usr/bin/find . -type f -print]
 regsub -all "\n" $files { } files
 
 foreach md {crc crc-zlib adler md5 sha haval ripemd128 ripemd160} {
-    mLog info $md ...
+    puts $md ...
     catch {eval exec md -a $md $files > digests.$md}
 }
-
-
-# generate standard permissions.
-mNormalPermissions [pwd]
 
 # and now the tuning
 exec      chmod u+w unix mac win tests
 eval exec chmod u+x unix/configure [glob tools/*]
-eval exec chmod u+x tea/configure tea/mkinstalldirs tea/testshell tea/install-sh
+eval exec chmod u+x configure mkinstalldirs testshell install-sh
 
-# Move the files in TEA into the main directory.
-
-file rename         tea/README README.tea
-eval file rename -- [glob tea/*] [pwd]
-
-
-
-
-# should secure digest files and checker application against
-# tampering (-> PGP signature)
+exit

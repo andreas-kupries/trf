@@ -1,7 +1,5 @@
 # -*- tcl -*-
 
-#	ftp://ftp.westend.com/pub/aku/trf@mShortDosVersion@-win32.zip
-
 extension trf {
     description {
 	A loadable extension to Tcl providing commands for data conversion,
@@ -33,17 +31,15 @@ extension trf {
 	otp_words
     }
 
-    author       {Andreas Kupries (a.kupries@westend.com)}
-    maintenance  {Andreas Kupries (a.kupries@westend.com)}
+    author       {Andreas Kupries (andreas_kupries@users.sourceforge.net)}
+    maintenance  {Andreas Kupries (andreas_kupries@users.sourceforge.net)}
 
     version	   2.1p2
     copying-policy {BSD-Style, see 'tcl'-license}
-    date           {@mDate@}
+    date           {AUG-26-2002}
 
     primary-urls {
-	http://www.purl.org/NET/akupries/tcltk.html
-	http://www.purl.org/NET/akupries/soft/trf/
-	http://www.purl.org/NET/akupries/soft/trf/download/<ARCH>
+	http://tcltrf.sourceforge.net/
     }
 
     development-platform {Linux 2.0.29, gcc 2.7.2.3}
