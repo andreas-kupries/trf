@@ -304,19 +304,20 @@ install-bin:	application
 	@echo "Installing tclsh"
 	@$(INSTALL_PROGRAM) $(APP) $(BIN_INSTALL_DIR)
 
-install-tools: fix-hashbang-line
+install-tools:
 	$(tool)/mkinstalldirs  $(BIN_INSTALL_DIR)
 	@echo "Installing tools"
 	for i in $(TOOLS);		\
 	do 					\
-		@$(INSTALL_PROGRAM) $(TOOL)/$$i $(BIN_INSTALL_DIR); \
+		@$(INSTALL_PROGRAM) $(tool)/$$i $(BIN_INSTALL_DIR); \
+		tclsh $(tool)/fixhbline $(TCLSH_PATH) $(WISH_PATH) $(BIN_INSTALL_DIR)/$$i; \
 	done
 
-fix-hashbang-line:
-	for i in $(TOOLS);		\
-	do 					\
-		tclsh $(tool)/fixhbline $(TCLSH_PATH) $(WISH_PATH) $(tool)/$$i; \
-	done
+#fix-hashbang-line:
+#	for i in $(TOOLS);		\
+#	do 					\
+#	tclsh $(tool)/fixhbline $(TCLSH_PATH) $(WISH_PATH) $(tool)/$$i; \
+#	done
 
 
 #-------------------------------------------------------#
