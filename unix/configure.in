@@ -30,7 +30,9 @@ dnl AC_PATH_PROG(MAKEDEPEND,makedepend,:)
 AC_HAVE_HEADERS(dlfcn.h stdlib.h)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long int)
-AC_CHECK_LIB(crypt, md5_init_ctx, HAS_LIBCRYPT=1, HAS_LIBCRYPT=0)
+
+AC_CHECK_LIB(crypt, main,         HAS_LIBCRYPT=1,     HAS_LIBCRYPT=0)
+AC_CHECK_LIB(crypt, md5_init_ctx, HAS_LIBCRYPT_MD5=1, HAS_LIBCRYPT_MD5=0)
 
 dnl
 dnl use location of tclsh (wish?) as default for prefix, exec-prefix
@@ -888,15 +890,26 @@ if test "x${TCL_SHARED_LIB_SUFFIX}" != 'x${VERSION}.a' -o "x${SHLIB_SUFFIX}" != 
 	TCL_LIB_SPEC=""
 fi
 
-
 #--------------------------------------------------------------------
-# MD5 handling... do the support library or not.
+# MD5 handling...
+# Cases:
+#	(1) libcrypt not present		=> compile, use that name.
+#	(2) libcrypt present, contains Md5	=> nothing to do
+#	(3) libcrypt present, no Md5		=> compile, name = libmd5crypt
+#--------------------------------------------------------------------
 
 MD5_LIB_FILE=""
 if test \( $HAS_LIBCRYPT -eq 0 \)
 then
 	MD5_LIB_FILE=libcrypt$SHLIB_SUFFIX
+	TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=libcrypt$SHLIB_SUFFIX"
+else
+	if test \( $HAS_LIBCRYPT_MD5 -eq 0 \)
+		MD5_LIB_FILE=libmd5crypt$SHLIB_SUFFIX
+		TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=libmd5crypt$SHLIB_SUFFIX"
+	fi
 fi
+
 AC_SUBST(MD5_LIB_FILE)
 
 

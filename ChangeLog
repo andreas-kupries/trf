@@ -1,3 +1,11 @@
+Wed Dec  1 21:07:57 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* (tea,unix)/configure.in (MD5_LIB_FILE): Added check to
+ 	  differentiate between the mere existence of libcrypt and a
+ 	  libcrypt having md5 functionality. Solaris f.e. has a libcrypt
+	  without md5 and we have to make sure that our version does not
+	  clash with it.
+
 Mon Nov 29 22:12:34 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/digest.c (WriteDigest): Mikhail Teterin noticed that I
