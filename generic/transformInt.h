@@ -1,7 +1,7 @@
 /* -*- c -*-
  * transformInt.h - internal definitions
  *
- * Copyright (c) 1996 Andreas Kupries (a.kupries@westend.com)
+ * Copyright (C) 1996, 1997 Andreas Kupries (a.kupries@westend.com)
  * All rights reserved.
  *
  * Permission is hereby granted, without written agreement and without
@@ -312,20 +312,11 @@ EXTERN int TrfInit_Binio     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 /*
  * Define general result generation, dependent on major tcl version.
+ * 05/29/1997: not anymore, 8.0b1 smooths this out again. But leave
+ * definitions in to avoid immediate conversion of all affected files!
  */
 
-#if (TCL_MAJOR_VERSION < 8)
 #define ADD_RES(interp, text) Tcl_AppendResult (interp, text, (char*) NULL);
 #define RESET_RES(interp)     Tcl_ResetResult  (interp);
-#else
-#define ADD_RES(interp, text) Tcl_StringObjAppend (Tcl_GetObjResult (interp), (char*) text, -1);
-#define RESET_RES(interp)     Tcl_ResetObjResult  (interp);
-
-/* redirect tcl functionality to wrapper, get interpreter result right */
-#define Tcl_GetChannel TrfGetChannel
-
-EXTERN Tcl_Channel TrfGetChannel _ANSI_ARGS_((Tcl_Interp *interp,
-					      char *chanName, int *modePtr));
-#endif
 
 #endif /* TRF_INT_H */

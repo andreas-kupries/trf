@@ -197,10 +197,6 @@ ClientData             clientData;
    */
 
   if (TCL_OK != TrfLoadZlib (interp)) {
-#if (TCL_MAJOR_VERSION >= 8)
-    /* copy standard result to object-result too */
-    Tcl_StringObjAppend (Tcl_GetObjResult (interp), interp->result, -1);
-#endif
     return TCL_ERROR;
   }
 
@@ -282,7 +278,7 @@ ClientData  clientData;
       int res, val;
 
 #if (TCL_MAJOR_VERSION >= 8)
-      long v;
+      int v;
       res = Tcl_GetIntFromObj (interp, (Tcl_Obj*) optvalue, &v);
       val = v;
 #else

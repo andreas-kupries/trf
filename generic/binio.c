@@ -29,6 +29,8 @@
 
 
 #include <transformInt.h>
+
+#ifdef ENABLE_BINIO
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
@@ -983,6 +985,7 @@ char**      argv;		/* Argument strings. */
 
   return TCL_OK;
 }
+#endif /* ENABLE_BINIO */
 
 /*
  *------------------------------------------------------*
@@ -1006,8 +1009,10 @@ EXTERN int
 TrfInit_Binio (interp)
 Tcl_Interp* interp;
 {
+#ifdef ENABLE_BINIO
   Tcl_CreateCommand (interp, "binio", BinioCmd,
 		     (ClientData) NULL,
 		     (Tcl_CmdDeleteProc *) NULL);
+#endif /* ENABLE_BINIO */
   return TCL_OK;
 }

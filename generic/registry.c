@@ -82,7 +82,7 @@ TrfDeleteRegistry _ANSI_ARGS_ ((ClientData clientData, Tcl_Interp *interp));
 #if (TCL_MAJOR_VERSION >= 8)
 static int
 TrfExecuteObjCmd _ANSI_ARGS_((ClientData clientData, Tcl_Interp* interp,
-			      int objc, struct Tcl_Obj* objv []));
+			      int objc, struct Tcl_Obj* CONST objv []));
 #else
 static int
 TrfExecuteCmd _ANSI_ARGS_((ClientData clientData, Tcl_Interp* interp,
@@ -111,11 +111,16 @@ TrfSeek _ANSI_ARGS_ ((ClientData instanceData, long offset,
 static void
 TrfWatch _ANSI_ARGS_ ((ClientData instanceData, int mask));
 
+#if (TCL_MAJOR_VERSION < 8)
 static int
 TrfReady _ANSI_ARGS_ ((ClientData instanceData, int mask));
 
 static Tcl_File
 TrfGetFile _ANSI_ARGS_ ((ClientData instanceData, int mask));
+#else
+static int
+TrfGetFile _ANSI_ARGS_ ((ClientData instanceData, int direction, ClientData* handlePtr));
+#endif
 
 static int
 TransformImmediate _ANSI_ARGS_ ((Tcl_Interp* interp, Trf_RegistryEntry* entry,
@@ -288,8 +293,7 @@ CONST Trf_TypeDefinition* type;
   entry->trfType    = (Trf_TypeDefinition*) type;
   entry->interp     = interp;
 #if (TCL_MAJOR_VERSION >= 8)
-  entry->trfCommand = Tcl_CreateObjCommand (interp, (char*) type->name,
-					    strlen (type->name), TrfExecuteObjCmd,
+  entry->trfCommand = Tcl_CreateObjCommand (interp, (char*) type->name, TrfExecuteObjCmd,
 					    (ClientData) entry, TrfDeleteCmd);
 #else
   entry->trfCommand = Tcl_CreateCommand (interp, (char*) type->name, TrfExecuteCmd,
@@ -308,9 +312,14 @@ CONST Trf_TypeDefinition* type;
   entry->transType->seekProc         = TrfSeek;
   entry->transType->setOptionProc    = NULL;
   entry->transType->getOptionProc    = NULL;
+#if (TCL_MAJOR_VERSION < 8)
   entry->transType->watchChannelProc = TrfWatch;
   entry->transType->channelReadyProc = TrfReady;
   entry->transType->getFileProc      = TrfGetFile;
+#else
+  entry->transType->watchProc        = TrfWatch;
+  entry->transType->getHandleProc    = TrfGetFile;
+#endif
 
   /*
    * Add entry to internal registry.
@@ -597,7 +606,7 @@ TrfExecuteObjCmd (clientData, interp, objc, objv)
 ClientData       clientData;
 Tcl_Interp*      interp;
 int              objc;
-struct Tcl_Obj** objv;
+struct Tcl_Obj* CONST * objv;
 {
   /* (readable) shortcuts for calling the option processing vectors.
    * as defined in 'TrfExecuteCmd'.
@@ -1111,9 +1120,14 @@ int        mask;		/* Events of interest */
   Tcl_ChannelType*           p_type     = Tcl_GetChannelType         (trans->parent);
   ClientData                 p_instance = Tcl_GetChannelInstanceData (trans->parent);
 
+#if (TCL_MAJOR_VERSION < 8)
   p_type->watchChannelProc (p_instance, mask);
+#else
+  p_type->watchProc (p_instance, mask);
+#endif
 }
 
+#if (TCL_MAJOR_VERSION < 8)
 /*
  *------------------------------------------------------*
  *
@@ -1150,7 +1164,9 @@ int        mask;		/* Mask of queried events */
 
   return p_type->channelReadyProc (p_instance, mask);
 }
+#endif /* (TCL_MAJOR_VERSION < 8) */
 
+#if (TCL_MAJOR_VERSION < 8)
 /*
  *------------------------------------------------------*
  *
@@ -1184,6 +1200,41 @@ int        mask;		/* Direction of interest */
 
   return Tcl_GetChannelFile (trans->parent, mask);
 }
+#else
+/*
+ *------------------------------------------------------*
+ *
+ *	TrfGetFile --
+ *
+ *	------------------------------------------------*
+ *	Called from Tcl_GetChannelHandle to retrieve
+ *	OS specific file handle from inside this channel.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		None.
+ *
+ *	Result:
+ *		The appropriate Tcl_File or NULL if not
+ *		present. 
+ *
+ *------------------------------------------------------*
+ */
+static int
+TrfGetFile (instanceData, direction, handlePtr)
+ClientData  instanceData;	/* Channel to query */
+int         direction;		/* Direction of interest */
+ClientData* handlePtr;		/* Place to store the handle into */
+{
+  /*
+   * return handle belonging to parent channel
+   */
+
+  TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
+
+  return Tcl_GetChannelHandle (trans->parent, direction, handlePtr);
+}
+#endif
 
 /*
  *------------------------------------------------------*

@@ -284,6 +284,8 @@ char*       out;
   out [3] = (077 &   (in [2] & 077));
 }
 
+#if 0
+/* 05/29/1997: not required anymore, 8.0b1 smooths this out again. */
 #if (TCL_MAJOR_VERSION >= 8)
 /*
  *------------------------------------------------------*
@@ -323,4 +325,5 @@ int*        modePtr;
 
   return res;
 }
+#endif
 #endif
