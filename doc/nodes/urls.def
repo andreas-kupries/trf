@@ -65,7 +65,7 @@ url SSLeay    [lib SSLeay] trf_ssleay.html
 url libz      [lib libz] trf_zip.html#zlib
 url zlib      [lib zlib] trf_zip.html#zlib
 
-#link trf_capi {c API} ----
+link trf_capi {c API} ----
 link cmd_ref  {command reference}   trf_cmds.html
 link inst_man {installation manual} trf_install.html
 

@@ -14,6 +14,8 @@ node trf_home {
 	parent tcltk
     }
 
+    logo   [imglink trf_logo]
+
     menu {
 	trf_intro   trf_where      trf_ack
 	trf_install trf_cmds       trf_capi
