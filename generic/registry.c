@@ -225,9 +225,10 @@ ChannelHandler _ANSI_ARGS_ ((ClientData clientData, int mask));
 static void
 ChannelHandlerTimer _ANSI_ARGS_ ((ClientData clientData));
 
-
+#ifdef USE_TCL_STUBS
 static Tcl_Channel
 DownChannel _ANSI_ARGS_ ((TrfTransformationInstance* ctrl));
+#endif
 
 
 /*
@@ -2198,11 +2199,12 @@ ClientData clientData; /* Transformation to query */
   trans->timer = (Tcl_TimerToken) NULL;
 
   if (trans->patchIntegrated) {
-    Tcl_NotifyChannel (trans->self, mask);
+    Tcl_NotifyChannel (trans->self, TCL_READABLE);
   } else {
     ChannelHandler (clientData, trans->watchMask);
   }
 }
+
 #ifdef USE_TCL_STUBS
 /*
  *------------------------------------------------------*
