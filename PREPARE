@@ -25,7 +25,8 @@ mInsertInfo \
 set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mShortDosVersion@).dll"
 mInsertInfo \
 	win/README      win/pkgIndex.tcl \
-	win/makefile.vc win/makefile.vc5
+	win/makefile.vc win/makefile.vc5 \
+	win/trf.rc
 
 mGetDescription
 mExpandUrls
@@ -139,6 +140,34 @@ cd ..
 mConfigure unix
 
 
+# --------------------------------------------------------------
+# Generate windows binary distribution -------------------------
+# Temp dir Trf@mVersion@ => win32.zip
+# Contents: pkgindex.tcl  (win)
+#           license.terms (doc)
+#           doc/html-tree
+#           *.dll
+# --------------------------------------------------------------
+# make that a procedure, later.
+
+set bindir  "[::pool::string::cap $mName]${mVersion}"
+
+file mkdir $bindir
+eval file copy [glob win/trf*] $bindir
+file copy      doc/license.terms win/pkgIndex.tcl win/msvcrt.dll README $bindir
+
+set supfolder [file join .. sup.${mName}${mFullVersion}]
+cd $bindir
+exec unzip [file join .. $supfolder doc.zip]
+file rename ${mName}${mFullVersion}/doc/html doc
+file delete -force ${mName}${mFullVersion}
+cd ..
+
+exec zip -r9 win32.zip $bindir
+mSupport win32.zip
+file delete -force $bindir
+
+# --------------------------------------------------------------
 
 # generate message digests for all files and several digests
 mLog info Generating digests (please wait)...
