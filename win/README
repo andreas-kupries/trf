@@ -1,6 +1,6 @@
 
 		Tcl Data transformations (Tcl-Trf)
-		(Version @VERSION@ / @DATE@)
+		(Version @mFullVersion@ / @mDate@)
 
 		Andreas Kupries	(a.kupries@westend.com)
 
@@ -9,7 +9,7 @@ This is the README file for the Windows version of the 'Tcl-Trf' package.
 
 In order to compile Trf for Windows, you need the following items:
 
-	Trf @VERSION@ Source Distribution
+	Trf @mFullVersion@ Source Distribution
 	Tcl 7.6, 8.0* Source distribution
 	A version of 'patch' running under Windows.
 

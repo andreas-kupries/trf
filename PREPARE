@@ -2,8 +2,6 @@
 # prepare module 'Trf' for distribution
 
 
-
-
 # O. insert various information into some files
 #    (version, patchlevel, current date)
 
@@ -17,12 +15,13 @@ mInsertInfo \
 	README \
 	LSM \
 	DESCRIPTION \
+	PORTING \
 	generic/transform.h \
 	generic/patchlevel.h \
-	unix/configure.in \
 	mac/README \
-	win/README \
+	unix/configure.in \
 	unix/README \
+	win/README \
 	win/pkgIndex.tcl \
 	win/makefile.vc \
 	doc/install.tex
@@ -32,9 +31,9 @@ mInsertInfo \
 # I.   clean documentation
 # I.a  remove inofficial documents
 
-mVerbose \t\t\tremove inofficial documents
+mVerbose \t\tRemove inofficial documents
 
-eval mExclude mails patches/v8.0a1 [glob patches/nijtmans.*]
+eval mExclude mails patches/v8.0a1 [glob patches/nijtmans.*] DEPENDS
 
 cd doc/speed
 exec /bin/ln -s		../../tests/sha.test.vec f1000000
@@ -44,7 +43,7 @@ cd ..
 mExclude file delete FUN ascii.man ascii85 scratch-pad code34 Notes ToDo trf.def hash.operation INSTALL INSTALL.optional
 
 # I.b  generate official manual, diverse variants (dvi, ps)
-mVerbose \t\t\tgenerate official manual
+mVerbose \t\tGenerate official manual
 
 # pwd = doc
 catch {exec latex man}
@@ -79,7 +78,7 @@ cd ..
 
 
 # II. security measures
-mVerbose \t\t\tsecurity measures
+mVerbose \t\tSecurity measures
 
 # enable checking at target (do this before generation of manifest)
 cd tests
@@ -94,12 +93,13 @@ mConfigure unix
 
 
 # generate message digests for all files and several digests
-mVerbose \t\t\tgenerating digests (please wait)
+mVerbose \t\tGenerating digests (please wait)
+
 set files [exec /usr/bin/find . -type f -print]
 regsub -all "\n" $files { } files
 
 foreach md {crc crc-zlib adler md5 sha haval} {
-    mVerbose \t\t\t\t$md ...
+    mVerbose \t\t\t$md ...
     catch {eval exec md -a $md $files > digests.$md}
 }
 

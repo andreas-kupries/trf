@@ -5,7 +5,7 @@ extension trf {
 
     version	   1.0b3
     copying-policy {BSD-Style, see 'tcl'-license}
-    date           {@DATE@}
+    date           {@mDate@}
 
     description {
 	Collection of transformation procedures
@@ -18,9 +18,9 @@ extension trf {
     }
 
     primary-urls {
-	ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.tar.gz (~500 K)
-	ftp.kisters.de/pub/lang/tcl/ext/trf@NODOT_VERSION@.zip (~500 K)
-	ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.readme (~2 K)
+	ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz (~500 K)
+	ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip (~500 K)
+	ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme (~2 K)
     }
 
     development-platform {Linux 1.2.13, gcc 2.7.0}

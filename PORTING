@@ -1,5 +1,6 @@
-Porting notes for Tcl-Trf, the transformers package
----------------------------------------------------
+Porting notes for Tcl-Trf, the transformers package,
+as of @mFullVersion@, @mDate@
+----------------------------------------------------
 
 DEC/OSF1 V3.2
 	generic/idea.c must not be compiled with -O, -O2, -O3, ...

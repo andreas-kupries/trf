@@ -1,6 +1,6 @@
 
 		Tcl Data transformations (Tcl-Trf)
-		(Version @VERSION@ / @DATE@)
+		(Version @mFullVersion@ / @mDate@)
 
 		Andreas Kupries	(a.kupries@westend.com)
 

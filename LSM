@@ -1,7 +1,7 @@
 Begin3
 Title:          trf
-Version:        @VERSION@
-Entered-date:   @DATE@
+Version:        @mFullVersion@
+Entered-date:   @mShortDate@
 Description:    loadable extension, provides commands for
                 data conversion, encryption, message digests,
                 compression, error-correction, channel-based
@@ -10,9 +10,9 @@ Keywords:       tcl, conversion, encryption, message digests,
                 compression, error-correction, binary io
 Author:         a.kupries@westend.com  (Andreas Kupries)
 Maintained-by:  a.kupries@westend.com  (Andreas Kupries)
-Primary-URL:	ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.tar.gz (~500 K)
-		ftp.kisters.de/pub/lang/tcl/ext/trf@NODOT_VERSION@.zip (~500 K)
-		ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.readme (~2 K)
+Primary-URL:	ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz (~500 K)
+		ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip (~500 K)
+		ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme (~2 K)
 Platforms:	Linux 1.2.13	(gcc 2.7.0)	Development sytem
 		IRIX 6.2	(cc only)
 		ULTRIX 4.1	(both cc and gcc)

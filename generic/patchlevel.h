@@ -1,7 +1,7 @@
 /* -*- c -*-
  * patchlevel.h --
  *
- * Distributed at @DATE@.
+ * Distributed at @mDate@.
  *
  * This file does nothing except to define a "patch level" for TRF.
  * The patch level has the form "X.YpZ" where X.Y is the base
@@ -21,4 +21,4 @@
  * CVS $Id$
  */
 
-#define TRF_PATCH_LEVEL	"@VERSION@"
+#define TRF_PATCH_LEVEL	"@mFullVersion@"

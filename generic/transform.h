@@ -2,7 +2,7 @@
  *
  * transform.h - externally visible facilities of data transformers
  *
- * Distributed at @DATE@.
+ * Distributed at @mDate@.
  *
  * Copyright (c) 1995 Andreas Kupries (a.kupries@westend.com)
  * All rights reserved.
@@ -36,9 +36,9 @@
  * Definition of module version
  */
 
-#define TRF_VERSION		"@VERSION@"
-#define TRF_MAJOR_VERSION	@MAJOR_VERSION@
-#define TRF_MINOR_VERSION	@MINOR_VERSION@
+#define TRF_VERSION		"@mVersion@"
+#define TRF_MAJOR_VERSION	@mMajor@
+#define TRF_MINOR_VERSION	@mMinor@
 
 
 /*

@@ -1,6 +1,6 @@
 Hello world,
 
-Hereby I announce the transformer package Tcl-Trf @VERSION@
+Hereby I announce the transformer package Tcl-Trf @mFullVersion@
 enabling you to do
 
 *	encryption
@@ -19,12 +19,12 @@ Changes from b1 to b2:
 	(Un)packing will reorder bytes as needed, using the information
 	mentioned above.
 
-The package compiles cleanly with tcl 8.0a1/2.
+The package compiles cleanly with tcl 7.6, 8.0a2 (not a1!).
 
 It can be found at
-        <ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.tar.gz>
-        <ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@NODOT_VERSION@.zip>
-        <ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@VERSION@.readme>
+        <ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz>
+        <ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip>
+        <ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme>
 
 For convenience some supporting libraries are provided as well:
 
@@ -59,9 +59,4 @@ help me in making this package better.
 Enjoy,
 	Andreas Kupries <a.kupries@westend.com>	(private)
                         <aku@kisters.de>	(at work)
-
-----------------------------------------+--------------------------------------
-Don't believe that I'm speaking		| pgp-key:	via keyserver
-for my employer, not even if the	| finger print: 3E C8 C9 6B 2A EC 05 B1
-contrary is stated in message above	|		EE 49 15 0B 62 DC 23 06
-----------------------------------------+--------------------------------------
+-------------------------------------------------------------------------------
