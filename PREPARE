@@ -70,7 +70,11 @@ mExclude \
 	unix/bdist/ak.3 unix/bdist/ak.4 \
 	win/bdist/cygwin.jan.17.1 win/bdist/jan.2
 
-mHandleBinaryDistributions doc/license.terms README win/msvcrt.dll
+mHandleBinaryDistributions \
+	doc/license.terms README \
+	win/msvcrt.dll \
+	win/bdist/crypt.dll \
+	unix/bdist/libcrypt.so
 
 
 # I.b  generate official manual, diverse variants (dvi, ps)
