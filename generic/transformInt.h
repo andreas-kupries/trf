@@ -210,6 +210,31 @@ TrfCipherOptions _ANSI_ARGS_ ((void));
 
 
 /*
+ * Definition of option information for general transformation (reflect.c, ref_opt.c)
+ * to set of vectors processing these.
+ */
+
+typedef struct _TrfTransformOptionBlock {
+  int mode; /* operation to execute (transform for read or write) */
+
+#if (TCL_MAJOR_VERSION >= 8)
+  Tcl_Obj*       command; /* tcl code to execute for a buffer */
+#else
+  unsigned char* command; /* tcl code to execute for a buffer */
+#endif
+} TrfTransformOptionBlock;
+
+/*#define TRF_UNKNOWN_MODE (0) -- transform.h */
+#define TRF_WRITE_MODE (1)
+#define TRF_READ_MODE  (2)
+
+
+
+EXTERN Trf_OptionVectors*
+TrfTransformOptions _ANSI_ARGS_ ((void));
+
+
+/*
  * Definition of option information for ZIP compressor
  * + accessor to set of vectors processing them
  */
@@ -308,6 +333,8 @@ EXTERN int TrfInit_ZIP       _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int TrfInit_Unstack   _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_Binio     _ANSI_ARGS_ ((Tcl_Interp* interp));
+
+EXTERN int TrfInit_Transform _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 
 /*

@@ -52,6 +52,10 @@ typedef struct _TrfTransformationInstance_ {
 
   int readIsFlushed; /* flag to note wether in.flushProc was called or not */
 
+  int mode;          /* mode of parent channel,
+		      * OR'ed combination of
+		      * TCL_READABLE, TCL_WRITABLE */
+
   /* Tcl_Transformation standard;   data required for all transformation instances */
   DirectionInfo      in;         /* information for conversion of read data */
   DirectionInfo      out;        /* information for conversion of written data */
@@ -274,13 +278,13 @@ CONST Trf_TypeDefinition* type;
 
   assert (type->encoder.createProc);
   assert (type->encoder.deleteProc);
-  assert (type->encoder.convertProc);
+  assert ((type->encoder.convertProc != NULL) || (type->encoder.convertBufProc != NULL));
   assert (type->encoder.flushProc);
   assert (type->encoder.clearProc);
 
   assert (type->decoder.createProc);
   assert (type->decoder.deleteProc);
-  assert (type->decoder.convertProc);
+  assert ((type->decoder.convertProc != NULL) || (type->decoder.convertBufProc != NULL));
   assert (type->decoder.flushProc);
   assert (type->decoder.clearProc);
 
@@ -829,13 +833,29 @@ Tcl_Interp* interp;
    * parts do rely on (-> message digests).
    */
 
-  trans->out.vectors->flushProc (trans->out.control, (Tcl_Interp*) NULL, trans->clientData);
 
-  if (!trans->readIsFlushed)
-    trans->in.vectors->flushProc (trans->in.control,  (Tcl_Interp*) NULL, trans->clientData);
+  if (trans->mode & TCL_WRITABLE) {
+    trans->out.vectors->flushProc (trans->out.control,
+				   (Tcl_Interp*) NULL,
+				   trans->clientData);
+  }
 
-  trans->out.vectors->deleteProc (trans->out.control, trans->clientData);
-  trans->in.vectors->deleteProc  (trans->in.control,  trans->clientData);
+  if (trans->mode & TCL_READABLE) {
+    if (!trans->readIsFlushed) {
+      trans->readIsFlushed = 1;
+      trans->in.vectors->flushProc (trans->in.control,
+				    (Tcl_Interp*) NULL,
+				    trans->clientData);
+    }
+  }
+
+  if (trans->mode & TCL_WRITABLE) {
+    trans->out.vectors->deleteProc (trans->out.control, trans->clientData);
+  }
+
+  if (trans->mode & TCL_READABLE) {
+    trans->in.vectors->deleteProc  (trans->in.control,  trans->clientData);
+  }
 
   if (trans->allocated)
     Tcl_Free (trans->result);
@@ -870,6 +890,8 @@ int*       errorCodePtr;
 {
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
   int gotBytes, read, i, res;
+
+  /* should assert (trans->mode & TCL_READABLE) */
 
   gotBytes = 0;
 
@@ -940,6 +962,11 @@ int*       errorCodePtr;
       if (! Tcl_Eof (trans->parent)) {
 	return gotBytes;
       } else {
+	if (trans->readIsFlushed) {
+	  /* already flushed, nothing to do anymore */
+	  return gotBytes;
+	}
+
 	trans->readIsFlushed = 1;
 	res = trans->in.vectors->flushProc (trans->in.control,
 					    (Tcl_Interp*) NULL,
@@ -1009,12 +1036,14 @@ int*       errorCodePtr;
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
   int i, res;
 
+  /* should assert (trans->mode & TCL_WRITABLE) */
+
   /*
    * transformation results are automatically written to the parent channel
    * ('PutDestination' was configured as write procedure in 'AttachTransformation')
    */
 
-    if (trans->in.vectors->convertBufProc){ 
+    if (trans->out.vectors->convertBufProc){ 
       res = trans->out.vectors->convertBufProc (trans->out.control,
 					       buf, toWrite,
 						(Tcl_Interp*) NULL,
@@ -1078,9 +1107,16 @@ int*       errorCodePtr;	/* Location of error flag. */
    * Flush data waiting for output, discard everything in the input buffers.
    */
 
-  trans->out.vectors->flushProc (trans->out.control, (Tcl_Interp*) NULL, trans->clientData);
-  trans->in.vectors->clearProc  (trans->in.control, trans->clientData);
-  trans->readIsFlushed = 0;
+  if (trans->mode & TCL_WRITABLE) {
+    trans->out.vectors->flushProc (trans->out.control,
+				   (Tcl_Interp*) NULL,
+				   trans->clientData);
+  }
+
+  if (trans->mode & TCL_READABLE) {
+    trans->in.vectors->clearProc  (trans->in.control, trans->clientData);
+    trans->readIsFlushed = 0;
+  }
 
   result = Tcl_Seek (trans->parent, offset, mode);
   *errorCodePtr = (result == -1) ? Tcl_GetErrno ():0;
@@ -1360,43 +1396,47 @@ Tcl_Interp*        interp;
   trans->clientData       = entry->trfType->clientData;
   trans->parent           = attach;
   trans->readIsFlushed    = 0;
+  trans->mode             = Tcl_GetChannelMode (attach);
 
   if (ENCODE_REQUEST (entry, optInfo)) {
     /* ENCODE on write
      * DECODE on read
      */
 
-    trans->out.vectors = &entry->trfType->encoder;
-    trans->in.vectors  = &entry->trfType->decoder;
+    trans->out.vectors = ((trans->mode & TCL_WRITABLE) ? &entry->trfType->encoder : NULL);
+    trans->in.vectors  = ((trans->mode & TCL_READABLE) ? &entry->trfType->decoder : NULL);
 
   } else /* mode == DECODE */ {
     /* DECODE on write
      * ENCODE on read
      */
 
-    trans->out.vectors = &entry->trfType->decoder;
-    trans->in.vectors  = &entry->trfType->encoder;
+    trans->out.vectors = ((trans->mode & TCL_WRITABLE) ? &entry->trfType->decoder : NULL);
+    trans->in.vectors  = ((trans->mode & TCL_READABLE) ? &entry->trfType->encoder : NULL);
   }
 
-  trans->out.control = trans->out.vectors->createProc ((ClientData) trans->parent,
-						       PutDestination,
-						       optInfo, interp,
-						       trans->clientData);
-
-  if (trans->out.control == (Trf_ControlBlock) NULL) {
-    Tcl_Free ((char*) trans);
-    return TCL_ERROR;
+  if (trans->mode & TCL_WRITABLE) {
+    trans->out.control = trans->out.vectors->createProc ((ClientData) trans->parent,
+							 PutDestination,
+							 optInfo, interp,
+							 trans->clientData);
+  
+    if (trans->out.control == (Trf_ControlBlock) NULL) {
+      Tcl_Free ((char*) trans);
+      return TCL_ERROR;
+    }
   }
 
-  trans->in.control  = trans->in.vectors->createProc  ((ClientData) trans, PutTrans,
-						       optInfo, interp,
-						       trans->clientData);
+  if (trans->mode & TCL_READABLE) {
+    trans->in.control  = trans->in.vectors->createProc  ((ClientData) trans, PutTrans,
+							 optInfo, interp,
+							 trans->clientData);
 
-  if (trans->in.control == (Trf_ControlBlock) NULL) {
-    Tcl_Free ((char*) trans);
-    return TCL_ERROR;
+    if (trans->in.control == (Trf_ControlBlock) NULL) {
+      Tcl_Free ((char*) trans);
+      return TCL_ERROR;
+    }
   }
-
 
   trans->result    = (unsigned char*) NULL;
   trans->allocated = 0;
@@ -1408,7 +1448,7 @@ Tcl_Interp*        interp;
 
   new = Tcl_ReplaceChannel (interp,
 			    entry->transType, (ClientData) trans,
-			    Tcl_GetChannelMode (attach), attach);
+			    trans->mode, attach);
 
 
   if (new == (Tcl_Channel) NULL) {

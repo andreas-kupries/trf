@@ -211,6 +211,15 @@ Tcl_Interp* interp;
       return res;
 
     /*
+     * Register freeform transformation, reflector into tcl level
+     */
+
+    res = TrfInit_Transform (interp);
+
+    if (res != TCL_OK)
+      return res;
+
+    /*
      * Register standard encodings.
      */
 
