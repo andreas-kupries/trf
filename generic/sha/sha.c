@@ -52,7 +52,7 @@ static void sha_transform(sha_info)
 SHA_INFO *sha_info;
 {
     int i;
-    LONG temp, A, B, C, D, E, W[80];
+    UINT32 temp, A, B, C, D, E, W[80];
 
     for (i = 0; i < 16; ++i) {
 	W[i] = sha_info->data[i];
@@ -114,12 +114,12 @@ SHA_INFO *sha_info;
 /* change endianness of data */
 
 static void byte_reverse(buffer, count)
-LONG *buffer; int count;
+UINT32 *buffer; int count;
 {
     int i;
     BYTE ct[4], *cp;
 
-    count /= sizeof(LONG);
+    count /= sizeof(UINT32);
     cp = (BYTE *) buffer;
     for (i = 0; i < count; ++i) {
 	ct[0] = cp[0];
@@ -130,7 +130,7 @@ LONG *buffer; int count;
 	cp[1] = ct[2];
 	cp[2] = ct[1];
 	cp[3] = ct[0];
-	cp += sizeof(LONG);
+	cp += sizeof(UINT32);
     }
 }
 
@@ -155,11 +155,11 @@ SHA_INFO *sha_info;
 void sha_update(sha_info, buffer, count)
 SHA_INFO *sha_info; BYTE *buffer; int count;
 {
-    if ((sha_info->count_lo + ((LONG) count << 3)) < sha_info->count_lo) {
+    if ((sha_info->count_lo + ((UINT32) count << 3)) < sha_info->count_lo) {
 	++sha_info->count_hi;
     }
-    sha_info->count_lo += (LONG) count << 3;
-    sha_info->count_hi += (LONG) count >> 29;
+    sha_info->count_lo += (UINT32) count << 3;
+    sha_info->count_hi += (UINT32) count >> 29;
     while (count >= SHA_BLOCKSIZE) {
 	memcpy(sha_info->data, buffer, SHA_BLOCKSIZE);
 #ifdef LITTLE_ENDIAN
@@ -178,7 +178,7 @@ void sha_final(sha_info)
 SHA_INFO *sha_info;
 {
     int count;
-    LONG lo_bit_count, hi_bit_count;
+    UINT32 lo_bit_count, hi_bit_count;
 
     lo_bit_count = sha_info->count_lo;
     hi_bit_count = sha_info->count_hi;

@@ -9,17 +9,20 @@
 /* Useful defines & typedefs */
 
 typedef unsigned char BYTE;
-#ifndef __WIN32__
-typedef unsigned long LONG;
+#ifdef __alpha
+typedef unsigned int  UINT32;
+#else
+typedef unsigned long UINT32;
 #endif
+
 
 #define SHA_BLOCKSIZE		64
 #define SHA_DIGESTSIZE		20
 
 typedef struct {
-    LONG digest[5];		/* message digest */
-    LONG count_lo, count_hi;	/* 64-bit bit count */
-    LONG data[16];		/* SHA data buffer */
+    UINT32 digest[5];		/* message digest */
+    UINT32 count_lo, count_hi;	/* 64-bit bit count */
+    UINT32 data[16];		/* SHA data buffer */
 } SHA_INFO;
 
 void sha_init   _ANSI_ARGS_ ((SHA_INFO *));

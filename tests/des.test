@@ -145,5 +145,9 @@ foreach i [lsort [array names key]] {
 }
 
 
+# test stream modes for DES
+
+
+
 # remove globals
 unset in out key

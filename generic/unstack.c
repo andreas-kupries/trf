@@ -30,7 +30,7 @@
 #include	"transformInt.h"
 
 static int
-TrfUnstackCmd _ANSI_ARGS_ ((ClientData notUsed, Tcl_Interp* interp, int argc, char** argv))
+TrfUnstackCmd _ANSI_ARGS_ ((ClientData notUsed, Tcl_Interp* interp, int argc, char** argv));
 
 /*
  *----------------------------------------------------------------------
@@ -51,10 +51,10 @@ TrfUnstackCmd _ANSI_ARGS_ ((ClientData notUsed, Tcl_Interp* interp, int argc, ch
 
 static int
 TrfUnstackCmd(notUsed, interp, argc, argv)
-    ClientData notUsed;			/* Not used. */
-    Tcl_Interp *interp;			/* Current interpreter. */
-    int argc;				/* Number of arguments. */
-    char **argv;			/* Argument strings. */
+    ClientData  notUsed;		/* Not used. */
+    Tcl_Interp* interp;			/* Current interpreter. */
+    int         argc;			/* Number of arguments. */
+    char**      argv;			/* Argument strings. */
 {
   /*
    * unstack <channel>

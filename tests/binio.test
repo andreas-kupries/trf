@@ -79,7 +79,12 @@ test binio-1.7 {binio copy, errors} {
 test binio-1.8 {binio copy} {
     set input  [open test.binio r]
     set output [memchan]
+
+    fconfigure $input  -translation binary
+    fconfigure $output -translation binary
+
     set n [binio copy $input $output]
+
     close $output
     close $input
     set n

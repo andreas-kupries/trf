@@ -203,7 +203,7 @@ test:	    $(TRFDLL)
 		source all
 <<
 install:	$(TRFDLL)
-	md $(INSTALLDIR)
+	-@md $(INSTALLDIR)
 	$(CP) $(TRFDLL)              $(INSTALLDIR)\$(TRFDLL)
 	$(CP) $(WINDIR)\pkgIndex.tcl $(INSTALLDIR)\pkgIndex.tcl
 

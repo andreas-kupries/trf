@@ -1,50 +1,40 @@
 
-think about make-tape extension to allow different prepares
-=>	international / us distribution
-=>	us distrib should contain stubs for all ciphers except DES!
-=>	there shall be exist some law banning import!! of strong crypto
-	(ref: jacob levy).
+Memchan:
+	source distributions:
+		memchanXX.tar.gz
+		memchanXX.zip
+
+	binary distributions:
+		mchanXXb.zip	(windoze)
+			mchanXX.dll
+			pkgIndex.tcl
+
+	infos
+		memchanXX.README
+		memchanXX.ANNOUNCE
+		memchanXX.LSM
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-<>	corrected error in tclIO.c
-	regarding delivery of empty buffer by transformation sequence
-	(got into infinite loop)
----------------------------------------------------------------------
+Trf:
+	source distributions:
+		trfXX.tar.gz
+		trfXX.zip
 
+	binary distributions:
+		trfXXb.zip	(windoze)
+			trfXX.dll
+			pkgIndex.tcl
 
-fragments for emacs registers
+	infos:
+		trfXX.README
+		trfXX.ANNOUNCE
+		trfXX.LSM
 
-clientData
-ClientData clientData;
-, clientData
-,
-						     ClientData clientData
+	loaded libraries:
+		zlib-1.0.4
+		lib-3.23
 
-
------------------------------------------------------------------------
-documentation to schedule interface.
-
-typedef void (Trf_BCSchedule)     _ANSI_ARGS_ ((VOID*  key, int wanted,
-						VOID** e_schedule,
-						VOID** d_schedule));
-possible calls:
-
-	key, encrypt, *e/d_schedule = NULL
-
-		generate encryption schedule (may generate decryption schedule too!)
-
-	key, decrypt, *e/d_schedule = NULL
-
-		generate decryption schedule (may generate encryption schedule too!)
-		(higher prob. of latter, as d_schedule often derived from e_schedule).
-
-	key, encrypt, *e_schedule != NULL
-
-		nothing to do for encryption schedule.
-		may generate decryption schedule.
-
-	key, decrypt, *d_schedule != NULL
-
-		nothing to do for decryption schedule.
-		may generate encryption schedule.
+	=> separate binary distribution for windoze
+	=>	trfXXbs.zip
+			zlib.dll
+			libdes.dll

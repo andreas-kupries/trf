@@ -1,8 +1,29 @@
+Tue Feb 25 22:38:18 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* generic/sha/sha.[ch]: renamed typedef'd LONG to UINT32. Avoids
+	  collision with definition made by Windows.
+
+Sun Feb 23 18:46:33 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* generic/idea/idea.h: see below.
+
+	* generic/sha/sha.h: Added check for compilation on DEC Alphas,
+	  define LONG accordingly.
+
+Thu Feb 20 21:27:32 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* generic/zlib.c (Z_LIB_NAME): Default is 'zlib.dll' now.
+
+	* win/makefile.vc (install): protect 'md' with -@ against errors
+	  (directory maybe in existence already).
+
+	* tests/binio.test: added 'fconfigure -translation binary' to 1.8
+
 Sat Feb 15 22:58:32 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* tests/sha.test: don't execute 'sha-2.2' under windows. Uses
 	  'cat' to beef up a 1000 character file to 1e6 characters. A more
-	  portable method is required. 
+	  portable method is required to do this. 
 
 	* tests/binio.test: spots using '/dev/null' rewritten, removed
 	  dependency on un*x.
@@ -72,7 +93,7 @@ Thu Feb 13 21:40:03 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	* generic/util.c (TrfMerge4To3): The cpp's used so far don't
 	  understand an empty argument to a macro. Noop '>> 0' supplied now.
 
-	* generic/binio.c (Packcmd, 'D', 'U'): Had wrong casts here.
+	* generic/binio.c (PackCmd, 'D', 'U'): Had wrong casts here.
 
 	* generic/registry.c (TransformImmediate): signed/unsigned mismatch.
 
@@ -144,7 +165,7 @@ Tue Feb 11 18:46:01 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* generic/registry.c (TrfExecuteObjCmd): New function, equivalent
 	  to 'TrfExecuteCmd', uses the object interfaces of tcl 8.
-	  Conditionally compilation removes functionality for Tcl below
+	  Conditional compilation removes functionality for Tcl below
 	  version 8.x
 
 Thu Feb  6 19:27:41 1997  Andreas Kupries  <aku@bluepeak.westend.com>

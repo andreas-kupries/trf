@@ -12,7 +12,7 @@
 #include "transformInt.h"
 
 #ifdef __WIN32__
-#define Z_LIB_NAME "z.dll"
+#define Z_LIB_NAME "zlib.dll"
 #endif
 
 #ifndef Z_LIB_NAME
