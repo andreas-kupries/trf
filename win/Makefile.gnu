@@ -6,7 +6,8 @@
 
 EXTENSION	= Trf
 VERSION		= @mFullVersion@
-TCL_VERSION	= 81
+#TCL_VERSION	= 81
+TCL_VERSION	= 82
 
 TRF_DLL_FILE	    = ${EXTENSION}@mShortDosVersion@.dll
 TRF_LIB_FILE	    = lib${EXTENSION}@mShortDosVersion@.a
@@ -31,7 +32,7 @@ TMPDIR		=	.
 # Directories in which the Tcl core can be found
 TCL_INC_DIR	= /progra~1/tcl/include
 TCL_LIB_DIR	= /progra~1/tcl/lib
-TCL_LIB_SPEC	= /progra~1/tcl/lib/libtclstub81.a
+TCL_LIB_SPEC	= /progra~1/tcl/lib/libtclstub$(TCL_VERSION).a
 
 # Libraries to be included with trf.dll
 TCL_SHARED_LIBS		=
@@ -78,7 +79,7 @@ MAN_INSTALL_DIR =	$(INSTALL_ROOT)$(prefix)/man
 
 # To change the compiler switches, for example to change from -O
 # to -g, change the following line:
-CFLAGS		=	-O2 -mno-cygwin -DNDEBUG -D__WIN32__ -DTCL_THREADS -DHAVE_STDLIB_H
+CFLAGS		=	-O2 -mno-cygwin -DNDEBUG -DUSE_TCL_STUBS -D__WIN32__ -DTCL_THREADS -DHAVE_STDLIB_H
 
 # To disable ANSI-C procedure prototypes reverse the comment characters
 # on the following lines:
@@ -157,7 +158,7 @@ DLLWRAP = dllwrap -mnocygwin
 WINDRES = windres
 
 DLL_LDFLAGS = -mwindows -Wl,-e,_DllMain@12
-DLL_LDLIBS = -L/progra~1/tcl/lib -ltclstub81
+DLL_LDLIBS = -L/progra~1/tcl/lib -ltclstub$(TCL_VERSION)
 
 baselibs   = -lkernel32 $(optlibs) -ladvapi32
 winlibs    = $(baselibs) -luser32 -lgdi32 -lcomdlg32 -lwinspool
@@ -253,6 +254,7 @@ OBJECTS	=	adler.o \
 	bz2.o \
 	bz2_opt.o \
 	bz2lib.o \
+	qpcode.o \
 	reflect.o \
 	ref_opt.o \
 	tclLoadWin.o
@@ -376,6 +378,9 @@ bz2_opt.o:	../generic/zip_opt.c
 
 bz2lib.o:	../generic/zlib.c
 	$(CC) -c $(CC_SWITCHES) ../generic/bz2lib.c -o $@
+
+qpcode.o:	../generic/qpcode.c
+	$(CC) -c $(CC_SWITCHES) ../generic/qpcode.c -o $@
 
 reflect.o:	../generic/reflect.c
 	$(CC) -c $(CC_SWITCHES) ../generic/reflect.c -o $@

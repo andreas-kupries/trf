@@ -1,3 +1,7 @@
+Tue Sep 14 23:07:50 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* Applied patch sent in by Jan Nijtmans.
+
 Fri Sep 10 21:10:55 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* doc/nodes/{intro,install,patch,future}.node: Updated to include

@@ -279,6 +279,8 @@ int haval_file (file_name, fingerprint)
  }
 }
 
+#ifndef __WIN32__
+
 /* hash input from stdin */
 void haval_stdin ()
 {
@@ -298,6 +300,8 @@ void haval_stdin ()
     putchar(fingerprint[i]);
   }
 }
+
+#endif
 
 /* initialization */
 void haval_start (state)

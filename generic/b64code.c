@@ -345,11 +345,13 @@ ClientData clientData;
 #define CRLF_IN(v) (CRLF_AT(0,v) || CRLF_AT(1,v))
 
     /* dbg + * /
+#if 0
     if (CRLF_IN (c->buf)){ 
       printf ("split (%d,%d,%d) = %d,%d,%d,%d = ",
 	      c->buf [0], c->buf [1], c->buf [2],
 	      buf [0], buf [1], buf [2], buf [3]);
     }
+#endif
     / **/
 
     TrfApplyEncoding (buf, 4, baseMap);

@@ -182,7 +182,7 @@ char *
 dlerror()
 {
     TclWinConvertError(GetLastError());
-    return Tcl_ErrnoMsg(errno);
+    return Tcl_ErrnoMsg(Tcl_GetErrno());
 }
 
 /*
