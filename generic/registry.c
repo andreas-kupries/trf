@@ -249,10 +249,11 @@ TrfExecuteObjCmd _ANSI_ARGS_((ClientData clientData, Tcl_Interp* interp,
 static void
 TrfDeleteCmd _ANSI_ARGS_((ClientData clientData));
 
+#if 0
 static int
 TrfInfoObjCmd _ANSI_ARGS_((ClientData clientData, Tcl_Interp* interp,
 			   int objc, struct Tcl_Obj* CONST objv []));
-
+#endif
 /* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
  */
 static int

@@ -209,6 +209,7 @@ AC_DEFINE(USE_TCL_STUBS)
 #--------------------------------------------------------------------
 
 AC_CHECK_FUNCS(ltoa)
+AC_CHECK_LIB(crypt, md5_init_ctx, HAS_LIBCRYPT=1, HAS_LIBCRYPT=0)
 
 #--------------------------------------------------------------------
 # This macro generates a line to use when building a library.  It
@@ -326,6 +327,17 @@ fi
 AC_SUBST(DL_OBJS)
 
 TRF_FIND_ZLIB_SSL
+
+#--------------------------------------------------------------------
+# MD5 handling... do the support library or not.
+
+MD5_LIB_FILE=""
+if test \( $HAS_LIBCRYPT -eq 0 \)
+then
+	MD5_LIB_FILE=libcrypt.$SHARED_LIB_SUFFIX
+fi
+AC_SUBST(MD5_LIB_FILE)
+
 
 #--------------------------------------------------------------------
 # Finally, substitute all of the various values into the Makefile.

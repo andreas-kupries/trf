@@ -151,6 +151,8 @@ TRF_STUB_LIB_FILE=	@TRF_STUB_LIB_FILE@
 ZLIB_LIB_FILE	=	@ZLIB_LIB_FILE@
 LIBDES_LIB_FILE	=	@LIBDES_LIB_FILE@
 
+MD5_LIB_FILE	=	@MD5_LIB_FILE@
+
 #----------------------------------------------------------------
 # The information below is modified by the configure script when
 # Makefile is generated from Makefile.in.  You shouldn't normally
@@ -186,6 +188,10 @@ CC_SWITCHES	=	$(CFLAGS) $(TRF_SHLIB_CFLAGS) $(CPPFLAGS)	\
 			$(LIBDES_OPTS) @TCL_DEFS@ @TRF_DEFS@
 # $(TCL_CC_SWITCHES)
 CPPFLAGS	=	$(DEFINES) $(INCLUDES)
+
+MD5_INCLUDES	=	$(INCLUDES) -I$(TOP_DIR)/md5-crypt
+MD5_CPPFLAGS	=	$(DEFINES) $(MD5_INCLUDES)
+MD5_CC_SWITCHES	=	$(CFLAGS) $(TRF_SHLIB_CFLAGS) $(MD5_CPPFLAGS)
 
 INCLUDES	=	-I. -I$(srcdir) -I$(GENERIC_DIR) -I$(TOP_DIR)	\
 			-I$(TCL_INCLUDE_DIR) -I$(SSL_INCLUDE_DIR)	\
@@ -243,7 +249,7 @@ CVT_ALG_OBJ	=	bincode.o hexcode.o octcode.o uucode.o b64code.o asc85code.o otpco
 MD_SRC		=	$(GENERIC_DIR)/dig_opt.c	\
 			$(GENERIC_DIR)/digest.c		\
 			$(GENERIC_DIR)/crc.c		\
-			$(GENERIC_DIR)/md5.c		\
+			$(GENERIC_DIR)/md5dig.c		\
 			$(GENERIC_DIR)/haval.c		\
 			$(GENERIC_DIR)/sha.c		\
 			$(GENERIC_DIR)/adler.c		\
@@ -255,7 +261,7 @@ MD_SRC		=	$(GENERIC_DIR)/dig_opt.c	\
 			$(GENERIC_DIR)/otpmd5.c		\
 			$(GENERIC_DIR)/otpsha1.c
 
-MD_OBJ		=	dig_opt.o digest.o crc.o md5.o haval.o sha.o	\
+MD_OBJ		=	dig_opt.o digest.o crc.o md5dig.o haval.o sha.o	\
 			adler.o crc_zlib.o md2.o sha1.o rmd160.o rmd128.o \
 			otpmd5.o otpsha1.o
 
@@ -293,12 +299,18 @@ LOADLIBES	=	@TRF_BUILD_LIB_SPEC@ $(ALL_LIBS)
 
 STUB_OBJ	=	@STUB_LIBOBJS@
 
+
+MD5_OBJECTS	=	stpncpy.o	\
+			crypt-entry.o	\
+			md5-crypt.o	\
+			md5.o
+
 #-------------------------------------------------------#
 
 all:	check-package library
 
 clean:
-	rm -f $(OBJECTS) $(TRF_LIB_FILE) $(TRF_STUB_LIB_FILE) $(APP) $(TCLSH_OBJS) $(DOCTEMP) $(STUB_OBJ)
+	rm -f $(OBJECTS) $(MD5_OBJECTS) $(TRF_LIB_FILE) $(MD5_LIB_FILE) $(TRF_STUB_LIB_FILE) $(APP) $(TCLSH_OBJS) $(DOCTEMP) $(STUB_OBJ)
 	rm -f TAGS *~ */*~ core*
 
 distclean:	clean
@@ -308,12 +320,14 @@ distclean:	clean
 install:	install-lib install-header @install_other@ install-tools
 
 
-install-lib: $(TRF_LIB_FILE) $(TRF_STUB_LIB_FILE)
+install-lib: $(TRF_LIB_FILE) $(MD5_LIB_FILE) $(TRF_STUB_LIB_FILE)
 	$(tool)/mkinstalldirs $(LIB_INSTALL_DIR)
 	@echo "Installing $(TRF_LIB_FILE)"
 	@$(INSTALL_DATA) $(TRF_LIB_FILE) $(LIB_INSTALL_DIR)
+	@$(INSTALL_DATA) $(MD5_LIB_FILE) $(LIB_INSTALL_DIR)
 	@$(INSTALL_DATA) $(TRF_STUB_LIB_FILE) $(LIB_INSTALL_DIR)
 	@$(RANLIB) $(LIB_INSTALL_DIR)/$(TRF_LIB_FILE)
+	@$(RANLIB) $(LIB_INSTALL_DIR)/$(MD5_LIB_FILE)
 	@$(INSTALL_DATA) $(UNIX_DIR)/pkgIndex.tcl $(LIB_INSTALL_DIR)/pkgIndex.tcl
 
 
@@ -347,7 +361,7 @@ install-tools:
 
 lib:	library
 
-library:	$(TRF_LIB_FILE) $(TRF_STUB_LIB_FILE)
+library:	$(TRF_LIB_FILE) $(TRF_STUB_LIB_FILE) $(MD5_LIB_FILE)
 	@echo ... done
 
 app:	application
@@ -372,9 +386,9 @@ check-package:
 
 check:	test
 
-test:	application
+test:
 	TCL_LIBRARY=$(TCL_SRC_DIR)/library; export TCL_LIBRARY; \
-	LD_LIBRARY_PATH="$(srcdir):./unix:$(TCL_LIB_DIR):$(ZLIB_LIB_DIR):$(SSL_LIB_DIR)"; \
+	LD_LIBRARY_PATH="$(srcdir):./unix:../unix:$(TCL_LIB_DIR):$(ZLIB_LIB_DIR):$(SSL_LIB_DIR)"; \
 	export LD_LIBRARY_PATH; SHLIB_PATH="$LD_LIBRARY_PATH"; export SHLIB_PATH ; \
 	echo package require Memchan \; load ./$(TRF_LIB_FILE) \; cd $(TOP_DIR)/tests \; source defs \; defConstraints \"$(TRF_TESTS)\" \; source all | $(TCLSH_PROG)
 
@@ -457,8 +471,8 @@ digest.o: $(GENERIC_DIR)/digest.c
 crc.o: $(GENERIC_DIR)/crc.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/crc.c -o $@
 
-md5.o: $(GENERIC_DIR)/md5.c
-	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/md5.c -o $@
+md5dig.o: $(GENERIC_DIR)/md5dig.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/md5dig.c -o $@
 
 md2.o: $(GENERIC_DIR)/md2.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/md2.c -o $@
@@ -537,6 +551,21 @@ _eprintf.o:	$(TOP_DIR)/compat/_eprintf.c
 	$(CC) -c $(CC_SWITCHES) $(TOP_DIR)/compat/_eprintf.c -o $@
 
 #-------------------------------------------------------#
+# MD5 files for supporting library
+
+stpncpy.o:	$(TOP_DIR)/compat/stpncpy.c
+	$(CC) -c $(MD5_CC_SWITCHES) $(TOP_DIR)/compat/stpncpy.c -o $@
+
+crypt-entry.o:	$(TOP_DIR)/md5-crypt/crypt-entry.c
+	$(CC) -c $(MD5_CC_SWITCHES) $(TOP_DIR)/md5-crypt/crypt-entry.c -o $@
+
+md5-crypt.o:	$(TOP_DIR)/md5-crypt/md5-crypt.c
+	$(CC) -c $(MD5_CC_SWITCHES) $(TOP_DIR)/md5-crypt/md5-crypt.c -o $@
+
+md5.o:	$(TOP_DIR)/md5-crypt/md5.c
+	$(CC) -c $(MD5_CC_SWITCHES) $(TOP_DIR)/md5-crypt/md5.c -o $@
+
+#-------------------------------------------------------#
 
 $(TRF_STUB_LIB_FILE):	$(STUB_OBJ)
 	$(AR) cr $@ $(STUB_OBJ)
@@ -546,8 +575,13 @@ $(TRF_LIB_FILE):	$(OBJECTS)
 	@MAKE_LIB@
 	$(RANLIB)	$(TRF_LIB_FILE)
 
-$(APP): $(TCLSH_OBJS) $(TRF_LIB_FILE)
-	$(CC) $(LDFLAGS) $(TCLSH_OBJS) $(LOADLIBES) -o $(APP)
+$(MD5_LIB_FILE):	$(MD5_OBJECTS)
+	rm -f		$(MD5_LIB_FILE)
+	@MAKE_MD5_LIB@
+	$(RANLIB)	$(MD5_LIB_FILE)
+
+#$(APP): $(TCLSH_OBJS) $(TRF_LIB_FILE)
+#	$(CC) $(LDFLAGS) $(TCLSH_OBJS) $(LOADLIBES) -o $(APP)
 
 
 #-------------------------------------------------------#

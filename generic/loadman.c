@@ -14,12 +14,23 @@
 /*
  * Allow the Makefile to define this value
  */
+
 #ifndef SSL_LIB_NAME
 #    ifdef __WIN32__
 #    define SSL_LIB_NAME "crypto32.dll"
 #    endif /* __WIN32__ */
 #    ifndef SSL_LIB_NAME
 #    define SSL_LIB_NAME "libcrypto.so"
+#    endif /* SSL_LIB_NAME */
+#endif /* SSL_LIB_NAME */
+
+
+#ifndef CRYPT_LIB_NAME
+#    ifdef __WIN32__
+#    define CRYPT_LIB_NAME "crypt.dll"
+#    endif /* __WIN32__ */
+#    ifndef CRYPT_LIB_NAME
+#    define CRYPT_LIB_NAME "libcrypt.so"
 #    endif /* SSL_LIB_NAME */
 #endif /* SSL_LIB_NAME */
 
@@ -50,6 +61,15 @@ static char* ssl_symbols [] = {
   (char *) NULL,
 };
 
+static char* crypt_symbols [] = {
+  /* md5 */
+  "md5_init_ctx",
+  "md5_process_bytes",
+  "md5_finish_ctx",
+  /* -- */
+  (char *) NULL,
+};
+
 
 
 
@@ -58,6 +78,7 @@ static char* ssl_symbols [] = {
  */
 
 md2Functions  md2f  = {0}; /* THREADING: serialize initialization */
+md5Functions  md5f  = {0}; /* THREADING: serialize initialization */
 sha1Functions sha1f = {0}; /* THREADING: serialize initialization */
 
 
@@ -121,6 +142,41 @@ TrfLoadMD2 (interp)
 
   TrfUnlock;
   return TCL_ERROR;
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	TrfLoadMD5 --
+ *
+ *	------------------------------------------------*
+ *	Makes MD5 functionality available.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		Loads the required shared library and
+ *		makes the addresses of MD5 functionality
+ *		available. In case of failure an error
+ *		message is left in the result area of
+ *		the specified interpreter.
+ *
+ *	Result:
+ *		A standard tcl error code.
+ *
+ *------------------------------------------------------*
+ */
+
+int
+TrfLoadMD5 (interp)
+    Tcl_Interp* interp;
+{
+  int res;
+
+  TrfLock; /* THREADING: serialize initialization */
+  res = Trf_LoadLibrary (interp, CRYPT_LIB_NAME, (VOID**) &md5f, crypt_symbols, 0);
+  TrfUnlock;
+
+  return res;
 }
 
 /*

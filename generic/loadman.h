@@ -66,6 +66,9 @@ extern "C" {
 #   include "../compat/sha.h"
 #endif
 
+#include "../md5-crypt/md5.h"
+
+
 #ifdef TCL_STORAGE_CLASS
 # undef TCL_STORAGE_CLASS
 #endif
@@ -86,16 +89,29 @@ extern "C" {
 typedef struct Md2Functions {
   long loaded;
   void (* init)   _ANSI_ARGS_ ((MD2_CTX* c));
-  void (* update) _ANSI_ARGS_ ((MD2_CTX* c, unsigned char* data, unsigned long length));
+  void (* update) _ANSI_ARGS_ ((MD2_CTX* c, unsigned char* data,
+				unsigned long length));
   void (* final)  _ANSI_ARGS_ ((unsigned char* digest, MD2_CTX* c));
 } md2Functions;
+
+typedef struct Md5Functions {
+  long loaded;
+  void (* init)   _ANSI_ARGS_ ((struct md5_ctx* c));
+  void (* update) _ANSI_ARGS_ ((unsigned char* data, unsigned long length,
+				struct md5_ctx* c));
+  void (* final)  _ANSI_ARGS_ ((struct md5_ctx* c, unsigned char* digest));
+} md5Functions;
 
 typedef struct Sha1Functions {
   long loaded;
   void (* init)   _ANSI_ARGS_ ((SHA_CTX* c));
-  void (* update) _ANSI_ARGS_ ((SHA_CTX* c, unsigned char* data, unsigned long length));
+  void (* update) _ANSI_ARGS_ ((SHA_CTX* c, unsigned char* data,
+				unsigned long length));
   void (* final)  _ANSI_ARGS_ ((unsigned char* digest, SHA_CTX* c));
 } sha1Functions;
+
+
+
 
 /* Global variables containing the vectors declared above. 99% of the time they
  * are read, but during load a write is required, which has to be protected by
@@ -103,11 +119,15 @@ typedef struct Sha1Functions {
  */
 
 EXTERN md2Functions  md2f;  /* THREADING: serialize initialization */
+EXTERN md5Functions  md5f;  /* THREADING: serialize initialization */
 EXTERN sha1Functions sha1f; /* THREADING: serialize initialization */
 
 
 EXTERN int
 TrfLoadMD2 _ANSI_ARGS_ ((Tcl_Interp *interp));
+
+EXTERN int
+TrfLoadMD5 _ANSI_ARGS_ ((Tcl_Interp *interp));
 
 EXTERN int
 TrfLoadSHA1 _ANSI_ARGS_ ((Tcl_Interp *interp));

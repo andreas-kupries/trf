@@ -40,15 +40,9 @@ foreach {i in digest} {
     7 12345678901234567890123456789012345678901234567890123456789012345678901234567890
     FBA42E8C0AE47F2F
 } {
-    if {[info tclversion] < 8.0} {
-	test otp_md5-4.$i-7.6 {otp_md5, immediate} {
-	    exec_md otp_md5 [text2hex $in]
-	} [string toupper $digest]
-    } else {
-	test otp_md5-4.$i-8.x {otp_md5, immediate} {
-	    hex -m e [otp_md5 $in]
-	} [string toupper $digest]
-    }
+    test otp_md5-4.$i-8.x {otp_md5, immediate} {
+	hex -m e -- [otp_md5 -- $in]
+    } [string toupper $digest]
 }
 
 

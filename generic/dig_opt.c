@@ -209,8 +209,11 @@ ClientData             clientData;
    * Call digest dependent check of environment first.
    */
 
+  START (dig_opt:CheckOptions);
+
   if (md_desc->checkProc != NULL) {
     if (TCL_OK != (*md_desc->checkProc) (interp)) {
+      DONE (dig_opt:CheckOptions);
       return TCL_ERROR;
     }
   }
@@ -231,24 +234,28 @@ ClientData             clientData;
 	(o->writeDestination != (char*) NULL)) {
       /* IMMEDIATE MODE */
       Tcl_AppendResult (interp, "immediate: no options allowed", (char*) NULL);
+      DONE (dig_opt:CheckOptions);
       return TCL_ERROR;
     }
   } else {
     /* ATTACH MODE / FILTER */
     if (o->mode == TRF_UNKNOWN_MODE) {
       Tcl_AppendResult (interp, "attach: -mode not defined", (char*) NULL);
+      DONE (dig_opt:CheckOptions);
       return TCL_ERROR;
 
     } else if (o->mode == TRF_ABSORB_HASH) {
       if ((baseOptions->attach_mode & TCL_READABLE) &&
 	  (o->matchFlag == (char*) NULL)) {
 	Tcl_AppendResult (interp, "attach: -matchflag not defined", (char*) NULL);
+	DONE (dig_opt:CheckOptions);
 	return TCL_ERROR;
       }
 
     } else if ((o->mode == TRF_WRITE_HASH) || (o->mode == TRF_TRANSPARENT)) {
       if (o->matchFlag != (char*) NULL) {
 	Tcl_AppendResult (interp, "attach: -matchflag not allowed", (char*) NULL);
+	DONE (dig_opt:CheckOptions);
 	return TCL_ERROR;
       }
 
@@ -256,17 +263,20 @@ ClientData             clientData;
 	if (o->readDestination == (char*) NULL) {
 	  Tcl_AppendResult (interp, "attach, external: -read-destination missing",
 			    (char*) NULL);
+	  DONE (dig_opt:CheckOptions);
 	  return TCL_ERROR;
 	} else if (o->rdIsChannel) {
 	  int mode;
 	  o->rdChannel = Tcl_GetChannel (interp, (char*) o->readDestination, &mode);
 
-	  if (o->rdChannel == (Tcl_Channel) NULL)
+	  if (o->rdChannel == (Tcl_Channel) NULL) {
+	    DONE (dig_opt:CheckOptions);
 	    return TCL_ERROR;
-	  else  if (! (mode & TCL_WRITABLE)) {
+	  } else  if (! (mode & TCL_WRITABLE)) {
 	    Tcl_AppendResult (interp,
 			      "read destination channel '", o->readDestination,
 			      "' not opened for writing", (char*) NULL);
+	    DONE (dig_opt:CheckOptions);
 	    return TCL_ERROR;
 	  }
 	}
@@ -276,18 +286,21 @@ ClientData             clientData;
 	if (o->writeDestination == (char*) NULL) {
 	  Tcl_AppendResult (interp, "attach, external: -write-destination missing",
 			    (char*) NULL);
+	  DONE (dig_opt:CheckOptions);
 	  return TCL_ERROR;
 	} else if (o->wdIsChannel) {
 	  int mode;
 
 	  o->wdChannel = Tcl_GetChannel (interp, (char*) o->writeDestination, &mode);
 
-	  if (o->wdChannel == (Tcl_Channel) NULL)
+	  if (o->wdChannel == (Tcl_Channel) NULL) {
+	    DONE (dig_opt:CheckOptions);
 	    return TCL_ERROR;
-	  else  if (! (mode & TCL_WRITABLE)) {
+	  } else  if (! (mode & TCL_WRITABLE)) {
 	    Tcl_AppendResult (interp,
 			      "write destination channel '", o->writeDestination,
 			      "' not opened for writing", (char*) NULL);
+	    DONE (dig_opt:CheckOptions);
 	    return TCL_ERROR;
 	  }
 	}
@@ -301,6 +314,8 @@ ClientData             clientData;
 		  TRF_IMMEDIATE :
 		  TRF_ATTACH);
 
+  PRINT ("Ok\n"); FL;
+  DONE (dig_opt:CheckOptions);
   return TCL_OK;
 }
 

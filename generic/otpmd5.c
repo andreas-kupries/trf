@@ -8,4 +8,4 @@
  */
 
 #define OTP
-#include "md5.c"
+#include "md5dig.c"

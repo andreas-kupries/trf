@@ -26,12 +26,14 @@ TRF_DOCDIR	=	$(TRF_TOPDIR)/doc
 TRF_TESTDIR	=	$(TRF_TOPDIR)/tests
 TRF_TEATESTDIR	=	$(TRF_TOPDIR)/tea.tests
 TRF_COMPATDIR	=	$(TRF_TOPDIR)/compat
+TRF_MDDIR	=	$(TRF_TOPDIR)/md5-crypt
 
 #========================================================================
 # This is the (parameterized) name of the library that we are building.
+# Extended for possible creation of supporting md5-crypt library.
 #========================================================================
 
-lib_BINARIES	=	$(Trf_LIB_FILE) $(Trf_STUB_LIB_FILE)
+lib_BINARIES	=	$(Trf_LIB_FILE) $(Trf_STUB_LIB_FILE) $(MD5_LIB_FILE)
 BINARIES	=	$(lib_BINARIES)
 
 #========================================================================
@@ -76,7 +78,7 @@ TRF_CVT_ALG_SRC	=	$(TRF_GENSRCDIR)/bincode.c	\
 TRF_MD_SRC	=	$(TRF_GENSRCDIR)/dig_opt.c	\
 			$(TRF_GENSRCDIR)/digest.c	\
 			$(TRF_GENSRCDIR)/crc.c		\
-			$(TRF_GENSRCDIR)/md5.c		\
+			$(TRF_GENSRCDIR)/md5dig.c	\
 			$(TRF_GENSRCDIR)/haval.c	\
 			$(TRF_GENSRCDIR)/sha.c		\
 			$(TRF_GENSRCDIR)/adler.c	\
@@ -96,6 +98,13 @@ TRF_COMPRESS_SRC=	$(TRF_GENSRCDIR)/zip_opt.c	\
 			$(TRF_GENSRCDIR)/bz2.c
 
 SOURCES		=	$(Trf_SOURCES)
+
+#========================================================================
+
+MD5_SOURCES	=	$(TRF_MDDIR)/crypt-entry.c	\
+			$(TRF_MDDIR)/md5-crypt.c	\
+			$(TRF_MDDIR)/md5.c		\
+			$(TRF_COMPATDIR)/stpncpy.c
 
 #========================================================================
 # Enumerate the names of the object files included in this package.
@@ -143,7 +152,7 @@ TRF_CVT_ALG_OBJ	=	bincode.$(OBJEXT)	\
 TRF_MD_OBJ	=	dig_opt.$(OBJEXT)	\
 			digest.$(OBJEXT)	\
 			crc.$(OBJEXT)		\
-			md5.$(OBJEXT)		\
+			md5dig.$(OBJEXT)	\
 			haval.$(OBJEXT)		\
 			sha.$(OBJEXT)		\
 			adler.$(OBJEXT)		\
@@ -165,6 +174,13 @@ TRF_COMPRESS_OBJ=	zip_opt.$(OBJEXT)	\
 OBJECTS		=	$(Trf_OBJECTS)
 
 #========================================================================
+
+MD5_OBJECTS	=	stpncpy.$(OBJEXT)	\
+			crypt-entry.$(OBJEXT)	\
+			md5-crypt.$(OBJEXT)	\
+			md5.$(OBJEXT)
+
+#========================================================================
 # The substitution of "Trf_LIB_FILE" into the variable name below
 # let's us refer to the objects for the library without knowing the name
 # of the library in advance.  It also lets us use the "$@" variable in
@@ -178,7 +194,13 @@ $(Trf_LIB_FILE)_OBJECTS		=	$(Trf_OBJECTS)
 Trf_STUB_LIB_FILE		=	@Trf_STUB_LIB_FILE@
 $(Trf_STUB_LIB_FILE)_OBJECTS	=	$(Trf_STUB_OBJECTS)
 
-Trf_INCLUDES		=	-I$(ZLIB_INCLUDE_DIR) -I$(SSL_INCLUDE_DIR)
+Trf_INCLUDES		=	-I$(ZLIB_INCLUDE_DIR)	\
+				-I$(SSL_INCLUDE_DIR)	\
+
+#========================================================================
+
+MD5_LIB_FILE			=	@MD5_LIB_FILE@
+$(MD5_LIB_FILE)_OBJECTS		=	$(MD5_OBJECTS)
 
 #========================================================================
 # This is a list of header files to be installed
@@ -302,6 +324,7 @@ AUTOCONF	= autoconf
 LDFLAGS		= $(LDFLAGS_DEFAULT)
 
 INCLUDES	= @TCL_INCLUDES@ $(Trf_INCLUDES)
+MD_INCLUDES	= $(INCLUDES) -I$(TRF_MDDIR)
 
 EXTRA_CFLAGS	=	$(TCL_DEFS)		\
 			$(PROTO_FLAGS)		\
@@ -321,6 +344,9 @@ LIBS		= @LIBS@
 AR		= ar
 CFLAGS		= @CFLAGS@
 COMPILE		= $(CC) $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+
+COMPILE_MD	= $(CC) $(DEFS) $(MD_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+
 CCLD		= $(CC)
 LINK		= $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(LDFLAGS) -o $@
 
@@ -402,12 +428,16 @@ install-doc: doc
 
 check:	test
 test:
+	LD_LIBRARY_PATH="$(srcdir):../tea/";	\
+	export LD_LIBRARY_PATH; SHLIB_PATH="$LD_LIBRARY_PATH"; export SHLIB_PATH ;	\
 	echo load ./$(Trf_LIB_FILE) \; cd $(TRF_TESTDIR) \; source defs \; defConstraints \"$(TRF_TESTS)\" \; source all | $(TCLSH_PROG)
 
 testshell	=	$(TCLSH_PROG) $(srcdir)/testshell
 
 tcheck:
 ttest:
+	LD_LIBRARY_PATH="$(srcdir)";	\
+	export LD_LIBRARY_PATH; SHLIB_PATH="$LD_LIBRARY_PATH"; export SHLIB_PATH ;	\
 	$(testshell)	\
 		-constraints '$(TRF_TESTS)'	\
 		-loadfile $(srcdir)/test.setup	\
@@ -466,6 +496,14 @@ $(Trf_LIB_FILE): $(Trf_OBJECTS)
 
 $(Trf_STUB_LIB_FILE): $(Trf_STUB_OBJECTS)
 	$(AR) cr $@ $(Trf_STUB_OBJECTS)
+
+#========================================================================
+# Additional target for supporting library.
+
+$(MD5_LIB_FILE): $(MD5_OBJECTS)
+	-rm -f $(MD5_LIB_FILE)
+	@MAKE_LIB@
+	$(RANLIB) $(MD5_LIB_FILE)
 
 #========================================================================
 # We need to enumerate the list of .c to .o lines here.
@@ -557,8 +595,8 @@ digest.$(OBJEXT): $(TRF_GENSRCDIR)/digest.c
 crc.$(OBJEXT): $(TRF_GENSRCDIR)/crc.c
 	$(COMPILE) -c `@CYGPATH@ $(TRF_GENSRCDIR)/crc.c` -o $@
 
-md5.$(OBJEXT): $(TRF_GENSRCDIR)/md5.c
-	$(COMPILE) -c `@CYGPATH@ $(TRF_GENSRCDIR)/md5.c` -o $@
+md5dig.$(OBJEXT): $(TRF_GENSRCDIR)/md5dig.c
+	$(COMPILE) -c `@CYGPATH@ $(TRF_GENSRCDIR)/md5dig.c` -o $@
 
 md2.$(OBJEXT): $(TRF_GENSRCDIR)/md2.c
 	$(COMPILE) -c `@CYGPATH@ $(TRF_GENSRCDIR)/md2.c` -o $@
@@ -636,6 +674,20 @@ tclLoadNone.$(OBJEXT):	$(TRF_COMPATDIR)/tclLoadNone.c
 _eprintf.$(OBJEXT):	$(TRF_COMPATDIR)/_eprintf.c
 	$(COMPILE) -c `@CYGPATH@ $(TRF_COMPATDIR)/_eprintf.c` -o $@
 
+#-------------------------------------------------------#
+# MD5 files for supporting library
+
+stpncpy.$(OBJEXT):	$(TRF_COMPATDIR)/stpncpy.c
+	$(COMPILE_MD) -c `@CYGPATH@ $(TRF_COMPATDIR)/stpncpy.c` -o $@
+
+crypt-entry.$(OBJEXT):	$(TRF_MDDIR)/crypt-entry.c
+	$(COMPILE_MD) -c `@CYGPATH@ $(TRF_MDDIR)/crypt-entry.c` -o $@
+
+md5-crypt.$(OBJEXT):	$(TRF_MDDIR)/md5-crypt.c
+	$(COMPILE_MD) -c `@CYGPATH@ $(TRF_MDDIR)/md5-crypt.c` -o $@
+
+md5.$(OBJEXT):	$(TRF_MDDIR)/md5.c
+	$(COMPILE_MD) -c `@CYGPATH@ $(TRF_MDDIR)/md5.c` -o $@
 
 #========================================================================
 # End of user-definable section

@@ -28,7 +28,8 @@
  */
 
 #include "transformInt.h"
-#include "md5/md5.h"
+#include "loadman.h"
+/*#include "md5/md5.h"*/
 
 /*
  * Generator description
@@ -37,6 +38,9 @@
  * The MD5 alogrithm is used to compute a cryptographically strong
  * message digest.
  */
+
+#define MD5_CTX  struct md5_ctx
+#define MD5_CTXP (struct md5_ctx*)
 
 #ifndef OTP
 #define DIGEST_SIZE               (16)
@@ -51,14 +55,17 @@
 
 static void MD_Start     _ANSI_ARGS_ ((VOID* context));
 static void MD_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
-static void MD_UpdateBuf _ANSI_ARGS_ ((VOID* context, unsigned char* buffer, int bufLen));
+static void MD_UpdateBuf _ANSI_ARGS_ ((VOID* context,
+				       unsigned char* buffer, int bufLen));
 static void MD_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
+static int  MD_Check     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 /*
  * Generator definition.
  */
 
-static Trf_MessageDigestDescription mdDescription = { /* THREADING: constant, read-only => safe */
+static Trf_MessageDigestDescription
+mdDescription = { /* THREADING: constant, read-only => safe */
 #ifndef OTP 
   "md5",
 #else
@@ -70,7 +77,7 @@ static Trf_MessageDigestDescription mdDescription = { /* THREADING: constant, re
   MD_Update,
   MD_UpdateBuf,
   MD_Final,
-  NULL
+  MD_Check
 };
 
 /*
@@ -125,7 +132,15 @@ static void
 MD_Start (context)
 VOID* context;
 {
-  MD5Init ((MD5_CTX*) context);
+  /*  MD5Init ((MD5_CTX*) context);*/
+  md5f.init (MD5_CTXP context);
+
+#ifdef TRF_DEBUG
+  {
+    MD5_CTX* c = MD5_CTXP context;
+    PRINT ("Init ABCD = %d %d %d %d\n", c->A, c->B, c->C, c->D); FL;
+  }
+#endif
 }
 
 /*
@@ -154,7 +169,9 @@ unsigned int   character;
 {
   unsigned char buf = character;
 
-  MD5Update ((MD5_CTX*) context, &buf, 1);
+  /*  MD5Update ((MD5_CTX*) context, &buf, 1); */
+
+  md5f.update (&buf, 1, MD5_CTXP context);
 }
 
 /*
@@ -182,7 +199,24 @@ VOID* context;
 unsigned char* buffer;
 int   bufLen;
 {
-  MD5Update ((MD5_CTX*) context, (unsigned char*) buffer, bufLen);
+  /*  MD5Update ((MD5_CTX*) context, (unsigned char*) buffer, bufLen);*/
+
+  PRTSTR ("update by %d (%s)\n", bufLen, buffer);
+#ifdef TRF_DEBUG
+  {
+    MD5_CTX* c = MD5_CTXP context;
+    PRINT ("Upd1 ABCD = %d %d %d %d\n", c->A, c->B, c->C, c->D); FL;
+  }
+#endif
+
+  md5f.update ((unsigned char*) buffer, bufLen, MD5_CTXP context);
+
+#ifdef TRF_DEBUG
+  {
+    MD5_CTX* c = MD5_CTXP context;
+    PRINT ("Upd2 ABCD = %d %d %d %d\n", c->A, c->B, c->C, c->D); FL;
+  }
+#endif
 }
 
 /*
@@ -210,24 +244,62 @@ VOID* context;
 VOID* digest;
 {
 #ifndef OTP
-  MD5Final ((unsigned char*) digest, (MD5_CTX*) context);
+  /*  MD5Final ((unsigned char*) digest, (MD5_CTX*) context); */
+  md5f.final (MD5_CTXP context, (unsigned char*) digest);
 #else
     int    i;
     unsigned char result[16];
 
-    MD5Final ((unsigned char*) result, (MD5_CTX*) context);
+    /*    MD5Final ((unsigned char*) result, (MD5_CTX*) context);*/
+    md5f.final (MD5_CTXP context, (unsigned char*) result);
 
     for (i = 0; i < 8; i++)
         result[i] ^= result[i + 8];
 
     memcpy ((VOID *) digest, (VOID *) result, DIGEST_SIZE);
 #endif
+
+#ifdef TRF_DEBUG
+  {
+    MD5_CTX* c = MD5_CTXP context;
+    PRINT ("Flsh ABCD = %d %d %d %d\n", c->A, c->B, c->C, c->D); FL;
+  }
+#endif
 }
 
+/*
+ *------------------------------------------------------*
+ *
+ *	MD_Check --
+ *
+ *	------------------------------------------------*
+ *	Do global one-time initializations of the message
+ *	digest generator.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		Loads the shared library containing the
+ *		SHA1 functionality
+ *
+ *	Result:
+ *		A standard Tcl error code.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+MD_Check (interp)
+Tcl_Interp* interp;
+{
+  return TrfLoadMD5 (interp);
+}
+
+#if 0
 /*
  * External code from here on.
  */
 
 #ifndef OTP
 #include "md5/md5.c" /* THREADING: import of one constant var, read-only => safe */
+#endif
 #endif

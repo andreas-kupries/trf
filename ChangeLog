@@ -1,3 +1,11 @@
+Sat Oct 16 00:55:39 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* Worked on the MD5 binding in the last days, using md5-crypt now,
+ 	  coming from glibc (is under LGPL). MD5 shared liib now loaded on
+ 	  demand. Changed all makefiles and configures to check for a
+ 	  libcrypt containing MD5. If none, the code we carry around is
+ 	  compiled.
+
 Mon Oct 11 18:48:49 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* tea.tests/common_seek.test: Did the same for the tea test suite.

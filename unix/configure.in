@@ -30,6 +30,7 @@ dnl AC_PATH_PROG(MAKEDEPEND,makedepend,:)
 AC_HAVE_HEADERS(dlfcn.h stdlib.h)
 AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long int)
+AC_CHECK_LIB(crypt, md5_init_ctx, HAS_LIBCRYPT=1, HAS_LIBCRYPT=0)
 
 dnl
 dnl use location of tclsh (wish?) as default for prefix, exec-prefix
@@ -714,6 +715,7 @@ if test "x$ok" = "xyes" -a "x${SHLIB_SUFFIX}" != "x"; then
     eval "ZLIB_LIB_FILE=libz${SHLIB_SUFFIX}"
     eval "LIBDES_LIB_FILE=libdes${SHLIB_SUFFIX}"
     MAKE_LIB="\${SHLIB_LD} -o \${TRF_LIB_FILE} \${OBJECTS} ${TCL_SHARED_LIBS} ${SHLIB_LD_LIBS}"
+    MAKE_MD5_LIB="\${SHLIB_LD} -o \${MD5_LIB_FILE} \${MD5_OBJECTS} ${SHLIB_LD_LIBS}"
     RANLIB=":"
 
 	# force usage of special link code for external libraries
@@ -739,6 +741,7 @@ else
     eval "ZLIB_LIB_FILE=libz.a"
     eval "LIBDES_LIB_FILE=libdes.a"
     MAKE_LIB="ar cr \${TRF_LIB_FILE} \${OBJECTS}"
+    MAKE_MD5_LIB="ar cr \${MD5_LIB_FILE} \${MD5_OBJECTS}"
     MAKE_ZLIB="ar cr \${ZLIB_LIB_FILE} \${ZLIB_OBJ}"
     MAKE_LIBDES="ar cr \${LIBDES_LIB_FILE} \${LIBDES_OBJ}"
 
@@ -864,6 +867,18 @@ if test "x${TCL_SHARED_LIB_SUFFIX}" != 'x${VERSION}.a' -o "x${SHLIB_SUFFIX}" != 
 fi
 
 
+#--------------------------------------------------------------------
+# MD5 handling... do the support library or not.
+
+MD5_LIB_FILE=""
+if test \( $HAS_LIBCRYPT -eq 0 \)
+then
+	MD5_LIB_FILE=libcrypt$SHLIB_SUFFIX
+fi
+AC_SUBST(MD5_LIB_FILE)
+
+
+
 AC_PATH_PROGS(TCLSH_PROG,
 	tclsh8.2${EXEEXT} tclsh82${EXEEXT} tclsh${EXEEXT},
 	:,
@@ -883,6 +898,7 @@ AC_SUBST(DL_OBJS)
 AC_SUBST(LD_FLAGS)
 AC_SUBST(TCL_LIBS)
 AC_SUBST(MAKE_LIB)
+AC_SUBST(MAKE_MD5_LIB)
 AC_SUBST(SHLIB_CFLAGS)
 AC_SUBST(SHLIB_LD)
 AC_SUBST(SHLIB_LD_LIBS)
