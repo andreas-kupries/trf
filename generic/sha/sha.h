@@ -8,7 +8,9 @@
 
 /* Useful defines & typedefs */
 
+#ifndef BYTE /* can be defined on Windows! */
 typedef unsigned char BYTE;
+#endif
 #ifdef __alpha
 typedef unsigned int  UINT32;
 #else
