@@ -1,3 +1,9 @@
+Thu Oct  1 17:46:49 1998  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/reflect.c, generic/asc85code.c: Fixed several char /
+	  unsigned char mismatches, detected by Larry Virden on his
+	  UltraSparc.
+
 Wed Sep 30 15:49:24 1998  Andreas Kupries  <a.kupries@westend.com>
 
 	* unix/Makefile.in: Added [ZLIB|SSL]_[LIB|INCLUDE]_DIR, analogous
