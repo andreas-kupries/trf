@@ -44,19 +44,12 @@ static int         CheckOptions  _ANSI_ARGS_ ((Trf_Options            options,
 					       CONST Trf_BaseOptions* baseOptions,
 					       ClientData             clientData));
 
-#if (TCL_MAJOR_VERSION >= 8)
 static int         SetOption     _ANSI_ARGS_ ((Trf_Options    options,
 					       Tcl_Interp*    interp,
 					       CONST char*    optname,
 					       CONST Tcl_Obj* optvalue,
 					       ClientData     clientData));
-#else
-static int         SetOption     _ANSI_ARGS_ ((Trf_Options options,
-					       Tcl_Interp* interp,
-					       CONST char* optname,
-					       CONST char* optvalue,
-					       ClientData  clientData));
-#endif
+
 static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
 					       ClientData  clientData));
 
@@ -88,13 +81,8 @@ TrfZIPOptions ()
       CreateOptions,
       DeleteOptions,
       CheckOptions,
-#if (TCL_MAJOR_VERSION >= 8)
-      NULL,      /* no string procedure */
+      NULL,      /* no string procedure for 'SetOption' */
       SetOption,
-#else
-      SetOption,
-      NULL,      /* no object procedure */
-#endif
       QueryOptions
     };
 
@@ -242,11 +230,7 @@ SetOption (options, interp, optname, optvalue, clientData)
 Trf_Options options;
 Tcl_Interp* interp;
 CONST char* optname;
-#if (TCL_MAJOR_VERSION >= 8)
 CONST Tcl_Obj* optvalue;
-#else
-CONST char*    optvalue;
-#endif
 ClientData  clientData;
 {
   /* Possible options:
@@ -265,11 +249,7 @@ ClientData  clientData;
     if (0 != strncmp (optname, "-level", len))
       goto unknown_option;
 
-#if (TCL_MAJOR_VERSION >= 8)
     value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
-#else
-    value = optvalue;
-#endif
     
     len = strlen (value);
     if (0 == strncmp (value, "default", len)) {
@@ -277,13 +257,9 @@ ClientData  clientData;
     } else {
       int res, val;
 
-#if (TCL_MAJOR_VERSION >= 8)
       int v;
       res = Tcl_GetIntFromObj (interp, (Tcl_Obj*) optvalue, &v);
       val = v;
-#else
-      res = Tcl_GetInt        (interp, (char*) optvalue, &val);
-#endif
 
       if (res != TCL_OK) {
 	return res;
@@ -305,12 +281,8 @@ ClientData  clientData;
     if (0 != strncmp (optname, "-mode", len))
       goto unknown_option;
 
-#if (TCL_MAJOR_VERSION >= 8)
     value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
-#else
-    value = optvalue;
-#endif
-    len = strlen (value);
+    len   = strlen (value);
 
     switch (value [0]) {
     case 'c':

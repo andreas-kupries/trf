@@ -995,19 +995,6 @@ char*                         digest;
 Trf_MessageDigestDescription* md;
 {
   if (destHandle != (char*) NULL) {
-#if (TCL_MAJOR_VERSION < 8)
-    /*
-     * Prevent running into unused memory
-     * Assumes that 'digest' was allocated bigger than required.
-     */
-    digest [md->digest_size] = '\0';
-
-    if (Tcl_SetVar (interp, destHandle, digest,
-		    TCL_LEAVE_ERR_MSG | TCL_GLOBAL_ONLY) == (char*) NULL) {
-      return TCL_ERROR;
-    }
-#else
-
     Tcl_Obj* digestObj = Tcl_NewStringObj (digest, md->digest_size);
     Tcl_Obj* result;
 
@@ -1034,8 +1021,6 @@ Trf_MessageDigestDescription* md;
     if (result == (Tcl_Obj*) NULL) {
       return TCL_ERROR;
     }
-
-#endif /* (TCL_MAJOR_VERSION < 8) */
   } else if (dest != (Tcl_Channel) NULL) {
     int res = Tcl_Write (dest, digest, md->digest_size);
 

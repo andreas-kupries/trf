@@ -1,5 +1,9 @@
 Sun Sep 19 01:29:23 1999  Andreas Kupries  <a.kupries@westend.com>
 
+	* generic/zip_opt.c, registry.c, reflect.c, ref_opt.c, digest.c,
+	  dig_opt.c, convert.c, bz2_opt.c: Removed support for Tcl 7.6 and
+	  below. 
+
 	* generic/bz2.c (FlushEncoder): Killed the bug that plagued the
 	  'bzip' transformation. It was an error in the compressor,
 	  although the test of the decompressor failed. BZ_FLUSH ->
@@ -11,7 +15,7 @@ Sun Sep 19 01:29:23 1999  Andreas Kupries  <a.kupries@westend.com>
 	  problem was shadowed by the first so far.
 
 	* Worked on a TEA compliant build chain (since yesterday
-	  evening). Nearly complete now.
+	  evening). Now complete.
 
 Tue Sep 14 23:07:50 1999  Andreas Kupries  <a.kupries@westend.com>
 

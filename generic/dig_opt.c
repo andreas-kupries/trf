@@ -37,25 +37,25 @@
 static Trf_Options CreateOptions _ANSI_ARGS_ ((ClientData clientData));
 static void        DeleteOptions _ANSI_ARGS_ ((Trf_Options options,
 					       ClientData clientData));
-static int         CheckOptions  _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
+static int         CheckOptions  _ANSI_ARGS_ ((Trf_Options options,
+					       Tcl_Interp* interp,
 					       CONST Trf_BaseOptions* baseOptions,
 					       ClientData clientData));
-#if (TCL_MAJOR_VERSION < 8)
-static int         SetOption     _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
-					       CONST char* optname, CONST char* optvalue,
+static int         SetOption     _ANSI_ARGS_ ((Trf_Options options,
+					       Tcl_Interp* interp,
+					       CONST char* optname,
+					       CONST Tcl_Obj* optvalue,
 					       ClientData clientData));
-#else
-static int         SetOption     _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
-					       CONST char* optname, CONST Tcl_Obj* optvalue,
-					       ClientData clientData));
-#endif
+
 static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
 					       ClientData clientData));
 
-static int         TargetType _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* typeString,
+static int         TargetType _ANSI_ARGS_ ((Tcl_Interp* interp,
+					    CONST char* typeString,
 					    int* isChannel));
 
-static int         DigestMode _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* modeString,
+static int         DigestMode _ANSI_ARGS_ ((Tcl_Interp* interp,
+					    CONST char* modeString,
 					    int* mode));
 
 /*
@@ -85,13 +85,8 @@ TrfMDOptions ()
       CreateOptions,
       DeleteOptions,
       CheckOptions,
-#if (TCL_MAJOR_VERSION < 8)
+      NULL,      /* no string procedure for 'SetOption' */
       SetOption,
-      NULL,      /* no object procedure */
-#else
-      NULL,      /* no string procedure */
-      SetOption,
-#endif
       QueryOptions
     };
 
@@ -332,11 +327,7 @@ SetOption (options, interp, optname, optvalue, clientData)
 Trf_Options options;
 Tcl_Interp* interp;
 CONST char* optname;
-#if (TCL_MAJOR_VERSION < 8)
-CONST char*    optvalue;
-#else
 CONST Tcl_Obj* optvalue;
-#endif
 ClientData  clientData;
 {
   /* Possible options:
@@ -352,11 +343,7 @@ ClientData  clientData;
 
   int len = strlen (optname);
 
-#if (TCL_MAJOR_VERSION < 8)
-    value = optvalue;
-#else
-    value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
-#endif
+  value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
 
   switch (optname [1]) {
   case 'm':

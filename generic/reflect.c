@@ -123,15 +123,8 @@ static Trf_TypeDefinition reflectDefinition =
 typedef struct _EncoderControl_ {
   Trf_WriteProc* write;
   ClientData     writeClientData;
-
-#if (TCL_MAJOR_VERSION >= 8)
   Tcl_Obj*       command; /* tcl code to execute for a buffer */
-#else
-  unsigned char* command; /* tcl code to execute for a buffer */
-#endif
-
-  Tcl_Interp* interp; /* interpreter creating the channel */
-
+  Tcl_Interp*    interp;  /* interpreter creating the channel */
 } EncoderControl;
 
 
@@ -141,13 +134,7 @@ typedef EncoderControl DecoderControl;
 typedef struct _DecoderControl_ {
   Trf_WriteProc* write;
   ClientData     writeClientData;
-
-#if (TCL_MAJOR_VERSION >= 8)
   Tcl_Obj*       command; / * tcl code to execute for a buffer * /
-#else
-  unsigned char* command; / * tcl code to execute for a buffer * /
-#endif
-
 } DecoderControl;
 */
 
@@ -227,27 +214,17 @@ ClientData     clientData;
   c->writeClientData = writeClientData;
   c->interp          = interp;
 
-#if (TCL_MAJOR_VERSION >= 8)
-    /* Store reference, tell the interpreter about it. */
-    c->command      = o->command;
-    Tcl_IncrRefCount (c->command);
-#else
-    /* Generate local copy of command string */
-    c->command = strcpy (Tcl_Alloc (1+strlen (o->command)), o->command);
-#endif
+  /* Store reference, tell the interpreter about it. */
+  c->command      = o->command;
+  Tcl_IncrRefCount (c->command);
 
-    res = Execute (c, interp, (unsigned char*) "create/write", NULL, 0, 0, 0);
+  res = Execute (c, interp, (unsigned char*) "create/write", NULL, 0, 0, 0);
 
-    if (res != TCL_OK) {
-#if (TCL_MAJOR_VERSION >= 8)
-      Tcl_DecrRefCount (c->command);
-#else
-      Tcl_Free ((VOID*) c->command);
-#endif
-
-      Tcl_Free ((VOID*) c);
-      return (ClientData) NULL;
-    }
+  if (res != TCL_OK) {
+    Tcl_DecrRefCount (c->command);
+    Tcl_Free ((VOID*) c);
+    return (ClientData) NULL;
+  }
 
   return (ClientData) c;
 }
@@ -279,12 +256,7 @@ ClientData clientData;
 
   Execute (c, NULL, (unsigned char*) "delete/write", NULL, 0, 0, 0);
 
-#if (TCL_MAJOR_VERSION >= 8)
   Tcl_DecrRefCount (c->command);
-#else
-  Tcl_Free ((VOID*) c->command);
-#endif
-
   Tcl_Free ((VOID*) c);
 }
 
@@ -414,26 +386,17 @@ ClientData     clientData;
   c->writeClientData = writeClientData;
   c->interp          = interp;
 
-#if (TCL_MAJOR_VERSION >= 8)
-    /* Store reference, tell the interpreter about it. */
-    c->command      = o->command;
-    Tcl_IncrRefCount (c->command);
-#else
-    /* Generate local copy of command string */
-    c->command = strcpy (Tcl_Alloc (1+strlen (o->command)), o->command);
-#endif
+  /* Store reference, tell the interpreter about it. */
+  c->command      = o->command;
+  Tcl_IncrRefCount (c->command);
 
-    if (TCL_OK != Execute (c, interp, (unsigned char*) "create/read",
-			   NULL, 0, 0, 0)) {
-#if (TCL_MAJOR_VERSION >= 8)
-      Tcl_DecrRefCount (c->command);
-#else
-      Tcl_Free ((VOID*) c->command);
-#endif
+  if (TCL_OK != Execute (c, interp, (unsigned char*) "create/read",
+			 NULL, 0, 0, 0)) {
+    Tcl_DecrRefCount (c->command);
 
-      Tcl_Free ((VOID*) c);
-      return (ClientData) NULL;
-    }
+    Tcl_Free ((VOID*) c);
+    return (ClientData) NULL;
+  }
 
   return (ClientData) c;
 }
@@ -465,12 +428,7 @@ ClientData clientData;
 
   Execute (c, NULL, (unsigned char*) "delete/read", NULL, 0, 0, 0);
 
-#if (TCL_MAJOR_VERSION >= 8)
   Tcl_DecrRefCount (c->command);
-#else
-  Tcl_Free ((VOID*) c->command);
-#endif
-
   Tcl_Free ((VOID*) c);
 }
 
@@ -603,7 +561,6 @@ int             preserve;
 
   int res;
 
-#if (TCL_MAJOR_VERSION >= 8)
   Tcl_Obj* command;
 #if GT81
   Tcl_SavedResult ciSave;
@@ -693,62 +650,4 @@ cleanup:
   }
 
   return res;
-
-#else
-
-  Tcl_DString command;
-
-  Tcl_DStringInit          (&command);
-  Tcl_DStringAppend        (&command, c->command, -1);
-  Tcl_DStringAppend        (&command, " ", -1);
-  Tcl_DStringAppend        (&command, op,  -1);
-  Tcl_DStringAppend        (&command, " ", -1);
- 
-  /* force buffer termination, avoid runing into garbage */
-
-  if (buf == NULL) {
-    Tcl_DStringAppendElement (&command, "");
-  } else {
-    if (buf [bufLen-1] == '\0') {
-      Tcl_DStringAppendElement (&command, buf);
-    } else {
-      unsigned char *t = Tcl_Alloc (bufLen+1);
-  
-      memcpy (t, buf, bufLen);
-
-      t [bufLen] = '\0';
-      Tcl_DStringAppendElement (&command, t);
-
-      Tcl_Free (t);
-    }
-  }
-
-  Tcl_DStringAppend        (&command, "",   1); /* terminate buffer for sure */
-
-  res = Tcl_GlobalEval (c->interp, command.string);
-
-  Tcl_DStringFree (&command);
-
-  if (res != TCL_OK) {
-    /* copy error message from 'c->interp' to actual 'interp'. */
-
-    if ((interp != (Tcl_Interp*) NULL) && (c->interp != interp)) {
-      Tcl_SetResult (interp, c->interp->result, TCL_VOLATILE);
-    }
-
-    return res;
-  }
-
-  if (transmit) {
-    /* Caller said to expect data in interpreter result area.
-     * Take it, then write it out to the channel system.
-     */
-
-    res = c->write (c->writeClientData, c->interp->result,
-		    strlen (c->interp->result), interp);
-    Tcl_ResetResult (c->interp);
-  }
-
-  return TCL_OK;
-#endif
 }

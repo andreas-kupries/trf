@@ -35,20 +35,21 @@
  */
 
 static Trf_Options CreateOptions _ANSI_ARGS_ ((ClientData clientData));
-static void        DeleteOptions _ANSI_ARGS_ ((Trf_Options options, ClientData clientData));
-static int         CheckOptions  _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
+static void        DeleteOptions _ANSI_ARGS_ ((Trf_Options options,
+					       ClientData clientData));
+static int         CheckOptions  _ANSI_ARGS_ ((Trf_Options options,
+					       Tcl_Interp* interp,
 					       CONST Trf_BaseOptions* baseOptions,
 					       ClientData clientData));
-#if (TCL_MAJOR_VERSION >= 8)
-static int         SetOption     _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
-					       CONST char* optname, CONST Tcl_Obj* optvalue,
+
+static int         SetOption     _ANSI_ARGS_ ((Trf_Options options,
+					       Tcl_Interp* interp,
+					       CONST char* optname,
+					       CONST Tcl_Obj* optvalue,
 					       ClientData clientData));
-#else
-static int         SetOption     _ANSI_ARGS_ ((Trf_Options options, Tcl_Interp* interp,
-					       CONST char* optname, CONST char* optvalue,
+
+static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options,
 					       ClientData clientData));
-#endif
-static int         QueryOptions  _ANSI_ARGS_ ((Trf_Options options, ClientData clientData));
 
 
 /*
@@ -78,13 +79,8 @@ TrfTransformOptions ()
       CreateOptions,
       DeleteOptions,
       CheckOptions,
-#if (TCL_MAJOR_VERSION >= 8)
-      NULL,      /* no string procedure */
+      NULL,      /* no string procedure for 'SetOption' */
       SetOption,
-#else
-      SetOption,
-      NULL,      /* no object procedure */
-#endif
       QueryOptions
     };
 
@@ -119,13 +115,8 @@ ClientData clientData;
   TrfTransformOptionBlock* o;
 
   o = (TrfTransformOptionBlock*) Tcl_Alloc (sizeof (TrfTransformOptionBlock));
-  o->mode = TRF_UNKNOWN_MODE;
-
-#if (TCL_MAJOR_VERSION >= 8)
+  o->mode    = TRF_UNKNOWN_MODE;
   o->command = (Tcl_Obj*) NULL;
-#else
-  o->command = (unsigned char*) NULL;
-#endif
 
   return (Trf_Options) o;
 }
@@ -157,11 +148,7 @@ ClientData  clientData;
   TrfTransformOptionBlock* o = (TrfTransformOptionBlock*) options;
 
   if (o->command != NULL) {
-#if (TCL_MAJOR_VERSION >= 8)
     Tcl_DecrRefCount (o->command);
-#else
-    Tcl_Free ((VOID*) o->command);
-#endif
   }
 
   Tcl_Free ((VOID*) o);
@@ -200,13 +187,11 @@ ClientData             clientData;
     return TCL_ERROR;
   }
 
-#if (TCL_MAJOR_VERSION >= 8)
   if ((o->command->bytes == 0) && (o->command->typePtr == NULL)) {
     /* object defined, but empty, reject this too */
     Tcl_AppendResult (interp, "command specified, but empty", (char*) NULL);
     return TCL_ERROR;
   }
-#endif
 
   if (baseOptions->attach == (Tcl_Channel) NULL) /* IMMEDIATE? */ {
     if (o->mode == TRF_UNKNOWN_MODE) {
@@ -218,7 +203,8 @@ ClientData             clientData;
       /* operation mode irrelevant for attached transformation,
        * and specification therefore ruled as illegal.
        */
-      Tcl_AppendResult (interp, "mode illegal for attached transformation", (char*) NULL);
+      Tcl_AppendResult (interp, "mode illegal for attached transformation",
+			(char*) NULL);
       return TCL_ERROR;
     }
     o->mode = TRF_WRITE_MODE;
@@ -248,15 +234,11 @@ ClientData             clientData;
 
 static int
 SetOption (options, interp, optname, optvalue, clientData)
-Trf_Options options;
-Tcl_Interp* interp;
-CONST char* optname;
-#if (TCL_MAJOR_VERSION >= 8)
+Trf_Options    options;
+Tcl_Interp*    interp;
+CONST char*    optname;
 CONST Tcl_Obj* optvalue;
-#else
-CONST char*    optvalue;
-#endif
-ClientData  clientData;
+ClientData     clientData;
 {
   TrfTransformOptionBlock* o = (TrfTransformOptionBlock*) options;
   int                     len;
@@ -269,11 +251,7 @@ ClientData  clientData;
     if (0 != strncmp (optname, "-mode", len))
       goto unknown_option;
 
-#if (TCL_MAJOR_VERSION >= 8)
     value = Tcl_GetStringFromObj ((Tcl_Obj*) optvalue, NULL);
-#else
-    value = optvalue;
-#endif
     len = strlen (value);
 
     switch (value [0]) {
@@ -307,7 +285,6 @@ ClientData  clientData;
 
     /* 'optvalue' contains the command to execute for a buffer */
 
-#if (TCL_MAJOR_VERSION >= 8)
     /*
      * Store reference, tell the interpreter about it.
      * We have to unCONST it explicitly to allow modification
@@ -315,10 +292,6 @@ ClientData  clientData;
      */
     o->command = (Tcl_Obj*) optvalue;
     Tcl_IncrRefCount (o->command);
-#else
-    /* Generate local copy of command string */
-    o->command = strcpy (Tcl_Alloc (1+strlen (optvalue)), optvalue);
-#endif
     break;
 
   default:
