@@ -35,6 +35,8 @@ TCL		= c:\tcl
 TCLSH		= $(TCL)\bin\tclsh80.exe
 TCLLIB		= $(TCL)\bin\tcl80.lib
 PKZIP		= pkzip.exe
+MSVCRT		= msvcrt.dll
+MSVCRT_SYS	= c:\windows\system\msvcrt.dll
 
 
 # Set this to the appropriate value of /MACHINE: for your platform
@@ -216,11 +218,37 @@ $(TRFDLL): $(TRFOBJS)
 
 bindist:      $(TRFDLL)
 	-@md	$(TRF)
+	-@md	$(TRF)\patches
+	-@md	$(TRF)\patches\v76
+	-@md	$(TRF)\patches\v80a2
 	-@$(CP)	$(TRFDLL)		$(TRF)\$(TRFDLL)
 	-@$(CP)	$(WINDIR)\pkgIndex.tcl	$(TRF)\pkgIndex.tcl
+	-@$(CP)	$(WINDIR)\README.VC	$(TRF)\README.VC
+	-@$(CP) $(MSVCRT_SYS)		$(TRF)\$(MSVCRT)
+	-@$(CP) $(ROOT)\patches\v7.6\byteorder.patch	$(TRF)\patches\v76
+	-@$(CP) $(ROOT)\patches\v7.6\standard.patch	$(TRF)\patches\v76
+	-@$(CP) $(ROOT)\patches\v7.6\tcl.h		$(TRF)\patches\v76
+	-@$(CP) $(ROOT)\patches\v7.6\tclIO.c		$(TRF)\patches\v76
+	-@$(CP) $(ROOT)\patches\v8.0a2\byteorder.patch	$(TRF)\patches\v80a2
+	-@$(CP) $(ROOT)\patches\v8.0a2\standard.patch	$(TRF)\patches\v80a2
+	-@$(CP) $(ROOT)\patches\v8.0a2\tcl.h		$(TRF)\patches\v80a2
+	-@$(CP) $(ROOT)\patches\v8.0a2\tclIO.c		$(TRF)\patches\v80a2
 	$(PKZIP) -r $(TRF)bin.zip $(TRF)\*.*
 	-@$(RM)	$(TRF)\$(TRFDLL)
 	-@$(RM)	$(TRF)\pkgIndex.tcl
+	-@$(RM)	$(TRF)\README.VC
+	-@$(RM) $(TRF)\$(MSVCRT)
+	-@$(RM) $(TRF)\patches\v76\byteorder.patch
+	-@$(RM) $(TRF)\patches\v76\standard.patch
+	-@$(RM) $(TRF)\patches\v76\tcl.h
+	-@$(RM) $(TRF)\patches\v76\tclIO.c
+	-@rd	$(TRF)\patches\v76
+	-@$(RM) $(TRF)\patches\v80a2\byteorder.patch
+	-@$(RM) $(TRF)\patches\v80a2\standard.patch
+	-@$(RM) $(TRF)\patches\v80a2\tcl.h
+	-@$(RM) $(TRF)\patches\v80a2\tclIO.c
+	-@rd	$(TRF)\patches\v80a2
+	-@rd	$(TRF)\patches
 	-@rd	$(TRF)
 
 #
