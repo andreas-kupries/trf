@@ -2,6 +2,9 @@ Wed Sep 22 22:35:38 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* --- Version 2.0 ready for release ---
 
+	* generic/transform.h: Removed old definitions of exported
+	  procedures.
+
 	* generic/sha/sha.h: Protected BYTE typedef, BYTE is defined as
 	  macro on Windows platforms. Sent in by Jan Nijtmans.
 
