@@ -27,6 +27,9 @@
 # PKZIP	  =	name and path to pkzip archiver application
 #		(required for generation of binary distribution only)
 #
+# TCLSH/TCLLIB
+#	choose the definitions matching your version of tcl.
+#
 
 ROOT		= ..
 TMPDIR		= .
@@ -34,6 +37,8 @@ TOOLS32		= c:\msdev
 TCL		= c:\tcl
 TCLSH		= $(TCL)\bin\tclsh80.exe
 TCLLIB		= $(TCL)\bin\tcl80.lib
+#	TCLSH		= $(TCL)\bin\tclsh81.exe
+#	TCLLIB		= $(TCL)\bin\tcl81.lib
 PKZIP		= pkzip.exe
 MSVCRT		= msvcrt.dll
 MSVCRT_SYS	= c:\windows\system\msvcrt.dll
