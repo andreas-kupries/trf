@@ -53,7 +53,14 @@
 #   include "compat/sha.h"
 #endif
 
-
+#ifdef TCL_STORAGE_CLASS
+# undef TCL_STORAGE_CLASS
+#endif
+#ifdef BUILD_trf
+# define TCL_STORAGE_CLASS DLLEXPORT
+#else
+# define TCL_STORAGE_CLASS DLLIMPORT
+#endif
 
 
 /* MD2, message digest.
@@ -90,6 +97,8 @@ EXTERN int
 TrfLoadSHA1 _ANSI_ARGS_ ((Tcl_Interp *interp));
 
 
+#undef TCL_STORAGE_CLASS
+#define TCL_STORAGE_CLASS DLLIMPORT
 
 #endif /* TRF_LOADMANAGER_H */
 

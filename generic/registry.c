@@ -190,7 +190,7 @@ PutInterpResult _ANSI_ARGS_ ((ClientData clientData,
  *------------------------------------------------------*
  */
 
-EXTERN Tcl_HashTable*
+Tcl_HashTable*
 TrfGetRegistry (interp)
 Tcl_Interp* interp;
 {
@@ -229,7 +229,7 @@ Tcl_Interp* interp;
  *------------------------------------------------------*
  */
 
-EXTERN Tcl_HashTable*
+Tcl_HashTable*
 TrfPeekForRegistry (interp)
 Tcl_Interp* interp;
 {
@@ -261,7 +261,7 @@ Tcl_Interp* interp;
  *------------------------------------------------------*
  */
 
-EXTERN int
+int
 Trf_Register (interp, type)
 Tcl_Interp*               interp;
 CONST Trf_TypeDefinition* type;
@@ -382,7 +382,7 @@ CONST Trf_TypeDefinition* type;
  *------------------------------------------------------*
  */
 
-EXTERN int
+int
 Trf_Unregister (interp, entry)
 Tcl_Interp*        interp;
 Trf_RegistryEntry* entry;

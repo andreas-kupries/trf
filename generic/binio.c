@@ -1005,7 +1005,7 @@ char**      argv;		/* Argument strings. */
  *------------------------------------------------------*
  */
 
-EXTERN int
+int
 TrfInit_Binio (interp)
 Tcl_Interp* interp;
 {

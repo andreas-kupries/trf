@@ -78,7 +78,7 @@ DllEntryPoint(hInst, reason, reserved)
  *------------------------------------------------------*
  */
 
-EXTERN int
+int
 Trf_Init (interp)
 Tcl_Interp* interp;
 {
@@ -244,7 +244,7 @@ Tcl_Interp* interp;
  *------------------------------------------------------*
  */
 
-EXTERN int
+int
 Trf_SafeInit (interp)
 Tcl_Interp* interp;
 {
@@ -272,7 +272,7 @@ Tcl_Interp* interp;
  *------------------------------------------------------*
  */
 
-EXTERN int
+int
 Trf_IsInitialized (interp)
 Tcl_Interp* interp;
 {

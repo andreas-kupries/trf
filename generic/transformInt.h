@@ -59,6 +59,16 @@
 #endif
 #endif
 
+#ifdef TCL_STORAGE_CLASS
+# undef TCL_STORAGE_CLASS
+#endif
+#ifdef BUILD_trf
+# define TCL_STORAGE_CLASS DLLEXPORT
+#else
+# define TCL_STORAGE_CLASS DLLIMPORT
+#endif
+
+
 /* make internal procedure of tcl available */
 EXTERN void
 panic _ANSI_ARGS_ ((CONST char* format, ...));
@@ -269,5 +279,9 @@ EXTERN int TrfInit_Transform _ANSI_ARGS_ ((Tcl_Interp* interp));
 #define GT81 ((TCL_MAJOR_VERSION > 8) || \
 	      ((TCL_MAJOR_VERSION == 8) && \
 	       (TCL_MINOR_VERSION >= 1)))
+
+
+#undef TCL_STORAGE_CLASS
+#define TCL_STORAGE_CLASS DLLIMPORT
 
 #endif /* TRF_INT_H */

@@ -50,7 +50,10 @@ typedef struct Functions {
     int (* next) _ANSI_ARGS_((void));
 } Functions;
 
-#define FAILED ((VOID *) -114)
+/* MS defines something under this name, avoid the collision
+ */
+
+#define TRF_LOAD_FAILED ((VOID *) -114)
 
 int
 Trf_LoadLibrary (interp, libName, handlePtr, symbols, num)
@@ -69,11 +72,11 @@ Trf_LoadLibrary (interp, libName, handlePtr, symbols, num)
     int length;
 
     if (lib->handle != NULL) {
-      if (lib->handle == FAILED) {
+      if (lib->handle == TRF_LOAD_FAILED) {
 	Tcl_AppendResult (interp, "cannot open ", (char*) NULL);
 	Tcl_AppendResult (interp, libName, (char*) NULL);
       }
-      return (lib->handle != FAILED) ? TCL_OK : TCL_ERROR;
+      return (lib->handle != TRF_LOAD_FAILED) ? TCL_OK : TCL_ERROR;
     }
 
     length = strlen(libName);
@@ -87,7 +90,7 @@ Trf_LoadLibrary (interp, libName, handlePtr, symbols, num)
 	        Tcl_AppendResult (interp, libName, (char*) NULL);
 	        Tcl_AppendResult (interp, ": ", (char*) NULL);
 	        Tcl_AppendResult (interp, dlerror (), (char*) NULL);
-		lib->handle = FAILED;
+		lib->handle = TRF_LOAD_FAILED;
 		return TCL_ERROR;
 	    }
 	    length = r - buf;
@@ -114,7 +117,7 @@ Trf_LoadLibrary (interp, libName, handlePtr, symbols, num)
 	        Tcl_AppendResult (interp, *q, (char*) NULL);
 	        Tcl_AppendResult (interp, "\" not found", (char*) NULL);
 		dlclose(handle);
-		lib->handle = FAILED;
+		lib->handle = TRF_LOAD_FAILED;
 		return TCL_ERROR;
 	    }
 	}
@@ -149,9 +152,9 @@ void
 Trf_LoadFailed (handlePtr)
     VOID **handlePtr;
 {
-    if ((*handlePtr != NULL) && (*handlePtr != FAILED)) {
+    if ((*handlePtr != NULL) && (*handlePtr != TRF_LOAD_FAILED)) {
 	/* Oops, still loaded. First remove it from menory */
 	dlclose(*handlePtr);
     }
-    *handlePtr = FAILED;
+    *handlePtr = TRF_LOAD_FAILED;
 }

@@ -189,7 +189,7 @@ WriteDigest _ANSI_ARGS_ ((Tcl_Interp* interp, char* destHandle,
  *------------------------------------------------------*
  */
 
-EXTERN int
+int
 Trf_RegisterMessageDigest (interp, md_desc)
 Tcl_Interp*                         interp;
 CONST Trf_MessageDigestDescription* md_desc;

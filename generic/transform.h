@@ -56,8 +56,18 @@
  * our entry point.
  */
 
+
+#ifdef TCL_STORAGE_CLASS
+# undef TCL_STORAGE_CLASS
+#endif
+#ifdef BUILD_trf
+# define TCL_STORAGE_CLASS DLLEXPORT
+#else
+# define TCL_STORAGE_CLASS DLLIMPORT
+#endif
+
 #   if defined(_MSC_VER)
-#	define TRF_EXPORT(a,b) __declspec(dllexport) a b
+#	define TRF_EXPORT(a,b) TCL_STORAGE_CLASS a b
 #	define DllEntryPoint DllMain
 #   else
 #	if defined(__BORLANDC__)
@@ -89,10 +99,10 @@
  */
 
 #ifdef __C2MAN__
-EXTERN int
+int
 Trf_Init (Tcl_Interp* interp /* interpreter to initialize */);
 #else
-EXTERN TRF_EXPORT (int,Trf_Init) _ANSI_ARGS_ ((Tcl_Interp* interp));
+TRF_EXPORT (int,Trf_Init) _ANSI_ARGS_ ((Tcl_Interp* interp));
 #endif
 
 /*
@@ -105,10 +115,10 @@ EXTERN TRF_EXPORT (int,Trf_Init) _ANSI_ARGS_ ((Tcl_Interp* interp));
  */
 
 #ifdef __C2MAN__
-EXTERN int
+int
 Trf_SafeInit (Tcl_Interp* interp /* interpreter to initialize */);
 #else
-EXTERN TRF_EXPORT (int,Trf_SafeInit) _ANSI_ARGS_ ((Tcl_Interp* interp));
+TRF_EXPORT (int,Trf_SafeInit) _ANSI_ARGS_ ((Tcl_Interp* interp));
 #endif
 
 /*
@@ -118,11 +128,10 @@ EXTERN TRF_EXPORT (int,Trf_SafeInit) _ANSI_ARGS_ ((Tcl_Interp* interp));
  */
 
 #ifdef __C2MAN__
-EXTERN int
+int
 Trf_IsInitialized (Tcl_Interp* interp /* interpreter to check for initialization */);
 #else
-EXTERN int
-Trf_IsInitialized _ANSI_ARGS_ ((Tcl_Interp* interp));
+TRF_EXPORT (int,Trf_IsInitialized) _ANSI_ARGS_ ((Tcl_Interp* interp));
 #endif
 
 /*
@@ -366,7 +375,7 @@ typedef int Trf_WriteProc _ANSI_ARGS_ ((ClientData     clientData,
 typedef Trf_ControlBlock Trf_CreateCtrlBlock (ClientData writeClientData /* arbitrary information
 									  * given as clientdata
 									  * to 'fun' */,
-					      Trf_WriteProc fun     /* vector to use for writing
+					      Trf_WriteProc* fun    /* vector to use for writing
 								     * generated results */,
 					      Trf_Options   optInfo /* options to configure the
 								     * control */,
@@ -378,7 +387,7 @@ typedef Trf_ControlBlock Trf_CreateCtrlBlock (ClientData writeClientData /* arbi
 								     */);
 #else
 typedef Trf_ControlBlock Trf_CreateCtrlBlock _ANSI_ARGS_ ((ClientData    writeClientData,
-							   Trf_WriteProc fun,
+							   Trf_WriteProc* fun,
 							   Trf_Options   optInfo,
 							   Tcl_Interp*   interp,
 							   ClientData    clientData));
@@ -531,12 +540,12 @@ typedef struct _Trf_TypeDefinition_ {
  */
 
 #ifdef __C2MAN__
-EXTERN int
+int
 Trf_Register (Tcl_Interp*               interp, /* interpreter to register at */
 	      CONST Trf_TypeDefinition* type    /* transformation to register */);
 #else
-EXTERN int
-Trf_Register _ANSI_ARGS_ ((Tcl_Interp* interp, CONST Trf_TypeDefinition* type));
+TRF_EXPORT (int,Trf_Register) _ANSI_ARGS_ ((Tcl_Interp* interp,
+					    CONST Trf_TypeDefinition* type));
 #endif
 
 
@@ -559,11 +568,10 @@ Trf_Register _ANSI_ARGS_ ((Tcl_Interp* interp, CONST Trf_TypeDefinition* type));
  */
 
 #ifdef __C2MAN__
-EXTERN Trf_OptionVectors*
+Trf_OptionVectors*
 Trf_ConverterOptions (void);
 #else
-EXTERN Trf_OptionVectors*
-Trf_ConverterOptions _ANSI_ARGS_ ((void));
+TRF_EXPORT (Trf_OptionVectors*,Trf_ConverterOptions) _ANSI_ARGS_ ((void));
 #endif
 
 /*
@@ -697,14 +705,13 @@ typedef struct _Trf_MessageDigestDescription {
  */
 
 #ifdef __C2MAN__
-EXTERN int
+int
 Trf_RegisterMessageDigest (Tcl_Interp* interp /* interpreter to register the MD algorithm at */,
-			   CONST Trf_MessageDigestDescription* md_desc /* description of the MD
+		   CONST Trf_MessageDigestDescription* md_desc /* description of the MD
 									* algorithm */);
 #else
-EXTERN int
-Trf_RegisterMessageDigest _ANSI_ARGS_ ((Tcl_Interp* interp,
-					CONST Trf_MessageDigestDescription* md_desc));
+TRF_EXPORT (int,Trf_RegisterMessageDigest) _ANSI_ARGS_ ((Tcl_Interp* interp,
+				CONST Trf_MessageDigestDescription* md_desc));
 #endif
 
 
@@ -717,12 +724,11 @@ Trf_RegisterMessageDigest _ANSI_ARGS_ ((Tcl_Interp* interp,
  * Used by -> TrfLoadZlib, -> TrfLoadLibdes.
  */
 
-EXTERN int
-Trf_LoadLibrary _ANSI_ARGS_ ((Tcl_Interp* interp, CONST char* libName,
+TRF_EXPORT (int,Trf_LoadLibrary) _ANSI_ARGS_ ((Tcl_Interp* interp,
+					       CONST char* libName,
 			    VOID** handlePtr, char** symbols, int num));
 
-EXTERN void
-Trf_LoadFailed _ANSI_ARGS_ ((VOID** handlePtr));
+TRF_EXPORT (void,Trf_LoadFailed) _ANSI_ARGS_ ((VOID** handlePtr));
 
 /*
  * XOR the bytes in a buffer with a mask.
@@ -731,13 +737,13 @@ Trf_LoadFailed _ANSI_ARGS_ ((VOID** handlePtr));
  */
 
 #ifdef __C2MAN__
-EXTERN void
+void
 Trf_XorBuffer (VOID* buffer, /* buffer to xor the mask with */
 	       VOID* mask,   /* mask bytes xor'ed into the buffer */
 	       int length    /* length of mask and buffer (in byte) */);
 #else
-EXTERN void
-Trf_XorBuffer _ANSI_ARGS_ ((VOID* buffer, VOID* mask, int length));
+TRF_EXPORT (void,Trf_XorBuffer) _ANSI_ARGS_ ((VOID* buffer, VOID* mask,
+					      int length));
 #endif
 
 
@@ -749,15 +755,15 @@ Trf_XorBuffer _ANSI_ARGS_ ((VOID* buffer, VOID* mask, int length));
  */
 
 #ifdef __C2MAN__
-EXTERN void
+void
 Trf_ShiftRegister (VOID* buffer,       /* data shifted to the left */
 		   VOID* in,           /* 2nd register shifted into the buffer */
 		   int   shift,        /* number of bytes to shift out (and in) */
 		   int   buffer_length /* length of buffer and in (in byte) */);
 #else
-EXTERN void
-Trf_ShiftRegister _ANSI_ARGS_ ((VOID* buffer, VOID* in,
-				int shift, int buffer_length));
+TRF_EXPORT (void,Trf_ShiftRegister) _ANSI_ARGS_ ((VOID* buffer, VOID* in,
+						  int shift,
+						  int buffer_length));
 #endif
 
 
@@ -766,12 +772,12 @@ Trf_ShiftRegister _ANSI_ARGS_ ((VOID* buffer, VOID* in,
  */
 
 #ifdef __C2MAN__
-EXTERN void
+void
 Trf_FlipRegisterShort (VOID* buffer, /* data to swap */
 		       int   length  /* length of buffer (in byte) */);
 #else
-EXTERN void
-Trf_FlipRegisterShort _ANSI_ARGS_ ((VOID* buffer, int length));
+TRF_EXPORT (void,Trf_FlipRegisterShort) _ANSI_ARGS_ ((VOID* buffer,
+						      int length));
 #endif
 
 /*
@@ -779,16 +785,19 @@ Trf_FlipRegisterShort _ANSI_ARGS_ ((VOID* buffer, int length));
  */
 
 #ifdef __C2MAN__
-EXTERN void
+void
 Trf_FlipRegisterLong (VOID* buffer, /* data to swap */
 		      int   length  /* length of buffer (in byte) */);
 #else
-EXTERN void
-Trf_FlipRegisterLong _ANSI_ARGS_ ((VOID* buffer, int length));
+TRF_EXPORT (void,Trf_FlipRegisterLong) _ANSI_ARGS_ ((VOID* buffer, int length));
 #endif
 
 /*
  * End of exported interface
  */
+
+
+#undef  TCL_STORAGE_CLASS
+#define TCL_STORAGE_CLASS DLLIMPORT
 
 #endif /* TRF_H */

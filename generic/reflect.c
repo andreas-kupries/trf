@@ -44,7 +44,7 @@
  */
 
 static Trf_ControlBlock CreateEncoder  _ANSI_ARGS_ ((ClientData writeClientData,
-						     Trf_WriteProc fun,
+						     Trf_WriteProc* fun,
 						     Trf_Options optInfo,
 						     Tcl_Interp*   interp,
 						     ClientData clientData));
@@ -66,7 +66,7 @@ static void             ClearEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 						     ClientData clientData));
 
 static Trf_ControlBlock CreateDecoder  _ANSI_ARGS_ ((ClientData writeClientData,
-						     Trf_WriteProc fun,
+						     Trf_WriteProc* fun,
 						     Trf_Options optInfo,
 						     Tcl_Interp*   interp,
 						     ClientData clientData));
@@ -208,11 +208,11 @@ Tcl_Interp* interp;
 
 static Trf_ControlBlock
 CreateEncoder (writeClientData, fun, optInfo, interp, clientData)
-ClientData    writeClientData;
-Trf_WriteProc fun;
-Trf_Options   optInfo;
-Tcl_Interp*   interp;
-ClientData clientData;
+ClientData     writeClientData;
+Trf_WriteProc* fun;
+Trf_Options    optInfo;
+Tcl_Interp*    interp;
+ClientData     clientData;
 {
   EncoderControl*          c;
   TrfTransformOptionBlock* o = (TrfTransformOptionBlock*) optInfo;
@@ -395,11 +395,11 @@ ClientData clientData;
 
 static Trf_ControlBlock
 CreateDecoder (writeClientData, fun, optInfo, interp, clientData)
-ClientData    writeClientData;
-Trf_WriteProc fun;
-Trf_Options   optInfo;
-Tcl_Interp*   interp;
-ClientData clientData;
+ClientData     writeClientData;
+Trf_WriteProc* fun;
+Trf_Options    optInfo;
+Tcl_Interp*    interp;
+ClientData     clientData;
 {
   DecoderControl*          c;
   TrfTransformOptionBlock* o = (TrfTransformOptionBlock*) optInfo;
