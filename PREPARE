@@ -16,7 +16,7 @@ file copy generic/pkgIndex.tcl.in win/pkgIndex.tcl
 
 mInsertInfo \
 	README DESCRIPTION PORTING                 \
-	doc/nodes/home.node doc/nodes/install.node  \
+	doc/nodes/home.node doc/nodes/install.node doc/nodes/intro.node \
 	generic/transform.h generic/patchlevel.h     \
 	mac/README                                    \
 	unix/README unix/configure.in unix/Makefile.in
