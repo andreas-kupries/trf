@@ -64,10 +64,10 @@ typedef struct _sha_trf_info {
  * Declarations of internal procedures.
  */
 
-static void MD_Start     _ANSI_ARGS_ ((VOID* context));
-static void MD_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
-static void MD_UpdateBuf _ANSI_ARGS_ ((VOID* context, unsigned char* buffer, int bufLen));
-static void MD_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
+static void MDsha_Start     _ANSI_ARGS_ ((VOID* context));
+static void MDsha_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
+static void MDsha_UpdateBuf _ANSI_ARGS_ ((VOID* context, unsigned char* buffer, int bufLen));
+static void MDsha_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
 
 /*
  * Generator definition.
@@ -77,10 +77,10 @@ static Trf_MessageDigestDescription mdDescription = { /* THREADING: constant, re
   "sha",
   sizeof (CTX_TYPE),
   DIGEST_SIZE,
-  MD_Start,
-  MD_Update,
-  MD_UpdateBuf,
-  MD_Final,
+  MDsha_Start,
+  MDsha_Update,
+  MDsha_UpdateBuf,
+  MDsha_Final,
   NULL
 };
 
@@ -112,7 +112,7 @@ Tcl_Interp* interp;
 /*
  *------------------------------------------------------*
  *
- *	MD_Start --
+ *	MDsha_Start --
  *
  *	------------------------------------------------*
  *	Initialize the internal state of the message
@@ -129,7 +129,7 @@ Tcl_Interp* interp;
  */
 
 static void
-MD_Start (context)
+MDsha_Start (context)
 VOID* context;
 {
   sha_trf_info* s = (sha_trf_info*) context;
@@ -141,7 +141,7 @@ VOID* context;
 /*
  *------------------------------------------------------*
  *
- *	MD_Update --
+ *	MDsha_Update --
  *
  *	------------------------------------------------*
  *	Update the internal state of the message digest
@@ -158,7 +158,7 @@ VOID* context;
  */
 
 static void
-MD_Update (context, character)
+MDsha_Update (context, character)
 VOID* context;
 unsigned int   character;
 {
@@ -176,7 +176,7 @@ unsigned int   character;
 /*
  *------------------------------------------------------*
  *
- *	MD_UpdateBuf --
+ *	MDsha_UpdateBuf --
  *
  *	------------------------------------------------*
  *	Update the internal state of the message digest
@@ -193,7 +193,7 @@ unsigned int   character;
  */
 
 static void
-MD_UpdateBuf (context, buffer, bufLen)
+MDsha_UpdateBuf (context, buffer, bufLen)
 VOID* context;
 unsigned char* buffer;
 int   bufLen;
@@ -242,7 +242,7 @@ int   bufLen;
 /*
  *------------------------------------------------------*
  *
- *	MD_Final --
+ *	MDsha_Final --
  *
  *	------------------------------------------------*
  *	Generate the digest from the internal state of
@@ -259,7 +259,7 @@ int   bufLen;
  */
 
 static void
-MD_Final (context, digest)
+MDsha_Final (context, digest)
 VOID* context;
 VOID* digest;
 {

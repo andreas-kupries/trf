@@ -58,35 +58,35 @@
  * Declarations of internal procedures.
  */
 
-static Trf_ControlBlock CreateEncoder  _ANSI_ARGS_ ((ClientData writeClientData, Trf_WriteProc *fun,
+static Trf_ControlBlock Asc85CreateEncoder  _ANSI_ARGS_ ((ClientData writeClientData, Trf_WriteProc *fun,
 						     Trf_Options optInfo, Tcl_Interp*   interp,
 						     ClientData clientData));
-static void             DeleteEncoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+static void             Asc85DeleteEncoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 						     ClientData clientData));
-static int              Encode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+static int              Asc85Encode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 						     unsigned int character,
 						     Tcl_Interp* interp,
 						     ClientData clientData));
-static int              FlushEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+static int              Asc85FlushEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 						     Tcl_Interp* interp,
 						     ClientData clientData));
-static void             ClearEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+static void             Asc85ClearEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 						     ClientData clientData));
 
 
-static Trf_ControlBlock CreateDecoder  _ANSI_ARGS_ ((ClientData writeClientData, Trf_WriteProc *fun,
+static Trf_ControlBlock Asc85CreateDecoder  _ANSI_ARGS_ ((ClientData writeClientData, Trf_WriteProc *fun,
 						     Trf_Options optInfo, Tcl_Interp*   interp,
 						     ClientData clientData));
-static void             DeleteDecoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+static void             Asc85DeleteDecoder  _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 						     ClientData clientData));
-static int              Decode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+static int              Asc85Decode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 						     unsigned int character,
 						     Tcl_Interp* interp,
 						     ClientData clientData));
-static int              FlushDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+static int              Asc85FlushDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 						     Tcl_Interp* interp,
 						     ClientData clientData));
-static void             ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
+static void             Asc85ClearDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 						     ClientData clientData));
 
 
@@ -100,20 +100,20 @@ static Trf_TypeDefinition convDefinition =
   NULL, /* clientData not used by conversions. */
   NULL, /* set later by Trf_InitAscii85 */ /* THREADING: serialize initialization */
   {
-    CreateEncoder,
-    DeleteEncoder,
-    Encode,
+    Asc85CreateEncoder,
+    Asc85DeleteEncoder,
+    Asc85Encode,
     NULL,
-    FlushEncoder,
-    ClearEncoder,
+    Asc85FlushEncoder,
+    Asc85ClearEncoder,
     NULL /* no MaxRead */
   }, {
-    CreateDecoder,
-    DeleteDecoder,
-    Decode,
+    Asc85CreateDecoder,
+    Asc85DeleteDecoder,
+    Asc85Decode,
     NULL,
-    FlushDecoder,
-    ClearDecoder,
+    Asc85FlushDecoder,
+    Asc85ClearDecoder,
     NULL
   },
   TRF_UNSEEKABLE
@@ -186,7 +186,7 @@ Tcl_Interp* interp;
 /*
  *------------------------------------------------------*
  *
- *	CreateEncoder --
+ *	Asc85CreateEncoder --
  *
  *	------------------------------------------------*
  *	Allocate and initialize the control block of a
@@ -203,7 +203,7 @@ Tcl_Interp* interp;
  */
 
 static Trf_ControlBlock
-CreateEncoder (writeClientData, fun, optInfo, interp, clientData)
+Asc85CreateEncoder (writeClientData, fun, optInfo, interp, clientData)
 ClientData    writeClientData;
 Trf_WriteProc *fun;
 Trf_Options   optInfo;
@@ -227,7 +227,7 @@ ClientData clientData;
 /*
  *------------------------------------------------------*
  *
- *	DeleteEncoder --
+ *	Asc85DeleteEncoder --
  *
  *	------------------------------------------------*
  *	Destroy the control block of an encoder.
@@ -243,7 +243,7 @@ ClientData clientData;
  */
 
 static void
-DeleteEncoder (ctrlBlock, clientData)
+Asc85DeleteEncoder (ctrlBlock, clientData)
 Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {
@@ -257,7 +257,7 @@ ClientData clientData;
 /*
  *------------------------------------------------------*
  *
- *	Encode --
+ *	Asc85Encode --
  *
  *	------------------------------------------------*
  *	Encode the given character and write the result.
@@ -274,7 +274,7 @@ ClientData clientData;
  */
 
 static int
-Encode (ctrlBlock, character, interp, clientData)
+Asc85Encode (ctrlBlock, character, interp, clientData)
 Trf_ControlBlock ctrlBlock;
 unsigned int character;
 Tcl_Interp* interp;
@@ -325,7 +325,7 @@ ClientData clientData;
 /*
  *------------------------------------------------------*
  *
- *	FlushEncoder --
+ *	Asc85FlushEncoder --
  *
  *	------------------------------------------------*
  *	Encode an incomplete character sequence (if possible).
@@ -342,7 +342,7 @@ ClientData clientData;
  */
 
 static int
-FlushEncoder (ctrlBlock, interp, clientData)
+Asc85FlushEncoder (ctrlBlock, interp, clientData)
 Trf_ControlBlock ctrlBlock;
 Tcl_Interp* interp;
 ClientData clientData;
@@ -385,7 +385,7 @@ ClientData clientData;
 /*
  *------------------------------------------------------*
  *
- *	ClearEncoder --
+ *	Asc85ClearEncoder --
  *
  *	------------------------------------------------*
  *	Discard an incomplete character sequence.
@@ -401,7 +401,7 @@ ClientData clientData;
  */
 
 static void
-ClearEncoder (ctrlBlock, clientData)
+Asc85ClearEncoder (ctrlBlock, clientData)
 Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {
@@ -415,7 +415,7 @@ ClientData clientData;
 /*
  *------------------------------------------------------*
  *
- *	CreateDecoder --
+ *	Asc85CreateDecoder --
  *
  *	------------------------------------------------*
  *	Allocate and initialize the control block of a
@@ -432,7 +432,7 @@ ClientData clientData;
  */
 
 static Trf_ControlBlock
-CreateDecoder (writeClientData, fun, optInfo, interp, clientData)
+Asc85CreateDecoder (writeClientData, fun, optInfo, interp, clientData)
 ClientData    writeClientData;
 Trf_WriteProc *fun;
 Trf_Options   optInfo;
@@ -456,7 +456,7 @@ ClientData clientData;
 /*
  *------------------------------------------------------*
  *
- *	DeleteDecoder --
+ *	Asc85DeleteDecoder --
  *
  *	------------------------------------------------*
  *	Destroy the control block of an decoder.
@@ -472,7 +472,7 @@ ClientData clientData;
  */
 
 static void
-DeleteDecoder (ctrlBlock, clientData)
+Asc85DeleteDecoder (ctrlBlock, clientData)
 Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {
@@ -486,7 +486,7 @@ ClientData clientData;
 /*
  *------------------------------------------------------*
  *
- *	Decode --
+ *	Asc85Decode --
  *
  *	------------------------------------------------*
  *	Decode the given character and write the result.
@@ -503,7 +503,7 @@ ClientData clientData;
  */
 
 static int
-Decode (ctrlBlock, character, interp, clientData)
+Asc85Decode (ctrlBlock, character, interp, clientData)
 Trf_ControlBlock ctrlBlock;
 unsigned int character;
 Tcl_Interp* interp;
@@ -561,7 +561,7 @@ ClientData clientData;
 /*
  *------------------------------------------------------*
  *
- *	FlushDecoder --
+ *	Asc85FlushDecoder --
  *
  *	------------------------------------------------*
  *	Decode an incomplete character sequence (if possible).
@@ -578,7 +578,7 @@ ClientData clientData;
  */
 
 static int
-FlushDecoder (ctrlBlock, interp, clientData)
+Asc85FlushDecoder (ctrlBlock, interp, clientData)
 Trf_ControlBlock ctrlBlock;
 Tcl_Interp* interp;
 ClientData clientData;
@@ -675,7 +675,7 @@ ClientData clientData;
 /*
  *------------------------------------------------------*
  *
- *	ClearDecoder --
+ *	Asc85ClearDecoder --
  *
  *	------------------------------------------------*
  *	Discard an incomplete character sequence.
@@ -691,7 +691,7 @@ ClientData clientData;
  */
 
 static void
-ClearDecoder (ctrlBlock, clientData)
+Asc85ClearDecoder (ctrlBlock, clientData)
 Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {

@@ -45,10 +45,10 @@
  * Declarations of internal procedures.
  */
 
-static void MD_Start     _ANSI_ARGS_ ((VOID* context));
-static void MD_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
-static void MD_UpdateBuf _ANSI_ARGS_ ((VOID* context, unsigned char* buffer, int bufLen));
-static void MD_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
+static void MDHaval_Start     _ANSI_ARGS_ ((VOID* context));
+static void MDHaval_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
+static void MDHaval_UpdateBuf _ANSI_ARGS_ ((VOID* context, unsigned char* buffer, int bufLen));
+static void MDHaval_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
 
 /*
  * Generator definition.
@@ -58,10 +58,10 @@ static Trf_MessageDigestDescription mdDescription = { /* THREADING: constant, re
   "haval",
   sizeof (CTX_TYPE),
   DIGEST_SIZE,
-  MD_Start,
-  MD_Update,
-  MD_UpdateBuf,
-  MD_Final,
+  MDHaval_Start,
+  MDHaval_Update,
+  MDHaval_UpdateBuf,
+  MDHaval_Final,
   NULL
 };
 
@@ -93,7 +93,7 @@ Tcl_Interp* interp;
 /*
  *------------------------------------------------------*
  *
- *	MD_Start --
+ *	MDHaval_Start --
  *
  *	------------------------------------------------*
  *	Initialize the internal state of the message
@@ -110,7 +110,7 @@ Tcl_Interp* interp;
  */
 
 static void
-MD_Start (context)
+MDHaval_Start (context)
 VOID* context;
 {
   haval_start ((CTX_TYPE*) context);
@@ -119,7 +119,7 @@ VOID* context;
 /*
  *------------------------------------------------------*
  *
- *	MD_Update --
+ *	MDHaval_Update --
  *
  *	------------------------------------------------*
  *	Update the internal state of the message digest
@@ -136,7 +136,7 @@ VOID* context;
  */
 
 static void
-MD_Update (context, character)
+MDHaval_Update (context, character)
 VOID* context;
 unsigned int   character;
 {
@@ -148,7 +148,7 @@ unsigned int   character;
 /*
  *------------------------------------------------------*
  *
- *	MD_UpdateBuf --
+ *	MDHaval_UpdateBuf --
  *
  *	------------------------------------------------*
  *	Update the internal state of the message digest
@@ -165,7 +165,7 @@ unsigned int   character;
  */
 
 static void
-MD_UpdateBuf (context, buffer, bufLen)
+MDHaval_UpdateBuf (context, buffer, bufLen)
 VOID* context;
 unsigned char* buffer;
 int   bufLen;
@@ -176,7 +176,7 @@ int   bufLen;
 /*
  *------------------------------------------------------*
  *
- *	MD_Final --
+ *	MDHaval_Final --
  *
  *	------------------------------------------------*
  *	Generate the digest from the internal state of
@@ -193,7 +193,7 @@ int   bufLen;
  */
 
 static void
-MD_Final (context, digest)
+MDHaval_Final (context, digest)
 VOID* context;
 VOID* digest;
 {

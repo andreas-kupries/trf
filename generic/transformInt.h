@@ -78,6 +78,15 @@ extern "C" {
 # define TCL_STORAGE_CLASS DLLIMPORT
 #endif
 
+/* 04/13/1999 Fileevent patch from Matt Newman <matt@novadigm.com>
+ * Normally defined in tcl*Port.h
+ */
+
+#ifndef EWOULDBLOCK
+#define EWOULDBLOCK EAGAIN
+#endif
+
+
 /* Debugging definitions.
  */
 
@@ -135,6 +144,7 @@ extern void DumpString  _ANSI_ARGS_ ((int level, int len, char* bytes));
 #define LIST_ADDINT(el, list, i) \
     LIST_ADDOBJ (el, list, Tcl_NewIntObj (i))
 
+
 /* Define macro which is TRUE for tcl versions >= 8.1
  * Required as there are incompatibilities between 8.0 and 8.1
  */
@@ -143,9 +153,23 @@ extern void DumpString  _ANSI_ARGS_ ((int level, int len, char* bytes));
 	      ((TCL_MAJOR_VERSION == 8) && \
 	       (TCL_MINOR_VERSION >= 1)))
 
+/* Define macro which is TRUE for tcl versions >= 8.3.2
+ */
+
+#define GT832 ((TCL_MAJOR_VERSION > 8) || \
+	      ((TCL_MAJOR_VERSION == 8) && \
+	       ((TCL_MINOR_VERSION > 3) || \
+		((TCL_MINOR_VERSION == 3) && \
+		 (TCL_RELEASE_LEVEL == TCL_FINAL_RELEASE) && \
+		 (TCL_RELEASE_SERIAL >= 2)))))
 
 #if ! (GT81)
-/* enable use of procedure internal to tcl */
+/*
+ * Tcl version 8.0.x don't export their 'panic' procedure. Here we
+ * define the necessary interface and map it to the name exported and
+ * used by the higher versions.
+ */
+
 EXTERN void
 panic _ANSI_ARGS_ (TCL_VARARGS(CONST char*, format));
 
@@ -163,14 +187,25 @@ panic _ANSI_ARGS_ (TCL_VARARGS(CONST char*, format));
 typedef struct _Trf_Registry_ {
   Tcl_HashTable* registry;        /* Table containing all registered
 				   * transformers. */
-  int            patchIntegrated; /* Boolean flag, set to one if the patch
-				   * is integrated into the core. If yes
-				   * switch some runtime behaviour, as the
-				   * integrated patch has some semantic
-				   * differences. This information is
-				   * propagated into the state of running
-				   * transformers as well. */
+#ifdef USE_TCL_STUBS
+  int            patchVariant;   /* Defined only for versions of Tcl
+				  * supporting stubs, and thus enable
+				  * the extension to switch its
+				  * runtime behaviour depending on the
+				  * version of the core loading
+				  * it. The possible values are
+				  * defined below. This information is
+				  * propagated into the state of
+				  * running transformers as well. */
+#endif
 } Trf_Registry;
+
+#ifdef USE_TCL_STUBS
+#define PATCH_ORIG (0) /* Patch as used in 8.0.x and 8.1.x */
+#define PATCH_82   (1) /* Patch as included into 8.2. Valid till 8.3.1 */
+#define PATCH_832  (2) /* Patch as rewritten for 8.3.2 and beyond */
+#endif
+
 
 /*
  * A structure of the type below is created and maintained
@@ -422,17 +457,22 @@ EXTERN int
 TrfLoadBZ2lib _ANSI_ARGS_ ((Tcl_Interp *interp));
 
 /*
- * The following definitions have to be usable for 7.6, 8.0.x, 8.1.x and 8.2
- * and beyond. The differences between these versions:
+ * The following definitions have to be usable for 8.0.x, 8.1.x, 8.2.x,
+ * 8.3.[01], 8.3.2 and beyond. The differences between these versions:
  *
- * 7.6, 8.0.x: Trf usable only if core is patched, to check at compile time
+ * 8.0.x:      Trf usable only if core is patched, to check at compile time
  *             (Check = Fails to compile, for now).
+ *
  * 8.1:        Trf usable with unpatched core, but restricted, check at
  *             compile time for missing definitions, check at runtime to
  *             disable the missing features.
- * 8.2:        Changed semantics for Tcl_StackChannel (Tcl_ReplaceChannel).
- *             Check at runtime to switch the behaviour. The patch is part
+ *
+ * 8.2.x:      Changed semantics for Tcl_StackChannel (Tcl_ReplaceChannel).
+ * 8.3.[01]:   Check at runtime to switch the behaviour. The patch is part
  *             of the core from now on.
+ *
+ * 8.3.2+:     Stacked channels rewritten for better behaviour in some
+ *             situations (closing). Some new API's, semantic changes.
  */
 
 #ifdef USE_TCL_STUBS
@@ -461,6 +501,7 @@ typedef void (trf_UnstackChannel) _ANSI_ARGS_((Tcl_Interp* interp,
 
 #endif /* Tcl_StackChannel */
 
+
 #ifndef Tcl_GetStackedChannel
 /*
  * Separate definition, available in 8.2, but not 8.1 and before !
@@ -472,6 +513,56 @@ typedef Tcl_Channel (trf_GetStackedChannel) _ANSI_ARGS_((Tcl_Channel chan));
 #define Tcl_GetStackedChannel ((trf_GetStackedChannel*) tclStubsPtr->reserved283)
 
 #endif /* Tcl_GetStackedChannel */
+
+
+#ifndef Tcl_WriteRaw
+/* Core is older than 8.3.2., so supply the missing definitions for
+ * the new API's in 8.3.2.
+ */
+
+/* 394 */
+typedef int (trf_ReadRaw)  _ANSI_ARGS_((Tcl_Channel chan,
+					char*       dst,
+					int         bytesToRead));
+/* 395 */
+typedef int (trf_WriteRaw) _ANSI_ARGS_((Tcl_Channel chan,
+					char*       src,
+					int         srcLen));
+/* 397 */
+typedef int (trf_ChannelBuffered) _ANSI_ARGS_((Tcl_Channel chan));
+
+/*
+ * Generating code for accessing these parts of the stub table when
+ * compiling against a core older than 8.3.2 is a hassle because even
+ * the 'reservedXXX' fields of the structure are not defined yet. So
+ * we have to write up some macros hiding some very hackish pointer
+ * arithmetics to get at these fields. We assume that pointer to
+ * functions are always of the same size.
+ */
+
+#define STUB_BASE   ((char*)(&(tclStubsPtr->tcl_UtfNcasecmp))) /* field 370 */
+#define procPtrSize (sizeof (Tcl_DriverBlockModeProc *))
+#define IDX(n)      (((n)-370) * procPtrSize)
+#define SLOT(n)     (STUB_BASE + IDX (n))
+
+#define Tcl_ReadRaw         (*((trf_ReadRaw**)         (SLOT (394))))
+#define Tcl_WriteRaw        (*((trf_WriteRaw**)        (SLOT (395))))
+#define Tcl_ChannelBuffered (*((trf_ChannelBuffered**) (SLOT (397))))
+
+/*
+#define Tcl_ReadRaw         ((trf_ReadRaw*)         tclStubsPtr->reserved394)
+#define Tcl_WriteRaw        ((trf_WriteRaw*)        tclStubsPtr->reserved395)
+#define Tcl_ChannelBuffered ((trf_ChannelBuffered*) tclStubsPtr->reserved397)
+*/
+
+/* Always required, easy emulation.
+ */
+#define Tcl_ChannelWatchProc(chanDriver)     ((chanDriver)->watchProc)
+#define Tcl_ChannelSetOptionProc(chanDriver) ((chanDriver)->setOptionProc)
+#define Tcl_ChannelGetOptionProc(chanDriver) ((chanDriver)->getOptionProc)
+#define Tcl_ChannelSeekProc(chanDriver)      ((chanDriver)->seekProc)
+
+#endif /* Tcl_WriteRaw */
 #endif /* USE_TCL_STUBS */
 
 
@@ -513,6 +604,14 @@ EXTERN int TrfInit_Transform _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_Crypt     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 
+
+/* Compile time distinctions between various versions of Tcl.
+ */
+
+/* Do we support locking ? Has to be a version of 8.1 or
+ * beyond with threading enabled.
+ */
+
 #if GT81 && defined (TCL_THREADS) /* THREADING: Lock procedures */
 
 EXTERN void TrfLockIt   _ANSI_ARGS_ ((void));
@@ -528,6 +627,44 @@ EXTERN void TrfUnlockIt _ANSI_ARGS_ ((void));
 #define TrfLock
 #define TrfUnlock
 #endif
+
+/* Tcl 8.1 and beyond have better support for binary data. We have to
+ * use that to avoid mangling information going through the
+ * transformations.
+ */
+
+#if GT81
+#define GET_DATA(in,len) (unsigned char*) Tcl_GetByteArrayFromObj ((in), (len))
+#define NEW_DATA(r)      Tcl_NewByteArrayObj ((r).buf, (r).used);
+#else
+#define GET_DATA(in,len) (unsigned char*) Tcl_GetStringFromObj ((in), (len))
+#define NEW_DATA(r)      Tcl_NewStringObj ((char*) (r).buf, (r).used)
+#endif
+
+/* Map the names of some procedures from the stubs-variant to their
+ * pre-stubs names.
+ */
+
+#ifndef USE_TCL_STUBS
+#define Tcl_UnstackChannel Tcl_UndoReplaceChannel
+#define Tcl_StackChannel   Tcl_ReplaceChannel
+#endif
+
+/* Define the code to 'provide' this package to the loading interpreter.
+ */
+
+#if !(GT81)
+#define PROVIDE(interp,stubs) Tcl_PkgProvide ((interp), "Trf", TRF_VERSION);
+#else
+#ifndef __WIN32__
+#define PROVIDE(interp,stubs) \
+    Tcl_PkgProvideEx ((interp), "Trf", TRF_VERSION, (ClientData) &(stubs)); \
+    Trf_InitStubs    ((interp), TRF_VERSION, 0);
+#else
+#define PROVIDE(interp,stubs) Tcl_PkgProvideEx ((interp), "Trf", TRF_VERSION, (ClientData) &(stubs));
+#endif
+#endif
+
 
 #include "trfIntDecls.h"
 

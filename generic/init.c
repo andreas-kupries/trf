@@ -56,6 +56,7 @@ Trf_Init (interp)
 Tcl_Interp* interp;
 {
   Trf_Registry*  registry;
+  int            res;
 
 #ifdef USE_TCL_STUBS
   char* actualVersion;
@@ -75,199 +76,212 @@ Tcl_Interp* interp;
 
   registry = TrfGetRegistry (interp);
 
-  if (registry) {
-    int res;
-
-#ifdef USE_TCL_STUBS
-#define BEYOND81 (actualVersion [0] > '8') || \
-    ((actualVersion [0] == '8') && (actualVersion [2] > '1'))
-
-    registry->patchIntegrated = (BEYOND81 ? 1 : 0);
-#else
-    registry->patchIntegrated = 0;
-#endif
-
-#if GT81 /* && defined(USE_TRF_STUBS) */
-
-    /* register extension as now available package */
-    Tcl_PkgProvideEx (interp, "Trf", TRF_VERSION, (ClientData) &trfStubs);
-
-#ifndef __WIN32__
-    Trf_InitStubs(interp, TRF_VERSION, 0);
-#endif
-
-#else
-
-    /* register extension as now available package */
-    Tcl_PkgProvide (interp, "Trf", TRF_VERSION);
-
-#endif
-
-    res = TrfInit_Unstack (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_Info (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-#ifdef ENABLE_BINIO
-    res = TrfInit_Binio (interp);
-
-    if (res != TCL_OK)
-      return res;
-#endif
-
-    /*
-     * Register error correction algorithms.
-     */
-
-    res = TrfInit_RS_ECC (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    /*
-     * Register compressors.
-     */
-
-    res = TrfInit_ZIP (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_BZ2 (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    /*
-     * Register message digests
-     */
-
-    res = TrfInit_CRC (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_ADLER (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_CRC_ZLIB (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_MD5 (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_OTP_MD5 (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_MD2 (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_HAVAL (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_SHA (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_SHA1 (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_OTP_SHA1 (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_RIPEMD160 (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_RIPEMD128 (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    /*
-     * Register freeform transformation, reflector into tcl level
-     */
-
-    res = TrfInit_Transform (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    /*
-     * Register crypt commands for pwd auth.
-     */
-
-    res = TrfInit_Crypt (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    /*
-     * Register standard encodings.
-     */
-
-    res = TrfInit_Ascii85 (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_UU (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_B64 (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_Bin (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_Oct (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_OTP_WORDS (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    res = TrfInit_QP (interp);
-
-    if (res != TCL_OK)
-      return res;
-
-    return TrfInit_Hex (interp);
-  } else {
+  if (!registry) {
     return TCL_ERROR;
   }
+
+#ifdef USE_TCL_STUBS
+  /*
+   * Discern which variant of stacked channels is or can be in use
+   * by the core which loaded us.
+   */
+
+  {
+    int major, minor, patchlevel, releasetype;
+    Tcl_GetVersion (&major, &minor, &patchlevel, &releasetype);
+
+    if (major > 8) {
+      /* Beyond 8.3.2 */
+      registry->patchVariant = PATCH_832;
+    } else if (major == 8) {
+      if ((minor > 3) ||
+	  ((minor == 3) && (patchlevel > 1) &&
+	   (releasetype == TCL_FINAL_RELEASE))) {
+	/* Is 8.3.2 or beyond */
+	registry->patchVariant = PATCH_832;
+      } else if (minor > 1) {
+	/* Is 8.2 or beyond */
+	registry->patchVariant = PATCH_82;
+      } else {
+	/* 8.0.x or 8.1.x */
+	registry->patchVariant = PATCH_ORIG;
+      }
+    } else /* major < 8 */ {
+      Tcl_AppendResult (interp,
+			"Cannot this compilation of Trf with a core below 8.0",
+			(char*) NULL);
+      return TCL_ERROR;
+    }
+  }
+#endif
+
+  /*
+   * Register us as a now available package
+   */
+  
+  PROVIDE (interp, trfStubs);
+  res = TrfInit_Unstack (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_Info (interp);
+
+  if (res != TCL_OK)
+    return res;
+  
+#ifdef ENABLE_BINIO
+  res = TrfInit_Binio (interp);
+
+  if (res != TCL_OK)
+    return res;
+#endif
+
+  /*
+   * Register error correction algorithms.
+   */
+
+  res = TrfInit_RS_ECC (interp);
+  
+  if (res != TCL_OK)
+    return res;
+
+  /*
+   * Register compressors.
+   */
+
+  res = TrfInit_ZIP (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_BZ2 (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  /*
+   * Register message digests
+   */
+
+  res = TrfInit_CRC (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_ADLER (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_CRC_ZLIB (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_MD5 (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_OTP_MD5 (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_MD2 (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_HAVAL (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_SHA (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_SHA1 (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_OTP_SHA1 (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_RIPEMD160 (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_RIPEMD128 (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  /*
+   * Register freeform transformation, reflector into tcl level
+   */
+
+  res = TrfInit_Transform (interp);
+
+  if (res != TCL_OK)
+    return res;
+  
+  /*
+   * Register crypt commands for pwd auth.
+   */
+
+  res = TrfInit_Crypt (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  /*
+   * Register standard encodings.
+   */
+
+  res = TrfInit_Ascii85 (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_UU (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_B64 (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_Bin (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_Oct (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_OTP_WORDS (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  res = TrfInit_QP (interp);
+
+  if (res != TCL_OK)
+    return res;
+
+  return TrfInit_Hex (interp);
 }
 
 /*
@@ -337,16 +351,14 @@ Tcl_Interp* interp;
  *	------------------------------------------------*
  *	Internal functions, used to serialize write-access
  *	to several global variables. Required only for
- *	a thread-enabled Tcl 8.1.x
+ *	a thread-enabled Tcl 8.1.x and beyond.
  *	------------------------------------------------*
  *
  *	Sideeffects:
  *		None.
  *
  *	Result:
- *		1 if and onlly if the extension is already
- *		initialized in the specified interpreter,
- *		0 else.
+ *		None.
  *
  *------------------------------------------------------*
  */
@@ -366,3 +378,4 @@ TrfUnlockIt ()
 }
 
 #endif /* GT81 */
+

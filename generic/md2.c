@@ -44,11 +44,11 @@
  * Declarations of internal procedures.
  */
 
-static void MD_Start     _ANSI_ARGS_ ((VOID* context));
-static void MD_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
-static void MD_UpdateBuf _ANSI_ARGS_ ((VOID* context, unsigned char* buffer, int bufLen));
-static void MD_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
-static int  MD_Check     _ANSI_ARGS_ ((Tcl_Interp* interp));
+static void MDmd2_Start     _ANSI_ARGS_ ((VOID* context));
+static void MDmd2_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
+static void MDmd2_UpdateBuf _ANSI_ARGS_ ((VOID* context, unsigned char* buffer, int bufLen));
+static void MDmd2_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
+static int  MDmd2_Check     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 /*
  * Generator definition.
@@ -58,11 +58,11 @@ static Trf_MessageDigestDescription mdDescription = { /* THREADING: constant, re
   "md2",
   sizeof (CTX_TYPE),
   DIGEST_SIZE,
-  MD_Start,
-  MD_Update,
-  MD_UpdateBuf,
-  MD_Final,
-  MD_Check
+  MDmd2_Start,
+  MDmd2_Update,
+  MDmd2_UpdateBuf,
+  MDmd2_Final,
+  MDmd2_Check
 };
 
 /*
@@ -93,7 +93,7 @@ Tcl_Interp* interp;
 /*
  *------------------------------------------------------*
  *
- *	MD_Start --
+ *	MDmd2_Start --
  *
  *	------------------------------------------------*
  *	Initialize the internal state of the message
@@ -110,7 +110,7 @@ Tcl_Interp* interp;
  */
 
 static void
-MD_Start (context)
+MDmd2_Start (context)
 VOID* context;
 {
   md2f.init ((MD2_CTX*) context);
@@ -119,7 +119,7 @@ VOID* context;
 /*
  *------------------------------------------------------*
  *
- *	MD_Update --
+ *	MDmd2_Update --
  *
  *	------------------------------------------------*
  *	Update the internal state of the message digest
@@ -136,7 +136,7 @@ VOID* context;
  */
 
 static void
-MD_Update (context, character)
+MDmd2_Update (context, character)
 VOID* context;
 unsigned int   character;
 {
@@ -148,7 +148,7 @@ unsigned int   character;
 /*
  *------------------------------------------------------*
  *
- *	MD_UpdateBuf --
+ *	MDmd2_UpdateBuf --
  *
  *	------------------------------------------------*
  *	Update the internal state of the message digest
@@ -165,7 +165,7 @@ unsigned int   character;
  */
 
 static void
-MD_UpdateBuf (context, buffer, bufLen)
+MDmd2_UpdateBuf (context, buffer, bufLen)
 VOID* context;
 unsigned char* buffer;
 int   bufLen;
@@ -176,7 +176,7 @@ int   bufLen;
 /*
  *------------------------------------------------------*
  *
- *	MD_Final --
+ *	MDmd2_Final --
  *
  *	------------------------------------------------*
  *	Generate the digest from the internal state of
@@ -193,7 +193,7 @@ int   bufLen;
  */
 
 static void
-MD_Final (context, digest)
+MDmd2_Final (context, digest)
 VOID* context;
 VOID* digest;
 {
@@ -203,7 +203,7 @@ VOID* digest;
 /*
  *------------------------------------------------------*
  *
- *	MD_Check --
+ *	MDmd2_Check --
  *
  *	------------------------------------------------*
  *	Do global one-time initializations of the message
@@ -221,7 +221,7 @@ VOID* digest;
  */
 
 static int
-MD_Check (interp)
+MDmd2_Check (interp)
 Tcl_Interp* interp;
 {
   return TrfLoadMD2 (interp);

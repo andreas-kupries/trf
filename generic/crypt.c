@@ -27,8 +27,7 @@
  * CVS: $Id$
  */
 
-#include	"transformInt.h"
-#include	"loadman.h"
+#include "loadman.h"
 
 static int
 TrfCryptObjCmd _ANSI_ARGS_ ((ClientData notUsed, Tcl_Interp* interp,

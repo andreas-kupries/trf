@@ -1,3 +1,55 @@
+Wed Aug  9 20:52:41 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* -- Released 2.1. --
+
+	* Consolidation complete to the point that Trf passes its
+	  testsuite for the following combinations of core compiled
+	  against and core run against:
+
+	  X = Version of core the extension was running  against.
+	  Y = Version of core the extension was compiled against.
+
+	            +-+----+
+	  (a) 8.0.5 |a|*   |   '-' = not passed.
+	  (b) 8.1.1 |b| ***|   '*' = passed.
+	  (c) 8.2.3 |c| ***|   ' ' = untested combination.
+	  (d) 8.3.2 |d| ***|
+		    +-+----+
+	            Y |abcd|
+	            +X-----+
+
+Tue Aug  8 00:19:26 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/registry.c: Consolidation complete to the point that Trf
+	  compiles against 8.0.5, 8.1.1, 8.2.3 and 8.3.2 without warnings
+	  (-Wall active).
+
+Tue Aug  1 20:08:08 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/registry.c: Consolidation. Started to merge patch for
+ 	  8.3.2 and higher into the codebase, should work from 8.0.x to
+ 	  8.3.2+.
+
+Sat Jul 29 00:53:24 2000  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/adler.c:
+	* generic/crc.c:
+	* generic/crc_zlib.c:
+	* generic/haval.c:
+	* generic/md2.c:
+	* generic/md5dig.c:
+	* generic/rmd128.c:
+	* generic/rmd160.c:
+	* generic/sha.c:
+	* generic/sha1.c: Cosmetic changes, renamed all functions with
+ 	  prefix MD_ to MD<name-of-digest>_. No benefit of these unique
+ 	  names from a compilation POV as they are all static anyway, but
+ 	  it makes the work of a tool like SourceNavigator simpler (and
+ 	  its views less ambiguous).
+
+	* generic/md5dig.c:
+	* generic/crypt.c: Removed unneeded header references.
+
 Tue Jun 20 20:49:05 2000  Andreas Kupries  <a.kupries@westend.com>
 
 	* md5-crypt/trf_crypt.h: Changed __const to CONST. Thanks to
@@ -19,14 +71,16 @@ Sat Apr 29 00:14:23 2000  Andreas Kupries  <a.kupries@westend.com>
 
 	* -- Release 2.0p7 --
 
-	* generic/qpcode.c, registry.c: Applied patch from Darren New
+	* generic/qpcode.c
+	* generic/registry.c: Applied patch from Darren New
 	  <dnew@san.rr.com> fixing a buffer overun in
 	  quoted_printable. Fixed nagging from purify too.
 
 Tue Apr 18 19:01:27 2000  Andreas Kupries  <a.kupries@westend.com>
 
-	* tea/tcl.m4, tea/configure.in: Accepted patch from Jan Nijtmans
-	  to enable usage of tea build with mingw32 environment on Win.
+	* tea/tcl.m4:
+	* tea/configure.in: Accepted patch from Jan Nijtmans to enable
+ 	  usage of tea build with mingw32 environment on Win.
 
 Wed Mar 22 19:48:30 2000  Andreas Kupries  <a.kupries@westend.com>
 
@@ -69,8 +123,9 @@ Fri Feb 25 17:27:47 2000  Andreas Kupries  <a.kupries@westend.com>
 	* generic/loadman.c, md5dig.c: See below. Base changes came from
 	  Jean-Claude Wippler <jcw@equi4.com>.
 
-	* tea/trf.m4, unix/configure.in: Added changes to allow static
-	  compilation of MD5 too.
+	* tea/trf.m4:
+ 	* unix/configure.in: Added changes to allow static compilation of
+ 	  MD5 too.
 
 Mon Jan 24 12:46:11 2000  Andreas Kupries  <a.kupries@westend.com>
 
@@ -108,8 +163,9 @@ Mon Dec 13 20:08:07 1999  Andreas Kupries  <a.kupries@westend.com>
 
 Fri Dec 10 18:32:48 1999  Andreas Kupries  <a.kupries@westend.com>
 	
-	* (tea|unix)/configure.in: Fixed problem with definition of
-	  CRYPT_LIB_NAME, reported by Tyler Riddle <triddle@iz-inc.com>.
+	* tea/configure.in:
+	* unix/configure.in: Fixed problem with definition of
+ 	  CRYPT_LIB_NAME, reported by Tyler Riddle <triddle@iz-inc.com>.
 
 	* Backed out all of the changes below, they cause miscompilation
 	  here. Now the radical approach: Go and remove all gcc/libc
@@ -123,18 +179,19 @@ Fri Dec 10 18:32:48 1999  Andreas Kupries  <a.kupries@westend.com>
 	  name, to avoid name clashes with an existing features.h
 	  (glibc-based Linux).
 
-	* (tea|unix)/configure.in: Added check for features.h. New code to
-	  add -lcrypt to LIBS if we have to compile md5 crypt with crypt
-	  present. Required to get both the real 'crypt' and the 'md5
-	  crypt'.
+	* tea/configure.in:
+	* unix/configure.in: Added check for features.h. New code to add
+ 	  -lcrypt to LIBS if we have to compile md5 crypt with crypt
+ 	  present. Required to get both the real 'crypt' and the 'md5
+ 	  crypt'.
 
 Wed Dec  1 21:07:57 1999  Andreas Kupries  <a.kupries@westend.com>
 
-	* (tea,unix)/configure.in (MD5_LIB_FILE): Added check to
- 	  differentiate between the mere existence of libcrypt and a
- 	  libcrypt having md5 functionality. Solaris f.e. has a libcrypt
-	  without md5 and we have to make sure that our version does not
-	  clash with it.
+	* tea/configure.in (MD5_LIB_FILE):
+	* unix/configure.in (MD5_LIB_FILE): Added check to differentiate
+ 	  between the mere existence of libcrypt and a libcrypt having md5
+ 	  functionality. Solaris f.e. has a libcrypt without md5 and we
+ 	  have to make sure that our version does not clash with it.
 
 Mon Nov 29 22:12:34 1999  Andreas Kupries  <a.kupries@westend.com>
 
@@ -249,12 +306,11 @@ Thu Oct 21 00:25:23 1999  Andreas Kupries  <a.kupries@westend.com>
 	* Made minor modifications to the patch (formatting, removed 7.6
 	  support, added analogous tests to the TEA part of the distrib.).
 
-	* tea.tests/zip.test: See below.
-
-	* tests/zip.test: See below.
-
-	* generic/zip.c, zip_opt.c, zlib.c: See below.
-
+	* tea.tests/zip.test:
+	* tests/zip.test:
+	* generic/zip.c:
+ 	* generic/zip_opt.c:
+ 	* generic/zlib.c:
 	* generic/transformInt.h: Finally applied the nowrap patch sent in
 	  by Jan Nijtmans quite some time ago (June 26, 1999).
 
@@ -282,8 +338,7 @@ Mon Oct 11 18:48:49 1999  Andreas Kupries  <a.kupries@westend.com>
 	  different on Windows, using some sort of hexcode. He inserted
 	  regsubs to normalize this part of the error messages.
 
-	* generic/bincode.c (DecodeBuffer): See below.
-
+	* generic/bincode.c (DecodeBuffer):
 	* generic/octcode.c (DecodeBuffer): New, analogous to hexcode.c
 
 	* generic/hexcode.c (DecodeBuffer): New, decode whole buffers
@@ -332,8 +387,8 @@ Wed Oct  6 23:22:19 1999  Andreas Kupries  <a.kupries@westend.com>
 
 Sun Oct  3 01:39:02 1999  Andreas Kupries  <a.kupries@westend.com>
 
-	* generic/bincode.c, octcode.c: Same as below.
-
+	* generic/bincode.c,
+ 	* generic/octcode.c:
 	* generic/hexcode.c (EncodeBuffer): New procedure to encode whole
 	  blocks. Written out of a desire to shorten the log produced by
 	  the debug facility (-DTRF_DEBUG) while playing with seek.
@@ -377,9 +432,9 @@ Sun Oct  3 01:39:02 1999  Andreas Kupries  <a.kupries@westend.com>
 	* Tests ok, no errors. Debug output (seek dumps) look ok too, so
 	  far (all transforms defined as unseekable).
 
-	* generic/registry.c: seek state and configuration placed into
-	  separate structures. result buffer now has reference to the seek
-	  state, possibly NULL. buffer positions are now updated by the
+	* generic/registry.c: Seek state and configuration placed into
+	  separate structures. Result buffer now has a reference to the seek
+	  state, possibly NULL. Buffer positions are now updated by the
 	  Result... procedures, if possible (state reference !=
 	  NULL). Some other code simplified.
 
@@ -444,10 +499,11 @@ Mon Sep 27 21:15:50 1999  Andreas Kupries  <a.kupries@westend.com>
 	* generic/transform.h: Added 'Trf_SeekTransformation'
 	  interface. Added vector to 'Trf_TypeDefinition' using it.
 
-	* unix/Makefile.in, unix/configure.in: The introduction of an
-	  exported stub table broke the 'unix' build for 8.0.x. Added more
-	  configure variables etc. to switch of compilation of trfStub*.o
-	  and linkage of libtrfstub.a
+	* unix/Makefile.in
+ 	* unix/configure.in: The introduction of an exported stub table
+ 	  broke the 'unix' build for 8.0.x. Added more configure variables
+ 	  etc. to switch of compilation of trfStub*.o and linkage of
+ 	  libtrfstub.a
 
 	  Reported by Stefan Studer <studer@glue.ch> while trying the
 	  unofficial distribution.
@@ -457,7 +513,7 @@ Sat Sep 25 20:24:12 1999  Andreas Kupries  <a.kupries@westend.com>
 	* doc/nodes/: Upgraded the documentation a bit.
 
 	* Well, not so ready anymore. Got some bug reports and patches
- 	  from Matt Newman. Bugfixes added in so far, applicaiton to 1.8
+ 	  from Matt Newman. Bugfixes added in so far, application to 1.8
 	  will be done too. Seek handling will be reworked, so state is
 	  not RSN anymore, but ASAP, or 'without date'.
 
@@ -491,9 +547,14 @@ Mon Sep 20 21:53:56 1999  Andreas Kupries  <a.kupries@westend.com>
 
 Sun Sep 19 01:29:23 1999  Andreas Kupries  <a.kupries@westend.com>
 
-	* generic/zip_opt.c, registry.c, reflect.c, ref_opt.c, digest.c,
-	  dig_opt.c, convert.c, bz2_opt.c: Removed support for Tcl 7.6 and
-	  below. 
+	* generic/zip_opt.c,
+ 	* generic/registry.c,
+ 	* generic/reflect.c,
+ 	* generic/ref_opt.c,
+ 	* generic/digest.c,
+	* generic/dig_opt.c,
+ 	* generic/convert.c,
+ 	* generic/bz2_opt.c: Removed support for Tcl 7.6 and below.
 
 	* generic/bz2.c (FlushEncoder): Killed the bug that plagued the
 	  'bzip' transformation. It was an error in the compressor,
@@ -514,8 +575,11 @@ Tue Sep 14 23:07:50 1999  Andreas Kupries  <a.kupries@westend.com>
 
 Fri Sep 10 21:10:55 1999  Andreas Kupries  <a.kupries@westend.com>
 
-	* doc/nodes/{intro,install,patch,future}.node: Updated to include
-	  information about Tcl 8.2 and its integration of the Trf patch.
+	* doc/nodes/intro.node:
+	* doc/nodes/install.node:
+	* doc/nodes/patch.node:
+	* doc/nodes/future.node: Updated to include information about Tcl
+ 	  8.2 and its integration of the Trf patch.
 
 Thu Sep  2 21:23:21 1999  Andreas Kupries  <a.kupries@westend.com>
 
@@ -560,10 +624,10 @@ Tue Jul 13 18:40:44 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/loadman.h: See below.
 
-	* unix/configure.in (): Newer versions of OpenSSL place their
-	includes in .../openssl/include/openssl/ instead of
-	.../openssl/include/. Changed to allow both, with the new
-	placement considered first.
+	* unix/configure.in: Newer versions of OpenSSL place their
+ 	  includes in .../openssl/include/openssl/ instead of
+ 	  .../openssl/include/. Changed to allow both, with the new
+ 	  placement considered first.
 
 	* generic/qpcode.c: More corrections from Marshall Rose,
 	  quoted-printable this time.
@@ -574,7 +638,8 @@ Fri Jul  9 16:51:14 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* unix/Makefile.in: Added all necessary code for bz2 from Jan.
 
-	* win/makefile.vc[5] (TRFOBJS): Added bz2*.obj to the definition.
+	* win/makefile.vc:
+	* win/makefile.vc5 (TRFOBJS): Added bz2*.obj to the definition.
 
 	* win/Makefile.gnu: Corrections sent by Jan Nijtmans. Additionally
  	  adds 'bz2' compression. Incomplete.
@@ -616,9 +681,10 @@ Tue Jun 29 21:20:23 1999  Andreas Kupries  <a.kupries@westend.com>
 
 Mon Jun 28 23:17:35 1999  Andreas Kupries  <a.kupries@westend.com>
 
-	* unix/configure.in, Makefile.in: Matt Newman <matt@novadigm.com>
-	  sent in some changes to built the extension on HPUX (Basically
-	  check for .sl extension too).
+	* unix/configure.in:
+ 	* unix/Makefile.in: Matt Newman <matt@novadigm.com> sent in some
+ 	  changes to built the extension on HPUX (Basically check for .sl
+ 	  extension too).
 
 Tue Jun 15 00:00:36 1999  Andreas Kupries  <a.kupries@westend.com>
 
@@ -641,8 +707,10 @@ Tue Jun 15 00:00:36 1999  Andreas Kupries  <a.kupries@westend.com>
 
 Mon Jun 14 20:39:21 1999  Andreas Kupries  <a.kupries@westend.com>
 
-	* generic/zlib.c, zip.c, crc_zip.c: Renamed 'z' to 'zf', as the
- 	  Gnu Tools on Windows have a bug with regard to the handling of
+	* generic/zlib.c,
+ 	* generic/zip.c,
+ 	* generic/crc_zip.c: Renamed 'z' to 'zf', as the Gnu Tools on
+ 	  Windows have a bug with regard to the handling of
  	  single-character variable names. Note by Jan Nijtmans.
 
 	* generic/transformInt.h: 'DllEntryPoint' removed. See below.
@@ -652,7 +720,8 @@ Mon Jun 14 20:39:21 1999  Andreas Kupries  <a.kupries@westend.com>
 	* win/: Added 'dllEntry.c', contains 'DllEntryPoint'. Added
 	  'Makefile.gnu'. Both from Jan Nijtmans.
 
-	* win/makefile.vc(5) (TRFOBJS): Added 'dllEntry.obj'.
+	* win/makefile.vc:
+	* win/makefile.vc5 (TRFOBJS): Added 'dllEntry.obj'.
 
 Sun May 30 10:49:42 1999  Andreas Kupries  <a.kupries@westend.com>
 
@@ -681,12 +750,20 @@ Sat May 29 22:56:31 1999  Andreas Kupries  <a.kupries@westend.com>
 
 Thu May 27 00:16:17 1999  Andreas Kupries  <a.kupries@westend.com>
 
-	* doc/nodes/ (md.node, conv.node, cmd.node): Integrated OTP
-	  documentation from Marshall Rose.
+	* doc/nodes/md.node:
+ 	* doc/nodes/conv.node:
+ 	* doc/nodes/cmd.node: Integrated OTP documentation from Marshall
+ 	  Rose.
 
-	* generic/ (transformInt.h, registry.c, init.c, otp*.c, md5.c,
-	  sha1.c): Integrated OTP code from Marshall Rose
-	  <mrose@dbc.mtview.ca.us>.
+	* generic/transformInt.h:
+ 	* generic/registry.c:
+ 	* generic/init.c:
+ 	* generic/otpcode.c:
+ 	* generic/otpmd5.c:
+ 	* generic/otpsha1.c:
+ 	* generic/md5.c:
+	* generic/sha1.c: Integrated OTP code from Marshall Rose
+ 	  <mrose@dbc.mtview.ca.us>.
 
 Tue May 25 23:22:21 1999  Andreas Kupries  <a.kupries@westend.com>
 
@@ -756,8 +833,9 @@ Tue Apr 13 08:28:10 1999  Andreas Kupries  <a.kupries@westend.com>
 	  <matt@novadigm.com> (<matt@sensus.org>) fixing problems with
 	  blocking mode and handling of fileevents.
 
-	* win/makefile.vc(5): Added definition of SSL_LIB_NAME to
-	  configuration section.
+	* win/makefile.vc:
+	* win/makefile.vc5: Added definition of SSL_LIB_NAME to
+ 	  configuration section.
 
 	* generic/loadman.c: Changed to allow the makefile to define the
 	  value of SSL_LIB_NAME.
@@ -782,9 +860,11 @@ Thu Mar 25 12:40:20 1999  Andreas Kupries  <a.kupries@westend.com>
 	* generic/reflect.c: Restored usage of 'Tcl_GlobalEvalObj'. Change
 	  between 8.1b1 and 8.1b2. No change between 8.0.x and 8.1b2.
 
-	* generic/binio.c, util.c, dig_opt.c, transformInt.h:
-	  Conditionalized usage of 'panic'. Now using 'Tcl_Panic' in case
-	  of compilation against tcl 8.1.
+	* generic/binio.c,
+ 	* generic/util.c,
+ 	* generic/dig_opt.c,
+ 	* generic/transformInt.h: Conditionalized usage of 'panic'. Now
+ 	  using 'Tcl_Panic' in case of compilation against tcl 8.1.
 
 	* unix/Makefile.in: Changed to allow usage of stubs.
 
@@ -826,8 +906,15 @@ Mon Feb 22 18:19:58 1999  Andreas Kupries  <a.kupries@westend.com>
 
 Tue Jan 12 20:53:36 1999  Andreas Kupries  <a.kupries@westend.com>
 
-	* generic/(binio.c, digest.c, reflect.c, registry.c, load.c,
-	  init.c, loadman.h, transformInt.h, transform.h): See below.
+	* generic/binio.c:
+ 	* generic/digest.c:
+ 	* generic/reflect.c:
+ 	* generic/registry.c:
+ 	* generic/load.c:
+	* generic/init.c:
+ 	* generic/loadman.h:
+ 	* generic/transformInt.h:
+ 	* generic/transform.h: See below.
 
 	* Fought against the MS environment today and won. Integrated
 	  the changes made there now into the master.
@@ -846,17 +933,22 @@ Mon Dec 14 22:04:35 1998  Andreas Kupries  <a.kupries@westend.com>
 
 Fri Nov 13 18:25:26 1998  Andreas Kupries  <a.kupries@westend.com>
 
-	* generic/util.c, bincode.c, hexcode.c, octcode.c, asc85code.c,
-	  reflect.c, rs_ecc.c, zip.c: See below.
-
+	* generic/util.c:
+ 	* bincode.c:
+ 	* hexcode.c:
+ 	* octcode.c:
+ 	* asc85code.c:
+	* reflect.c:
+ 	* rs_ecc.c:
+ 	* zip.c:
 	* generic/registry.c: Fixed several char/uchar
 	  mismatches. Reported by Larry.
 
 Thu Oct  1 17:46:49 1998  Andreas Kupries  <a.kupries@westend.com>
 
-	* generic/reflect.c, generic/asc85code.c: Fixed several char /
-	  unsigned char mismatches, detected by Larry Virden on his
-	  UltraSparc.
+	* generic/reflect.c:
+ 	* generic/asc85code.c: Fixed several char / unsigned char
+ 	  mismatches, detected by Larry Virden on his UltraSparc.
 
 Wed Sep 30 15:49:24 1998  Andreas Kupries  <a.kupries@westend.com>
 
@@ -888,16 +980,20 @@ Mon Jul 27 22:11:59 1998  Andreas Kupries  <a.kupries@westend.com>
 
 Sun Jul 19 22:24:43 1998  Andreas Kupries  <a.kupries@westend.com>
 
-	* tools/mmencode, -decode: Minimum replacements for the named
-	  applications (metamail). Conversion of a bytestream from and to
-	  base64.
+	* tools/mmencode:
+ 	* tools/mmdecode: Minimal replacements for the named applications
+ 	  (metamail). Conversion of a bytestream from and to base64.
 
 	* tools/demo: Visual demonstration application, sent to Jan for
 	  inclusion into his win installation (Consosrtium CD ROM
 	  Project). The logo too.
 
-	* doc/nodes/img/logo-*: Designed a logo for trf, built in various
-	  sizes.
+	* doc/nodes/img/logo-120x181.gif:
+	* doc/nodes/img/logo-16x16.gif:
+	* doc/nodes/img/logo-32x32.gif:
+	* doc/nodes/img/logo-60x90.gif:
+	* doc/nodes/img/logo-64x64.gif: Designed a logo for trf, built in
+ 	  various sizes.
 
 Sat Jul  4 21:29:26 1998  Andreas Kupries  <a.kupries@westend.com>
 
@@ -946,9 +1042,9 @@ Tue Jun 30 22:41:18 1998  Andreas Kupries  <a.kupries@westend.com>
 	  documentation for linkage into my westend site and for
 	  standalone distribution.
 
-	  Ad *) webTemplate is a system for the generation of a whole web
-	  site using node descriptions and a selectable layout/style
-	  definition. Current state: *INTERNAL*.
+	  (Ad *) webTemplate is a system for the generation of a whole web
+ 	  site using node descriptions and a selectable layout/style
+ 	  definition. Current state: *INTERNAL*.
 
 	* doc/: Replaced latex documentation by native HTML. Added 'nodes'
 	  directory.
@@ -964,8 +1060,11 @@ Mon Jun 29 20:13:55 1998  Andreas Kupries  <a.kupries@westend.com>
 	
 Wed Jun 17 21:38:32 1998  Andreas Kupries  <a.kupries@westend.com>
 
-	* doc/*.tex: Checked the urls, removed some broken ones. Added
-	  some notes about binio, see below, and 'bzip' (future section).
+	* doc/def.tex:
+	* doc/man.tex:
+	* doc/install.tex: Checked the urls, removed some broken
+ 	  ones. Added some notes about binio, see below, and 'bzip'
+ 	  (future section).
 
 	* patches/v8.1a2/byteorder.patch: Reworked to expose a minimal set
 	  of declarations in the patched tcl.h. First step towards
@@ -1040,9 +1139,11 @@ Mon Jul 28 20:34:05 1997  Andreas Kupries  <a.kupries@westend.com>
 	* doc/man.tex (section {Message digests}): Added explanation of
 	  transparent mode.
 
-	* generic/dig_opt.c, digest.c, transformInt.h: Added transparent
-	  mode to general message digest code. A mixture of absorb and
-	  write, see 'doc/man.tex' for more.
+	* generic/dig_opt.c:
+ 	* generic/digest.c:
+ 	* generic/transformInt.h: Added transparent mode to general
+ 	  message digest code. A mixture of absorb and write, see
+ 	  'doc/man.tex' for more.
 
 	* doc/defs.tex: Some more homepages found, updated references to
 	  Jan Nijtmans.
@@ -1064,11 +1165,15 @@ Fri Jul 25 18:13:12 1997  Andreas Kupries  <a.kupries@westend.com>
 	  options (choice between 2 keyschedules, standard and strong,
 	  allows specification of number of rounds).
 
-	* generic/rc4.c, rot.c (C_Schedule):Adapted to changes in type
-	  'Trf_CSchedule'.
+	* generic/rc4.c:
+ 	* generic/rot.c (C_Schedule): Adapted to changes in type
+ 	  'Trf_CSchedule'.
 
-	* generic/rc2.c, idea.c, blowfish.c, des.c (BC_Schedule): Adapted
-	  to changes in type 'Trf_BCSchedule'.
+	* generic/rc2.c,
+ 	* generic/idea.c,
+ 	* generic/blowfish.c,
+ 	* generic/des.c (BC_Schedule): Adapted to changes in type
+ 	  'Trf_BCSchedule'.
 
 	* generic/blockcipher.c (InitializeState): Cipher specific option
 	  information is given to the scheduler for incorporation into the
@@ -1098,8 +1203,13 @@ Thu Jul 24 00:41:05 1997  Andreas Kupries  <a.kupries@westend.com>
 	  specific option information to structures
 	  'TrfBlockcipherOptionBlock' and 'TrfCipherOptionBlock'.
 
-	* generic/blowfish.c, des.c, idea.c, rc4.c, rc2.c, rot.c: Updated
-	  to new structure definition (NULL == no additional options).
+	* generic/blowfish.c,
+ 	* generic/des.c,
+ 	* generic/idea.c,
+ 	* generic/rc4.c,
+ 	* generic/rc2.c,
+ 	* generic/rot.c: Updated to new structure definition (NULL == no
+ 	  additional options).
 
 	* generic/transform.h: Added references to Trf_OptionVrctors to
 	  'Trf_CipherDescription' and 'Trf_BlockcipherDescription', to
@@ -1174,9 +1284,15 @@ Tue Jul 22 00:07:21 1997  Andreas Kupries  <a.kupries@westend.com>
 
 Mon Jul 21 21:26:17 1997  Andreas Kupries  <a.kupries@westend.com>
 
-	* tests/crc.test, haval.test, md5.test, rmd128.test, rmd160.test,
-	  sha.test, md2.test, adler.test, crc_zlib.test:
-	  Rewritten. Message digests done now.
+	* tests/crc.test,
+ 	* tests/haval.test,
+ 	* tests/md5.test,
+ 	* tests/rmd128.test,
+ 	* tests/rmd160.test,
+	* tests/sha.test,
+ 	* tests/md2.test,
+ 	* tests/adler.test,
+ 	* tests/crc_zlib.test: Rewritten. Message digests done now.
 
 	* tests/common.md.test: New tests, checking common behaviour of
 	  all message digests, as implemented in 'dig_opt.c' and
@@ -1186,8 +1302,9 @@ Mon Jul 21 21:26:17 1997  Andreas Kupries  <a.kupries@westend.com>
 
 Fri Jul 18 00:19:45 1997  Andreas Kupries  <a.kupries@westend.com>
 
-	* tests/idea.test, des.test, blowfish.test: Rewritten. Block
-	  ciphers are done now. 
+	* tests/idea.test:
+ 	* tests/des.test:
+ 	* tests/blowfish.test: Rewritten. Block ciphers are done now.
 
 Thu Jul 17 22:29:49 1997  Andreas Kupries  <a.kupries@westend.com>
 
@@ -1201,7 +1318,9 @@ Thu Jul 17 22:29:49 1997  Andreas Kupries  <a.kupries@westend.com>
 	* tests/common.bc.test: New file, checks common behaviour of all
 	  block ciphers.
 
-	* generic/bc_opt.c, c_opt.c, c_util.c: Moved interpretation of
+	* generic/bc_opt.c:
+ 	* generic/c_opt.c:
+ 	* generic/c_util.c: Moved interpretation of
 	  argument to '-xx-type' into a separate procedure, then
 	  simplified the option processors.
 
@@ -1227,21 +1346,28 @@ Tue Jul 15 23:29:16 1997  Andreas Kupries  <a.kupries@westend.com>
 
 Mon Jul 14 00:04:52 1997  Andreas Kupries  <a.kupries@westend.com>
 
-	* tests/zip.test, rs_ecc.test: Rewritten now.
+	* tests/zip.test:
+ 	* tests/rs_ecc.test: Rewritten now.
 
 	* tests/ascii85.test, uu.test: New tests, all conversions are
 	  checked now.
 
-	* tests/hex.test, oct.test, base64.test: Rewritten, as with bin.test
+	* tests/hex.test:
+ 	* tests/oct.test:
+ 	* tests/base64.test: Rewritten, as with bin.test
 
-	* generic/octcode.c, bincode.c, hexcode.c, uucode.c, b64code.c,
-	  asc85code.c: Added 'Tcl_ResetResult' to all error generating
-	  returns, to clear out any partial result written via
-	  'PutInterpResult' (registry.c). 
+	* generic/octcode.c,
+ 	* generic/bincode.c,
+ 	* generic/hexcode.c,
+ 	* generic/uucode.c,
+ 	* generic/b64code.c,
+	* generic/asc85code.c: Added 'Tcl_ResetResult' to all error
+ 	  generating returns, to clear out any partial result written via
+ 	  'PutInterpResult' (registry.c).
 
 	* -- evening again --
 
-	* tests/bin.test: Started rewrite of tests, to handle, and take
+	* tests/bin.test: Started rewrite of tests, to handle and take
 	  advantage of new syntax.
 
 Sun Jul 13 22:16:39 1997  Andreas Kupries  <a.kupries@westend.com>
@@ -1257,7 +1383,7 @@ Sun Jul 13 22:16:39 1997  Andreas Kupries  <a.kupries@westend.com>
 
 Wed Jul  9 20:40:20 1997  Andreas Kupries  <a.kupries@westend.com>
 
-	* generic/rot13.c): New cipher: rot. Just fore fun, not for strength.
+	* generic/rot13.c: New cipher: rot. Just fore fun, not for strength.
 
 	* doc/man.tex (chapter {Copyrights}): Updated due to changes in
 	  the copyright of HAVAL. Added info about sabbatical leave in
@@ -1267,9 +1393,11 @@ Wed Jul  9 20:40:20 1997  Andreas Kupries  <a.kupries@westend.com>
 
 	* tests/haval.test: updated.
 
-	* generic/haval.1996/havalapp.h, haval.h, haval.c: Changes made to
-	  old haval added in here too. See January 5 and 13. Retained
-	  original files, with suffix '.orig'.
+	* generic/haval.1996/havalapp.h,
+ 	* generic/haval.1996/haval.h,
+ 	* generic/haval.1996/haval.c: Changes made to old haval added in
+ 	  here too. See January 5 and 13. Retained original files, with
+ 	  suffix '.orig'.
 
 	* generic/haval.1996/*: Added 1996 revision of HAVAL.
 
@@ -1407,8 +1535,9 @@ Thu May 29 21:16:05 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 Wed May 24 22:11:25 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
-	* doc/man.tex, install.tex: Made urls into hyperlinks, at least in
-	  the HTML version of the manuals. Done in the last days.
+	* doc/man.tex:
+ 	* doc/install.tex: Made urls into hyperlinks, at least in the HTML
+ 	  version of the manuals. Done in the last days.
 
 Wed May 21 18:16:42 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
@@ -1421,8 +1550,9 @@ Wed May 21 18:16:42 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 Mon May 19 22:35:19 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
-	* doc/man.tex, install.tex: checked with 'ispell', added new
-	  message digests.
+	* doc/man.tex:
+ 	* doc/install.tex: checked with 'ispell', added new message
+ 	  digests.
 
 	* generic/ripemd/rmd128.c: see below.
 
@@ -1480,18 +1610,20 @@ Sun May 11 21:36:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	* win/makefile.vc (LIBDES): Removed this configuration
 	  variable. See Feb 26 too. Superfluous now, see below.
 
-	* generic/loadman.[ch]: new files, supercede 'libdes.c', which is
-	  removed from the distribution now. This manager allows for
-	  individual loading of functionality from a variety of
-	  libraries. Currently uses 'libcrypto.so' (SSLeay) and
-	  'libdes.so' only.
+	* generic/loadman.c:
+	* generic/loadman.h: new files, supercede 'libdes.c', which is
+ 	  removed from the distribution now. This manager allows for
+ 	  individual loading of functionality from a variety of
+ 	  libraries. Currently uses 'libcrypto.so' (SSLeay) and
+ 	  'libdes.so' only.
 
 Sat May 10 21:56:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* first step to change from 'libdes' over to 'SSLeay' ('libcrypto').
 
-	* generic/zlib.c, libdes.c: Changed to use the new functionality
-	  described below.
+	* generic/zlib.c:
+ 	* generic/libdes.c: Changed to use the new functionality described
+ 	  below.
 
 	* generic/load.c: New file. Used last the 2 functions of
 	  'imgInit.c' (Img library, Jan Nijtmans) to factor out the common
@@ -1566,9 +1698,10 @@ Wed Feb 26 18:31:50 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 Tue Feb 25 22:38:18 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
-	* generic/sha/sha.[ch]: renamed typedef'd LONG to UINT32. Avoids
-	  collision with definition made by Windows. SHA finally ok under
-	  windows (see Feb 15 too).
+	* generic/sha/sha.c:
+	* generic/sha/sha.h: renamed typedef'd LONG to UINT32. Avoids
+ 	  collision with definition made by Windows. SHA finally ok under
+ 	  windows (see Feb 15 too).
 
 Sun Feb 23 18:46:33 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
@@ -1669,9 +1802,10 @@ Thu Feb 13 21:40:03 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	* generic/asc85code.c (Encode, FlushEncoder, Decode,
 	  FlushDecoder): see below.
 
-	* generic/adler.c, crc.c, crc_zlib.c (MD_Final): added casts to
-	  stop MS VC++ 4.2 from complaining about conversion problems and
-	  loss of data. 
+	* generic/adler.c:
+ 	* generic/crc.c:
+ 	* generic/crc_zlib.c (MD_Final): added casts to stop MS VC++ 4.2
+ 	  from complaining about conversion problems and loss of data.
 
 Tue Feb 11 18:46:01 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
@@ -1684,11 +1818,17 @@ Tue Feb 11 18:46:01 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  into the 'objResult' of the interpreter. Automatically activated
 	  in 'transformInt.h', for tcl major >= 8.
 
-	* generic/blockcipher.c, digest.c, rs_ecc.c, zip.c: see below.
-
-	* generic/b64code.c, octcode.c, hexcode.c, bincode.c, uucode.c,
-	  asc85code.c: changed result generation from 'Tcl_AppendResult'
-	  to 'ADD_RES'. 
+	* generic/blockcipher.c:
+ 	* generic/digest.c:
+ 	* generic/rs_ecc.c:
+ 	* generic/zip.c:
+	* generic/b64code.c:
+ 	* generic/octcode.c:
+ 	* generic/hexcode.c:
+ 	* generic/bincode.c:
+ 	* generic/uucode.c:
+	* generic/asc85code.c: changed result generation from
+ 	  'Tcl_AppendResult' to 'ADD_RES'.
 
 	* 2nd iteration through files named below, changed result
 	  generation from 'Tcl_AppendResult' to 'ADD_RES'.
@@ -1717,8 +1857,11 @@ Tue Feb 11 18:46:01 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	* generic/convert.c (SetOption): ok.
 	  (Trf_ConverterOptions): ok.
 
-	* zipt_opt.c, dig_opt.c, bc_opt.c, c_opt.c, convert.c: adaption to
-	  object interfaces required here!
+	* zipt_opt.c:
+ 	* dig_opt.c:
+ 	* bc_opt.c:
+ 	* c_opt.c:
+ 	* convert.c: adaption to object interfaces required here!
 
 	* generic/transform.h (Trf_OptionVectors): added 'setObjProc' to
 	  structure. 
@@ -1767,8 +1910,9 @@ Wed Feb  4 21:18:15 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 Fri Jan 31 18:43:29 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
-	* libdes.c, zlib.c: use library names without path, use OS
-	  facilities for searching (LD_LIBRARY_PATH, et.al).
+	* libdes.c:
+	* zlib.c: use library names without path, use OS facilities for
+ 	  searching (LD_LIBRARY_PATH, et.al).
 
 	* tools/ldAout.tcl: search for symbols did not account for
 	  capitals. Found after building libz.a without zsymbols.c
@@ -1848,13 +1992,20 @@ Mon Jan 13 21:41:33 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	* haval/haval.c: Most of conversion was already done (See Jan 5),
 	  with the exception of a single place (haval_tailor).
 
-	* blowfish/blowfish.*, idea/idea.*, md5/md5.*, rc4/rc4.*: See
-	  below. Most files integrated from external sources have this
-	  problem.
+	* blowfish/blowfish.c:
+	* blowfish/blowfish.h:
+	* idea/idea.c:
+	* idea/idea.h:
+	* md5/md5.c:
+	* md5/md5.h:
+	* rc4/rc4.c:
+	* rc4/rc4.h: See below. Most files integrated from external
+ 	  sources have this problem.
 
-	* sha/sha.[ch]: added <tcl.h>, _ANSI_ARGS_ (), generally conform
-	  to JO's conventions for extension programming. Removed usage of
-	  ##-operator too (concatenates token processed by preprocessor).
+	* sha/sha.c:
+ 	* sha/sha.h: added <tcl.h>, _ANSI_ARGS_ () generally to conform to
+ 	  JO's conventions for extension programming. Removed usage of
+ 	  ##-operator too (concatenates token processed by preprocessor).
 
 	  REASON: HP (uname -> 'A.09.04 B') choked on prototypes and the
 	  like.
@@ -1882,8 +2033,9 @@ Fri Jan 10 12:48:13 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* configure.in: Added 8.0, 8.0a1 to search sequences.
 
-	* doc/INSTALL, doc/INSTALL.optional, doc/man.tex: updated
-	  dependency information.
+	* doc/INSTALL:
+ 	* doc/INSTALL.optional:
+ 	* doc/man.tex: updated dependency information.
 
 Mon Jan  6 19:14:20 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
@@ -1903,19 +2055,27 @@ Sun Jan  5 22:26:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	  exported by libz and libdes resp. This forces static linkage on
 	  systems not supporting dynamic loading.
 
-	* haval/haval.h, haval/haval.c: changed header prototypes to
-	  _ANSI_ARGS_-notation of Tcl. Changed prototypes to K&R style.
+	* haval/haval.h:
+ 	* haval/haval.c: changed header prototypes to _ANSI_ARGS_-notation
+ 	  of Tcl. Changed prototypes to K&R style.
 
-	* registry.c, unstack.c: Removed superfluous '&'s.
+	* registry.c:
+ 	* unstack.c: Removed superfluous '&'s.
 
 	* transform.h.in: const -> CONST
 
-	* asc85code.c, b64code.c, bincode.c, hexcode.c, octcode.c,	(XX)
-	  uucode.c, rs_ecc.c, blockcipher.c, digest.c:
-	  I consistently used 'Trf_WriteProc fun' instead of
-	  'Trf_WriteProc* fun' in declarations and definitions of
-	  'Create(En/De)coder'. Severe case of cut/copy/paste
-	  disease. Found by an older compiler under Ultrix 4.1.
+	* asc85code.c:
+ 	* b64code.c:
+ 	* bincode.c:
+ 	* hexcode.c:
+ 	* octcode.c:	(XX)
+	* uucode.c:
+ 	* rs_ecc.c:
+ 	* blockcipher.c:
+ 	* digest.c: I consistently used 'Trf_WriteProc fun' instead of
+ 	  'Trf_WriteProc* fun' in declarations and definitions of
+ 	  'Create(En/De)coder'. Severe case of cut/copy/paste
+ 	  disease. Found by an older compiler under Ultrix 4.1. Fixed now.
 
 	* Back from christmas holiday. --> Integrate patch send by Jan at
 	  Dec 20, 1996. 
@@ -1930,10 +2090,12 @@ Wed Dec 18 18:46:58 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 
 Tue Dec 17 17:35:13 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 
-	* transform.h.in, c_opt.c, rc4.c, templates/c_template.c: extended
-	  interface analogously to message digests, blockcipher to allow
-	  dynamic loading. RC4 does not require this, but later
-	  functionality might do.
+	* transform.h.in:
+ 	* c_opt.c:
+ 	* rc4.c:
+ 	* templates/c_template.c: extended interface analogously to
+ 	  message digests, blockcipher to allow dynamic loading. RC4 does
+ 	  not require this, but later functionality might do.
 
 	* Makefile.in (depend): added -D___MAKEDEPEND___, see below.
 
@@ -1958,9 +2120,9 @@ Tue Dec 17 17:35:13 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* transformInt.h: HAVE_LIBDES_H -> HAVE_DES_H.
 
-	* compat/tclLoadNone.c, compat/_eprintf.c: new files, for systems
-	  without dyn. loading, and to avoid problems with gcc and
-	  assert. Send in by Jan.
+	* compat/tclLoadNone.c:
+ 	* compat/_eprintf.c: new files, for systems without dyn. loading,
+ 	  and to avoid problems with gcc and assert. Send in by Jan.
 
 	* compat/tclLoadAout.c: new version from Jan, had problems on
 	  Ultrix due to some unknown symbols.
@@ -1973,16 +2135,22 @@ Tue Dec 17 17:35:13 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 
 Mon Dec 16 18:29:27 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 
-	* des.c, bc_opt.c, transformInt.h, libdes.c: LIBDES will be loaded
-	  on demand now. Removed from distribution.
+	* des.c:
+ 	* bc_opt.c:
+ 	* transformInt.h:
+	* libdes.c: LIBDES will be loaded on demand now. Removed from
+ 	  distribution.
 
 	* ZLIB removed from distribution, will be loaded if required
 	  (commands: adler, crc-zlib, zip).
 
-	* adler.c, crc_zlib.c (MD_Check): checkProc searches and loads
-	  'libz'.
+	* adler.c:
+ 	* crc_zlib.c (MD_Check): checkProc searches and loads 'libz'.
 
-	* sha.c, md5.c, crc.c, haval.c: no checkProc required.
+	* sha.c:
+ 	* md5.c:
+ 	* crc.c:
+ 	* haval.c: no checkProc required.
 
 	* dig_opt.c (checkOptions): Calls 'checkProc' now.
 
@@ -1997,9 +2165,10 @@ Mon Dec 16 18:29:27 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 
 Sat Dec 14 19:17:56 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 
-	* integrated information from patch (*2) into configure.in and
-	  Makefile.in. New directory 'compat' with dll-loading code for
-	  various OS (taken from tcl).
+	* configure.in:
+	* Makefile.in: Integrated information from patch (*2).  New
+ 	  directory 'compat' with dll-loading code for various OS (taken
+ 	  from tcl).
 
 	* blowfish/blowfish.c (Blowfish_decipher): changed assignments
 	  'Xl = *xl', 'Xr = *xr' to 'Xl.word = *xl', 'Xr.word = *xr'. The
@@ -2009,19 +2178,27 @@ Sat Dec 14 19:17:56 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 	  got through the Ultrix 4.4, cc3.0 preprocessor and let the
 	  compiler bark. Removed now.
 
-	* blockcipher.c, bc_util.c, cipher.c, blowfish.c. zip.c: see below.
+	* blockcipher.c:
+ 	* bc_util.c:
+ 	* cipher.c:
+ 	* blowfish.c
+ 	* zip.c: see below.
 
-	* md5.c, haval.c, sha.c (MD_Update(Buf), MD_Final): see below.
+	* md5.c:
+	* haval.c:
+ 	* sha.c (MD_Update(Buf), MD_Final): see below.
 
 	* digest.c: all allocs now cast to the correct type (there were
 	  some casts missing, causing ULTRIX 4.4, cc3.0 to barf).
 
-	* hexcode.c, octcode.c, bincode.c: encode uses table-lookup now,
-	  no more bitfiddling.
+	* hexcode.c:
+	* octcode.c:
+ 	* bincode.c: encode uses table-lookup now, no more bitfiddling.
 
 Wed Dec 11 20:54:10 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 
-	* zip.c, rs_ecc.c: Done too.
+	* zip.c:
+	* rs_ecc.c: Done too.
 
 	* Got patch from Jan Nijtmans (*2) to load arbitrary dynamic
 	  libraries, enabling me to remove 'zlib' and 'libdes' from
@@ -2032,8 +2209,11 @@ Wed Dec 11 20:54:10 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 
 Tue Dec 10 21:22:02 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 
-	* md5.c, crc.c, crc_zlib.c, haval.c: All updated to handle buffers
-	  containing more than one character. For speedups see doc/speed/*
+	* md5.c:
+	* crc.c:
+	* crc_zlib.c:
+	* haval.c: All updated to handle buffers containing more than one
+ 	  character. For speedups see doc/speed/*
 
 	* sha.c (MD_UpdateBuf): New procedure to handle a buffer of
 	  characters. Depending on input-size 'sha' is now ~2-3 times as
@@ -2098,8 +2278,9 @@ Tue Oct 15 00:06:20 1996  Andreas Kupries  <aku@bluepeak.oche.de>
 
 	* init.c (Trf_Init): register new digests.
 
-	* adler32.c, crc32.c: added message digests algorithm contained in
-	  zlib as separate commands.
+	* adler32.c:
+	* crc32.c: added message digests algorithm contained in zlib as
+ 	  separate commands.
 
 	* templates/cvt_template.c: see below.
 

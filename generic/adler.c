@@ -44,11 +44,11 @@
  * Declarations of internal procedures.
  */
 
-static void MD_Start     _ANSI_ARGS_ ((VOID* context));
-static void MD_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
-static void MD_UpdateBuf _ANSI_ARGS_ ((VOID* context, unsigned char* buffer, int bufLen));
-static void MD_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
-static int  MD_Check     _ANSI_ARGS_ ((Tcl_Interp* interp));
+static void MDAdler_Start     _ANSI_ARGS_ ((VOID* context));
+static void MDAdler_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
+static void MDAdler_UpdateBuf _ANSI_ARGS_ ((VOID* context, unsigned char* buffer, int bufLen));
+static void MDAdler_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
+static int  MDAdler_Check     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 /*
  * Generator definition.
@@ -58,11 +58,11 @@ static Trf_MessageDigestDescription mdDescription = { /* THREADING: constant, re
   "adler",
   sizeof (CTX_TYPE),
   DIGEST_SIZE,
-  MD_Start,
-  MD_Update,
-  MD_UpdateBuf,
-  MD_Final,
-  MD_Check
+  MDAdler_Start,
+  MDAdler_Update,
+  MDAdler_UpdateBuf,
+  MDAdler_Final,
+  MDAdler_Check
 };
 
 #define ADLER (*((uLong*) context))
@@ -95,7 +95,7 @@ Tcl_Interp* interp;
 /*
  *------------------------------------------------------*
  *
- *	MD_Start --
+ *	MDAdler_Start --
  *
  *	------------------------------------------------*
  *	Initialize the internal state of the message
@@ -112,23 +112,23 @@ Tcl_Interp* interp;
  */
 
 static void
-MD_Start (context)
+MDAdler_Start (context)
 VOID* context;
 {
-  START (adler.MD_Start);
+  START (MDAdler_Start);
   PRINT ("Context = %p, Zf = %p\n", context, &zf);
 
   /* call md specific initialization here */
 
   ADLER = zf.adler32 (0L, Z_NULL, 0);
 
-  DONE (adler.MD_Start);
+  DONE (MDAdler_Start);
 }
 
 /*
  *------------------------------------------------------*
  *
- *	MD_Update --
+ *	MDAdler_Update --
  *
  *	------------------------------------------------*
  *	Update the internal state of the message digest
@@ -145,7 +145,7 @@ VOID* context;
  */
 
 static void
-MD_Update (context, character)
+MDAdler_Update (context, character)
 VOID* context;
 unsigned int   character;
 {
@@ -159,7 +159,7 @@ unsigned int   character;
 /*
  *------------------------------------------------------*
  *
- *	MD_UpdateBuf --
+ *	MDAdler_UpdateBuf --
  *
  *	------------------------------------------------*
  *	Update the internal state of the message digest
@@ -176,7 +176,7 @@ unsigned int   character;
  */
 
 static void
-MD_UpdateBuf (context, buffer, bufLen)
+MDAdler_UpdateBuf (context, buffer, bufLen)
 VOID* context;
 unsigned char* buffer;
 int   bufLen;
@@ -189,7 +189,7 @@ int   bufLen;
 /*
  *------------------------------------------------------*
  *
- *	MD_Final --
+ *	MDAdler_Final --
  *
  *	------------------------------------------------*
  *	Generate the digest from the internal state of
@@ -206,7 +206,7 @@ int   bufLen;
  */
 
 static void
-MD_Final (context, digest)
+MDAdler_Final (context, digest)
 VOID* context;
 VOID* digest;
 {
@@ -225,7 +225,7 @@ VOID* digest;
 /*
  *------------------------------------------------------*
  *
- *	MD_Check --
+ *	MDAdler_Check --
  *
  *	------------------------------------------------*
  *	Check for existence of libz, load it.
@@ -241,17 +241,17 @@ VOID* digest;
  */
 
 static int
-MD_Check (interp)
+MDAdler_Check (interp)
 Tcl_Interp* interp;
 {
   int res;
 
-  START (adler.MD_Check);
+  START (MDAdler_Check);
 
   res = TrfLoadZlib (interp);
 
   PRINT ("res = %d\n", res);
-  DONE (adler.MD_Check);
+  DONE (MDAdler_Check);
   return res;
 }
 

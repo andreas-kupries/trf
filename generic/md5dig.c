@@ -27,9 +27,7 @@
  * CVS: $Id$
  */
 
-#include "transformInt.h"
 #include "loadman.h"
-/*#include "md5/md5.h"*/
 
 /*
  * Generator description
@@ -53,12 +51,12 @@
  * Declarations of internal procedures.
  */
 
-static void MD_Start     _ANSI_ARGS_ ((VOID* context));
-static void MD_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
-static void MD_UpdateBuf _ANSI_ARGS_ ((VOID* context,
+static void MDmd5_Start     _ANSI_ARGS_ ((VOID* context));
+static void MDmd5_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
+static void MDmd5_UpdateBuf _ANSI_ARGS_ ((VOID* context,
 				       unsigned char* buffer, int bufLen));
-static void MD_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
-static int  MD_Check     _ANSI_ARGS_ ((Tcl_Interp* interp));
+static void MDmd5_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
+static int  MDmd5_Check     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 /*
  * Generator definition.
@@ -73,11 +71,11 @@ mdDescription = { /* THREADING: constant, read-only => safe */
 #endif
   sizeof (CTX_TYPE),
   DIGEST_SIZE,
-  MD_Start,
-  MD_Update,
-  MD_UpdateBuf,
-  MD_Final,
-  MD_Check
+  MDmd5_Start,
+  MDmd5_Update,
+  MDmd5_UpdateBuf,
+  MDmd5_Final,
+  MDmd5_Check
 };
 
 /*
@@ -112,7 +110,7 @@ Tcl_Interp* interp;
 /*
  *------------------------------------------------------*
  *
- *	MD_Start --
+ *	MDmd5_Start --
  *
  *	------------------------------------------------*
  *	Initialize the internal state of the message
@@ -129,7 +127,7 @@ Tcl_Interp* interp;
  */
 
 static void
-MD_Start (context)
+MDmd5_Start (context)
 VOID* context;
 {
   /*  MD5Init ((MD5_CTX*) context);*/
@@ -146,7 +144,7 @@ VOID* context;
 /*
  *------------------------------------------------------*
  *
- *	MD_Update --
+ *	MDmd5_Update --
  *
  *	------------------------------------------------*
  *	Update the internal state of the message digest
@@ -163,7 +161,7 @@ VOID* context;
  */
 
 static void
-MD_Update (context, character)
+MDmd5_Update (context, character)
 VOID* context;
 unsigned int   character;
 {
@@ -177,7 +175,7 @@ unsigned int   character;
 /*
  *------------------------------------------------------*
  *
- *	MD_UpdateBuf --
+ *	MDmd5_UpdateBuf --
  *
  *	------------------------------------------------*
  *	Update the internal state of the message digest
@@ -194,7 +192,7 @@ unsigned int   character;
  */
 
 static void
-MD_UpdateBuf (context, buffer, bufLen)
+MDmd5_UpdateBuf (context, buffer, bufLen)
 VOID* context;
 unsigned char* buffer;
 int   bufLen;
@@ -222,7 +220,7 @@ int   bufLen;
 /*
  *------------------------------------------------------*
  *
- *	MD_Final --
+ *	MDmd5_Final --
  *
  *	------------------------------------------------*
  *	Generate the digest from the internal state of
@@ -239,7 +237,7 @@ int   bufLen;
  */
 
 static void
-MD_Final (context, digest)
+MDmd5_Final (context, digest)
 VOID* context;
 VOID* digest;
 {
@@ -270,7 +268,7 @@ VOID* digest;
 /*
  *------------------------------------------------------*
  *
- *	MD_Check --
+ *	MDmd5_Check --
  *
  *	------------------------------------------------*
  *	Do global one-time initializations of the message
@@ -288,7 +286,7 @@ VOID* digest;
  */
 
 static int
-MD_Check (interp)
+MDmd5_Check (interp)
 Tcl_Interp* interp;
 {
 #ifdef MD5_STATIC_BUILD

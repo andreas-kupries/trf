@@ -65,9 +65,9 @@ TrfUnstackObjCmd (notUsed, interp, objc, objv)
   int         mode;
 
 #ifdef USE_TCL_STUBS
-  const char* cmd = Tcl_GetStringFromObj (objv [0], NULL);
-
   if (Tcl_UnstackChannel == NULL) {
+    const char* cmd = Tcl_GetStringFromObj (objv [0], NULL);
+
     Tcl_AppendResult (interp, cmd, " is not available as the required ",
 		      "patch to the core was not applied", (char*) NULL);
     return TCL_ERROR;
@@ -87,12 +87,7 @@ TrfUnstackObjCmd (notUsed, interp, objc, objv)
     return TCL_ERROR;
   }
 
-#ifdef USE_TCL_STUBS
   Tcl_UnstackChannel (interp, chan);
-#else
-  Tcl_UndoReplaceChannel (interp, chan); /* Non-stub Tcl, 8.0.x or below */
-#endif
-
   return TCL_OK;
 }
 

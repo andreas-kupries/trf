@@ -45,10 +45,10 @@
  * Declarations of internal procedures.
  */
 
-static void MD_Start     _ANSI_ARGS_ ((VOID* context));
-static void MD_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
-static void MD_UpdateBuf _ANSI_ARGS_ ((VOID* context, unsigned char* buffer, int bufLen));
-static void MD_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
+static void MDcrc_Start     _ANSI_ARGS_ ((VOID* context));
+static void MDcrc_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
+static void MDcrc_UpdateBuf _ANSI_ARGS_ ((VOID* context, unsigned char* buffer, int bufLen));
+static void MDcrc_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
 
 /*
  * Generator definition.
@@ -58,10 +58,10 @@ static Trf_MessageDigestDescription mdDescription = {
   "crc",
   sizeof (CTX_TYPE),
   DIGEST_SIZE,
-  MD_Start,
-  MD_Update,
-  MD_UpdateBuf,
-  MD_Final,
+  MDcrc_Start,
+  MDcrc_Update,
+  MDcrc_UpdateBuf,
+  MDcrc_Final,
   NULL
 };
 
@@ -104,7 +104,7 @@ Tcl_Interp* interp;
 /*
  *------------------------------------------------------*
  *
- *	MD_Start --
+ *	MDcrc_Start --
  *
  *	------------------------------------------------*
  *	Initialize the internal state of the message
@@ -121,7 +121,7 @@ Tcl_Interp* interp;
  */
 
 static void
-MD_Start (context)
+MDcrc_Start (context)
 VOID* context;
 {
   /* call md specific initialization here */
@@ -132,7 +132,7 @@ VOID* context;
 /*
  *------------------------------------------------------*
  *
- *	MD_Update --
+ *	MDcrc_Update --
  *
  *	------------------------------------------------*
  *	Update the internal state of the message digest
@@ -149,7 +149,7 @@ VOID* context;
  */
 
 static void
-MD_Update (context, character)
+MDcrc_Update (context, character)
 VOID* context;
 unsigned int   character;
 {
@@ -172,7 +172,7 @@ unsigned int   character;
 /*
  *------------------------------------------------------*
  *
- *	MD_UpdateBuf --
+ *	MDcrc_UpdateBuf --
  *
  *	------------------------------------------------*
  *	Update the internal state of the message digest
@@ -189,7 +189,7 @@ unsigned int   character;
  */
 
 static void
-MD_UpdateBuf (context, buffer, bufLen)
+MDcrc_UpdateBuf (context, buffer, bufLen)
 VOID* context;
 unsigned char* buffer;
 int   bufLen;
@@ -216,7 +216,7 @@ int   bufLen;
 /*
  *------------------------------------------------------*
  *
- *	MD_Final --
+ *	MDcrc_Final --
  *
  *	------------------------------------------------*
  *	Generate the digest from the internal state of
@@ -233,7 +233,7 @@ int   bufLen;
  */
 
 static void
-MD_Final (context, digest)
+MDcrc_Final (context, digest)
 VOID* context;
 VOID* digest;
 {

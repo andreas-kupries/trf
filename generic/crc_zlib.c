@@ -44,11 +44,11 @@
  * Declarations of internal procedures.
  */
 
-static void MD_Start     _ANSI_ARGS_ ((VOID* context));
-static void MD_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
-static void MD_UpdateBuf _ANSI_ARGS_ ((VOID* context, unsigned char* buffer, int bufLen));
-static void MD_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
-static int  MD_Check     _ANSI_ARGS_ ((Tcl_Interp* interp));
+static void MDcrcz_Start     _ANSI_ARGS_ ((VOID* context));
+static void MDcrcz_Update    _ANSI_ARGS_ ((VOID* context, unsigned int character));
+static void MDcrcz_UpdateBuf _ANSI_ARGS_ ((VOID* context, unsigned char* buffer, int bufLen));
+static void MDcrcz_Final     _ANSI_ARGS_ ((VOID* context, VOID* digest));
+static int  MDcrcz_Check     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 /*
  * Generator definition.
@@ -58,11 +58,11 @@ static Trf_MessageDigestDescription mdDescription = {
   "crc-zlib",
   sizeof (CTX_TYPE),
   DIGEST_SIZE,
-  MD_Start,
-  MD_Update,
-  MD_UpdateBuf,
-  MD_Final,
-  MD_Check
+  MDcrcz_Start,
+  MDcrcz_Update,
+  MDcrcz_UpdateBuf,
+  MDcrcz_Final,
+  MDcrcz_Check
 };
 
 #define CRC (*((uLong*) context))
@@ -95,7 +95,7 @@ Tcl_Interp* interp;
 /*
  *------------------------------------------------------*
  *
- *	MD_Start --
+ *	MDcrcz_Start --
  *
  *	------------------------------------------------*
  *	Initialize the internal state of the message
@@ -112,7 +112,7 @@ Tcl_Interp* interp;
  */
 
 static void
-MD_Start (context)
+MDcrcz_Start (context)
 VOID* context;
 {
   /* call md specific initialization here */
@@ -123,7 +123,7 @@ VOID* context;
 /*
  *------------------------------------------------------*
  *
- *	MD_Update --
+ *	MDcrcz_Update --
  *
  *	------------------------------------------------*
  *	Update the internal state of the message digest
@@ -140,7 +140,7 @@ VOID* context;
  */
 
 static void
-MD_Update (context, character)
+MDcrcz_Update (context, character)
 VOID* context;
 unsigned int   character;
 {
@@ -154,7 +154,7 @@ unsigned int   character;
 /*
  *------------------------------------------------------*
  *
- *	MD_UpdateBuf --
+ *	MDcrcz_UpdateBuf --
  *
  *	------------------------------------------------*
  *	Update the internal state of the message digest
@@ -171,7 +171,7 @@ unsigned int   character;
  */
 
 static void
-MD_UpdateBuf (context, buffer, bufLen)
+MDcrcz_UpdateBuf (context, buffer, bufLen)
 VOID* context;
 unsigned char* buffer;
 int   bufLen;
@@ -184,7 +184,7 @@ int   bufLen;
 /*
  *------------------------------------------------------*
  *
- *	MD_Final --
+ *	MDcrcz_Final --
  *
  *	------------------------------------------------*
  *	Generate the digest from the internal state of
@@ -201,7 +201,7 @@ int   bufLen;
  */
 
 static void
-MD_Final (context, digest)
+MDcrcz_Final (context, digest)
 VOID* context;
 VOID* digest;
 {
@@ -220,7 +220,7 @@ VOID* digest;
 /*
  *------------------------------------------------------*
  *
- *	MD_Check --
+ *	MDcrcz_Check --
  *
  *	------------------------------------------------*
  *	Check for existence of libz, load it.
@@ -236,7 +236,7 @@ VOID* digest;
  */
 
 static int
-MD_Check (interp)
+MDcrcz_Check (interp)
 Tcl_Interp* interp;
 {
   return TrfLoadZlib (interp);

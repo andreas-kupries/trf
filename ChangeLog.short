@@ -1,3 +1,15 @@
+Changes from 2.0p7 to 2.1
+
+*	Adapted to the rewrite of the stacked channel functionality in
+	8.3.2. A single binary should now support all stubbed cores
+	(8.1 upward) by switching its behaviour at runtime. Some
+	voodoo is used to make sure that it is not relevant which
+	version of the core was used to create that all-purpose
+	binary.
+
+	Only the 8.0.x series requires a separate binary because it is
+	not stubbed.
+
 Changes from 2.0p6 to 2.0p7
 
 *	Bugfixes for

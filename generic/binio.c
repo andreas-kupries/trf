@@ -31,9 +31,7 @@
 #include "transformInt.h"
 
 #ifdef ENABLE_BINIO
-#include <errno.h>
 #include <limits.h>
-#include <string.h>
 
 /*
  * Forward declarations of internal procedures.
