@@ -245,6 +245,14 @@ md5_process_bytes (buffer, len, ctx)
       len -= add;
     }
 
+  /* Process misaligned blocks. */
+  while ((len > 64) && ((((unsigned int) buffer) & 3) != 0)) {
+    memcpy(ctx->buffer, buffer, 64);
+    md5_process_block(ctx->buffer, 64, ctx);
+    buffer = (const char *) buffer + 64;
+    len -= 64;
+  }
+
   /* Process available complete blocks.  */
   if (len > 64)
     {

@@ -1,3 +1,11 @@
+2003-03-27  Andreas Kupries  <andreask@activestate.com>
+
+	* md5-crypt/md5.c (md5_process_bytes): Accepted patch #667168 by
+	  Olly Stephens <ollystephens@users.sourceforge.net>. Without the
+	  the patch new md5 test-case (see yesterday) causes a crash on
+	  the solaris machine, and with it the new test passes cleanly
+	  (also generates the expected result).
+
 2003-03-26  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* tools/svfiles: Added 'doc/common/trf_version.inc' to list of
