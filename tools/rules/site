@@ -16,6 +16,11 @@ source [file join [here] formatting] ; # Make general formatting available.
 # - Content -       |
 # Footer            | [page_end]
 
+global    pages
+array set pages {
+    mp   {}
+    tags {}
+}
 
 proc sitepage {tag text url} {
     global pages

@@ -36,7 +36,9 @@ proc trf/latest-release {} {
 
     set releasepage [wget [releases/url]]
 
-    regexp {release_id=([0-9]+)} $releasepage -> release_id
+    if {![regexp {release_id=([0-9]+)} $releasepage -> release_id]} {
+	return "version $version as of $date (No SF releases yet)"
+    }
 
     return "[link "version $version" [releases/url]&release_id=$release_id] as of $date"
 }

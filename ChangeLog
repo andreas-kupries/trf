@@ -1,3 +1,12 @@
+2002-09-14  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
+
+	* tools/htdocs_setup:
+	* ./tools/rules/site:
+	* ./tools/rules/trf:
+	* ./tools/htdocs_refresh: Made code more robust for case of
+	  non yet existing manpages. Also added markers to distinguish
+	  output from memchan.
+
 2002-08-26  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
 	* generic/registry.c (ChannelHandlerTimer): Fix of bug found by
