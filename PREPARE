@@ -154,7 +154,7 @@ foreach md {crc crc-zlib adler md5 sha haval ripemd128 ripemd160} {
 mNormalPermissions [pwd]
 
 # and now the tuning
-exec      chmod u+w unix mac win tests tests/sha.test.vec
+exec      chmod u+w unix mac win tests
 eval exec chmod u+x unix/configure [glob tools/*]
 
 
