@@ -51,7 +51,7 @@ VOID *dlopen(path, mode)
 {
     VOID *handle;
     LibraryList *ptr;
-    static int intialized = 0;
+    static int initialized = 0;
 
     if (!initialized) {
 	initialized = 1;
@@ -103,7 +103,7 @@ dlclose(handle)
 	    } else {
 		libraryList = ptr->nextPtr;
 	    }
-	    ckfree(ptr);
+	    ckfree((char*) ptr);
 	    return 0;
 	}
 	prevPtr = ptr;
@@ -182,12 +182,12 @@ UnloadLibraries(clientData)
     ClientData clientData;
 {
     LibraryList *ptr;
-    LibraryList *list = *((LibraryList **) clientData)
+    LibraryList *list = *((LibraryList **) clientData);
 
     while (list != NULL) {
 	FreeLibrary(list->handle);
 	ptr = list->nextPtr;
-	ckfree(list);
+	ckfree((char*) list);
 	list = ptr;
     }
 }

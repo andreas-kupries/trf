@@ -906,25 +906,58 @@ int*       errorCodePtr;
     read = Tcl_Read (trans->parent, buf, toRead);
 
     if (read < 0) {
+      /* Report errors to caller.
+       */
+
       *errorCodePtr = Tcl_GetErrno ();
       return -1;      
     }
 
     if (read == 0) {
-      /* Return the part we got */
-      return gotBytes;
+      /* check wether we hit on EOF in 'trans->parent' or
+       * not. If not we are in non-blocking mode and ran
+       * temporarily out of data. Return the part we got
+       * and let the caller wait for more. On the other
+       * hand, if we got an Eof we have to convert and
+       * flush all waiting partial data.
+       */
+
+      if (! Tcl_Eof (trans->parent)) {
+	return gotBytes;
+      } else {
+	res = trans->in.vectors->flushProc (trans->in.control,
+					    (Tcl_Interp*) NULL,
+					    trans->clientData);
+	if (trans->used == 0) {
+	  /* we had nothing to flush */
+	  return gotBytes;
+	}
+	continue; /* at: while (toRead > 0) */
+      }
     }
 
     /* transform the read chunk */
 
-    for (i=0; i < read; i++) {
-      res = trans->in.vectors->convertProc (trans->in.control, buf [i],
-					    (Tcl_Interp*) NULL,
-					    trans->clientData);
-      if (res != TCL_OK) {
-	*errorCodePtr = EINVAL;
-	return -1;
+    if (trans->in.vectors->convertBufProc){ 
+      res = trans->in.vectors->convertBufProc (trans->in.control,
+					       buf, read,
+					       (Tcl_Interp*) NULL,
+					       trans->clientData);
+    } else {
+      res = TCL_OK;
+      for (i=0; i < read; i++) {
+	res = trans->in.vectors->convertProc (trans->in.control, buf [i],
+					      (Tcl_Interp*) NULL,
+					      trans->clientData);
+	if (res != TCL_OK) {
+	  break;
+	}
       }
+    }
+
+    if (res != TCL_OK) {
+      *errorCodePtr = EINVAL;
+      return -1;
     }
   } /* while toRead > 0 */
 
@@ -965,14 +998,26 @@ int*       errorCodePtr;
    * ('PutDestination' was configured as write procedure in 'AttachTransformation')
    */
 
-  for (i=0; i < toWrite; i++) {
-    res = trans->out.vectors->convertProc (trans->out.control, buf [i],
-					   (Tcl_Interp*) NULL,
-					   trans->clientData);
-    if (res != TCL_OK) {
-      *errorCodePtr = EINVAL;
-      return -1;
+    if (trans->in.vectors->convertBufProc){ 
+      res = trans->out.vectors->convertBufProc (trans->out.control,
+					       buf, toWrite,
+						(Tcl_Interp*) NULL,
+					       trans->clientData);
+    } else {
+      res = TCL_OK;
+      for (i=0; i < toWrite; i++) {
+	res = trans->out.vectors->convertProc (trans->out.control, buf [i],
+					       (Tcl_Interp*) NULL,
+					       trans->clientData);
+	if (res != TCL_OK) {
+	  break;
+	}
+      }
     }
+
+  if (res != TCL_OK) {
+    *errorCodePtr = EINVAL;
+    return -1;
   }
 
   return toWrite;
@@ -1197,7 +1242,7 @@ Trf_Options        optInfo;
     } else {
       unsigned int i, c;
 
-      for (i=0; i < actuallyRead; i++) {
+      for (i=0; i < ((int) actuallyRead); i++) {
 	c = buf [i];
 	res = v->convertProc (control, c, interp,
 			      entry->trfType->clientData);

@@ -328,13 +328,13 @@ char**      argv;	/* trailing arguments */
 	break;
 
       case 'D':
-	cvt.si = (long int) cvt.i;
+	cvt.si = (short int) cvt.i;
 	bufPtr = (char*) &cvt.si;
 	bufLen = sizeof (short int);
 	break;
 
       case 'U':
-	cvt.us = (long int) cvt.i;
+	cvt.us = (short int) cvt.i;
 	bufPtr = (char*) &cvt.us;
 	bufLen = sizeof (unsigned short);
 	break;

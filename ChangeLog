@@ -1,3 +1,56 @@
+Fri Feb 14 19:15:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* win/makefile.vc: first stab at Makefile for windows. Constructed
+	  from 'ftp://ftp.sunlabs.com/pub/tcl/example.zip(makefile.vc)'
+	  and the makefile used by tcl itself.
+
+	* generic/init.c: added prolog required for DLL generation under
+	  windows. 
+
+	* generic/registry.c (TrfInput, TrfOutput): Inserted usage of
+	  procedures for handling complete buffers, they are prefered over
+	  the single-character vectors.
+	  (TrfInput): corrected logical error causing the system to loose
+	  partial data at Eof on underlying channel.
+
+Thu Feb 13 21:40:03 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* - the bunch of messages below resulted from my first try to
+	  compile trf under windoof. Some other messages, not recorded
+	  here, were due to the usage of an unpatched version of tcl.
+
+	  Note: The current stage of development in using the object
+	  interfaces compiles ok against 8.0a2, but NOT a1. The 'interp'
+	  arguments to the used functions were removed between these
+	  revisions. First thought at work: How the hell could gcc compile
+	  my code, containing such a grave error as supplying to few
+	  arguments to a function. Have to install 8.0a2 at work pronto.
+
+	* compat/tclLoadWin.c: fixed some small problems in here.
+	  (dlopen): corrected declaration of 'intialized', added an 'i'.
+	  (UnloadLibraries): terminated 2nd declaration with ';'.
+	  (dlclose, UnloadLibraries): calls to 'ckfree' required casts.
+
+	  Had some more warnings, investigation defered to next try.
+
+	* generic/digest.c (EncodeBuffer): signed/unsigned mismatch.
+
+	* generic/util.c (TrfMerge4To3): The cpp's used so far don't
+	  understand an empty argument to a macro. Noop '>> 0' supplied now.
+
+	* generic/binio.c (Packcmd, 'D', 'U'): Had wrong casts here.
+
+	* generic/registry.c (TransformImmediate): signed/unsigned mismatch.
+
+	* generic/rc4/rc4.c (rc4_prepare_key): see below.
+
+	* generic/asc85code.c (Encode, FlushEncoder, Decode,
+	  FlushDecoder): see below.
+
+	* generic/adler.c, crc.c, crc_zlib.c (MD_Final): added casts to
+	  stop MS VC++ 4.2 from complaining about conversion problems and
+	  loss of data. 
+
 Tue Feb 11 18:46:01 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* 'binio', 'unstack' need conversion too.
@@ -338,7 +391,7 @@ Sat Dec 14 19:17:56 1996  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* md5.c, haval.c, sha.c (MD_Update(Buf), MD_Final): see below.
 
-	* digest.c: all allocates now cast to the correct type (there were
+	* digest.c: all allocs now cast to the correct type (there were
 	  some casts missing, causing ULTRIX 4.4, cc3.0 to barf).
 
 	* hexcode.c, octcode.c, bincode.c: encode uses table-lookup now,

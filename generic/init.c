@@ -28,6 +28,73 @@
  */
 
 #include "transformInt.h"
+
+
+/*
+ * Definitions to enable the generation of a DLL under Windows.
+ * Taken from 'ftp://ftp.sunlabs.com/pub/tcl/example.zip(example.c)'
+ */
+
+#if defined(__WIN32__)
+#   define WIN32_LEAN_AND_MEAN
+#   include <windows.h>
+#   undef WIN32_LEAN_AND_MEAN
+
+/*
+ * VC++ has an alternate entry point called DllMain, so we need to rename
+ * our entry point.
+ */
+
+#   if defined(_MSC_VER)
+#	define EXPORT(a,b) __declspec(dllexport) a b
+#	define DllEntryPoint DllMain
+#   else
+#	if defined(__BORLANDC__)
+#	    define EXPORT(a,b) a _export b
+#	else
+#	    define EXPORT(a,b) a b
+#	endif
+#   endif
+#else
+#   define EXPORT(a,b) a b
+#endif
+
+/*
+ * Declarations for functions defined in this file.
+ */
+
+EXTERN EXPORT(int,Trf_Init)     _ANSI_ARGS_ ((Tcl_Interp *interp));
+EXTERN EXPORT(int,Trf_SafeInit) _ANSI_ARGS_ ((Tcl_Interp *interp));
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * DllEntryPoint --
+ *
+ *	This wrapper function is used by Windows to invoke the
+ *	initialization code for the DLL.  If we are compiling
+ *	with Visual C++, this routine will be renamed to DllMain.
+ *	routine.
+ *
+ * Results:
+ *	Returns TRUE;
+ *
+ * Side effects:
+ *	None.
+ *
+ *----------------------------------------------------------------------
+ */
+
+#ifdef __WIN32__
+BOOL APIENTRY
+DllEntryPoint(hInst, reason, reserved)
+    HINSTANCE hInst;		/* Library instance handle. */
+    DWORD reason;		/* Reason this function is being called. */
+    LPVOID reserved;		/* Not used. */
+{
+    return TRUE;
+}
+#endif
 
 /*
  *------------------------------------------------------*

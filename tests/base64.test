@@ -1,0 +1,185 @@
+# -*- tcl -*-
+# Commands covered:  base64
+#
+# This file contains a collection of tests for one or more of the trf
+# commands of the TRF extension. Sourcing this file into Tcl runs the
+# tests and generates output for errors.  No output means no errors were
+# found.
+#
+# Copyright (c) 1995 Andreas Kupries (a.kupries@westend.com)
+#
+# See the file "license.terms" for information on usage and redistribution
+# of this file, and for a DISCLAIMER OF ALL WARRANTIES.
+#
+# $Id$
+
+if {[string compare test [info procs test]] == 1} then {source defs}
+
+set text		{hello}
+set text_c		{hell}
+set text_base64		{aGVsbG8=}
+set text_base64_c	{aGVsbA}
+set wrong_base64	{aGV!bG8=}
+
+
+test base64-1.0 {base64, convert into} {
+    puts -nonewline [set ma [memchan]] $text
+    seek $ma 0
+
+    base64 -mode encode $ma [set mb [memchan]]
+    seek $mb 0
+
+    set result [list [fconfigure $mb -length] [read -nonewline $mb]]
+
+    close $ma
+    close $mb
+
+    set result
+} [list 8 $text_base64]
+
+
+test base64-1.1 {base64, convert from} {
+    puts -nonewline [set ma [memchan]] $text_base64
+    seek $ma 0
+
+    base64 -mode decode $ma [set mb [memchan]]
+    seek $mb 0
+
+    set result [list [fconfigure $mb -length] [read -nonewline $mb]]
+
+    close $ma
+    close $mb
+
+    set result
+} [list 5 $text]
+
+
+
+
+test base64-2.0 {base64 argument errors} {
+    catch {base64} msg
+    set msg
+} {mode not defined}
+
+
+test base64-2.1 {base64 argument errors} {
+    catch {base64 -mode} msg
+    set msg
+} {base64: wrong # args}
+
+
+test base64-2.2 {base64 argument errors} {
+    catch {base64 -o x} msg
+    set msg
+} {unknown option '-o'}
+
+
+test base64-2.3 {base64 argument errors} {
+    catch {base64 -m x} msg
+    set msg
+} {unknown mode 'x'}
+
+
+test base64-2.4 {base64 argument errors} {
+    catch {base64 -m decode} msg
+    set msg
+} {base64: source, destination missing}
+
+
+test base64-2.5 {base64 argument errors} {
+    catch {base64 -m decode xx} msg
+    set msg
+} {base64: wrong # args}
+
+
+test base64-2.6 {base64 argument errors} {
+    catch {base64 -m decode xx zz} msg
+    set msg
+} {can not find channel named "xx"}
+
+
+test base64-2.7 {base64 argument errors} {
+    set ma [open __xx w]
+    set mb [memchan]
+
+    catch {base64 -m decode $ma $mb} msg
+
+    close $ma
+    close $mb
+
+    set msg
+} {base64: source-channel not readable}
+
+
+test base64-2.8 {base64 argument errors} {
+    set ma [memchan]
+    set mb [open __xx r]
+
+    catch {base64 -m decode $ma $mb} msg
+
+    close $ma
+    close $mb
+
+    set msg
+} {base64: destination-channel not writable}
+
+
+test base64-2.9 {base64 argument errors} {
+    catch {base64 -a x} msg
+    set msg
+} {can not find channel named "x"}
+
+
+test base64-3.0 {base64 conversion errors} {
+    puts -nonewline [set ma [memchan]] $wrong_base64
+    seek $ma 0
+
+    catch {base64 -mode decode $ma [set mb [memchan]]} msg
+
+    close $ma
+    close $mb
+
+    set msg
+} {illegal characters in string}
+
+
+test base64-4.0 {base64, partial conversion} {
+    puts -nonewline [set ma [memchan]] $text_base64_c
+    seek $ma 0
+
+    base64 -mode decode $ma [set mb [memchan]]
+    seek $mb 0
+
+    set result [list [fconfigure $mb -length] [read -nonewline $mb]]
+
+    close $ma
+    close $mb
+
+    set result
+} [list 4 $text_c]
+
+
+test base64-4.1 {base64, partial conversion for attachments} {
+    puts -nonewline [set ma [memchan]] $text_base64_c
+    seek $ma 0
+    base64 -mode encode -attach $ma
+
+    set data [read $ma]
+    close $ma
+    list [string length $data] $data
+} [list 4 $text_c]
+
+
+test base64-4.2 {base64, partial conversion for attachments} {
+    puts -nonewline [set ma [memchan]] $text
+    seek $ma 0
+
+    base64 -mode decode -attach $ma
+
+    set data [read $ma]
+    close $ma
+    list [string length $data] $data
+} [list 8 $text_base64]
+
+
+unset text text_c text_base64 text_base64_c wrong_base64

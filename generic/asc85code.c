@@ -300,11 +300,11 @@ ClientData clientData;
       result [0] = 'z';
     } else {
       len        = 5;
-      result [4] = '!' + (num % 85);  num /= 85;
-      result [3] = '!' + (num % 85);  num /= 85;
-      result [2] = '!' + (num % 85);  num /= 85;
-      result [1] = '!' + (num % 85);  num /= 85;
-      result [0] = '!' + (num % 85);  num /= 85;
+      result [4] = '!' + (char) (num % 85);  num /= 85;
+      result [3] = '!' + (char) (num % 85);  num /= 85;
+      result [2] = '!' + (char) (num % 85);  num /= 85;
+      result [1] = '!' + (char) (num % 85);  num /= 85;
+      result [0] = '!' + (char) (num % 85);  num /= 85;
     }
 
     c->charCount = 0;
@@ -361,11 +361,11 @@ ClientData clientData;
 	   (c->buf [3] <<  0));
   	  
     len        = c->charCount + 1;
-    result [4] = '!' + (num % 85);  num /= 85;
-    result [3] = '!' + (num % 85);  num /= 85;
-    result [2] = '!' + (num % 85);  num /= 85;
-    result [1] = '!' + (num % 85);  num /= 85;
-    result [0] = '!' + (num % 85);  num /= 85;
+    result [4] = '!' + (char) (num % 85);  num /= 85;
+    result [3] = '!' + (char) (num % 85);  num /= 85;
+    result [2] = '!' + (char) (num % 85);  num /= 85;
+    result [1] = '!' + (char) (num % 85);  num /= 85;
+    result [0] = '!' + (char) (num % 85);  num /= 85;
 
     c->charCount = 0;
     memset (c->buf, '\0', 4);
@@ -538,7 +538,7 @@ ClientData clientData;
       len = 4;
       for (k=3; 0 <= k; k --) {
 	/* result [k] = num % 256;  num  /= 256; */
-	   result [k] = num & 0xFF; num >>= 8;
+	   result [k] = (char) (num & 0xff); num >>= 8;
       }
 
       c->charCount = 0;
@@ -652,7 +652,7 @@ ClientData clientData;
 
       for (k = (partial-1); 0 <= k; k--) {
 	/* result [k] = num % 256;  num  /= 256; */
-	   result [k] = num & 0xFF; num >>= 8;
+	   result [k] = (char) (num & 0xff); num >>= 8;
       }
 
       c->charCount = 0;

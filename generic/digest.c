@@ -344,7 +344,7 @@ ClientData       clientData;
   } else {
     unsigned int character, i;
 
-    for (i=0; i < bufLen; i++) {
+    for (i=0; i < ((unsigned int) bufLen); i++) {
       character = buffer [i];
       (*md->updateProc) (c->context, character);
     }

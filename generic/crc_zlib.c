@@ -211,10 +211,10 @@ VOID* digest;
   char*   out = (char*) digest;
 
   /* LITTLE ENDIAN output */
-  out [3] = (crc >> 24) & 0xff;
-  out [2] = (crc >> 16) & 0xff;
-  out [1] = (crc >>  8) & 0xff;
-  out [0] = (crc >>  0) & 0xff;
+  out [3] = (char) ((crc >> 24) & 0xff);
+  out [2] = (char) ((crc >> 16) & 0xff);
+  out [1] = (char) ((crc >>  8) & 0xff);
+  out [0] = (char) ((crc >>  0) & 0xff);
 }
 
 /*

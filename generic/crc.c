@@ -245,9 +245,9 @@ VOID* digest;
   /* -*- PGP -*-, was outcrc, BIGENDIAN output */
   /* DEPENDENT on CRCBYTES !!, only a value of 3 is supported here */
 
-  out [0] = (crc >> 16) & 0xff;
-  out [1] = (crc >>  8) & 0xff;
-  out [2] = (crc >>  0) & 0xff;
+  out [0] = (char) ((crc >> 16) & 0xff);
+  out [1] = (char) ((crc >>  8) & 0xff);
+  out [2] = (char) ((crc >>  0) & 0xff);
   /* -*- PGP -*- */
 }
 
