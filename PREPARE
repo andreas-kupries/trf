@@ -101,8 +101,8 @@ foreach md {crc crc-zlib adler md5 sha haval} {
 # generate standard permissions.
 mNormalPermissions [pwd]
 
-# win, unix, mac, tests should be writable
-exec      chmod u+w unix mac win tests
+# and now the tuning
+exec      chmod u+w unix mac win tests tests/sha.test.vec
 eval exec chmod u+x unix/configure [glob tools/*]
 
 
