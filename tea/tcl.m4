@@ -3,7 +3,8 @@
 #	This file provides a set of autoconf macros to help TEA-enable
 #	a Tcl extension.
 #
-# Copyright (c) 1999 Scriptics Corporation.
+# Copyright (c) 1999-2000 Ajuba Solutions.
+# See the file "license.terms" for information on usage and redistribution of this file.
 #
 # See the file "license.terms" for information on usage and redistribution
 # of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -69,6 +70,7 @@ AC_DEFUN(SC_PATH_TCLCONFIG, [
 	    # check in a few common install locations
 	    if test x"${ac_cv_c_tclconfig}" = x ; then
 		for i in `ls -d ${prefix}/lib 2>/dev/null` \
+			`ls -d /usr/lib 2>/dev/null` \
 			`ls -d /usr/local/lib 2>/dev/null` ; do
 		    if test -f "$i/tclConfig.sh" ; then
 			ac_cv_c_tclconfig=`(cd $i; pwd)`
@@ -161,6 +163,7 @@ AC_DEFUN(SC_PATH_TKCONFIG, [
 	    # check in a few common install locations
 	    if test x"${ac_cv_c_tkconfig}" = x ; then
 		for i in `ls -d ${prefix}/lib 2>/dev/null` \
+			`ls -d /usr/lib 2>/dev/null` \
 			`ls -d /usr/local/lib 2>/dev/null` ; do
 		    if test -f "$i/tkConfig.sh" ; then
 			ac_cv_c_tkconfig=`(cd $i; pwd)`
@@ -663,37 +666,6 @@ AC_DEFUN(SC_CONFIG_CFLAGS, [
 	    LD_SEARCH_FLAGS=""
 	    ;;
 	*win32*|*WIN32*|CYGWIN_NT*|cygwin_nt*|*CYGWIN_98*|*CYGWIN_95*)
-	  if test "$CC" = "gcc" -o `$CC -v 2>&1 | grep -c gcc` != "0" ; then
-	    if "$CC" -v 2>&1 | egrep '\/gcc-lib\/i[[3-6]]86[[^\/]]*-cygwin' >/dev/null; then
-		mno_cygwin="yes"
-		extra_cflags="-mno-cygwin"
-		extra_ldflags="-mno-cygwin"
-	    else
-		mno_cygwin="no"
-		extra_cflags=""
-		extra_ldflags=""
-	    fi
-
-	    if test "$cross_compiling" = "yes" -o "$mno_cygwin" = "yes"; then
-		PATHTYPE=''
-		CYGPATH='echo '
-		VPSEP=':'
-	    else
-		PATHTYPE='-w'
-		CYGPATH='cygpath'
-	 	VPSEP=';'
-	    fi
-	    CFLAGS_DEBUG="-g ${runtime}d"
-	    CFLAGS_OPTIMIZE="-O2 ${runtime}"
-	    LDFLAGS_CONSOLE="-mconsole ${extra_ldflags}"
-	    LDFLAGS_WINDOW="-mwindows ${extra_ldflags}"
-	    LDFLAGS_DEBUG="-g"
-	    LDFLAGS_OPTIMIZE=""
-	    EXTRA_CFLAGS="${extra_cflags}"
-	    SHLIB_LD="dllwrap"
-	    SHLIB_LD_LIBS="-luser32 -ladvapi32"
-	    RC="windres"
-	  else
 	    CFLAGS_DEBUG="-nologo -Z7 -Od -WX ${runtime}d"
 	    CFLAGS_OPTIMIZE="-nologo -Oti -Gs -GD ${runtime}"
 	    LDFLAGS_CONSOLE="-subsystem:console"
@@ -706,7 +678,6 @@ AC_DEFUN(SC_CONFIG_CFLAGS, [
 	    SHLIB_LD="link -dll -nologo"
 	    SHLIB_LD_LIBS="user32.lib advapi32.lib"
 	    RC="rc"
-	  fi
 	    ;;
 	dgux*)
 	    SHLIB_CFLAGS="-K PIC"
@@ -1828,9 +1799,6 @@ AC_DEFUN(SC_MAKE_LIB, [
 	    if test "${CC-cc}" = "cl"; then
 		MAKE_STATIC_LIB="\${STLIB_LD} -out:\[$]@ \$(\[$]@_OBJECTS) "
 		MAKE_SHARED_LIB="\${SHLIB_LD} \${SHLIB_LDFLAGS} \${SHLIB_LD_LIBS} \$(LDFLAGS) -out:\[$]@ \$(\[$]@_OBJECTS) "
-	    else
-		MAKE_STATIC_LIB="\${STLIB_LD} \[$]@ \$(\[$]@_OBJECTS)"
-		MAKE_SHARED_LIB="\${SHLIB_LD} -o \[$]@ --output-lib \[$](patsubst %.dll,lib%.a,\[$]@) \$(\[$]@_OBJECTS) \${SHLIB_LDFLAGS} \${SHLIB_LD_LIBS}"
 	    fi
 	    ;;
 	*)
@@ -1883,7 +1851,7 @@ AC_DEFUN(SC_LIB_SPEC, [
 
     if test x"${exec_prefix}" != x"NONE" ; then
 	sc_lib_name_dir="${exec_prefix}/lib"
-    elif test x"${prefix}" != "NONE" ; then
+    elif test x"${prefix}" != x"NONE" ; then
 	sc_lib_name_dir="${prefix}/lib"
     else
 	eval "sc_lib_name_dir=${libdir}"
@@ -1897,13 +1865,21 @@ AC_DEFUN(SC_LIB_SPEC, [
 
     for i in \
 	    `ls -dr ${sc_extra_lib_dir}/$1[[0-9]]*.lib 2>/dev/null ` \
+	    `ls -dr ${sc_extra_lib_dir}/$1.lib 2>/dev/null ` \
 	    `ls -dr ${sc_extra_lib_dir}/lib$1[[0-9]]* 2>/dev/null ` \
+	    `ls -dr ${sc_extra_lib_dir}/lib$1.* 2>/dev/null ` \
 	    `ls -dr ${sc_lib_name_dir}/$1[[0-9]]*.lib 2>/dev/null ` \
+	    `ls -dr ${sc_lib_name_dir}/$1.lib 2>/dev/null ` \
 	    `ls -dr ${sc_lib_name_dir}/lib$1[[0-9]]* 2>/dev/null ` \
+	    `ls -dr ${sc_lib_name_dir}/lib$1.* 2>/dev/null ` \
 	    `ls -dr /usr/lib/$1[[0-9]]*.lib 2>/dev/null ` \
+	    `ls -dr /usr/lib/$1.lib 2>/dev/null ` \
 	    `ls -dr /usr/lib/lib$1[[0-9]]* 2>/dev/null ` \
+	    `ls -dr /usr/lib/lib$1.* 2>/dev/null ` \
 	    `ls -dr /usr/local/lib/$1[[0-9]]*.lib 2>/dev/null ` \
-	    `ls -dr /usr/local/lib/lib$1[[0-9]]* 2>/dev/null ` ; do
+	    `ls -dr /usr/local/lib/$1.lib 2>/dev/null ` \
+	    `ls -dr /usr/local/lib/lib$1[[0-9]]* 2>/dev/null ` \
+	    `ls -dr /usr/local/lib/lib$1.* 2>/dev/null ` ; do
 	if test -f "$i" ; then
 
 	    sc_lib_name_dir=`dirname $i`
@@ -1920,11 +1896,12 @@ AC_DEFUN(SC_LIB_SPEC, [
 	*)
 	    # Strip off the leading "lib" and trailing ".a" or ".so"
 
-	    sc_lib_name_lib=`echo ${$1_LIB_NAME}|sed -e 's/^lib//' -e 's/\.[[^.]]*$//'`
+	    sc_lib_name_lib=`echo ${$1_LIB_NAME}|sed -e 's/^lib//' -e 's/\.[[^.]]*$//' -e 's/\.so.*//'`
 	    $1_LIB_SPEC="-L${sc_lib_name_dir} -l${sc_lib_name_lib}"
 	    ;;
     esac
-    if test "x$1_LIB_NAME" = x ; then
+
+    if test "x${$1_LIB_NAME}" = x ; then
 	AC_MSG_ERROR(not found)
     else
 	AC_MSG_RESULT(${$1_LIB_SPEC})
@@ -1961,13 +1938,13 @@ AC_DEFUN(SC_PRIVATE_TCL_HEADERS, [
 
     case "`uname -s`" in
 	*win32* | *WIN32* | *CYGWIN_NT* |*CYGWIN_98*|*CYGWIN_95*)
-	    TCL_TOP_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/..`\"
-	    TCL_GENERIC_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/../generic`\"
-	    TCL_UNIX_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/../unix`\"
-	    TCL_WIN_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/../win`\"
-	    TCL_BMAP_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/../bitmaps`\"
-	    TCL_TOOL_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/../tools`\"
-	    TCL_COMPAT_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/../compat`\"
+	    TCL_TOP_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}`\"
+	    TCL_GENERIC_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/generic`\"
+	    TCL_UNIX_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/unix`\"
+	    TCL_WIN_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/win`\"
+	    TCL_BMAP_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/bitmaps`\"
+	    TCL_TOOL_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/tools`\"
+	    TCL_COMPAT_DIR_NATIVE=\"`${CYGPATH} ${TCL_SRC_DIR}/compat`\"
 	    TCL_PLATFORM_DIR_NATIVE=${TCL_WIN_DIR_NATIVE}
 	;;
 	*)
@@ -2037,7 +2014,9 @@ AC_DEFUN(SC_PUBLIC_TCL_HEADERS, [
 
 		eval "temp_includedir=${includedir}"
 		for i in \
+			`ls -d ${TCL_PREFIX}/include 2>/dev/null` \
 			`ls -d ${temp_includedir} 2>/dev/null` \
+			`ls -d ${TCL_BIN_DIR}/../include 2>/dev/null` \
 			/usr/local/include /usr/include ; do
 		    if test -f "$i/tcl.h" ; then
 			ac_cv_c_tclh=$i
@@ -2087,15 +2066,17 @@ AC_DEFUN(SC_PRIVATE_TK_HEADERS, [
 
     case "`uname -s`" in
 	*win32* | *WIN32* | *CYGWIN_NT* |*CYGWIN_98*|*CYGWIN_95*)
-	    TK_UNIX_DIR_NATIVE=\"`${CYGPATH} ${TK_SRC_DIR}/../unix`\"
-	    TK_WIN_DIR_NATIVE=\"`${CYGPATH} ${TK_SRC_DIR}/../win`\"
-	    TK_GENERIC_DIR_NATIVE=\"`${CYGPATH} ${TK_SRC_DIR}/../generic`\"
-	    TK_XLIB_DIR_NATIVE=\"`${CYGPATH} ${TK_SRC_DIR}/../xlib`\"
+	    TK_TOP_DIR_NATIVE=\"`${CYGPATH} ${TK_SRC_DIR}`\"
+	    TK_UNIX_DIR_NATIVE=\"`${CYGPATH} ${TK_SRC_DIR}/unix`\"
+	    TK_WIN_DIR_NATIVE=\"`${CYGPATH} ${TK_SRC_DIR}/win`\"
+	    TK_GENERIC_DIR_NATIVE=\"`${CYGPATH} ${TK_SRC_DIR}/generic`\"
+	    TK_XLIB_DIR_NATIVE=\"`${CYGPATH} ${TK_SRC_DIR}/xlib`\"
 	    TK_PLATFORM_DIR_NATIVE=${TK_WIN_DIR_NATIVE}
 
 	    TK_INCLUDES="-I${TK_GENERIC_DIR_NATIVE} -I${TK_PLATFORM_DIR_NATIVE} -I${TK_XLIB_DIR_NATIVE}"
 	;;
 	*)
+	    TK_TOP_DIR_NATIVE='$(TK_SRC_DIR)'
 	    TK_GENERIC_DIR_NATIVE='$(TK_TOP_DIR_NATIVE)/generic'
 	    TK_UNIX_DIR_NATIVE='$(TK_TOP_DIR_NATIVE)/unix'
 	    TK_WIN_DIR_NATIVE='$(TK_TOP_DIR_NATIVE)/win'
@@ -2105,6 +2086,7 @@ AC_DEFUN(SC_PRIVATE_TK_HEADERS, [
 	;;
     esac
 
+    AC_SUBST(TK_TOP_DIR_NATIVE)
     AC_SUBST(TK_UNIX_DIR_NATIVE)
     AC_SUBST(TK_WIN_DIR_NATIVE)
     AC_SUBST(TK_GENERIC_DIR_NATIVE)
@@ -2157,7 +2139,9 @@ AC_DEFUN(SC_PUBLIC_TK_HEADERS, [
 
 		eval "temp_includedir=${includedir}"
 		for i in \
+			`ls -d ${TCL_PREFIX}/include 2>/dev/null` \
 			`ls -d ${temp_includedir} 2>/dev/null` \
+			`ls -d ${TCL_BIN_DIR}/../include 2>/dev/null` \
 			/usr/local/include /usr/include ; do
 		    if test -f "$i/tk.h" ; then
 			ac_cv_c_tkh=$i
@@ -2303,3 +2287,292 @@ AC_DEFUN(SC_PROG_WISH, [
     AC_SUBST(WISH_PROG)
 ])
 
+#------------------------------------------------------------------------
+# SC_SET_PLATFORM
+#	Determine the common name of the platform we are using
+#
+# Arguments
+#	none
+#
+# Results
+#	Subst's the following values:
+#		PLATFORM
+#		CYGPATH
+#------------------------------------------------------------------------
+
+AC_DEFUN(SC_SET_PLATFORM, [
+    AC_MSG_CHECKING(host platform)
+
+    case "`uname -s`" in
+	*win32* | *WIN32* | *CYGWIN_NT* | *CYGWIN_98* | *CYGWIN_95*)
+		CYGPATH="cygpath -w"
+		PLATFORM=win32-ix86
+	    ;;
+	SunOS)
+		CYGPATH=echo
+		PLATFORM=solaris-sparc
+	    ;;
+	Linux)
+		CYGPATH=echo
+		PLATFORM=linux-ix86
+	    ;;
+	FreeBSD)
+		CYGPATH=echo
+		PLATFORM=freebsd-ix86
+	    ;;
+	AIX)
+		CYGPATH=echo
+		PLATFORM=aix-risc
+	    ;;
+	HP-UX)
+		CYGPATH=echo
+		PLATFORM=hpux-parisc
+	    ;;
+	IRIX)
+		CYGPATH=echo
+		PLATFORM=irix-mips
+	    ;;
+	*)
+		CYGPATH=echo
+		PLATFORM=UNSUPPORTED
+	    ;;
+    esac
+
+    if test x"${PLATFORM}" = x"UNSUPPORTED" ; then
+	AC_MSG_ERROR(Can't figure out what platform you are using)
+    else
+	AC_MSG_RESULT(${PLATFORM})
+    fi
+
+    AC_SUBST(PLATFORM)
+    AC_SUBST(CYGPATH)
+])
+
+#------------------------------------------------------------------------
+# SC_PATH_MODULE
+#	Add a --with-foodir flag for locating sources for an external module
+#	Search order:
+#		--with-foodir configure switch value
+#		cached configure value
+#		$2 argument
+#		${srcdir}/modules/$1
+#		${srcdir}/../$1
+#		${srcdir}/../$1[0-9]*
+#
+# Arguments
+#	$1	Name of module to locate
+#	$2	Default directory where module can be found.  If not specified,
+#		the macro looks in some well-known locations.  This argument
+#		is mainly used for internal modules.
+#
+# Results
+#	sets MODULE_DIR_$1 to point to the top level directory of
+#	the module.
+#------------------------------------------------------------------------
+
+AC_DEFUN(SC_PATH_MODULE, [
+
+    if test x"${CYGPATH}" = x ; then
+        SC_SET_PLATFORM
+    fi
+
+    modsrcdir=$1
+
+    AC_ARG_WITH($1dir, [  --with-$1dir              directory containing sources for $1], with_module=${withval}, with_module="")
+    AC_MSG_CHECKING([for $1dir])
+
+    if test x"${with_module}" = x ; then
+	AC_CACHE_VAL(ac_cv_module_$1dir,[
+	    if test x"${with_module}" != x ; then
+		# Sanity check.  Look for this module dir
+		if test -d "${with_module}" ; then
+		    ac_cv_module_$1dir=`(cd ${with_module} ; pwd)`
+		fi
+	    fi
+
+
+	    # If not found, look in a few standard places for this module.
+	    # Look in the default location (as specified by the argument(s)
+	    # to this macro) first
+
+	    if test x"$2" != x ; then
+		for i in \
+			`ls -dr $2 2>/dev/null` \
+			`ls -dr ${srcdir}/$2 2>/dev/null` \
+			`ls -dr ${srcdir}/../$2 2>/dev/null` \
+			`ls -dr ${srcdir}/../$2[[0-9]]* 2>/dev/null` ; do
+		    if test -d $i ; then
+			ac_cv_module_$1dir=`(cd $i; pwd)`
+			break
+		    fi
+                done
+	    fi
+    
+	    # Make sure not to require a specific version number.
+
+	    if test x"${ac_cv_module_$1dir}" = x ; then
+		for i in \
+			`ls -dr ${srcdir}/modules/$modsrcdir 2>/dev/null` \
+			`ls -dr ${srcdir}/../$modsrcdir 2>/dev/null` \
+			`ls -dr ${srcdir}/../$modsrcdir[[0-9]]* 2>/dev/null` ; do
+		    if test -d $i ; then
+			ac_cv_module_$1dir=`(cd $i; pwd)`
+			break
+		    fi
+		done
+	    fi
+    
+
+	])
+    else
+	if test -d "${with_module}" ; then
+	    ac_cv_module_$1dir=`(cd ${with_module} ; pwd)`
+	else
+	    AC_MSG_ERROR("Directory ${with_module} does not exist!")
+	fi
+    fi
+
+    if test x"${ac_cv_module_$1dir}" = x ; then
+	AC_MSG_WARN(MISSING.  Use --with-$1dir to specify location of $1 or make sure you have checked out the sources from cvs.)
+	MISSING_MODULE_LIST="${MISSING_MODULE_LIST} $1"
+        MODULE_LIST="${MODULE_LIST} $1"
+    else
+	# Strip off any trailing \ from the path
+	MODULE_DIR_$1=`${CYGPATH} ${ac_cv_module_$1dir} | sed -e 's%\\\\$%%'`
+	AC_MSG_RESULT(${MODULE_DIR_$1})
+	AC_SUBST(MODULE_DIR_$1)
+	if test x"$1" != x"${PACKAGE}" ; then
+	    MODULE_LIST="${MODULE_LIST} $1"
+	fi
+    fi
+])
+
+#------------------------------------------------------------------------
+# SC_PATH_TOOLS
+#	Add a --with-toolsdir flag for locating sources for an external module
+#
+# Arguments
+#	none
+#
+# Results
+#	sets MODULE_DIR_tools to point to the top level directory of
+#	the module.
+#------------------------------------------------------------------------
+
+AC_DEFUN(SC_PATH_TOOLS, [
+    AC_ARG_WITH(toolsdir, [  --with-toolsdir              directory containing sources for tools], with_module=${withval}, with_module="")
+    AC_MSG_CHECKING([for toolsdir])
+
+    if test x"${with_module}" = x ; then
+	AC_CACHE_VAL(ac_cv_module_toolsdir,[
+	    if test x"${with_module}" != x ; then
+		# Sanity check.  Look for configure.in in this module dir
+		if test -d "${with_module}" ; then
+		    ac_cv_module_toolsdir=`(cd ${with_module} ; pwd)`
+		fi
+	    fi
+
+
+
+	    # If not found, look in a few standard places for this module.
+	    # Make sure not to require a specific version number.
+
+	    if test x"${ac_cv_module_toolsdir}" = x ; then
+		for i in \
+			`ls -dr /tools/1.[[1-5]] 2>/dev/null` \
+			`ls -dr /tools/TclPro1.[[1-5]] 2>/dev/null` \
+			`ls -dr //t/tools/1.[[1-5]] 2>/dev/null` \
+			`ls -dr //t/tools/TclPro1.[[1-5]] 2>/dev/null` \
+			`ls -dr //pop/tools/1.[[1-5]] 2>/dev/null` \
+			`ls -dr //pop/tools/TclPro1.[[1-5]] 2>/dev/null` ; do
+		    if test -d $i ; then
+			ac_cv_module_toolsdir=`(cd $i; pwd)`
+			break
+		    fi
+		done
+	    fi
+
+
+	])
+    else
+	if test -d "${with_module}" ; then
+	    ac_cv_module_toolsdir=`(cd ${with_module} ; pwd)`
+	else
+	    AC_MSG_WARN(Directory ${with_module} does not exist!)
+	fi
+    fi
+
+    if test x"${ac_cv_module_toolsdir}" = x ; then
+	AC_MSG_WARN(No tools directory - pressing forward with bogus value.)
+	MODULE_DIR_tools=no_tools_dir
+	AC_SUBST(MODULE_DIR_tools)
+#	AC_MSG_ERROR("Use --with-toolsdir to specify location of tools")
+#	exit 1
+    else
+	MODULE_DIR_tools=${ac_cv_module_toolsdir}
+	AC_MSG_RESULT(${ac_cv_module_toolsdir})
+	AC_SUBST(MODULE_DIR_tools)
+    fi
+])
+
+#------------------------------------------------------------------------
+# SC_PATH_PROTOOLS
+#	Path to a valid Tclpro installation.  You must call SC_ SET_PLATFORM
+#	before calling this macro.
+#
+# Arguments
+#	none
+#
+# Results
+#	Subst's the following values:
+#		PROTOOLSDIR
+#------------------------------------------------------------------------
+
+AC_DEFUN(SC_PATH_PROTOOLS, [
+    if test x"${PLATFORM}" = x ; then
+        SC_SET_PLATFORM
+    fi
+
+    AC_ARG_WITH(protools, [ --with-protools            directory containing the Tclpro installation], protools_dir=${withval})
+
+    AC_MSG_CHECKING(for protclsh in a TclPro installation)
+
+    if test x"${protools_dir}" != x ; then
+	# Look for protclsh
+
+	for i in `ls -r ${protools_dir}/${PLATFORM}/bin/protclsh* 2>/dev/null` ; do
+	    if test -f $i ; then
+		PROTCLSH=$i
+		break
+	    fi
+	done
+    else
+	for i in `ls -dr /tools/TclPro1.[[3-4]] 2>/dev/null` \
+		`ls -dr //t/tools/TclPro1.[[3-4]] 2>/dev/null ` ; do
+
+	    # Look for protclsh
+
+	    for j in `ls $i/${PLATFORM}/bin/protclsh* 2>/dev/null` ; do
+		if test -f $j ; then
+		    PROTCLSH=$j
+		    break
+		fi
+	    done
+
+	    if test x"${PROTCLSH}" != x ; then
+		protools_dir=$i
+		break
+	    fi
+	done
+    fi
+
+    if test x"${PROTCLSH}" = x ; then
+	AC_MSG_WARN(Could not locate a TclPro installation containing protclsh.  Use --with-protoolsdir to specify a valid TclPro installation.)
+	protools_dir=BOGUS_protools_dir
+    else
+	AC_MSG_RESULT("found ${PROTCLSH}")
+    fi
+
+    PROTOOLSDIR=${protools_dir}
+    AC_SUBST(PROTOOLSDIR)
+])
