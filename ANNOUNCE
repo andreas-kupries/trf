@@ -18,6 +18,7 @@ Changes from b2 to b3:
 *	Some bugfixes.
 
 *	More algorithms: RC2, MD2, SHA-1	(SSLeay required)
+			 RIPEMD-160
 
 *	Commands created use the object-interface of tcl8.0a2 now.
 	Runs with 7.6 nevertheless, BUT NOT with 8.0a1.

@@ -10,7 +10,7 @@ extension trf {
     description {
 	Collection of transformation procedures
 	* Encryption      (des, idea, blowfish, rc4, rc2)
-	* Message digests (crc (pgp), md2, md5, sha, sha-1, haval, crc32, adler32 (both zlib))
+	* Message digests (crc (pgp), md2, md5, sha, sha-1, haval, crc32, adler32 (both zlib), ripemd-160)
 	* Data conversion (dual, hexadecimal, octal, uu, base64, ascii85)
 	* Error correcting coding (reed-solomon coder)
 	* Compression (zlib based).

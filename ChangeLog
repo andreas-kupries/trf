@@ -1,3 +1,21 @@
+Thu May 15 20:32:49 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* generic/ripemd/rmd160.c: see below.
+
+	* generic/ripemd/rmd160.h: Made usable for AXP (64bit long's),
+	  added unique prefix to function names. Added tcl.h, _ANSI_ARGS_
+	  to let it compile for K&R too.
+
+	* win/makefile.vc (TRFOBJS): see below.
+
+	* tests/rmd160.test: see below.
+
+	* unix/Makefile.in (rmd160.o): see below.
+
+	* generic/init.c: see below.
+
+	* generic/rmd160.c: Added message digest RIPEMD-160.
+
 Sun May 11 21:36:46 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* doc/install.tex, man.tex: Adapted to made changes.
