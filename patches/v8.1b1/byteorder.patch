@@ -27,7 +27,7 @@
 + /* Andreas Kupries <a.kupries@westend.com>, 05/31/1997.
 +  * "Trf-Patch for channels with a switchable byteorder"
 +  */
-+ #define CHANNEL_IS_SMALLENDIAN	(1<<15)	/* Multibyte words are stored with MSB last  */
++ #define CHANNEL_IS_SMALLENDIAN	(1<<16)	/* Multibyte words are stored with MSB last  */
   
   /*
    * For each channel handler registered in a call to Tcl_CreateChannelHandler,
