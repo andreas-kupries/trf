@@ -649,9 +649,8 @@ typedef void Trf_MDFinal _ANSI_ARGS_ ((VOID* context, VOID* digest));
 #endif
 
 /*
- * Interface to procedures for check/manipulation of the
- * environment (shared libraries, ...). A procedure of this type
- * is called before doing any sort of processing.
+ * Interface to procedures for check/manipulation of the environment (shared libraries, ...).
+ * A procedure of this type is called before doing any sort of processing.
  */
 
 #ifdef __C2MAN__
@@ -772,9 +771,8 @@ typedef void Trf_CDecryptChar _ANSI_ARGS_ ((unsigned char* inout, VOID* schedule
 #endif
 
 /*
- * Interface to procedures for check/manipulation of the
- * environment (shared libraries, ...). A procedure of this type
- * is called before doing any sort of processing.
+ * Interface to procedures for check/manipulation of the environment (shared libraries, ...).
+ * A procedure of this type is called before doing any sort of processing.
  */
 
 #ifdef __C2MAN__
@@ -885,9 +883,8 @@ typedef void Trf_BCDecryptBlock _ANSI_ARGS_ ((VOID* in, VOID* out, VOID* schedul
 
 
 /*
- * Interface to procedures for check/manipulation of the
- * environment (shared libraries, ...). A procedure of this type
- * is called before doing any sort of processing.
+ * Interface to procedures for check/manipulation of the environment (shared libraries, ...).
+ * A procedure of this type is called before doing any sort of processing.
  */
 
 #ifdef __C2MAN__
