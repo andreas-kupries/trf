@@ -23,7 +23,7 @@ This is the installation manual of Tcl-Trf @mFullVersion@, as distributed
 at @mDate@. For instructions on how to compile and install it see \file
 {install.tex} or one of its derivatives (\file {install.dvi}, \file {install.ps}).
 
-After torturing the world with 2 extensions releated to binary support
+After torturing the world with 2 extensions related to binary support
 in tcl (\blob{} and \blobx{}) I could not resist and wrote another
 one :-). It can be seen as a merger of features from these 2, but in
 contrast to them it is build on top of the binary data support coming
@@ -181,10 +181,10 @@ different modes and therefore have additional options defined:
 	\item[ofb]	$=$ \strong {o}utput \strong {f}eed\strong {b}ack.
 	\end   {itemize}
 
-	Only ``ecb'' neither requires a shiftvalue nor an initialization
+	Only ``ecb'' neither requires a shift value nor an initialization
 	vector (see options below). All other (``stream'') modes require
 	the initialization vector, the feedback modes additionally
-	need a shiftvalue.
+	need a shift value.
 
 	The number of characters buffered internally depends both on
 	cipher and operation mode.
@@ -223,7 +223,7 @@ implementation of some operations in the framework.}
 
 \section {Message digests}
 
-8 message digests are implemented:
+10 message digests are implemented:
 
 \begin {enumerate}
 \item	2 crc checkers, taken from PGP and library \lib {zlib}, under
@@ -232,6 +232,7 @@ implementation of some operations in the framework.}
 \item	MD2, MD5
 \item	SHA (or SHS), SHA-1
 \item	HAVAL
+\item	RIPEMD-128, -160
 \end   {enumerate}
 
 The commands to invoke them are identical to the names, converted to
@@ -251,14 +252,14 @@ digests have to submodes available:
 
 		In the second submode read or written data goes into
 		nirwana, their digests are computed as
-		sideeffect. After the channel is closed the computed
+		side effect. After the channel is closed the computed
 		digests are written to the channels specified with
 		'-read/write-dest'.
 
 \item[-matchflag]	The value specifies the name of global
 			variable to write the result of a digest
 			comparison to. Allowed for mode ``absorb''
-			only. Its definition for a writeonly channel
+			only. Its definition for a write-only channel
 			will be ignored.
 
 \item[-write-dest]	The value must specify a writable channel. The
@@ -272,7 +273,7 @@ digests have to submodes available:
 			message digest computed for data read from
 			the attached channel is written into it after
 			closing the attached channel. Allowed for mode
-			``write'' only. Its definition for a writeonly
+			``write'' only. Its definition for a write-only
 			channel is ignored.
 \end   {itemize}
 
@@ -300,7 +301,7 @@ None of them buffers characters internally.
 		buffer 2 characters internally until a block is complete.
 \item[base64]	Blocks of 3 characters are
 		base64-encoded/decoded. This is equivalent to PGP's
-		ascii armor. Used by MIME too. Will buffer 2
+		ASCII armor. Used by MIME too. Will buffer 2
 		characters internally until a block is complete.
 \item[ascii85]	Blocks of 4 characters will be encoded into Ascii85
 		representation as defined in the 'Postscript Reference
@@ -334,7 +335,7 @@ input.
 
 \item	\cmd {unstack}. This command must be used to remove a
 	conversion channel. The underlying channel is uncovered and
-	accessible again. It requires a channelhandle as its only
+	accessible again. It requires a channelhandle as its one and only
 	argument. Its application to a normal channel (file, socket,
 	\dots {}) is identical to \cmd {close}.
 
@@ -365,7 +366,7 @@ message digests, \dots {}:
 		or referencing the derived work.
 	\end   {quotation}
 
-	I consider the terms of the license fullfilled by this
+	I consider the terms of the license fulfilled by this
 	quotation. 
 
 \item	HAVAL is copyright $C^3SR$ and may not be sold or used as
