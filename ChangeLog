@@ -1,5 +1,7 @@
 2002-10-01  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
+	* configure.in: Readded check for 'eprintf'.
+
 	* compat/tclLoadShl.c (dlopen): mode is 'unsigned int'.
 
 	* trf.m4: Moved the calls to CYGPATH behind the corresponding

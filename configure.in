@@ -98,6 +98,26 @@ AC_CHECK_FUNCS(ltoa)
 AC_CHECK_LIB(crypt, main,         HAS_LIBCRYPT=1,     HAS_LIBCRYPT=0)
 AC_CHECK_LIB(crypt, md5_init_ctx, HAS_LIBCRYPT_MD5=1, HAS_LIBCRYPT_MD5=0)
 
+# -----------------------------------------------------------------------
+AC_MSG_CHECKING(if assert needs __eprintf)
+cat > conftest.$ac_ext <<EOF
+#include "confdefs.h"
+#include "assert.h"
+int main(argc)
+    int argc;
+{
+assert(argc);
+; return 0; }
+EOF
+${TCL_CC-cc} -c $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext 1>&5
+if test "x`nm conftest.o |grep __eprintf`" != "x"; then
+    AC_MSG_RESULT(yes)
+    EP_OBJS="_eprintf.o"
+else
+    EP_OBJS=""
+    AC_MSG_RESULT(no)
+fi
+
 #--------------------------------------------------------------------
 # __CHANGE__
 # Choose which headers you need.  Extension authors should try very
@@ -226,6 +246,7 @@ case "`uname -s`" in
     ;;
 esac
 
+DL_OBJS="${DL_OBJS} ${EP_OBJS}"
 AC_SUBST(DL_OBJS)
 
 #--------------------------------------------------------------------
