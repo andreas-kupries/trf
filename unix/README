@@ -6,5 +6,7 @@
 
 This is the README file for the Unix version of the Tcl-Trf package.
 
-Please follow the instructions in ../doc/INSTALL for compilation and
-installation of this package. After that, enjoy it.
+Please follow the instructions in ../doc/install.tex for compilation
+and installation of this package.
+
+After that, enjoy it.

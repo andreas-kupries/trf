@@ -8,7 +8,7 @@
 # $Id$
 
 EXTENSION	=	Trf
-VERSION		=	@TRF_VERSION@
+VERSION		=	@mVersion@
 
 #----------------------------------------------------------------
 # Things you can change to personalize the Makefile for your own
@@ -174,9 +174,14 @@ SOURCES		=	$(BASE_SRC) $(CVT_SRC) $(MD_SRC) $(CRYPT_SRC) $(ECC_SRC) $(COMPRESS_S
 OBJECTS		=	$(BASE_OBJ) $(CVT_OBJ) $(MD_OBJ) $(CRYPT_OBJ) $(ECC_OBJ) $(COMPRESS_OBJ)
 
 #		fundamentals of this library
-BASE_SRC	=	$(GENERIC_DIR)/zlib.c     $(GENERIC_DIR)/loadman.c $(GENERIC_DIR)/init.c  \
-			$(GENERIC_DIR)/registry.c $(GENERIC_DIR)/unstack.c $(GENERIC_DIR)/binio.c \
+BASE_SRC	=	$(GENERIC_DIR)/zlib.c		\
+			$(GENERIC_DIR)/loadman.c	\
+			$(GENERIC_DIR)/init.c		\
+			$(GENERIC_DIR)/registry.c	\
+			$(GENERIC_DIR)/unstack.c	\
+			$(GENERIC_DIR)/binio.c		\
 			$(GENERIC_DIR)/load.c
+
 BASE_OBJ	=	zlib.o loadman.o init.o registry.o unstack.o binio.o load.o @DL_OBJS@
 
 #		conversions, base & algorithms
@@ -188,16 +193,27 @@ CVT_BASE_SRC	=	$(GENERIC_DIR)/convert.c $(GENERIC_DIR)/util.c
 CVT_BASE_OBJ	=	convert.o util.o
 
 #		conversion algorithms
-CVT_ALG_SRC	=	$(GENERIC_DIR)/bincode.c $(GENERIC_DIR)/hexcode.c $(GENERIC_DIR)/octcode.c	\
-			$(GENERIC_DIR)/uucode.c  $(GENERIC_DIR)/b64code.c $(GENERIC_DIR)/asc85code.c
+CVT_ALG_SRC	=	$(GENERIC_DIR)/bincode.c	\
+			$(GENERIC_DIR)/hexcode.c	\
+			$(GENERIC_DIR)/octcode.c	\
+			$(GENERIC_DIR)/uucode.c		\
+			$(GENERIC_DIR)/b64code.c	\
+			$(GENERIC_DIR)/asc85code.c
 CVT_ALG_OBJ	=	bincode.o hexcode.o octcode.o uucode.o b64code.o asc85code.o
 
 
 #		message digests, base & algorithms
-MD_SRC		=	$(GENERIC_DIR)/dig_opt.c $(GENERIC_DIR)/digest.c			\
-			$(GENERIC_DIR)/crc.c $(GENERIC_DIR)/md5.c   $(GENERIC_DIR)/haval.c	\
-			$(GENERIC_DIR)/sha.c $(GENERIC_DIR)/adler.c $(GENERIC_DIR)/crc_zlib.c	\
-			$(GENERIC_DIR)/md2.c $(GENERIC_DIR)/sha1.c  $(GENERIC_DIR)/rmd160.c	\
+MD_SRC		=	$(GENERIC_DIR)/dig_opt.c	\
+			$(GENERIC_DIR)/digest.c		\
+			$(GENERIC_DIR)/crc.c		\
+			$(GENERIC_DIR)/md5.c		\
+			$(GENERIC_DIR)/haval.c		\
+			$(GENERIC_DIR)/sha.c		\
+			$(GENERIC_DIR)/adler.c		\
+			$(GENERIC_DIR)/crc_zlib.c	\
+			$(GENERIC_DIR)/md2.c		\
+			$(GENERIC_DIR)/sha1.c		\
+			$(GENERIC_DIR)/rmd160.c		\
 			$(GENERIC_DIR)/rmd128.c
 MD_OBJ		=	dig_opt.o digest.o crc.o md5.o haval.o sha.o	\
 			adler.o crc_zlib.o md2.o sha1.o rmd160.o rmd128.o
@@ -208,13 +224,18 @@ CRYPT_SRC	=	$(CRYPT_BASE_SRC) $(CRYPT_ALG_SRC)
 CRYPT_OBJ	=	$(CRYPT_BASE_OBJ) $(CRYPT_ALG_OBJ)
 
 #		encryption base
-CRYPT_BASE_SRC	=	$(GENERIC_DIR)/bc_opt.c $(GENERIC_DIR)/blockcipher.c $(GENERIC_DIR)/bc_util.c	\
-			$(GENERIC_DIR)/c_opt.c  $(GENERIC_DIR)/cipher.c
+CRYPT_BASE_SRC	=	$(GENERIC_DIR)/bc_opt.c		\
+			$(GENERIC_DIR)/blockcipher.c	\
+			$(GENERIC_DIR)/bc_util.c	\
+			$(GENERIC_DIR)/c_opt.c		\
+			$(GENERIC_DIR)/cipher.c
 CRYPT_BASE_OBJ	=	bc_opt.o blockcipher.o bc_util.o c_opt.o cipher.o
 
 #		encryption algorithms
-CRYPT_ALG_SRC	=	$(GENERIC_DIR)/idea.c $(GENERIC_DIR)/blowfish.c	\
-			$(GENERIC_DIR)/des.c  $(GENERIC_DIR)/rc4.c	\
+CRYPT_ALG_SRC	=	$(GENERIC_DIR)/idea.c		\
+			$(GENERIC_DIR)/blowfish.c	\
+			$(GENERIC_DIR)/des.c		\
+			$(GENERIC_DIR)/rc4.c		\
 			$(GENERIC_DIR)/rc2.c
 CRYPT_ALG_OBJ	=	idea.o blowfish.o des.o rc4.o rc2.o
 
@@ -223,18 +244,24 @@ ECC_SRC		=	$(GENERIC_DIR)/rs_ecc.c
 ECC_OBJ		=	rs_ecc.o
 
 #		compression, base
-COMPRESS_SRC	=	$(GENERIC_DIR)/zip_opt.c $(GENERIC_DIR)/zip.c
+COMPRESS_SRC	=	$(GENERIC_DIR)/zip_opt.c	\
+			$(GENERIC_DIR)/zip.c
 COMPRESS_OBJ	=	zip_opt.o zip.o
 
 
 #		initialization for tclsh with trf preloaded
 TCLSH_OBJS	=	$(TOP_DIR)/app/tclAppInit.o
 
-DOCTEMP		=	$(TOP_DIR)/doc/man.log	\
-			$(TOP_DIR)/doc/man.aux	\
-			$(TOP_DIR)/doc/man.toc	\
-			$(TOP_DIR)/doc/man.dvi	\
-			$(TOP_DIR)/doc/man.ps
+DOCTEMP		=	$(TOP_DIR)/doc/man.log		\
+			$(TOP_DIR)/doc/man.aux		\
+			$(TOP_DIR)/doc/man.toc		\
+			$(TOP_DIR)/doc/man.dvi		\
+			$(TOP_DIR)/doc/man.ps		\
+			$(TOP_DIR)/doc/install.log	\
+			$(TOP_DIR)/doc/install.aux	\
+			$(TOP_DIR)/doc/install.toc	\
+			$(TOP_DIR)/doc/install.dvi	\
+			$(TOP_DIR)/doc/install.ps
 
 APP		=	$(srcdir)/tclsh
 
