@@ -3170,7 +3170,8 @@ ClientData clientData; /* Transformation to query */
 
   ChannelHandler (clientData, trans->watchMask);
 #else
-  if (trans->patchVariant == PATCH_82) {
+  if ((trans->patchVariant == PATCH_82) ||
+      (trans->patchVariant == PATCH_832)) {
     /*
      * Use the standard notification mechanism to invoke all channel
      * handlers.

@@ -1,5 +1,8 @@
 2002-08-26  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
+	* generic/registry.c (ChannelHandlerTimer): Fix of bug found by
+	  Michael A. Cleverly <michael@cleverly.com>.
+
 	* Big cleanup and restructuring in prepration of moving this CVS
 	  to SourceForge.
 
