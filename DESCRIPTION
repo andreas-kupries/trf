@@ -18,15 +18,15 @@ extension trf {
     }
 
     primary-urls {
-	ftp.westend.com/pub/aku/trf@mFullVersion@.tar.gz (~500 K)
-	ftp.westend.com/pub/aku/trf@mDosVersion@.zip (~500 K)
-	ftp.westend.com/pub/aku/trf@mFullVersion@.readme (~2 K)
+	Sources:                  ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.tar.gz (~800 K)
+	Same, different archiver: ftp://ftp.westend.com/pub/aku/trf@mDosVersion@.zip     (~800 K)
+	Short documentation:      ftp://ftp.westend.com/pub/aku/trf@mFullVersion@.README (~2 K)
     }
 
     secondary-urls {
-	ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz (~500 K)
-	ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip (~500 K)
-	ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme (~2 K)
+	ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.tar.gz
+	ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mDosVersion@.zip
+	ftp://ftp.kisters.de/pub/lang/tcl/ext/trf@mFullVersion@.readme
     }
 
     development-platform {Linux 2.0.29, gcc 2.7.2.1}

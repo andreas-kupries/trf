@@ -88,8 +88,9 @@ set fail [catch {
 if {$fail} {mLog log error $msg}
 
 # generate base page for c-api documentation
-exec ./capibase > html/capi/capi.html
+exec ./capibase > html/capi.html
 mExclude capibase
+file rename html/capi.html html/capi/capi.html
 
 
 mLatex2html \
