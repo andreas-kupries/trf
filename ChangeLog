@@ -1,3 +1,10 @@
+Sun Oct 10 21:14:39 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/registry.c (PutDestinationImm): New, variant of
+	  'PutDestination', specialized for writing into a channel during
+	  an immediate transform. NOw necessary, after changing the call
+	  to 'PutDestination' in 'AttachTransform' (clientData).
+
 Sat Oct  9 13:20:58 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* Added more tests yesterday. Decided to pack the current state

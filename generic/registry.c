@@ -307,6 +307,10 @@ PutDestination _ANSI_ARGS_ ((ClientData clientData,
                              Tcl_Interp* interp));
 
 static int
+PutDestinationImm _ANSI_ARGS_ ((ClientData clientData,
+				unsigned char* outString, int outLen,
+				Tcl_Interp* interp));
+static int
 PutTrans _ANSI_ARGS_ ((ClientData clientData,
 		       unsigned char* outString, int outLen,
 		       Tcl_Interp* interp));
@@ -2323,7 +2327,7 @@ Trf_Options        optInfo;
 			     entry->trfType->clientData);
   } else {
     PRINT ("___.createproc\n"); FL;
-    control = v->createProc ((ClientData) destination, PutDestination,
+    control = v->createProc ((ClientData) destination, PutDestinationImm,
 			     optInfo, interp,
 			     entry->trfType->clientData);
   }
@@ -2674,7 +2678,6 @@ Tcl_Interp*        interp;
  *
  *	------------------------------------------------*
  *	Handler used by a transformation to write its results.
- *	Used during the explicit transformation done by 'Transform'.
  *	------------------------------------------------*
  *
  *	Sideeffects:
@@ -2714,16 +2717,65 @@ Tcl_Interp*    interp;
 
   if (res < 0) {
     if (interp) {
-      Tcl_AppendResult (interp, "error writing \"",          (char*) NULL);
-      Tcl_AppendResult (interp, Tcl_GetChannelName (parent), (char*) NULL);
-      Tcl_AppendResult (interp, "\": ",                      (char*) NULL);
-      Tcl_AppendResult (interp, Tcl_PosixError (interp),     (char*) NULL);
+      Tcl_AppendResult (interp, "error writing \"",
+			Tcl_GetChannelName (parent),
+			"\": ", Tcl_PosixError (interp),
+			(char*) NULL);
     }
     DONE (PutDestination);
     return TCL_ERROR;
   }
 
   DONE (PutDestination);
+  return TCL_OK;
+}
+
+/*
+ *------------------------------------------------------*
+ *
+ *	PutDestinationImm --
+ *
+ *	------------------------------------------------*
+ *	Handler used during an immediate transformation
+ *	to write its results into the -out channel.
+ *	------------------------------------------------*
+ *
+ *	Sideeffects:
+ *		Writes to the channel.
+ *
+ *	Result:
+ *		A standard Tcl error code.
+ *
+ *------------------------------------------------------*
+ */
+
+static int
+PutDestinationImm (clientData, outString, outLen, interp)
+ClientData     clientData;
+unsigned char* outString;
+int            outLen;
+Tcl_Interp*    interp;
+{
+  int         res;
+  Tcl_Channel destination = (Tcl_Channel) clientData;
+
+  START  (PutDestinationImm);
+  PRTSTR ("Data = {%d, \"%s\"}\n", outLen, outString);
+
+  res = Tcl_Write (destination, (char*) outString, outLen);
+
+  if (res < 0) {
+    if (interp) {
+      Tcl_AppendResult (interp, "error writing \"",
+			Tcl_GetChannelName (destination),
+			"\": ", Tcl_PosixError (interp),
+			(char*) NULL);
+    }
+    DONE (PutDestinationImm);
+    return TCL_ERROR;
+  }
+
+  DONE (PutDestinationImm);
   return TCL_OK;
 }
 
