@@ -32,7 +32,7 @@ node trf_zip {
 		p "Possible arguments are ``default'' and everything accepted
 		by Tcl_GetBoolean(FromObj).
 		"
-		p "Normally the compressed stream is "wrapped" between
+		p "Normally the compressed stream is \"wrapped\" between
 		2 header-bytes (id) and 4 footer-bytes (crc). When using
 		[strong -nowrap], those bytes are stripped off the stream.
 		They are only used for error-checking and not for the actual
