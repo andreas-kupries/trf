@@ -1,3 +1,7 @@
+Tue Jun 17 19:07:42 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* win/makefile.vc (TRFOBJS): Added reflect.o, ref_opt.o.
+
 Sun Jun 15 12:53:57 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* doc/man.tex (section {Misc.}): Added documentation of general
