@@ -1044,7 +1044,8 @@ Trf_MessageDigestDescription* md;
     Tcl_IncrRefCount(digestObj);
 
     result = Tcl_ObjSetVar2 (interp, varName, (Tcl_Obj*) NULL, digestObj,
-			     TCL_LEAVE_ERR_MSG | TCL_GLOBAL_ONLY);
+			     TCL_LEAVE_ERR_MSG | TCL_GLOBAL_ONLY |
+			     TCL_PARSE_PART1);
     Tcl_DecrRefCount(varName);
     /*#endif / * GT81 */
 

@@ -154,9 +154,9 @@ typedef struct _DecoderControl_ {
   /* add conversion specific items here (ZIP) */
 
   z_stream state;	/* decompressor state */
-
-  char* output_buffer;
-
+  char*    output_buffer;
+  /*  int      stop;        / * Boolean flag. Set after
+			 * reaching Z_STREAM_END */
 } DecoderControl;
 
 #define KILO     (1024)
@@ -613,6 +613,7 @@ ClientData     clientData;
   c->write           = fun;
   c->writeClientData = writeClientData;
   c->nowrap          = o->nowrap;
+  /*  c->stop            = 0; */
 
   /* initialize conversion specific items here (ZIP) */
 
@@ -730,7 +731,13 @@ ClientData clientData;
   int res;
 
   START (ZipDecode); 
-
+  /*
+  if (c->stop) {
+    PRINTLN ("stopped");
+    DONE (ZipDecode);
+    return TCL_OK;
+  }
+  */
   in = character;
 
   c->state.next_in   = (Bytef*) &in;
@@ -762,11 +769,27 @@ ClientData clientData;
       }
     }
 
-    if (c->state.avail_in > 0)
-      continue;
+    /* 29.11.1999, AK * /
+    if (res == Z_STREAM_END) {
+      /* Don't process the remainining characters, they are not part of the
+       * compressed stream. Push them back into the channel downward and then
+       * fake our upstream user into EOF.
+       * /
 
-    if ((c->state.avail_out == 0) && (res == Z_OK))
+      PRINTLN ("STOP");
+      c->stop = 1;
+      break;
+    }*/
+
+    if (c->state.avail_in > 0) {
+      PRINTLN ("More to process");
       continue;
+    }
+
+    if ((c->state.avail_out == 0) && (res == Z_OK)) {
+      PRINTLN ("Output space exhausted, still ok");
+      continue;
+    }
 
     break;
   }
@@ -809,7 +832,13 @@ ClientData clientData;
 
   START (ZipDecodeBuffer); 
   PRINT ("Data = {%d, \"%s\"}\n", bufLen, buffer); FL;
-
+  /*
+  if (c->stop) {
+    PRINTLN ("stopped");
+    DONE (ZipDecodeBuffer);
+    return TCL_OK;
+  }
+  */
   c->state.next_in   = (Bytef*) buffer;
   c->state.avail_in  = bufLen;
 
@@ -838,6 +867,19 @@ ClientData clientData;
 	return res;
       }
     }
+
+    /* 29.11.1999, AK * /
+    if (res == Z_STREAM_END) {
+      /* Don't process the remainining characters, they are not part of the
+       * compressed stream. Push them back into the channel downward and then
+       * fake our upstream user into EOF.
+       * /
+
+      PRINTLN ("STOP");
+      c->stop = 1;
+      break;
+    }*/
+
 
     if (c->state.avail_in > 0) {
       PRINTLN ("More to process");
