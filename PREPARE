@@ -146,11 +146,13 @@ mExclude generic/blowfish generic/idea generic/rc4 generic/safer
 mLog info Security measures
 
 # enable checking at target (do this before generation of manifest)
-cd tests
-file rename ________ ________.test
-cd ..
+#
+## -- disabled temporarily, broken for TEA --
+#
+#cd tests
+#file rename ________ ________.test
+#cd ..
 # pwd = root of distribution
-
 
 # generate configure script to be used
 mConfigure unix
