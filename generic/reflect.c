@@ -605,14 +605,18 @@ int             preserve;
 
 #if (TCL_MAJOR_VERSION >= 8)
   Tcl_Obj* command;
+#if GT81
   Tcl_SavedResult ciSave;
+#endif
 
   command = Tcl_DuplicateObj (c->command);
   Tcl_IncrRefCount (command);
 
+#if GT81
   if (preserve) {
     Tcl_SaveResult (ctrl->interp, &ciSave);
   }
+#endif
 
   if (command == (Tcl_Obj*) NULL) {
     res = TCL_ERROR;
@@ -669,16 +673,20 @@ int             preserve;
     Tcl_ResetResult (c->interp);
   }
 
+#if GT81
   if (preserve) {
     Tcl_RestoreResult (ctrl->interp, &ciSave);
   }
+#endif
 
   return res;
 
 cleanup:
+#if GT81
   if (preserve) {
     Tcl_RestoreResult (ctrl->interp, &ciSave);
   }
+#endif
 
   if (command != (Tcl_Obj*) NULL) {
     Tcl_DecrRefCount (command);
