@@ -69,19 +69,27 @@ at @mDate@. For instructions on how to compile and install it see
 
 After torturing the world with 2 extensions related to binary support
 in tcl (\blob{} and \blobx{}) I could not resist and wrote another
-one :-). It can be seen as a merger of features from these 2, but in
-contrast to them it is build on top of the binary data support coming
-in tcl8.0, aka
+one :-).
 
-\begin{itemize}
-\item	the \cmd{binio} command,
-\item	memory channels,
-\item	and transformation procedures.
-\end{itemize}
+This one is based on the idea to add hooks into the IO subsystem of
+\tcl{} allowing us to intercept any read/write call made by the user
+and to act upon the data before it is given to him (read) or the
+channel driver (write). This unfortunately requires us to patch the
+core to get it going.
 
-\strong {This is not true in the current implementation}. Please read
-the \installman{} to gain insight into the requirements of this
-extension.
+This requirement for \tcl{} 7.6 is no such one for \tcl{} 8.x. The
+possibility to store binary data in normal variables allowed me to
+rewrite the extension in such a way that its commands operate on
+standard arguments and simply return their results. Of course, people
+wanting to use the channel filter mode still need to patch the core.
+
+Hopefully \tcl{} 8.1 will contain the necessary hooks as part of the
+core, obviating the need for patches. The probability is very low
+however, due to the shift of the development from \sun{} to
+\scriptics{}.
+
+Please read the \installman{} to gain insight into the complete
+requirements of this extension.
 
 At the \capi{} a set of commands is provided for management,
 implementation and usage of ``transformer''-procedures. These are
@@ -627,6 +635,10 @@ input.
 	\cmd {binary} and \cmd {fcopy}). Inclusion requires
 	application of the byteorder patch. See the \installman{} for
 	more information.
+
+	\strong {Please note}: Due to the availability of the \cmd {binary}
+	command in \tcl{} 8.x I have decided to remove the support for
+	\cmd {binio} in the next release.
 \end	{enumerate}
 
 
@@ -857,6 +869,8 @@ Things to be done in future.
 %%\item	Identity-transformation with ability to gather statistics
 %%	about the information flowing through it.
 %% not needed anymore, use 'transform' instead!
+
+\item	Add the \cmd {bzip} compressor.
 
 \item	Anybody out there wishing more ? Feel free to send \me{}
 	suggestions.

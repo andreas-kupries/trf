@@ -36,29 +36,31 @@ This package depends in its operation on quite a few others. Here is a
 list of them:
 
 \begin{itemize}
-\item	\strong {\tcl}, of course. The package will compile with 7.6
-	and 8.0. Version 8.0a1/a2/b1/b2 cannot be used anymore.
+\item	\strong {\tcl}, of course. The package will compile with 7.6,
+	8.0 and 8.1a2. The versions 8.0a1/a2/b1/b2 cannot be used anymore.
 
-	This package requires manipulation of the core, hence a
-	\strong {source distribution} is required. Instructions on how
-	to patch it is provided in chapter \ref {scalpel}.
+	This package requires manipulation of the core for full
+	functionality. If you can live without filter channels no
+	patching is required. In case you want patch \tcl, a
+	\strong {source distribution} is necessary. Instructions
+	on how to patch it is provided in chapter \ref {scalpel}.
 
 \item	\strong {Memchan}. Trf can be used without, but the
 	testsuite coming with this distribution requires it.
 
-	Current version is 1.3. A binary distribution for Win32 is
+	Current version is 1.4. A binary distribution for Win32 is
 	available.
 
 	\latex{\begin {tabular} {|l|l|} \hline
-	source 	       & \url {ftp://ftp.westend.com/pub/aku/memchan1.3.tar.gz} \\ \hline
-	source (win)   & \url {ftp://ftp.westend.com/pub/aku/memchan13.zip} \\ \hline
-	binary (win32) & \url {ftp://ftp.westend.com/pub/aku/mchan13b.zip} \\ \hline
+	source 	       & \url {ftp://ftp.westend.com/pub/aku/memchan1.4.tar.gz} \\ \hline
+	source (win)   & \url {ftp://ftp.westend.com/pub/aku/memchan14.zip} \\ \hline
+	binary (win32) & \url {ftp://ftp.westend.com/pub/aku/mchan14b.zip} \\ \hline
 	\end {tabular}}
 	\html{	\html{
 	\begin{itemize}
-	\item	\htmladdnormallink {source}{ftp://ftp.westend.com/pub/aku/memchan1.3.tar.gz}
-	\item	\htmladdnormallink {source (win)}{ftp://ftp.westend.com/pub/aku/memchan13.zip}
-	\item	\htmladdnormallink {binary (win32)}{ftp://ftp.westend.com/pub/aku/mchan13b.zip}
+	\item	\htmladdnormallink {source}{ftp://ftp.westend.com/pub/aku/memchan1.4.tar.gz}
+	\item	\htmladdnormallink {source (win)}{ftp://ftp.westend.com/pub/aku/memchan14.zip}
+	\item	\htmladdnormallink {binary (win32)}{ftp://ftp.westend.com/pub/aku/mchan14b.zip}
 	\end{itemize}}}
 
 	
@@ -119,7 +121,7 @@ Now you have two choices.
 
 	\begin {tabular} {|l|l|} \hline
 	7.6, 7.6p2	& tcl$<$version$>$		\\ \hline
-	8.0		& tcl$<$version$>$/generic	\\ \hline
+	8.x		& tcl$<$version$>$/generic	\\ \hline
 	\end {tabular}
 
 	\strong {Remark}: The byteorder patch is required only if the
@@ -128,7 +130,7 @@ Now you have two choices.
 
 	\strong {Recommendation}: Unter 7.6 it is a good choice to
 	activate \cmd {binio}, as there is no equivalent functionality
-	available. Tcl 8.0 on the other hand has \cmd {fcopy} and
+	available. Tcl 8.x on the other hand has \cmd {fcopy} and
 	\cmd {binary}, so it is no loss if \cmd {binio} is left out.
 
 \end   {enumerate}
@@ -138,7 +140,7 @@ Now you have two choices.
 
 \zlib{} is a freely available compression library using the
 unpatented ``deflate''-algorithm employed by \cmd {gzip}, \cmd
-{pkzip} and others. Current version is 1.0.4.
+{pkzip} and others. Current version is 1.1.2.
 \html{Additional sources of information are \file {rfc1950.txt}, \file
 {rfc1951.txt} and \file {rfc1952.txt}.}
 \latex{The official homepage can be found at \url
@@ -176,6 +178,11 @@ without such \strong {don't} loose however.
 \end   {itemize}
 
 
+\strong {Remark}: The current version of \zlib (1.1.2) uses
+'configure' from GNU autoconf to configure itself for a variety of
+unix systems. This includes generation of a shared library too and
+makes compilation of this library much easier.
+
 
 \chapter {libdes, DES encryption}\label {libdes}
 
@@ -208,6 +215,7 @@ The list of mirror sites is too long to be included here, but the
 
 \trf{} requires a shared library version of \lib {libdes}. People
 without such \strong {don't} loose however.
+
 
 \begin {itemize}
 \item	The unix-specific makefile contains the target ``libdes''. This
@@ -296,6 +304,7 @@ you.
 
 	\begin {enumerate}
 	\item	\$(TCL\_INCLUDE\_DIR)
+	\item	\file {../../tcl8.1/generic}
 	\item	\file {../../tcl8.0/generic}
 	\item	\file {../../tcl7.6/generic}
 	\item	\file {../../tcl/generic}
@@ -322,6 +331,7 @@ you.
 
 	\begin {enumerate}
 	\item	\$(TCL\_LIB\_DIR)
+	\item	\file {../../tcl8.1/unix}
 	\item	\file {../../tcl8.0/unix}
 	\item	\file {../../tcl7.6/unix}
 	\item	\file {../../tcl/unix}
