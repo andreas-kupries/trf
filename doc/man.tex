@@ -14,11 +14,11 @@
 \def\strterm{$\backslash 0$}
 
 % remove this for the official release.
-\def\unoff{
-	\strong{Beware:} This is an unofficial and unannounced
-	release, just to have a complete web site. The official
-	distribution will be made as soon as tcl 8.0b1 is out. Because
-	of this no binary release for \win{} was made, too.}
+%\def\unoff{
+%	\strong{Beware:} This is an unofficial and unannounced
+%	release, just to have a complete web site. The official
+%	distribution will be made as soon as tcl 8.0b1 is out. Because
+%	of this no binary release for \win{} was made, too.}
 
 
 \begin {document}
@@ -62,9 +62,10 @@ cryptography. Additionally some binary data support is put in as well.
 This is the reference manual of Tcl-Trf @mFullVersion@, as distributed
 at @mDate@. For instructions on how to compile and install it see
 \file {\install} or one of its derivatives (\file {install.dvi},
-\htmladdnormallink{install.ps.gz}{\file {install.ps}}).
+\htmlonly{\htmladdnormallink{install.ps.gz}{install.ps}}
+\latexonly{\file{install.ps}}).
 
-\unoff
+%\unoff
 
 After torturing the world with 2 extensions related to binary support
 in tcl (\blob{} and \blobx{}) I could not resist and wrote another
