@@ -340,7 +340,7 @@ ClientData clientData;
 {
   EncoderControl* c = (EncoderControl*) ctrlBlock;
 
-  return Execute (c, interp, "flush_write", NULL, 0, 1);
+  return Execute (c, interp, "flush/write", NULL, 0, 1);
 }
 
 /*
@@ -524,7 +524,7 @@ ClientData clientData;
 {
   DecoderControl* c = (DecoderControl*) ctrlBlock;
 
-  return Execute (c, interp, "flush_read", NULL, 0, 1);
+  return Execute (c, interp, "flush/read", NULL, 0, 1);
 }
 
 /*
@@ -647,9 +647,11 @@ cleanup:
 
   Tcl_DString command;
 
-  Tcl_DStringInit (&command);
+  Tcl_DStringInit          (&command);
   Tcl_DStringAppend        (&command, c->command, -1);
+  Tcl_DStringAppend        (&command, " ", -1);
   Tcl_DStringAppend        (&command, op, -1);
+  Tcl_DStringAppend        (&command, " ", -1);
   Tcl_DStringAppendElement (&command, buf);
 
   res = Tcl_GlobalEval (c->interp, command.string);
