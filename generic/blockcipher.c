@@ -1291,6 +1291,7 @@ Trf_BlockcipherDescription* bc_desc;
     direction = TRF_ENCRYPT;
   }
 
+
   if (direction == TRF_ENCRYPT) {
     if (o->encrypt_keyschedule == NULL) {
       (*bc_desc->scheduleProc) (o->key, o->key_length, direction,
