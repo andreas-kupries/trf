@@ -218,7 +218,7 @@ bindist:      $(TRFDLL)
 	-@md	$(TRF)
 	-@$(CP)	$(TRFDLL)		$(TRF)\$(TRFDLL)
 	-@$(CP)	$(WINDIR)\pkgIndex.tcl	$(TRF)\pkgIndex.tcl
-	$(PKZIP) -r $(TRF)bin.zip $(TRF)
+	$(PKZIP) -r $(TRF)bin.zip $(TRF)\*.*
 	-@$(RM)	$(TRF)\$(TRFDLL)
 	-@$(RM)	$(TRF)\pkgIndex.tcl
 	-@rd	$(TRF)
