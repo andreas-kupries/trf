@@ -51,7 +51,7 @@ static int              Encode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 						     Tcl_Interp* interp,
 						     ClientData clientData));
 static int              EncodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     char* buffer, int bufLen,
+						     unsigned char* buffer, int bufLen,
 						     Tcl_Interp* interp,
 						     ClientData clientData));
 static int              FlushEncoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
@@ -72,7 +72,7 @@ static int              Decode         _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
 						     Tcl_Interp* interp,
 						     ClientData clientData));
 static int              DecodeBuffer   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
-						     char* buffer, int bufLen,
+						     unsigned char* buffer, int bufLen,
 						     Tcl_Interp* interp,
 						     ClientData clientData));
 static int              FlushDecoder   _ANSI_ARGS_ ((Trf_ControlBlock ctrlBlock,
@@ -280,7 +280,7 @@ ClientData clientData;
 static int
 EncodeBuffer (ctrlBlock, buffer, bufLen, interp, clientData)
 Trf_ControlBlock ctrlBlock;
-char* buffer;
+unsigned char* buffer;
 int bufLen;
 Tcl_Interp* interp;
 ClientData clientData;
@@ -469,7 +469,7 @@ ClientData clientData;
 static int
 DecodeBuffer (ctrlBlock, buffer, bufLen, interp, clientData)
 Trf_ControlBlock ctrlBlock;
-char* buffer;
+unsigned char* buffer;
 int bufLen;
 Tcl_Interp* interp;
 ClientData clientData;
