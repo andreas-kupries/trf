@@ -5,26 +5,22 @@
 # O. insert various information into some files
 #    (version, patchlevel, current date)
 
+mVerbose \t\tInsert last minute information
+
+set mInfo(@TRF_VERSION@)     $mInfo(@mVersion@)
 set mInfo(@configure_input@) "Distributed at $mInfo(@mDate@)"
 set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mDosVersion@).dll"
 
 file copy generic/pkgIndex.tcl.in win/pkgIndex.tcl
 
 mInsertInfo \
-	ANNOUNCE \
-	README \
-	LSM \
-	DESCRIPTION \
-	PORTING \
-	generic/transform.h \
-	generic/patchlevel.h \
+	ANNOUNCE README LSM DESCRIPTION PORTING \
+	doc/install.tex doc/man.tex \
+	generic/transform.h generic/patchlevel.h \
 	mac/README \
-	unix/configure.in \
-	unix/README \
-	win/README \
-	win/pkgIndex.tcl \
-	win/makefile.vc \
-	doc/install.tex
+	unix/README unix/configure.in \
+	win/README win/pkgIndex.tcl win/makefile.vc
+
 
 
 

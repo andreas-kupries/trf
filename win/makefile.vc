@@ -50,7 +50,7 @@ NODEBUG=1
 # Do not modify below this line
 ######################################################################
 
-TRF		=	trf@mDosVersion@
+TRF		=	trf@mShortDosVersion@
 TRFLIB		=	$(TRF).lib
 TRFDLL		=	$(TRF).dll
 INSTALLDIR	=	$(TCL)\lib\$(TRF)
