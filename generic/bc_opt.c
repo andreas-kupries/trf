@@ -487,7 +487,7 @@ ClientData  clientData;
       int res;
 
 #if (TCL_MAJOR_VERSION >= 8)
-      long sw;
+      int sw;
       res = Tcl_GetIntFromObj (interp, (Tcl_Obj*) optvalue, &sw);
       o->shift_width = sw;
 #else
