@@ -90,6 +90,7 @@ TRFOBJS = \
 	$(TMPDIR)\rc4.obj \
 	$(TMPDIR)\rc2.obj \
 	$(TMPDIR)\rot.obj \
+	$(TMPDIR)\safer.obj \
 	$(TMPDIR)\registry.obj \
 	$(TMPDIR)\rs_ecc.obj \
 	$(TMPDIR)\sha.obj \
