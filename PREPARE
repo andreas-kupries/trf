@@ -9,7 +9,7 @@ mVerbose \t\tInsert last minute information
 
 set mInfo(@TRF_VERSION@)     $mInfo(@mVersion@)
 set mInfo(@configure_input@) "Distributed at $mInfo(@mDate@)"
-set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mDosVersion@).dll"
+set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mShortDosVersion@).dll"
 
 file copy generic/pkgIndex.tcl.in win/pkgIndex.tcl
 
