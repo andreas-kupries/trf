@@ -3364,14 +3364,29 @@ SeekCalculatePolicies (trans)
    * i.   some transformation below unseekable ? not-overidable unseekable
    * ii.  base channel unseekable ?              see above
    * iii. naturally unseekable ?                 overidable unseekable.
+   *
+   * WARNING: For 8.0 and 8.1 we will always return 'unseekable'. Due to a
+   * missing 'Tcl_GetStackedChannel' we are unable to go down through the
+   * stack of transformations.
    */
-  
+
   Tcl_Channel self = trans->self;
   Tcl_Channel next;
 
   int stopped = 0;
 
   START (SeekCalculatePolicies);
+
+#ifdef USE_TCL_STUBS
+  if (!trans->patchIntegrated) {
+    PRINTLN ("8.1., no Tcl_GetStackedChannel, unseekable, no overide");
+
+    TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
+    trans->seekCfg.overideAllowed = 0;
+    goto done;
+  }
+
+  /* 8.2 or higher */
 
   while (self != (Tcl_Channel) NULL) {
 #if GT81
@@ -3486,6 +3501,14 @@ SeekCalculatePolicies (trans)
     }
   }
 
+#else
+  PRINTLN ("8.0., no Tcl_GetStackedChannel, unseekable, no overide");
+
+  TRF_SET_UNSEEKABLE (trans->seekCfg.chosen);
+  trans->seekCfg.overideAllowed = 0;
+#endif
+
+done:
   trans->seekState.used.numBytesTransform =
     trans->seekCfg.chosen.numBytesTransform;
 
