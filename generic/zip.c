@@ -314,7 +314,7 @@ ClientData clientData;
     }
 
     if (c->state.avail_out < OUT_SIZE) {
-      res = c->write (c->writeClientData, c->output_buffer,
+      res = c->write (c->writeClientData, (unsigned char*) c->output_buffer,
 		      OUT_SIZE - c->state.avail_out, interp);
       if (res != TCL_OK) {
 	return res;
@@ -383,7 +383,7 @@ ClientData clientData;
     }
 
     if (c->state.avail_out < OUT_SIZE) {
-      res = c->write (c->writeClientData, c->output_buffer,
+      res = c->write (c->writeClientData, (unsigned char*) c->output_buffer,
 		      OUT_SIZE - c->state.avail_out, interp);
       if (res != TCL_OK) {
 	return res;
@@ -450,7 +450,7 @@ ClientData clientData;
     }
 
     if (c->state.avail_out < OUT_SIZE) {
-      res = c->write (c->writeClientData, c->output_buffer,
+      res = c->write (c->writeClientData, (unsigned char*) c->output_buffer,
 		      OUT_SIZE - c->state.avail_out, interp);
       if (res != TCL_OK) {
 	return res;
@@ -642,7 +642,7 @@ ClientData clientData;
     }
 
     if (c->state.avail_out < OUT_SIZE) {
-      res = c->write (c->writeClientData, c->output_buffer,
+      res = c->write (c->writeClientData, (unsigned char*) c->output_buffer,
 		      OUT_SIZE - c->state.avail_out, interp);
       if (res != TCL_OK) {
 	return res;
@@ -710,7 +710,7 @@ ClientData clientData;
     }
 
     if (c->state.avail_out < OUT_SIZE) {
-      res = c->write (c->writeClientData, c->output_buffer,
+      res = c->write (c->writeClientData, (unsigned char*) c->output_buffer,
 		      OUT_SIZE - c->state.avail_out, interp);
       if (res != TCL_OK) {
 	return res;
@@ -777,7 +777,7 @@ ClientData clientData;
     }
 
     if (c->state.avail_out < OUT_SIZE) {
-      res = c->write (c->writeClientData, c->output_buffer,
+      res = c->write (c->writeClientData, (unsigned char*) c->output_buffer,
 		      OUT_SIZE - c->state.avail_out, interp);
       if (res != TCL_OK) {
 	return res;

@@ -305,7 +305,7 @@ ClientData       clientData;
     "11111000", "11111001", "11111010", "11111011", "11111100", "11111101", "11111110", "11111111",
   };
 
-  return c->write (c->writeClientData, (char*) code [character & 0x00ff], CHAR_BIT, interp);
+  return c->write (c->writeClientData, (unsigned char*) code [character & 0x00ff], CHAR_BIT, interp);
 }
 
 /*

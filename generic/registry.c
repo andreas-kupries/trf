@@ -941,7 +941,7 @@ Tcl_Interp* interp;
   }
 
   if (trans->result.allocated)
-    Tcl_Free (trans->result.buf);
+    Tcl_Free ((char*) trans->result.buf);
 
   return TCL_OK;
 }
@@ -1066,7 +1066,7 @@ int*       errorCodePtr;
 
     if (trans->in.vectors->convertBufProc){ 
       res = trans->in.vectors->convertBufProc (trans->in.control,
-					       buf, read,
+					       (unsigned char*) buf, read,
 					       (Tcl_Interp*) NULL,
 					       trans->clientData);
     } else {
@@ -1129,7 +1129,7 @@ int*       errorCodePtr;
 
     if (trans->out.vectors->convertBufProc){ 
       res = trans->out.vectors->convertBufProc (trans->out.control,
-					       buf, toWrite,
+					       (unsigned char*) buf, toWrite,
 						(Tcl_Interp*) NULL,
 					       trans->clientData);
     } else {
@@ -1436,23 +1436,23 @@ Trf_Options        optInfo;
     /* 7.6, argument 'in' is a string.
      */
     length = strlen (in);
-    buf    = (char*) in;
+    buf    = (unsigned char*) in;
 #else
     /* 8.x, argument 'in' is arbitrary object, its string rep. may contain \0.
      */
-    buf = Tcl_GetStringFromObj (in, &length);
+    buf = (unsigned char*) Tcl_GetStringFromObj (in, &length);
 #endif
 
     if (v->convertBufProc) {
       /* play it safe, use a copy, avoid clobbering the input. */
       unsigned char* tmp;
 
-      tmp = Tcl_Alloc (length);
+      tmp = (unsigned char*) Tcl_Alloc (length);
       memcpy (tmp, buf, length);
 
       res = v->convertBufProc (control, tmp, length, interp,
 			       entry->trfType->clientData);
-      Tcl_Free (tmp);
+      Tcl_Free ((char*) tmp);
     } else {
       unsigned int i, c;
       
@@ -1481,7 +1481,7 @@ Trf_Options        optInfo;
       if (Tcl_Eof (source))
 	break;
 
-      actuallyRead = Tcl_Read (source, buf, READ_CHUNK_SIZE);
+      actuallyRead = Tcl_Read (source, (unsigned char*) buf, READ_CHUNK_SIZE);
 
       if (actuallyRead <= 0)
 	break;
@@ -1506,7 +1506,7 @@ Trf_Options        optInfo;
 	break;
     }
 
-    Tcl_Free (buf);
+    Tcl_Free ((char*) buf);
 
     if (res == TCL_OK)
       res = v->flushProc (control, interp, entry->trfType->clientData);
@@ -1521,7 +1521,7 @@ Trf_Options        optInfo;
 
     if (res != TCL_OK) {
       if (r.buf != NULL)
-	Tcl_Free (r.buf);
+	Tcl_Free ((char*) r.buf);
     } else {
       Tcl_ResetResult (interp);
 
@@ -1536,7 +1536,7 @@ Trf_Options        optInfo;
 	r.buf [r.used] = '\0';
 	Tcl_AppendResult (interp, r.buf, (char*) NULL);
 #else
-	Tcl_Obj* o = Tcl_NewStringObj (r.buf, r.used);
+	Tcl_Obj* o = Tcl_NewStringObj ((char*) r.buf, r.used);
 
 	Tcl_IncrRefCount (o);
 	Tcl_SetObjResult (interp, o);
@@ -1686,7 +1686,7 @@ Tcl_Interp*    interp;
   Tcl_Channel destination = (Tcl_Channel) clientData;
   int         res;
 
-  res = Tcl_Write (destination, outString, outLen);
+  res = Tcl_Write (destination, (char*) outString, outLen);
 
   if (res < 0) {
     if (interp) {
@@ -1740,7 +1740,8 @@ Tcl_Interp*    interp;
       trans->result.buf    = (unsigned char*) Tcl_Alloc (trans->result.allocated);
     } else {
       trans->result.allocated += outLen + INCREMENT;
-      trans->result.buf     = (unsigned char*) Tcl_Realloc (trans->result.buf, trans->result.allocated);
+      trans->result.buf     = (unsigned char*) Tcl_Realloc ((char*) trans->result.buf,
+							    trans->result.allocated);
     }
   }
 
@@ -1795,7 +1796,7 @@ Tcl_Interp*    interp;
       r->buf    = (unsigned char*) Tcl_Alloc (r->allocated);
     } else {
       r->allocated += outLen + INCREMENT;
-      r->buf     = (unsigned char*) Tcl_Realloc (r->buf, r->allocated);
+      r->buf     = (unsigned char*) Tcl_Realloc ((char*) r->buf, r->allocated);
     }
   }
 

@@ -278,12 +278,12 @@ ClientData       clientData;
 
     c->block [MSG_LEN-1] = c->charCount; /* == MSG_LEN-1 */
 
-    rsencode (c->block, out);
+    rsencode ((char*) c->block, out);
 
     /* not really required: memset (c->block, '\0', MSG_LEN); */
     c->charCount = 0;
 
-    return c->write (c->writeClientData, out, CODE_LEN, interp);
+    return c->write (c->writeClientData, (unsigned char*) out, CODE_LEN, interp);
   }
 
   return TCL_OK;
@@ -346,11 +346,11 @@ ClientData       clientData;
 
     c->block [MSG_LEN-1] = c->charCount; /* == MSG_LEN-1 */
 
-    rsencode (c->block, out);
+    rsencode (c->block, (unsigned char*) out);
 
     c->charCount = 0;
 
-    res = c->write (c->writeClientData, out, CODE_LEN, interp);
+    res = c->write (c->writeClientData, (unsigned char*) out, CODE_LEN, interp);
 
     buffer += k;
     bufLen -= k;
@@ -372,11 +372,11 @@ ClientData       clientData;
     oldchar = buffer [MSG_LEN-1];
     buffer [MSG_LEN-1] = (unsigned char) (MSG_LEN-1);
 
-    rsencode (buffer, out);
+    rsencode (buffer, (unsigned char*) out);
 
     buffer [MSG_LEN-1] = oldchar;
 
-    res = c->write (c->writeClientData, out, CODE_LEN, interp);
+    res = c->write (c->writeClientData, (unsigned char*) out, CODE_LEN, interp);
 
     buffer += MSG_LEN-1;
     bufLen -= MSG_LEN-1;
@@ -391,11 +391,11 @@ ClientData       clientData;
   if (bufLen == (MSG_LEN-1)) {
     c->block [MSG_LEN-1] = c->charCount; /* == MSG_LEN-1 */
 
-    rsencode (c->block, out);
+    rsencode (c->block, (unsigned char*) out);
 
     c->charCount = 0;
 
-    return c->write (c->writeClientData, out, CODE_LEN, interp);
+    return c->write (c->writeClientData, (unsigned char*) out, CODE_LEN, interp);
   } /* else: nothing more to do to remember incomplete data */
 
   return TCL_OK;
@@ -435,9 +435,9 @@ ClientData       clientData;
 
     c->block [MSG_LEN-1] = c->charCount; /* < (MSG_LEN-1) */
 
-    rsencode (c->block, out);
+    rsencode (c->block, (unsigned char*) out);
 
-    return c->write (c->writeClientData, out, CODE_LEN, interp);
+    return c->write (c->writeClientData, (unsigned char*) out, CODE_LEN, interp);
   }
 
   return TCL_OK;

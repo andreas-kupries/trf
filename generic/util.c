@@ -65,7 +65,7 @@ unsigned char*       out;
 int               length;
 {
   if (length == 3) {
-    Split (in, out);
+    Split ((char*) in, (char*) out);
   } else {
     char buf [3];
 
@@ -73,7 +73,7 @@ int               length;
     memset (buf, '\0', 3);
     memcpy (buf, in,   length);
 
-    Split (buf, out);
+    Split (buf, (char*) out);
 
     switch (length) {
     case 1:

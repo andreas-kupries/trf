@@ -303,7 +303,7 @@ ClientData clientData;
     "370", "371", "372", "373", "374", "375", "376", "377",
   };
 
-  return c->write (c->writeClientData, (char*) code [character & 0x00ff], 3, interp);
+  return c->write (c->writeClientData, (unsigned char*) code [character & 0x00ff], 3, interp);
 }
 
 /*

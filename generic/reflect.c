@@ -606,7 +606,7 @@ int             transmit;
   }
 
   res = Tcl_ListObjAppendElement (interp, command,
-				  Tcl_NewStringObj ((char*) op, strlen (op)));
+				  Tcl_NewStringObj ((char*) op, -1));
   if (res != TCL_OK)
     goto cleanup;
 
