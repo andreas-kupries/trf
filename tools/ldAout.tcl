@@ -147,16 +147,16 @@ proc tclLdAout {{cc {}} {shlib_suffix {}} {shlib_cflags none}} {
     set shlib_suffix ""
   }
   if [regexp {\..*$} $outputFile match] {
-    set l [expr [string length $m] - [string length $match]]
+      set l [expr {[string length $m] - [string length $match]}]
   } else {
-    error "Output file does not appear to have a suffix"
+      error "Output file does not appear to have a suffix"
   }
-  set modName [string tolower [string range $m 0 [expr $l-1]]]
+  set modName [string tolower [string range $m 0 [expr {$l-1}]]]
   if [regexp {^lib} $modName] {
     set modName [string range $modName 3 end]
   }
   if [regexp {[0-9\.]*(_g0)?$} $modName match] {
-    set modName [string range $modName 0 [expr [string length $modName]-[string length $match]-1]]
+      set modName [string range $modName 0 [expr {[string length $modName]-[string length $match]-1}]]
   }
   set modName "[string toupper [string index $modName 0]][string range $modName 1 end]"
   
