@@ -1,3 +1,38 @@
+Fri Jul  9 16:51:14 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* tests/base64.test: Adapted to changes in 'base64'.
+
+	* unix/Makefile.in: Added all necessary code for bz2 from Jan.
+
+	* win/makefile.vc[5] (TRFOBJS): Added bz2*.obj to the definition.
+
+	* win/Makefile.gnu: Corrections sent by Jan Nijtmans. Additionally
+ 	  adds 'bz2' compression. Incomplete.
+
+	* Marshall sent some corrections to his new transform
+	  ('quoted-printable') and to his changes to 'base64'.
+
+Tue Jul  6 20:01:49 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/b64code.c: Accepted change from Marshall Rose inserting
+	  a newline after every 76 characters. This makes the encoder MIME
+	  compliant. Newlines in the input are ignored.
+
+Mon Jul  5 23:21:34 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* doc/nodes/conv.node: See below.
+
+	* doc/nodes/cmds.node: See below.
+
+	* win/Makefile.gnu, win/makefile.vc*: See below.
+
+	* unix/Makefile.in: See below.
+
+	* generic/qpcode.c: New transform, donated by "Marshall Rose"
+ 	  <mrose@dbc.mtview.ca.us>. The transform is 'quoted-printable',
+ 	  one of the encodings for mail and news, as defined by MIME (RFC
+ 	  2045).
+
 Tue Jun 29 21:20:23 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* unix/configure.in: Extended the code to deal with the upcoming

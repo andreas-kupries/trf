@@ -1022,18 +1022,27 @@ int mode;
 #endif
 
   TrfTransformationInstance* trans = (TrfTransformationInstance*) instanceData;
+  CONST char*                block;
 
   if (mode == TCL_MODE_NONBLOCKING) {
     trans->flags |= CHANNEL_ASYNC;
+    block = "0";
   } else {
     trans->flags &= ~(CHANNEL_ASYNC);
+    block = "1";
   }
-
+#if 0
   /* Forwarding of this action to underlying channel by myself, not Matt.
    * This should make it easier to generate a consistent blocking mode across
    * the whole stack of channels.
    */
 
+  Tcl_SetChannelOption (NULL, trans->parent, "-blocking", block);
+
+    return Tcl_SetChannelOption(statePtr->interp, statePtr->parent,
+		"-blocking", (mode == TCL_MODE_NONBLOCKING) ? "0" : "1");
+
+#endif
 #if 0
   /* not yet, need 'tclIO.c/SetBlockMode', which is internal, and interp
    * Or some other internal definitions from TclInt.h
@@ -1155,7 +1164,7 @@ Tcl_Interp* interp;
  *	------------------------------------------------*
  *
  *	Sideeffects:
- *		As defined by the converiosn.
+ *		As defined by the conversion.
  *
  *	Result:
  *		A transformed buffer.
@@ -2118,7 +2127,7 @@ int            mask;
 #if (TCL_MAJOR_VERSION >= 8)
   /* Check the I/O-Buffers of this channel for waiting information.
    * Setup a timer generating an artificial event for us if we have
-   * such. A timer is used to prevent starvation of other even sources.
+   * such. A timer is used to prevent starvation of other event sources.
    */
 
   if (trans->timer != (Tcl_TimerToken) NULL) {

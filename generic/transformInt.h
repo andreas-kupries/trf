@@ -44,6 +44,7 @@ extern "C" {
 #ifdef MAC_TCL
 #include "compat:dlfcn.h"
 #include "compat:zlib.h"
+#include "compat:bzlib.h"
 #else
 #ifdef HAVE_DLFCN_H
 #   include <dlfcn.h>
@@ -55,6 +56,11 @@ extern "C" {
 #else
 #   include "../compat/zlib.h"
 #endif
+#endif
+#ifdef HAVE_BZLIB_H
+#   include <bzlib.h>
+#else
+#   include "../compat/bzlib.h"
 #endif
 #ifdef HAVE_STDLIB_H
 #   include <stdlib.h>
@@ -219,6 +225,19 @@ typedef struct _TrfZipOptionBlock {
 EXTERN Trf_OptionVectors*
 TrfZIPOptions _ANSI_ARGS_ ((void));
 
+/*
+ * Definition of option information for BZ2 compressor
+ * + accessor to set of vectors processing them
+ */
+
+typedef struct _TrfBz2OptionBlock {
+  int mode;   /* compressor mode: compress/decompress */
+  int level;  /* compression level (1..9, 9 = default) */
+} TrfBz2OptionBlock;
+
+EXTERN Trf_OptionVectors*
+TrfBZ2Options _ANSI_ARGS_ ((void));
+
 #define TRF_COMPRESS   (1)
 #define TRF_DECOMPRESS (2)
 
@@ -259,6 +278,34 @@ EXTERN int
 TrfLoadZlib _ANSI_ARGS_ ((Tcl_Interp *interp));
 
 /*
+ * 'libbz2' will be dynamically loaded. Following a structure to
+ * contain the addresses of all functions required by this extension.
+ *
+ * Affected commands are: bzip.
+ * They will fail, if the library could not be loaded.
+ */
+
+#ifndef WINAPI
+#define WINAPI
+#endif
+
+typedef struct BZFunctions {
+  VOID *handle;
+  int (WINAPI * compress)           _ANSI_ARGS_ ((bz_stream* strm, int action));
+  int (WINAPI * compressEnd)        _ANSI_ARGS_ ((bz_stream* strm));
+  int (WINAPI * compressInit)       _ANSI_ARGS_ ((bz_stream* strm, int blockSize100k, int verbosity, int workFactor));
+  int (WINAPI * decompress)         _ANSI_ARGS_ ((bz_stream* strm));
+  int (WINAPI * decompressEnd)      _ANSI_ARGS_ ((bz_stream* strm));
+  int (WINAPI * decompressInit)     _ANSI_ARGS_ ((bz_stream* strm, int verbosity, int small));
+} bzFunctions;
+
+
+EXTERN bzFunctions bz; /* THREADING: serialize initialization */
+
+EXTERN int
+TrfLoadBZ2lib _ANSI_ARGS_ ((Tcl_Interp *interp));
+
+/*
  * Macro to use to determine the offset of a structure member
  * in bytes from the beginning of the structure.
  */
@@ -267,7 +314,7 @@ TrfLoadZlib _ANSI_ARGS_ ((Tcl_Interp *interp));
 #define offsetof(type, field) ((int) ((char *) &((type *) 0)->field))
 #endif
 
-#if GT81
+#ifdef USE_TCL_STUBS
 #ifndef Tcl_ReplaceChannel
 /* The core we are compiling against is not patched, so supply the
  * necesssary definitions here by ourselves. The form chosen for
@@ -293,14 +340,12 @@ typedef void (trf_UndoReplaceChannel) _ANSI_ARGS_((Tcl_Interp* interp,
 #define Tcl_UndoReplaceChannel ((trf_UndoReplaceChannel*) tclStubsPtr->reserved282)
 
 #endif /* Tcl_ReplaceChannel */
-#endif /* GT81 */
-
+#endif /* USE_TCL_STUBS */
 
 
 /*
  * Internal initialization procedures for all transformers implemented here.
  */
-
 
 EXTERN int TrfInit_Bin       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_Oct       _ANSI_ARGS_ ((Tcl_Interp* interp));
@@ -309,6 +354,7 @@ EXTERN int TrfInit_UU        _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_B64       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_Ascii85   _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_OTP_WORDS _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_QP        _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int TrfInit_CRC       _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_MD5       _ANSI_ARGS_ ((Tcl_Interp* interp));
@@ -325,6 +371,7 @@ EXTERN int TrfInit_OTP_MD5   _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int TrfInit_RS_ECC    _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_ZIP       _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_BZ2       _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int TrfInit_Unstack   _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_Binio     _ANSI_ARGS_ ((Tcl_Interp* interp));

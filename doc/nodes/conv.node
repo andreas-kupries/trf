@@ -40,7 +40,9 @@ node trf_conv {
 		p "
 		Blocks of 3 characters are base64-encoded/decoded. This is
 		equivalent to [PGP]'s ASCII armor. Used by MIME too. Will
-		buffer 2 characters internally until a block is complete."
+		buffer 2 characters internally until a block is complete.
+		See [rfc 2045] for its definition.
+		"
 		# MIME, base64 => RFC reference !
 	    }
 
@@ -56,6 +58,11 @@ node trf_conv {
                 See also [link _ otp_md5 trf_md.html].
 		"
 	    }
+	    defrow quoted-printable {
+		p "Printable ASCII characters are largely untouched. Otherwise
+		a three-character encoding sequence is used. This is MIME's
+		compromise encoding. See [rfc 2045] for its definition.
+		"
 	}
 
 	p "

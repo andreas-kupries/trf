@@ -90,6 +90,7 @@ node trf_cmds {
 			tr valign=top [list bin		[cv]		[trf]]
 			tr valign=top [list hex		[cv]		[trf]]
 			tr valign=top [list oct		[cv]		[trf]]
+			tr valign=top [list quoted-printable [cv]       [trf]]
 			tr valign=top [list otp_words	[cv]		[trf]]
 			tr valign=top [list uuencode	[cv]		[trf]]
 			thline 3

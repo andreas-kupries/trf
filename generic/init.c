@@ -103,6 +103,11 @@ Tcl_Interp* interp;
     if (res != TCL_OK)
       return res;
 
+    res = TrfInit_BZ2 (interp);
+
+    if (res != TCL_OK)
+      return res;
+
     /*
      * Register message digests
      */
@@ -206,6 +211,11 @@ Tcl_Interp* interp;
       return res;
 
     res = TrfInit_OTP_WORDS (interp);
+
+    if (res != TCL_OK)
+      return res;
+
+    res = TrfInit_QP (interp);
 
     if (res != TCL_OK)
       return res;

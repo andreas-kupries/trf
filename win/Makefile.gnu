@@ -8,9 +8,13 @@ EXTENSION	= Trf
 VERSION		= @mFullVersion@
 TCL_VERSION	= 81
 
-TRF_DLL_FILE = ${EXTENSION}@mShortDosVersion@.dll
+TRF_DLL_FILE	    = ${EXTENSION}@mShortDosVersion@.dll
+TRF_LIB_FILE	    = lib${EXTENSION}@mShortDosVersion@.a
+TRF_STATIC_LIB_FILE = lib${EXTENSION}@mShortDosVersion@s.a
+
 
 SSL_LIBRARY	= -DSSL_LIB_NAME=\"libeay32.dll\"
+BZ2_LIBRARY	= -DBZ2_LIB_NAME=\"bz2.dll\"
 
 #
 #----------------------------------------------------------------
@@ -106,13 +110,15 @@ INSTALL = $(tool)/install-sh -c
 # The symbols below provide support for dynamic loading and shared
 # libraries.  The values of the symbols are normally set by the
 # configure script.  You shouldn't normally need to modify any of
-# these definitions by hand.
+# these definitions by hand. The second definition should be used
+# in conjunction with Tcl 8.1.
 
 TRF_SHLIB_CFLAGS =
+#TRF_SHLIB_CFLAGS = -DTCL_USE_STUBS
 
 
-# The symbol below provipng support for dynamic loading and shared
-# libraries.  See configure.in for a pngcription of what it means.
+# The symbol below provides support for dynamic loading and shared
+# libraries.  See configure.in for a description of what it means.
 # The values of the symbolis normally set by the configure script.
 
 SHLIB_LD =
@@ -147,7 +153,7 @@ CC		=	gcc
 AS = as
 LD = ld
 DLLTOOL = dlltool
-DLLWRAP = dllwrap 
+DLLWRAP = dllwrap -mnocygwin 
 WINDRES = windres
 
 DLL_LDFLAGS = -mwindows -Wl,-e,_DllMain@12
@@ -159,7 +165,7 @@ guilibs	   = $(libc) $(winlibs)
 
 guilibsdll = $(libcdll) $(winlibs)
 
-TRF_DEFINES	= -D__WIN32__ -DSTATIC_BUILD -DUSE_TCL_STUBS -DTRF_VERSION="\"${VERSION}\"" ${SSL_LIBRARY}
+TRF_DEFINES	= -D__WIN32__ -DSTATIC_BUILD  ${TRF_SHLIB_CFLAGS} -DTRF_VERSION="\"${VERSION}\"" ${SSL_LIBRARY}
 
 # $(TCL_CC_SWITCHES)
 INCLUDES	=	-I. -I$(srcdir) -I../generic -I$(TCL_INC_DIR)
@@ -202,6 +208,10 @@ SOURCES	=	../generic/adler.c \
 	../generic/zip.c \
 	../generic/zip_opt.c \
 	../generic/zlib.c \
+	../generic/bz2.c \
+	../generic/bz2_opt.c \
+	../generic/bz2lib.c \
+	../generic/qpcode.c \
 	../generic/reflect.c \
 	../generic/ref_opt.c \
 	../compat/tclLoadWin.c
@@ -240,13 +250,16 @@ OBJECTS	=	adler.o \
 	zip.o \
 	zip_opt.o \
 	zlib.o \
+	bz2.o \
+	bz2_opt.o \
+	bz2lib.o \
 	reflect.o \
 	ref_opt.o \
 	tclLoadWin.o
 
 #-------------------------------------------------------#
 
-default:	$(TRF_DLL_FILE)
+default:	$(TRF_DLL_FILE) $(TRF_LIB_FILE)
 
 all:	default
 
@@ -355,6 +368,15 @@ zip_opt.o:	../generic/zip_opt.c
 zlib.o:	../generic/zlib.c
 	$(CC) -c $(CC_SWITCHES) ../generic/zlib.c -o $@
 
+bz2.o:	../generic/zip.c
+	$(CC) -c $(CC_SWITCHES) ../generic/bz2.c -o $@
+
+bz2_opt.o:	../generic/zip_opt.c
+	$(CC) -c $(CC_SWITCHES) ../generic/bz2_opt.c -o $@
+
+bz2lib.o:	../generic/zlib.c
+	$(CC) -c $(CC_SWITCHES) ../generic/bz2lib.c -o $@
+
 reflect.o:	../generic/reflect.c
 	$(CC) -c $(CC_SWITCHES) ../generic/reflect.c -o $@
 
@@ -374,8 +396,16 @@ $(TRF_DLL_FILE):	$(OBJECTS) trfres.o dllEntry.o trf.def
 		trfres.o dllEntry.o --def trf.def \
 		$(DLL_LDLIBS) 
 
+$(TRF_LIB_FILE): trf.def $(TRF_DLL_FILE)
+	$(DLLTOOL) --as=$(AS) --dllname $(TRF_DLL_FILE) \
+		--def trf.def --output-lib $@
+
+$(TRF_STATIC_LIB_FILE): $(OBJECTS)
+	$(AR) cr $@ $(OBJECTS)
+
+
 trf.def: $(OBJECTS)
-	$(DLLTOOL) --export-all --exclude-symbols DllMain@12 --output-def $@ $(OBJECTS)
+	$(DLLTOOL) --export-all --exclude-symbols DllMain@12,DllEntryPoint@0,z  --output-def $@ $(OBJECTS)
 
 trfres.o: trf.rc
 	$(WINDRES) --include . --define VS_VERSION_INFO=1 trf.rc trfres.o

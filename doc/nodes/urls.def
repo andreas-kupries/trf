@@ -52,6 +52,11 @@ url zlib_win \
 
 url zLib [lib zlib] http://www.cdrom.com/pub/infozip/zlib/
 
+url bzLib      [lib bzlib] http://www.muraroa.demon.co.uk/
+url bzip       [cmd bzip]  http://www.muraroa.demon.co.uk/
+url bzlib_home http://www.muraroa.demon.co.uk/ http://www.muraroa.demon.co.uk/
+
+
 url tls        [lib TLS]    http://www.sensus.org/tcl/
 #url tls_source "TLS source" http://www.sensus.org/tcl/tls11.tgz
 

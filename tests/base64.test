@@ -23,8 +23,10 @@ test base64-2.0 {base64, conversion errors} {
 
 
 foreach {index string fullencode encode} {
-    1 hello aGVsbG8= aGVsbG8=
-    2 hell  aGVsbA== aGVsbA
+    1 hello {aGVsbG8=
+} aGVsbG8=
+2 hell  {aGVsbA==
+} aGVsbA
 } {
     test base64-3.$index {base64, encode string} {
 	base64 -mode encode $string
@@ -66,4 +68,5 @@ test base64-7.2 {base64, partial conversion for attachments} {
     set data [read $ma]
     close $ma
     list [string length $data] $data
-} {8 aGVsbG8=}
+} {9 {aGVsbG8=
+}}

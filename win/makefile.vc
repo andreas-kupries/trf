@@ -104,6 +104,10 @@ TRFOBJS = \
 	$(TMPDIR)\zip.obj \
 	$(TMPDIR)\zip_opt.obj \
 	$(TMPDIR)\zlib.obj \
+	$(TMPDIR)\bz2.obj \
+	$(TMPDIR)\bz2_opt.obj \
+	$(TMPDIR)\bz2lib.obj \
+	$(TMPDIR)\qpcode.obj \
 	$(TMPDIR)\reflect.obj \
 	$(TMPDIR)\ref_opt.obj \
 	$(TMPDIR)\tclLoadWin.obj

@@ -123,6 +123,9 @@ typedef struct _EncoderControl_ {
   unsigned char charCount;
   unsigned char buf [3];
 
+#define	QPERLIN (76 >> 2)	/* according to RFC 2045 */
+  int  quads;
+
 } EncoderControl;
 
 
@@ -264,6 +267,7 @@ ClientData clientData;
 
   c->charCount = 0;
   memset (c->buf, '\0', 3);
+  c->quads = 0;
 
   return (ClientData) c;
 }
@@ -332,6 +336,7 @@ ClientData clientData;
   c->charCount ++;
 
   if (c->charCount == 3) {
+    int i;
     unsigned char buf [4];
 
     TrfSplit3to4     (c->buf, buf, 3);
@@ -359,7 +364,12 @@ ClientData clientData;
     c->charCount = 0;
     memset (c->buf, '\0', 3);
 
-    return c->write (c->writeClientData, buf, 4, interp);
+    if ((i = c->write (c->writeClientData, buf, 4, interp)) != TCL_OK)
+      return i;
+    if (++c->quads >= QPERLIN) {
+      c->quads = 0;
+      return c->write (c->writeClientData, "\n", 1, interp);
+    }
   }
 
   return TCL_OK;
@@ -395,6 +405,7 @@ ClientData clientData;
   /* execute conversion specific code here (base64 encode) */
 
   if (c->charCount > 0) {
+    int i;
     unsigned char buf [4];
 
     TrfSplit3to4     (c->buf, buf, c->charCount);
@@ -403,10 +414,12 @@ ClientData clientData;
     c->charCount = 0;
     memset (c->buf, '\0', 3);
 
-    return c->write (c->writeClientData, buf, 4, interp);
+    if ((i = c->write (c->writeClientData, buf, 4, interp)) != TCL_OK)
+      return i;
   }
 
-  return TCL_OK;
+  c->quads = 0;
+  return c->write (c->writeClientData, "\n", 1, interp);
 }
 
 /*
@@ -541,6 +554,9 @@ ClientData clientData;
   DecoderControl* c = (DecoderControl*) ctrlBlock;
 
   /* execute conversion specific code here (base64 decode) */
+
+  if ((character == '\r') || (character == '\n'))
+      return TCL_OK;
 
   if (c->expectFlush) {
     /*
