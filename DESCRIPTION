@@ -29,7 +29,7 @@ extension trf {
     author       {Andreas Kupries (a.kupries@westend.com)}
     maintenance  {Andreas Kupries (a.kupries@westend.com)}
 
-    version	   1.0
+    version	   1.1
     copying-policy {BSD-Style, see 'tcl'-license}
     date           {@mDate@}
 
@@ -38,7 +38,7 @@ extension trf {
 	ftp://ftp.westend.com/pub/aku/trf@mShortDosVersion@-win32.zip
     }
 
-    development-platform {Linux 2.0.29, gcc 2.7.2.1}
+    development-platform {Linux 2.0.29, gcc 2.7.2.3}
     platforms {
 	Linux 2.0.29	(gcc 2.7.2.1)	Development system
 	IRIX 6.2	(cc only)
@@ -55,7 +55,7 @@ extension trf {
 	tcl 7.6, 8.0 or higher,
 	plus-patches as of Dec 5, 1996 or later (optional),
 	memchan 1.0  or higher (required by testsuite),
-	zlib-1.0.4   or higher (optional),
+	zlib-1.0.4   or higher (optional, 1.1.2 is current),
 	libdes-3.21  or higher (optional),
 	SSLeay-0.6.6 or higher (optional)
     }

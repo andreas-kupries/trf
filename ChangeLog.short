@@ -1,3 +1,16 @@
+Changes from 1.0 to 1.1
+
+*	Adapted to C-API changes between 8.0 and 8.1
+	Added patches for Tcl 8.1a2
+
+*	Compiles now with Tcl 7.6, 8.0 and 8.1a2
+
+*	binio is more reclusive, it and its support (byteorder patch)
+	will be removed in the next release.
+
+	Please use the official 'binary' command of Tcl 8.x instead.
+
+
 Changes from b3 to final:
 
 *	**** WARNING to all users of earlier versions ****

@@ -1,4 +1,64 @@
+Wed Jun 17 21:38:32 1998  Andreas Kupries  <a.kupries@westend.com>
+
+	* doc/*.tex: Checked the urls, removed some broken ones. Added
+	  some notes about binio, see below, and 'bzip' (future section).
+
+	* patches/v8.1a2/byteorder.patch: Reworked to expose a minimal set
+	  of declarations in the patched tcl.h. First step towards
+	  complete removal of 'binio' and its support in favor of the
+	  official 'binary' command.
+
+Sat Jun 13 13:38:19 1998  Andreas Kupries  <a.kupries@westend.com>
+
+	* The patch required an adaption to I18N/UTF: A channel X
+	  replacing another channel C via Tcl_ReplaceChannel takes over
+	  the encoding information from C. Acess to the filter channel via
+	  'puts' will now encode/decode the given strings prior to the
+	  transformation of X. Below X no encoding will take place. 
+
+	* The extension itself did not require adaptions to I18N and
+	  UTF. This is because an attached channel uses 'Tcl_Read' and
+	  'Tcl_Write' to access the underlying channel, thus bypassing its
+	  encoding stage.
+
+	* Passed all tests.
+
+	* Fixed problem in new 'standard.patch', forgot to initialize
+	  'chanPtr->outputStage'. transform.test 2.1 and base64.test 7.1
+	  solved.
+	
+	* generic/reflect.c (Execute): Fixed refcount problem. Tcl_Eval
+	  now increments and decrements the refcount of the given script
+	  object. As 'Tcl_DuplicateObj' returns an object having refcount
+	  0 I caused a problem by not incrementing the refcount, but
+	  decrementing it, thus trying to free the object a second time.
+	=> transform.test 1.x solved.
+
+Fri Jun 12 16:13:26 1998  Andreas Kupries  <a.kupries@westend.com>
+
+	* 2 tests failing: transform.test (1.x, 2.1), base64.test (7.1)
+
+	* --------------------------------------------------------
+	  Ok, this completes the basic adaption to the new version of
+	  tcl. Still missing: Insinuation of the channel hooks into
+	  'tclIO.c', and adaptions to the new I18N features (UTF
+	  et. al.).
+
+	* generic/digest.c (WriteDigest): Added code to adapt to an API
+	  change between 8.0 and 8.1 (Tcl_ObjSetVar2 renamed to
+	  Tcl_SetObjVar2, and type changes for the part1/2 parameters,
+	  'Tcl_Obj*' to 'char*').
+
+	* generic/reflect.c (Execute): Added code to adapt to an API
+	  change between 8.0 and 8.1 (Tcl_GlobalEvalObj was removed,
+	  Tcl_EvalObj got an additional flag instead).
+
+	* generic/registry.c (Trf_Register): Added code special to 8.1:
+	  Initialization of the 'close2Proc' driver procedure (NULL).
+
 Mon Aug 18 21:18:31 1997  Andreas Kupries  <a.kupries@westend.com>
+
+	* -------------- 1.0 relased -----------------------------
 
 	* win/makefile.vc, PREPARE: finishing touches, removed last
 	  remnants of '8.0b2'.
