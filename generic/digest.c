@@ -484,7 +484,7 @@ ClientData    clientData;
 
   c = (DecoderControl*) Tcl_Alloc (sizeof (DecoderControl));
   c->write           = fun;
-  c->writeClientData = clientData;
+  c->writeClientData = writeClientData;
 
   c->operation_mode = (o->mode == TRF_ABSORB_HASH ?
 		       ATTACH_ABSORB :
@@ -854,7 +854,7 @@ ClientData       clientData;
 	temp [j] = c->digest_buffer [i];
       }
 
-      memcpy ((VOID*) &c->digest_buffer, (VOID*) temp, md->digest_size);
+      memcpy ((VOID*) c->digest_buffer, (VOID*) temp, md->digest_size);
       Tcl_Free (temp);
     }
 
@@ -862,7 +862,7 @@ ClientData       clientData;
      * Compare computed and transmitted checksums
      */
 
-    result_text = (0 == memcmp ((VOID*) digest, (VOID*) &c->digest_buffer, md->digest_size) ?
+    result_text = (0 == memcmp ((VOID*) digest, (VOID*) c->digest_buffer, md->digest_size) ?
 		   "ok" : "failed");
 
     Tcl_SetVar (c->mfInterp, c->matchFlag, result_text, TCL_GLOBAL_ONLY);
