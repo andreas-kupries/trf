@@ -1,5 +1,12 @@
 Sat Feb 15 22:58:32 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
+	* tests/sha.test: don't execute 'sha-2.2' under windows. Uses
+	  'cat' to beef up a 1000 character file to 1e6 characters. A more
+	  portable method is required. 
+
+	* tests/binio.test: spots using '/dev/null' rewritten, removed
+	  dependency on un*x.
+
 	* generic/b64code.c: see below, same thing.
 
 	* generic/uucode.c: added explicit casts to all array
