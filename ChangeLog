@@ -33,6 +33,15 @@ Sun Jun  8 09:14:24 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 	
 	* patches/v7.6p2: Added directory and files in it.
 
+Sat Jun  7 18:31:55 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* doc/install.tex (chapter  {Patching the core}): Corrected
+	  information about working directories of the various patch
+	  files.
+
+	* patches/v7.6p2/: New directory. The patches are the same, the
+	  prepatched versions of various files not.
+
 Sun Jun  1 12:03:58 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* ---------------- Release 1.0b3 ----------------
