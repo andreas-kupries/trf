@@ -1,10 +1,18 @@
+Tue Oct 19 21:41:26 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* generic/init.c: Added registration of the two new commands.
+
+	* Adapted makefiles to compile the new file.
+
+	* generic/crypt.c: New file, implements 'crypt' and 'md5crypt'.
+
 Sat Oct 16 00:55:39 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* Worked on the MD5 binding in the last days, using md5-crypt now,
  	  coming from glibc (is under LGPL). MD5 shared liib now loaded on
  	  demand. Changed all makefiles and configures to check for a
- 	  libcrypt containing MD5. If none, the code we carry around is
- 	  compiled.
+ 	  libcrypt containing MD5. If none, the code we carry around (see
+	  md5-crypt) is compiled.
 
 Mon Oct 11 18:48:49 1999  Andreas Kupries  <a.kupries@westend.com>
 

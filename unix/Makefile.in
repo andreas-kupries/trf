@@ -216,11 +216,12 @@ BASE_SRC	=	$(GENERIC_DIR)/zlib.c		\
 			$(GENERIC_DIR)/unstack.c	\
 			$(GENERIC_DIR)/binio.c		\
 			$(GENERIC_DIR)/trfStubInit.c	\
-			$(GENERIC_DIR)/load.c
+			$(GENERIC_DIR)/load.c		\
+			$(GENERIC_DIR)/crypt.c
 
 BASE_OBJ	=	bz2lib.o zlib.o loadman.o init.o	\
 			registry.o unstack.o binio.o load.o	\
-			@DL_OBJS@ @STUB_OBJS@
+			crypt.o @DL_OBJS@ @STUB_OBJS@
 
 #		conversions, base & algorithms
 CVT_SRC		=	$(CVT_BASE_SRC) $(CVT_ALG_SRC)
@@ -413,6 +414,9 @@ trfStubInit.o:	$(GENERIC_DIR)/trfStubInit.c
 
 load.o: $(GENERIC_DIR)/load.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/load.c -o $@
+
+crypt.o: $(GENERIC_DIR)/crypt.c
+	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/crypt.c -o $@
 
 zlib.o: $(GENERIC_DIR)/zlib.c
 	$(CC) -c $(CC_SWITCHES) $(GENERIC_DIR)/zlib.c -o $@

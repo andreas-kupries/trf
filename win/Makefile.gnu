@@ -192,6 +192,7 @@ SOURCES	=	../generic/adler.c \
 	../generic/hexcode.c \
 	../generic/init.c \
 	../generic/load.c \
+	../generic/crypt.c \
 	../generic/loadman.c \
 	../generic/md5.c \
 	../generic/md2.c \
@@ -235,6 +236,7 @@ OBJECTS	=	adler.o \
 	hexcode.o \
 	init.o \
 	load.o \
+	crypt.o \
 	loadman.o \
 	md5.o \
 	md2.o \
@@ -322,6 +324,9 @@ init.o:	../generic/init.c
 
 load.o:	../generic/load.c
 	$(CC) -c $(CC_SWITCHES) ../generic/load.c -o $@
+
+crypt.o:	../generic/crypt.c
+	$(CC) -c $(CC_SWITCHES) ../generic/crypt.c -o $@
 
 loadman.o:	../generic/loadman.c
 	$(CC) -c $(CC_SWITCHES) ../generic/loadman.c -o $@

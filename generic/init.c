@@ -217,6 +217,15 @@ Tcl_Interp* interp;
       return res;
 
     /*
+     * Register crypt commands for pwd auth.
+     */
+
+    res = TrfInit_Crypt (interp);
+
+    if (res != TCL_OK)
+      return res;
+
+    /*
      * Register standard encodings.
      */
 

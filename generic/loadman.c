@@ -66,6 +66,7 @@ static char* crypt_symbols [] = {
   "md5_init_ctx",
   "md5_process_bytes",
   "md5_finish_ctx",
+  "crypt",
   /* -- */
   (char *) NULL,
 };
@@ -173,7 +174,8 @@ TrfLoadMD5 (interp)
   int res;
 
   TrfLock; /* THREADING: serialize initialization */
-  res = Trf_LoadLibrary (interp, CRYPT_LIB_NAME, (VOID**) &md5f, crypt_symbols, 0);
+  res = Trf_LoadLibrary (interp, CRYPT_LIB_NAME, (VOID**) &md5f,
+			 crypt_symbols, 0);
   TrfUnlock;
 
   return res;

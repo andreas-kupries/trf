@@ -184,6 +184,7 @@ TRFOBJS = \
 	$(TMPDIR)\hexcode.obj \
 	$(TMPDIR)\init.obj \
 	$(TMPDIR)\load.obj \
+	$(TMPDIR)\crypt.obj \
 	$(TMPDIR)\loadman.obj \
 	$(TMPDIR)\md5.obj \
 	$(TMPDIR)\md2.obj \

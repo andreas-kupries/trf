@@ -483,6 +483,7 @@ EXTERN int TrfInit_Unstack   _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int TrfInit_Binio     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 EXTERN int TrfInit_Transform _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN int TrfInit_Crypt     _ANSI_ARGS_ ((Tcl_Interp* interp));
 
 
 #if GT81 && defined (TCL_THREADS) /* THREADING: Lock procedures */

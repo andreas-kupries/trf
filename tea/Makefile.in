@@ -54,7 +54,8 @@ TRF_BASE_SRC	=	$(TRF_GENSRCDIR)/zlib.c		\
 			$(TRF_GENSRCDIR)/registry.c	\
 			$(TRF_GENSRCDIR)/unstack.c	\
 			$(TRF_GENSRCDIR)/load.c		\
-			$(TRF_GENSRCDIR)/trfStubInit.c
+			$(TRF_GENSRCDIR)/trfStubInit.c	\
+			$(TRF_GENSRCDIR)/crypt.c
 
 # Deprecated		$(TRF_GENSRCDIR)/binio.c
 
@@ -128,6 +129,7 @@ TRF_BASE_OBJ	=	@DL_OBJS@ bz2lib.$(OBJEXT)	\
 			registry.$(OBJEXT) 	\
 			unstack.$(OBJEXT) 	\
 			load.$(OBJEXT)		\
+			crypt.$(OBJEXT)		\
 			trfStubInit.$(OBJEXT)
 
 # Deprecated		binio.$(OBJEXT)
@@ -537,6 +539,9 @@ trfStubInit.$(OBJEXT):	$(TRF_GENSRCDIR)/trfStubInit.c
 
 load.$(OBJEXT): $(TRF_GENSRCDIR)/load.c
 	$(COMPILE) -c `@CYGPATH@ $(TRF_GENSRCDIR)/load.c` -o $@
+
+crypt.$(OBJEXT): $(TRF_GENSRCDIR)/crypt.c
+	$(COMPILE) -c `@CYGPATH@ $(TRF_GENSRCDIR)/crypt.c` -o $@
 
 zlib.$(OBJEXT): $(TRF_GENSRCDIR)/zlib.c
 	$(COMPILE) -c `@CYGPATH@ $(TRF_GENSRCDIR)/zlib.c` -o $@

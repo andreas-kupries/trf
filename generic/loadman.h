@@ -100,6 +100,9 @@ typedef struct Md5Functions {
   void (* update) _ANSI_ARGS_ ((unsigned char* data, unsigned long length,
 				struct md5_ctx* c));
   void (* final)  _ANSI_ARGS_ ((struct md5_ctx* c, unsigned char* digest));
+
+  const char* (* crypt) _ANSI_ARGS_ ((const char* key, const char* salt));
+
 } md5Functions;
 
 typedef struct Sha1Functions {
