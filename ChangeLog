@@ -1,3 +1,8 @@
+Sun Sep 26 19:34:05 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* Updated docs, added compile time time option to allow static
+	  linking of zlib and/or bzlib.
+
 Sat Sep 25 21:04:28 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* Fixes sent in by Matt Newman. Added to maintain

@@ -39,8 +39,8 @@ extension trf {
 
     primary-urls {
 	http://www.oche.de/%7Eakupries/tcltk.html
-	http://www.oche.de/%7Eakupries/soft/trf/
-	http://www.oche.de/%7Eakupries/soft/trf/download/<ARCH>
+	http://www.oche.de/%7Eakupries/soft/trf1.8/
+	http://www.oche.de/%7Eakupries/soft/trf1.8/download/<ARCH>
     }
 
     development-platform {Linux 2.0.29, gcc 2.7.2.3}
