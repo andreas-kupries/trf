@@ -39,15 +39,18 @@ node trf_install {
 	table {
 	    defrow [tcl] {
 		p "
-		of course. The package will compile with 7.6, 8.0 and 8.1a2.
-		The versions 8.0a1/a2/b1/b2 cannot be used anymore."
-
+		of course. The package will compile with 7.6, 8.0.x, 8.1.x
+		and 8.2.x. This does not include alpha and beta releases.
+		"
 		p "
 		This package requires manipulation of the core for full
-		functionality. If you can live without filter channels no
-		patching is required. In case you want patch [tcl], a
-		[strong {source distribution}] is necessary. Instructions
-		on how to patch it is provided in a [link patch]"
+		functionality, [strong {but only}] if used in conjunction
+		with versions of Tcl below 8.2.
+		"
+		p "If you can live without filter channels and use Tcl 8.1.x
+		no patching is required. In case you want patch [tcl], a
+		[strong {source distribution}] is necessary. Instructions on
+		how to patch it is provided in a [link patch]."
 	    }
 	    defrow [link memchan] {
 		p "

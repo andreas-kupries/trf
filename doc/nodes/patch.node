@@ -15,7 +15,13 @@ node trf_patch {
 	p "
 	For version 7.6plus please check that your patch was younger then
 	Dec 12, 1996. A plus-patch older than this does not contain
-	the required modifications. Skip ahead to the [link patch_next]."
+	the required modifications. Skip ahead to the [link patch_next].
+	"
+
+	p "[strong [cem Note:]] [strong No] patch is required if you use
+	Tcl 8.2 or beyond. Since that version of Tcl the Trf patch was
+	made official and added to the core.
+	"
 
 	hr
 

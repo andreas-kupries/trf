@@ -45,6 +45,11 @@ node trf_intro {
 	however, due to the shift of the development from Sun to
 	[scriptics]."
 
+	p "[strong [cem Update:]] Tcl 8.2 made the patch official, i.e. it
+	was added to the core interpreter, obviating the need to patch it.
+	So, in conjunction with Tcl 8.2 this extension is a simple,
+	non-patching one."
+
 	# -W- installman => link to chapter 'install'
 
 	p "

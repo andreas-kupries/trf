@@ -19,11 +19,13 @@ node trf_future {
 	    "
 
 	    li	"
-	    Channel doing special framing after a fixed (but
-	    user-defined) number of characters"
+	    Implement a channel doing special framing after a fixed (but
+	    user-defined) number of characters. See [afile tools/mmencode]
+	    in the distribution for a simple example of this. A generalized
+	    implementation should be made."
 
 	    li	"
-	    Random-byte generator (as real channeltype, no
+	    Random-byte generator (as a real channeltype, no
 	    transformation!)."
 	    #	\strong {Better place it with memchan}.
 
@@ -31,7 +33,8 @@ node trf_future {
 	    ##	about the information flowing through it.
 	    ## not needed anymore, use 'transform' instead!
 
-	    li	"Add the [cmd bzip] compressor."
+	    li	"A partial implementation of the [cmd bzip] compressor was
+	    donated by [jan]. The decompressor does not work yet."
 
 	    li	"
 	    Anybody out there wishing more ? Feel free to send [link meT]

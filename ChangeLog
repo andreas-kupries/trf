@@ -1,3 +1,8 @@
+Fri Sep 10 21:10:55 1999  Andreas Kupries  <a.kupries@westend.com>
+
+	* doc/nodes/{intro,install,patch,future}.node: Updated to include
+	  information about Tcl 8.2 and its integration of the Trf patch.
+
 Thu Sep  2 21:23:21 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* doc/nodes/md.node: Added reference to Bruce Adams
@@ -7,10 +12,10 @@ Thu Sep  2 21:23:21 1999  Andreas Kupries  <a.kupries@westend.com>
 Sat Jul 17 18:10:28 1999  Andreas Kupries  <a.kupries@westend.com>
 
 	* generic/reflect.c: Changed to use a byte-array for the buffer
-	  argument incase of compilation against 8.1 or higher.
+	  argument in case of compilation against 8.1 or higher.
 
 	* generic/registry.c: Finalized adaption to 8.2, and the runtime
-	  switching.
+	  switching too.
 
 Tue Jul 13 18:40:44 1999  Andreas Kupries  <a.kupries@westend.com>
 
