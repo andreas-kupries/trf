@@ -1,3 +1,66 @@
+Sat May 31 00:04:27 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* tests went through without problems.
+
+	* trf now compiles again, without warnings.
+
+	* tcl 8.0b1 with patches compiles, links and tests sucessfully
+	  (iocmd 8.8, 8.9 fail due to the new option '-byteorder').
+
+	* patches/v8.0b1: Added directory and files in it. These are the
+	  patches to the tcl 8.0b1 core.
+
+	* generic/binio.c: See --enable-binio below. Added the appropriate
+	  ifdefs.
+
+	* unix/configure.in (--enable-shared): changed to
+	  --disable-shared, making build of shared libraries the default
+	  behaviour.
+	  (--enable-binio): new option to enable compilation of 'binio'
+	  command. Default: NO compilation. See commands 'binary' and
+	  'fcopy' of 8.0b1 for equivalent functionality.
+
+Fri May 30 23:49:38 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* generic/registry.c: compiles, only warnings due to unpatched
+	  core remain.
+
+	* generic/registry.c (TrfExecuteObjCmd): Added CONST to 'objv', as
+	  required by new API.
+	  (TrfReady): Excluded for 8.0b1, due to new notifier mechanism.
+	  (TrfGetFile): Updated to new interface.
+	  (TrfRegister): Updated command creation to changed interfacce of
+	  'Tcl_CreateObjCommand'. Updated initialisation of
+	  'entry->transtype', due to changed notifier.
+	  (TrfWatch): Updated to changed notifier ('watchChannelProc' now
+	  named 'watchProc').
+
+Thu May 29 21:16:05 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* All files, with exception of 'unstack.c', 'binio.c' and
+	  'registry.c' compile without flaws now. The named files depend
+	  (partially) on the patches to the core, and the C-API to
+	  channels. Near midnight, tackle them tomorrow.
+
+	* generic/bc_opt.c (SetOption): see 'SetOption' below.
+
+	* generic/zip_opt.c (CheckOptions): Removed special code to
+	  transfer string to object result. See below.
+	  (SetOption): changed 'long' to 'int' for 3rd arg. to 'Tcl_GetIntFromObj'.
+
+	* generic/util.c (TrfGetChannel): Disabled this code, not required
+	  anymore, see below.
+
+	* generic/transformInt.h (ADD_RES, RESET_RES): 8.0b1 has smoothed
+	  out the problems arising from having two results (string,
+	  obj). No dependency on version anymore. Definitions left in to
+	  avoid immediate conversion of all affected files.
+
+Wed May 24 22:11:25 1997  Andreas Kupries  <aku@bluepeak.westend.com>
+
+	* doc/man.tex, install.tex: Made urls into hyperlinks, at least in
+	  the HTML version of the manuals. Done in the last days.
+
 Wed May 21 18:16:42 1997  Andreas Kupries  <aku@bluepeak.westend.com>
 
 	* PREPARE: use newly installed 'latex2html' to generate and

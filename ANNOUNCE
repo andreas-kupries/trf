@@ -9,7 +9,24 @@ enabling you to do
 *	error correcting coding
 *	and data conversion (bin, hex, base64, ...)
 
+Abstract:
+	Trf extends the language at the C-level with so-called
+	``transformer''-procedures. With the help of some patches to the
+	core the package is able to intercept all read/write operations
+	on designated channels, thus giving it the ability to transform
+	the buffer contents as desired. This allows things like
+	transparent encryption, compression, charset recoding,
+	etc. Build upon this framework (and as proof of concept) a
+	collection of tcl-level commands was implemented, most of them
+	related to cryptography. Additionally some binary data support
+	is put in as well.
+
+
 Changes from b2 to b3:
+
+*	'binio' command supported, but not included by default, because
+	of equivalent functionality in 8.0b1, see 'binary' and 'fcopy'.
+	Configure option '--enable-binio'.
 
 *	Reorganized code into generic and os dependent parts.
 
@@ -20,8 +37,8 @@ Changes from b2 to b3:
 *	More algorithms: RC2, MD2, SHA-1	(SSLeay required)
 			 RIPEMD-160
 
-*	Commands created use the object-interface of tcl8.0a2 now.
-	Runs with 7.6 nevertheless, BUT NOT with 8.0a1.
+*	Commands created use the object-interface of tcl8.0b1 now.
+	Runs with 7.6 nevertheless, BUT NOT with 8.0a1 or a2.
 
 
 Changes from b1 to b2:
@@ -77,5 +94,6 @@ help me in making this package better.
 
 Enjoy,
 	Andreas Kupries <a.kupries@westend.com>	(private)
+			<http://www.westend.com/~kupries>
                         <aku@kisters.de>	(at work)
 -------------------------------------------------------------------------------

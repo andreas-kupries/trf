@@ -26,7 +26,7 @@ mInsertInfo \
 # I.   clean documentation
 # I.a  remove inofficial documents
 
-eval mExclude mails patches/v8.0a1 [glob patches/nijtmans.*] DEPENDS
+eval mExclude mails patches/v8.0a1 patches/v8.0a2 [glob patches/nijtmans.*] DEPENDS
 
 cd doc/speed
 exec /bin/ln -s		../../tests/sha.test.vec f1000000
