@@ -37,8 +37,7 @@ list of them:
 
 \begin{itemize}
 \item	\strong {\tcl}, of course. The package will compile with 7.6
-	and 8.0a2. Version 8.0a1 cannot be used anymore due to the
-	differences in the object API for commands.
+	and 8.0b1. Version 8.0a1/a2 cannot be used anymore.
 
 	This package requires manipulation of the core, hence a
 	\strong {source distribution} is required. Instructions on how
@@ -119,15 +118,9 @@ Now you have two choices.
 	{byteorder.patch}. The appropriate working directories are
 
 	\begin {tabular} {|l|l|} \hline
-	standard.patch	& tcl$<$version$>$/generic	\\ \hline
-	byteorder.patch	& \strong {see below}		\\ \hline
+	7.6, 7.6p2	& tcl$<$version$>$		\\ \hline
+	8.0b1		& tcl$<$version$>$/generic	\\ \hline
 	\end {tabular}
-
-	\strong {Danger}: The working directories required by the
-	byteorder patch differ between tcl 7.6 and 8.0b1. It is
-	tcl$<$version$>$/ for 7.6 and tcl$<$version$>$/generic for
-	8.0b1. I made some changes to the patch to remove the
-	dependency on \file {configure*}.
 
 	\strong {Remark}: The byteorder patch is required only if the
 	availability of command \cmd {binio} is desired. See the OS
