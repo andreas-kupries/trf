@@ -6,5 +6,9 @@
 
 This is the README file for the Macintosh version of the Tcl-Trf package.
 
-Neither do I possess nor do I have access to a Mac. Because of this a
-Macintosh version does not exist. Anybody out there to take up the task ?
+
+	I don't have a Mac, nor do I have access one. Because
+	of this I am unable to provide a Mac port of this
+	extension.  I will most happily integrate any required
+	changes, makefiles, et cetera into the distribution,
+	if they are send to me (a.kupries@westend.com).

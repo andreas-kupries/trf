@@ -28,7 +28,7 @@
  */
 
 
-#include <tcl.h>
+#include <transformInt.h>
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
@@ -37,9 +37,10 @@
  * Forward declarations of internal procedures.
  */
 
-static int	CopyCmd   _ANSI_ARGS_((Tcl_Interp *interp, int argc, char** argv));
-static int	PackCmd   _ANSI_ARGS_((Tcl_Interp *interp, int argc, char** argv));
-static int	UnpackCmd _ANSI_ARGS_((Tcl_Interp *interp, int argc, char** argv));
+static int CopyCmd   _ANSI_ARGS_((Tcl_Interp *interp, int argc, char** argv));
+static int PackCmd   _ANSI_ARGS_((Tcl_Interp *interp, int argc, char** argv));
+static int UnpackCmd _ANSI_ARGS_((Tcl_Interp *interp, int argc, char** argv));
+static int BinioCmd  _ANSI_ARGS_((ClientData notUsed, Tcl_Interp* interp, int argc, char** argv));
 
 static void	ReorderBytes _ANSI_ARGS_ ((char* buf, int len /*2,4,8*/));
 
@@ -904,7 +905,7 @@ long int*   result;
  *------------------------------------------------------*
  */
 	/* ARGSUSED */
-int
+static int
 BinioCmd (notUsed, interp, argc, argv)
 ClientData  notUsed;		/* Not used. */
 Tcl_Interp* interp;		/* Current interpreter. */
@@ -1003,6 +1004,7 @@ TrfInit_Binio (interp)
 Tcl_Interp* interp;
 {
   Tcl_CreateCommand (interp, "binio", BinioCmd,
-		     (ClientData) NULL, NULL);
+		     (ClientData) NULL,
+		     (Tcl_CmdDeleteProc *) NULL);
   return TCL_OK;
 }

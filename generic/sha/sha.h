@@ -9,7 +9,9 @@
 /* Useful defines & typedefs */
 
 typedef unsigned char BYTE;
+#ifndef __WIN32__
 typedef unsigned long LONG;
+#endif
 
 #define SHA_BLOCKSIZE		64
 #define SHA_DIGESTSIZE		20

@@ -1242,7 +1242,7 @@ Trf_Options        optInfo;
     } else {
       unsigned int i, c;
 
-      for (i=0; i < ((int) actuallyRead); i++) {
+      for (i=0; i < ((unsigned int) actuallyRead); i++) {
 	c = buf [i];
 	res = v->convertProc (control, c, interp,
 			      entry->trfType->clientData);

@@ -24,6 +24,9 @@
 #
 # TCL     = location where Tcl is installed.
 #
+# PKZIP	  =	name and path to pkzip archiver application
+#		(required for generation of binary distribution only)
+#
 
 ROOT		= ..
 TMPDIR		= .
@@ -31,6 +34,8 @@ TOOLS32		= c:\msdev
 TCL		= c:\tcl
 TCLSH		= $(TCL)\bin\tclsh80.exe
 TCLLIB		= $(TCL)\bin\tcl80.lib
+PKZIP		= pkzip.exe
+
 
 # Set this to the appropriate value of /MACHINE: for your platform
 MACHINE	= IX86
@@ -43,46 +48,47 @@ NODEBUG=1
 # Do not modify below this line
 ######################################################################
 
-TRFLIB		=	trf@TRF_nodotVERSION@.lib
-TRFDLL		=	trf@TRF_nodotVERSION@.dll
-INSTALLDIR	=	$(TCL)\trf@TRF_nodotVERSION@
+TRF		=	trf@TRF_nodotVERSION@
+TRFLIB		=	$(TRF).lib
+TRFDLL		=	$(TRF).dll
+INSTALLDIR	=	$(TCL)\lib\$(TRF)
 
 
 TRFOBJS = \
-	$(TMPDIR)\adler.o \
-	$(TMPDIR)\asc85code.o \
-	$(TMPDIR)\b64code.o \
-	$(TMPDIR)\bc_opt.o \
-	$(TMPDIR)\bc_util.o \
-	$(TMPDIR)\bincode.o \
-	$(TMPDIR)\binio.o \
-	$(TMPDIR)\blockcipher.o \
-	$(TMPDIR)\blowfish.o \
-	$(TMPDIR)\c_opt.o \
-	$(TMPDIR)\cipher.o \
-	$(TMPDIR)\convert.o \
-	$(TMPDIR)\crc.o \
-	$(TMPDIR)\crc_zlib.o \
-	$(TMPDIR)\des.o \
-	$(TMPDIR)\dig_opt.o \
-	$(TMPDIR)\digest.o \
-	$(TMPDIR)\haval.o \
-	$(TMPDIR)\hexcode.o \
-	$(TMPDIR)\idea.o \
-	$(TMPDIR)\init.o \
-	$(TMPDIR)\libdes.o \
-	$(TMPDIR)\md5.o \
-	$(TMPDIR)\octcode.o \
-	$(TMPDIR)\rc4.o \
-	$(TMPDIR)\registry.o \
-	$(TMPDIR)\rs_ecc.o \
-	$(TMPDIR)\sha.o \
-	$(TMPDIR)\unstack.o \
-	$(TMPDIR)\util.o \
-	$(TMPDIR)\uucode.o \
-	$(TMPDIR)\zip.o \
-	$(TMPDIR)\zip_opt.o \
-	$(TMPDIR)\zlib.o \
+	$(TMPDIR)\adler.obj \
+	$(TMPDIR)\asc85code.obj \
+	$(TMPDIR)\b64code.obj \
+	$(TMPDIR)\bc_opt.obj \
+	$(TMPDIR)\bc_util.obj \
+	$(TMPDIR)\bincode.obj \
+	$(TMPDIR)\binio.obj \
+	$(TMPDIR)\blockcipher.obj \
+	$(TMPDIR)\blowfish.obj \
+	$(TMPDIR)\c_opt.obj \
+	$(TMPDIR)\cipher.obj \
+	$(TMPDIR)\convert.obj \
+	$(TMPDIR)\crc.obj \
+	$(TMPDIR)\crc_zlib.obj \
+	$(TMPDIR)\des.obj \
+	$(TMPDIR)\dig_opt.obj \
+	$(TMPDIR)\digest.obj \
+	$(TMPDIR)\haval.obj \
+	$(TMPDIR)\hexcode.obj \
+	$(TMPDIR)\idea.obj \
+	$(TMPDIR)\init.obj \
+	$(TMPDIR)\libdes.obj \
+	$(TMPDIR)\md5.obj \
+	$(TMPDIR)\octcode.obj \
+	$(TMPDIR)\rc4.obj \
+	$(TMPDIR)\registry.obj \
+	$(TMPDIR)\rs_ecc.obj \
+	$(TMPDIR)\sha.obj \
+	$(TMPDIR)\unstack.obj \
+	$(TMPDIR)\util.obj \
+	$(TMPDIR)\uucode.obj \
+	$(TMPDIR)\zip.obj \
+	$(TMPDIR)\zip_opt.obj \
+	$(TMPDIR)\zlib.obj \
 	$(TMPDIR)\tclLoadWin.obj
 
 
@@ -99,7 +105,7 @@ WINDIR          = $(ROOT)\win
 GENERICDIR	= $(ROOT)\generic
 
 TRF_INCLUDES	= -I$(WINDIR) -I$(GENERICDIR) -I$(ROOT) -I$(TCL)\include
-TRF_DEFINES	= -nologo -D__WIN32__
+TRF_DEFINES	= -nologo -D__WIN32__ -DHAVE_STDLIB_H
 
 # meaning of -nologo ?
 #!include <ntwin32.mak> # thats this for?
@@ -198,18 +204,22 @@ test:	    $(TRFDLL)
 <<
 install:	$(TRFDLL)
 	md $(INSTALLDIR)
-	$(CP) $(TRFDLL)              $(INSTALLDIR)
-	$(CP) $(WINDIR)\pkgIndex.tcl $(INSTALLDIR)
+	$(CP) $(TRFDLL)              $(INSTALLDIR)\$(TRFDLL)
+	$(CP) $(WINDIR)\pkgIndex.tcl $(INSTALLDIR)\pkgIndex.tcl
 
 
 $(TRFDLL): $(TRFOBJS)
-	$(link) $(ldebug) $(dlllflags) $(TCLLIB) \
+	$(link32) $(ldebug) $(dlllflags) $(TCLLIB) \
 		$(guilibsdll) -out:$(TRFDLL) $(TRFOBJS)
 
-
-#
-# Special case object file targets
-#
+bindist:      $(TRFDLL)
+	-@md	$(TRF)
+	-@$(CP)	$(TRFDLL)		$(TRF)\$(TRFDLL)
+	-@$(CP)	$(WINDIR)\pkgIndex.tcl	$(TRF)\pkgIndex.tcl
+	$(PKZIP) -r $(TRF)bin.zip $(TRF)
+	-@$(RM)	$(TRF)\$(TRFDLL)
+	-@$(RM)	$(TRF)\pkgIndex.tcl
+	-@rd	$(TRF)
 
 #
 # Implicit rules
@@ -232,6 +242,6 @@ clean:
         -@del *.exp 
 	-@del *.lib 
 	-@del *.dll 
-	-@del *.exe
+	-@del *.pch
+	-@del *.pdb
         -@del $(TMPDIR)\*.obj
-        -@del $(TMPDIR)\*.def

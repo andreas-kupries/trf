@@ -10,6 +10,15 @@
 #include <windows.h>
 #include "transformInt.h"
 
+/*
+ * taken from "tcl/win/tclWinPort.h"
+ * enable usage of procedure internal to tcl
+ */
+
+EXTERN void
+TclWinConvertError _ANSI_ARGS_((DWORD errCode));
+
+
 typedef struct LibraryList {
     HINSTANCE handle;
     struct LibraryList *nextPtr;
@@ -21,7 +30,8 @@ static LibraryList *libraryList = NULL;	/* List of currently loaded DLL's.  */
  * Declarations for functions that are only used in this file.
  */
 
-static void 		UnloadLibraries _ANSI_ARGS_((ClientData clientData));
+static void
+UnloadLibraries _ANSI_ARGS_((ClientData clientData));
 
 
 /*

@@ -40,6 +40,36 @@
 #define TRF_MAJOR_VERSION	@MAJOR_VERSION@
 #define TRF_MINOR_VERSION	@MINOR_VERSION@
 
+
+/*
+ * Definitions to enable the generation of a DLL under Windows.
+ * Taken from 'ftp://ftp.sunlabs.com/pub/tcl/example.zip(example.c)'
+ */
+
+#if defined(__WIN32__)
+#   define WIN32_LEAN_AND_MEAN
+#   include <windows.h>
+#   undef WIN32_LEAN_AND_MEAN
+
+/*
+ * VC++ has an alternate entry point called DllMain, so we need to rename
+ * our entry point.
+ */
+
+#   if defined(_MSC_VER)
+#	define TRF_EXPORT(a,b) __declspec(dllexport) a b
+#	define DllEntryPoint DllMain
+#   else
+#	if defined(__BORLANDC__)
+#	    define TRF_EXPORT(a,b) a _export b
+#	else
+#	    define TRF_EXPORT(a,b) a b
+#	endif
+#   endif
+#else
+#   define TRF_EXPORT(a,b) a b
+#endif
+
 /*
  * Exported tcl level procedures.
  *
@@ -62,8 +92,7 @@
 EXTERN int
 Trf_Init (Tcl_Interp* interp /* interpreter to initialize */);
 #else
-EXTERN int
-Trf_Init _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN TRF_EXPORT (int,Trf_Init) _ANSI_ARGS_ ((Tcl_Interp* interp));
 #endif
 
 /*
@@ -79,8 +108,7 @@ Trf_Init _ANSI_ARGS_ ((Tcl_Interp* interp));
 EXTERN int
 Trf_SafeInit (Tcl_Interp* interp /* interpreter to initialize */);
 #else
-EXTERN int
-Trf_SafeInit _ANSI_ARGS_ ((Tcl_Interp* interp));
+EXTERN TRF_EXPORT (int,Trf_SafeInit) _ANSI_ARGS_ ((Tcl_Interp* interp));
 #endif
 
 /*

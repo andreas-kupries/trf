@@ -29,6 +29,8 @@
 
 #include	"transformInt.h"
 
+static int
+TrfUnstackCmd _ANSI_ARGS_ ((ClientData notUsed, Tcl_Interp* interp, int argc, char** argv))
 
 /*
  *----------------------------------------------------------------------
@@ -47,7 +49,7 @@
  *----------------------------------------------------------------------
  */
 
-int
+static int
 TrfUnstackCmd(notUsed, interp, argc, argv)
     ClientData notUsed;			/* Not used. */
     Tcl_Interp *interp;			/* Current interpreter. */
@@ -100,7 +102,8 @@ TrfInit_Unstack (interp)
 Tcl_Interp* interp;
 {
   Tcl_CreateCommand (interp, "unstack", TrfUnstackCmd,
-		     (ClientData) NULL, NULL);
+		     (ClientData) NULL,
+		     (Tcl_CmdDeleteProc *) NULL);
 
   return TCL_OK;
 }

@@ -211,10 +211,10 @@ VOID* digest;
   char*   out = (char*) digest;
 
   /* BIGENDIAN output */
-  out [0] = (adler >> 24) & 0xff;
-  out [1] = (adler >> 16) & 0xff;
-  out [2] = (adler >>  8) & 0xff;
-  out [3] = (adler >>  0) & 0xff;
+  out [0] = (char) ((adler >> 24) & 0xff);
+  out [1] = (char) ((adler >> 16) & 0xff);
+  out [2] = (char) ((adler >>  8) & 0xff);
+  out [3] = (char) ((adler >>  0) & 0xff);
 }
 
 /*

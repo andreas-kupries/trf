@@ -121,7 +121,7 @@ VOID** d_schedule;
       if (*d_schedule != NULL) {
 	memcpy (*e_schedule, *d_schedule, KEYSCHEDULE_SIZE);
       } else {
-	InitializeBlowfish ((unsigned char*) key, key_length,
+	InitializeBlowfish ((unsigned char*) key, (short) key_length,
 			    (Blowfish_keyschedule*) *e_schedule);
       }
     }
@@ -132,7 +132,7 @@ VOID** d_schedule;
       if (*e_schedule != NULL) {
 	memcpy (*d_schedule, *e_schedule, KEYSCHEDULE_SIZE);
       } else {
-	InitializeBlowfish ((unsigned char*) key, key_length,
+	InitializeBlowfish ((unsigned char*) key, (short) key_length,
 			    (Blowfish_keyschedule*) *d_schedule);
       }
 
