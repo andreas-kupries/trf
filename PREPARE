@@ -70,6 +70,8 @@ mExclude \
 	unix/bdist/ak.3 unix/bdist/ak.4 \
 	win/bdist/cygwin.jan.17.1 win/bdist/jan.2
 
+file rename win/bdist/jan.4 xx
+
 mHandleBinaryDistributions \
 	doc/license.terms README \
 	win/bdist/crypt.dll \
@@ -79,9 +81,7 @@ mHandleBinaryDistributions \
 	win/bdist/NOTE.crypt \
 	unix/bdist/libcrypt.so
 
-eval mExclude \
-	win/bdist/jan.3 \
-	[glob unix/bdist/*]
+file rename xx win/bdist/jan.4
 
 mHandleBinaryDistributions \
 	doc/license.terms README \
