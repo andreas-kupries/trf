@@ -57,6 +57,12 @@ eval mExclude \
 	patches/v8.1/gendiff patches/v8.1/getorig patches/v8.1/genstubs \
 	patches/v8.1/getcurrent patches/v8.1/setorig
 
+
+file delete -force win/bdist ; # no win release yet.
+#mHandleBinaryDistributions
+mHandleBinaryDistributions doc/license.terms README win/msvcrt.dll
+
+
 # I.b  generate official manual, diverse variants (dvi, ps)
 mLog info generating manual 
 
@@ -104,9 +110,6 @@ exec ./capibase > nodes/capi.node
 
 # Now generate documentation for linkage into my
 # site and standalone distribution
-
-#mHandleBinaryDistributions
-mHandleBinaryDistributions doc/license.terms README win/msvcrt.dll
 
 # -up-man assumes that the document is part of the
 # hierarchy at http://www.westend.com/~kupries

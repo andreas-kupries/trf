@@ -8,7 +8,7 @@ node trf_where {
     parent      trf_home
 
     menu {
-	memchan_bdist
+	trf_bdist
     }
 
     contents {
@@ -50,7 +50,7 @@ node trf_where {
 	    table_row bgcolor=#ffffcc {
 		table_data {
 		    p "The binary distributions are on a separate page."
-		    p [link memchan_bdist]
+		    p [link trf_bdist]
 		}
 	    }
 	}
