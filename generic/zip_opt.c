@@ -282,7 +282,7 @@ ClientData  clientData;
       res = Tcl_GetIntFromObj (interp, (Tcl_Obj*) optvalue, &v);
       val = v;
 #else
-      res = Tcl_GetInt        (interp, optvalue, &val);
+      res = Tcl_GetInt        (interp, (char*) optvalue, &val);
 #endif
 
       if (res != TCL_OK) {

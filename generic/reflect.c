@@ -652,7 +652,7 @@ cleanup:
   Tcl_DStringAppend        (&command, op, -1);
   Tcl_DStringAppendElement (&command, buf);
 
-  res = Tcl_GlobalEval (c->interp, command->string);
+  res = Tcl_GlobalEval (c->interp, command.string);
 
   Tcl_DStringFree (&command);
 
@@ -660,7 +660,7 @@ cleanup:
     /* copy error message from 'c->interp' to actual 'interp'. */
 
     if ((interp != (Tcl_Interp*) NULL) && (c->interp != interp)) {
-      Tcl_SetResult (interp, c->interp->result);
+      Tcl_SetResult (interp, c->interp->result, TCL_VOLATILE);
     }
 
     return res;
