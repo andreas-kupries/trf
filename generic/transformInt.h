@@ -382,6 +382,10 @@ TrfBZ2Options _ANSI_ARGS_ ((void));
 #undef  ZEXPORT
 #define ZEXPORT WINAPI
 #endif
+#ifdef HAVE_zlibtcl_PACKAGE
+#undef  ZEXPORT
+#define ZEXPORT
+#endif
 
 /*
  * 'zlib' will be dynamically loaded. Following a structure to
