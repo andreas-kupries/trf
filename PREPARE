@@ -70,30 +70,24 @@ mExclude \
 	unix/bdist/ak.3 unix/bdist/ak.4 \
 	win/bdist/cygwin.jan.17.1 win/bdist/jan.2
 
-file rename win/bdist/jan.4        xx
-file copy   win/bdist/WARNING.zlib xx.wz
-file copy   win/bdist/NOTE.crypt   xx.nc
+cd win/bdist
+
+if {0} {
+    foreach f {WARNING.zlib NOTE.crypt} {
+	file copy   $f jan.3/
+	file copy   $f jan.4/
+	file delete $f
+    }
+}
+foreach f {bz2.dll zlib.dll crypt.dll} {
+    file rename $f jan.3/
+}
 
 mHandleBinaryDistributions \
 	doc/license.terms README \
-	win/bdist/crypt.dll \
-	win/bdist/bz2.dll \
-	win/bdist/zlib.dll \
 	win/bdist/WARNING.zlib \
 	win/bdist/NOTE.crypt \
 	unix/bdist/libcrypt.so
-
-file mkdir        win/bdist
-file rename xx    win/bdist/jan.4
-file rename xx.wz win/bdist/WARNING.zlib 
-file rename xx.nc win/bdist/NOTE.crypt
-
-
-mHandleBinaryDistributions \
-	doc/license.terms README \
-	win/bdist/WARNING.zlib \
-	win/bdist/NOTE.crypt
-
 
 # I.b  generate official manual, diverse variants (dvi, ps)
 mLog info generating manual 
