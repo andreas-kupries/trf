@@ -10,14 +10,20 @@ proc url {code text url} {
 
 # -------------------------------------------------
 
-url tcl       [lang tcl]               http://sunscript.sun.com
-url sun       Sun                      http://sunscript.sun.com
-url scriptics Scriptics                http://www.scriptics.com
+url tcl       [lang tcl]               http://sunscript.sun.com/
+url sun       Sun                      http://sunscript.sun.com/
+url scriptics Scriptics                http://www.scriptics.com/
+url consortium "Tcl/Tk Consortium"     http://www.tclconsortium.org/
+
 url PGP       PGP                      http://www.pgp.com/
 url NIST      NIST                     http://www.nist.gov/
 url rsadsi    {RSA Data Security, Inc} http://www.rsa.com/
 url ascom     {Ascom-Tech AG}          http://wwwtech.ascom.ch/
 url pgplib    PGPlib                   ftp://dslab1.cs.uit.no/pub/PGPlib.tar.gz
+url povray    povray                   http://www.povray.org/
+
+url imagick   ImageMagick \
+	http://www.wizards.dupont.com/cristy/ImageMagick.html
 
 url rmd       RIPEMD-160 \
 	http://www.esat.kuleuven.ac.be/%7Ebosselae/ripemd160.html
@@ -91,3 +97,6 @@ if {[info exists ::westend]} {
     link memchan    Memchan \
             http://www.westend.com/~kupries/tcltk.html
 }
+
+
+url trf_logo [imglink trf_logo] trf_logo.html
