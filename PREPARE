@@ -30,7 +30,7 @@ set mInfo(@TRF_LIB_FILE@)    "trf$mInfo(@mShortDosVersion@).dll"
 eval mInsertInfo \
 	win/README      win/pkgIndex.tcl \
 	win/makefile.vc win/makefile.vc5 win/Makefile.gnu win/Makefile.cross \
-	win/trf.rc [glob win/trf*.README]
+	win/trf.rc
 
 mGetDescription
 mExpandUrls
