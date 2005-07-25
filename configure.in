@@ -3,65 +3,16 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_REVISION($Id$)
 
+AC_INIT([Trf],[2.1])
+
+TEA_INIT([3.2])
+
+AC_CONFIG_AUX_DIR(tclconfig)
+
 #--------------------------------------------------------------------
 # Configure script for package 'trf', as distributed at November 20, 2001.
 # TEA compliant.
 #--------------------------------------------------------------------
-
-#--------------------------------------------------------------------
-# This very first macro is used to verify that the configure script can 
-# find the sources.  The argument to AC_INIT is a unique filename for
-# this package.
-#--------------------------------------------------------------------
-
-AC_INIT(./generic/trf.decls)
-
-AC_CONFIG_AUX_DIR(tclconfig)
-CONFIGDIR=${srcdir}/tclconfig
-AC_SUBST(CONFIGDIR)
-
-#--------------------------------------------------------------------
-# Setting our package name and version numbers.  The NODOT_VERSION is
-# required for constructing the library name on systems that don't like
-# dots in library names (Windows).  The VERSION variable is used on the
-# other systems.
-#--------------------------------------------------------------------
-
-PACKAGE=Trf
-
-MAJOR_VERSION=2
-MINOR_VERSION=1
-#MAJOR_VERSION=10
-#MINOR_VERSION=0
-PATCHLEVEL=
-
-VERSION=${MAJOR_VERSION}.${MINOR_VERSION}${PATCHLEVEL}
-NODOT_VERSION=${MAJOR_VERSION}${MINOR_VERSION}
-TRF_VERSION=${VERSION}
-
-AC_SUBST(PACKAGE)
-AC_SUBST(VERSION)
-AC_SUBST(TRF_VERSION)
-
-# This package name must be replaced statically for AC_SUBST to work
-AC_SUBST(Trf_LIB_FILE)
-# Substitute stub_LIB_FILE if your package creates a stub library too.
-AC_SUBST(Trfstub_LIB_FILE)
-
-#--------------------------------------------------------------------
-# This was placed here so that we can compile with -DVERSION="1.2" to
-# encode the package version directly into the source files.
-#--------------------------------------------------------------------
-
-eval AC_DEFINE_UNQUOTED(VERSION, "${VERSION}")
-eval AC_DEFINE_UNQUOTED(TRF_VERSION, "${TRF_VERSION}")
-
-#--------------------------------------------------------------------
-# Call TEA_INIT as the first TEA_ macro to set up initial vars.
-# This will define a ${TEA_PLATFORM} variable == "unix" or "windows".
-#--------------------------------------------------------------------
-
-TEA_INIT
 
 #--------------------------------------------------------------------
 # Load the tclConfig.sh file
@@ -70,7 +21,7 @@ TEA_INIT
 TEA_PATH_TCLCONFIG
 TEA_LOAD_TCLCONFIG
 
-TEA_PATH_CONFIG(zlibtcl,optional)
+TEA_PATH_CONFIG_X(zlibtcl,optional)
 if test $HAVE_zlibtcl_PACKAGE -gt 0 ; then
     TEA_LOAD_CONFIG(zlibtcl)
 
@@ -91,8 +42,8 @@ if test $HAVE_zlibtcl_PACKAGE -gt 0 ; then
     zlibtcl_BUILD_PATH="`dirname $zlibtcl_BUILD_STUB_LIB_PATH`"
 
     if test "${TEA_PLATFORM}" = "windows" ; then
-	zlibtcl_SRC_PATH="\"`$CYGPATH $zlibtcl_SRC_PATH`\""
-	zlibtcl_BUILD_PATH="\"`$CYGPATH $zlibtcl_BUILD_PATH`\""
+	zlibtcl_SRC_PATH="`$CYGPATH $zlibtcl_SRC_PATH`"
+	zlibtcl_BUILD_PATH="`$CYGPATH $zlibtcl_BUILD_PATH`"
     fi
 fi
 
@@ -116,6 +67,51 @@ TEA_PREFIX
 
 TEA_SETUP_COMPILER
 
+#-----------------------------------------------------------------------
+# Specify the C source files to compile in TEA_ADD_SOURCES,
+# public headers that need to be installed in TEA_ADD_HEADERS,
+# stub library C source files to compile in TEA_ADD_STUB_SOURCES,
+# and runtime Tcl library files in TEA_ADD_TCL_SOURCES.
+# This defines PKG(_STUB)_SOURCES, PKG(_STUB)_OBJECTS, PKG_HEADERS
+# and PKG_TCL_SOURCES.
+#-----------------------------------------------------------------------
+
+TEA_ADD_SOURCES([zlib.c bz2lib.c loadman.c init.c registry.c unstack.c load.c crypt.c])
+
+TEA_ADD_SOURCES([convert.c util.c ref_opt.c])
+TEA_ADD_SOURCES([bincode.c hexcode.c octcode.c])
+TEA_ADD_SOURCES([uucode.c b64code.c asc85code.c])
+TEA_ADD_SOURCES([otpcode.c qpcode.c reflect.c])
+
+TEA_ADD_SOURCES([dig_opt.c digest.c])
+TEA_ADD_SOURCES([crc.c crc_zlib.c adler.c])
+TEA_ADD_SOURCES([md5dig.c haval.c sha.c md2.c sha1.c])
+TEA_ADD_SOURCES([rmd160.c rmd128.c])
+TEA_ADD_SOURCES([otpmd5.c otpsha1.c])
+
+TEA_ADD_SOURCES([rs_ecc.c])
+TEA_ADD_SOURCES([zip_opt.c zip.c bz2_opt.c bz2.c])
+
+TEA_ADD_SOURCES([trfStubInit.c])
+TEA_ADD_HEADERS([generic/transform.h generic/trfDecls.h])
+
+TEA_ADD_INCLUDES([-I\"`\${CYGPATH} \${srcdir}/generic`\"])
+TEA_ADD_INCLUDES([-I\"`\${CYGPATH} \${zlibtcl_SRC_PATH}`\"])
+TEA_ADD_INCLUDES([-I\"`\${CYGPATH} \${zlibtcl_BUILD_PATH}`\"])
+TEA_ADD_INCLUDES([-I\${ZLIB_INCLUDE_DIR}])
+TEA_ADD_INCLUDES([-I\${SSL_INCLUDE_DIR}])
+TEA_ADD_INCLUDES([-DLIBZ_DEFAULTNAME=\\\"libz${SHLIB_SUFFIX}\\\"])
+AC_SUBST(SHLIB_SUFFIX)
+
+
+TEA_ADD_LIBS([])
+TEA_ADD_CFLAGS([])
+TEA_ADD_CFLAGS([-DZLIBTCL_VERSION=\\\"${zlibtcl_VERSION}\\\"])
+
+TEA_ADD_STUB_SOURCES([trfStubLib.c])
+dnl TEA_ADD_SOURCES([trfStubLib.c])
+TEA_ADD_TCL_SOURCES([])
+
 #--------------------------------------------------------------------
 # If ltoa is present, use it to convert integer values into strings.
 # If not, sprintf is used, which is slower and requires more code.
@@ -130,7 +126,7 @@ if test "${TEA_PLATFORM}" = "windows" ; then
     AC_MSG_RESULT([no (Windows)])
     HAS_LIBCRYPT=0
 else
-    AC_CHECK_LIB(crypt, main,         HAS_LIBCRYPT=1,     HAS_LIBCRYPT=0)
+    AC_CHECK_LIB(crypt, main, HAS_LIBCRYPT=1, HAS_LIBCRYPT=0)
 fi
 AC_CHECK_LIB(crypt, md5_init_ctx, HAS_LIBCRYPT_MD5=1, HAS_LIBCRYPT_MD5=0)
 
@@ -150,9 +146,9 @@ EOF
 ${TCL_CC-cc} -c $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext 1>&5
 if test "x`nm conftest.o |grep __eprintf`" != "x"; then
     AC_MSG_RESULT(yes)
-    EP_OBJS="_eprintf.o"
+
+    TEA_ADD_SOURCES([compat/_eprintf.c])
 else
-    EP_OBJS=""
     AC_MSG_RESULT(no)
 fi
 
@@ -197,13 +193,10 @@ esac
 if test "${TEA_PLATFORM}" = "windows" ; then
     AC_DEFINE(BUILD_Trf)
     CLEANFILES="pkgIndex.tcl *.lib *.dll *.exp *.ilk *.pdb vc*.pch"
-    EXTRA_SOURCES='$(WIN_SOURCES)'
 else
     CLEANFILES="pkgIndex.tcl"
-    EXTRA_SOURCES='$(UNIX_SOURCES)'
 fi
 AC_SUBST(CLEANFILES)
-AC_SUBST(EXTRA_SOURCES)
 
 #--------------------------------------------------------------------
 # Check whether --enable-threads or --disable-threads was given.
@@ -256,14 +249,11 @@ TEA_MAKE_LIB
 # Add platform libs to LIBS or SHLIB_LD_LIBS as necessary.
 #--------------------------------------------------------------------
 
-if test $HAVE_zlibtcl_PACKAGE -gt 0 ; then
-    if test "${TEA_PLATFORM}" = "windows" -a "$GCC" != "yes" ; then
-	SHLIB_LD_LIBS="${SHLIB_LD_LIBS} \"`${CYGPATH} ${zlibtcl_STUB_LIB_PATH}`\""
-    else
-	SHLIB_LD_LIBS="${SHLIB_LD_LIBS} ${zlibtcl_STUB_LIB_SPEC}"
-    fi
+if test "${TEA_PLATFORM}" = "windows" -a "$GCC" != "yes" ; then
+    TEA_ADD_LIBS([\"`${CYGPATH} ${zlibtcl_STUB_LIB_PATH}`\"])
+else
+    TEA_ADD_LIBS([${zlibtcl_STUB_LIB_SPEC}])
 fi
-AC_SUBST(SHLIB_SUFFIX)
 
 #--------------------------------------------------------------------
 # Find tclsh so that we can run pkg_mkIndex to generate the pkgIndex.tcl
@@ -280,20 +270,17 @@ TEA_PROG_TCLSH
 # Propagate the information about the required loader file.
 #--------------------------------------------------------------------
 
-if test "x${DL_OBJS}" = "xtclLoadDl.o"
-then
-    DL_OBJS=""
-fi
 case "`uname -s`" in
     *win32* | *WIN32* | *CYGWIN_NT* | *CYGWIN_98* | *CYGWIN_95*)
-	DL_OBJS="tclLoadWin.obj"
+	TEA_ADD_SOURCES([compat/tclLoadWin.c])
     ;;
     *)
+	if test "x${DL_OBJS}" != "xtclLoadDl.o"
+	then
+	    TEA_ADD_SOURCES([compat/`basename ${DL_OBJS} .o`.c])
+	fi
     ;;
 esac
-
-DL_OBJS="${DL_OBJS} ${EP_OBJS}"
-AC_SUBST(DL_OBJS)
 
 #--------------------------------------------------------------------
 # Locate supporting libraries
@@ -317,7 +304,7 @@ then
 	## TRF_DEFS="$TRF_DEFS -DCRYPT_LIB_NAME=\\\"NONE\\\""
 	eval AC_DEFINE_UNQUOTED(MD5_STATIC_BUILD, 1)
 
-	EXTRA_SOURCES="\$(Md5_SOURCES)"
+	TEA_ADD_SOURCES([md5-crypt/crypt-entry.c md5-crypt/md5-crypt.c md5-crypt/md5.c compat/stpncpy.c])
 else
 	# (2,3)
 	if test \( $HAS_LIBCRYPT_MD5 -eq 0 \)
@@ -339,7 +326,7 @@ else
 
 		eval AC_DEFINE_UNQUOTED(MD5_STATIC_BUILD, 1)
 
-		EXTRA_SOURCES="\$(Md5_SOURCES)"
+		TEA_ADD_SOURCES([md5-crypt/crypt-entry.c md5-crypt/md5-crypt.c md5-crypt/md5.c compat/stpncpy.c])
 	fi
 fi
 

@@ -1,3 +1,110 @@
+#------------------------------------------------------------------------
+# TEA_PATH_CONFIG --
+#
+#	Locate the ${1}Config.sh file and perform a sanity check on
+#	the ${1} compile flags.  These are used by packages like
+#	[incr Tk] that load *Config.sh files from more than Tcl and Tk.
+#
+#	Normally aborts if the package could not be found. This can be
+#	supressed by specifying a second argument with a value of "optional".
+#
+# Arguments:
+#	$1	Name of the package to look for.
+#	$2	Optional: Flag. If present and $2 == "optional"
+#               then the script will _not_ abort when failing to
+#		find the package.
+#
+# Results:
+#
+#	Adds the following arguments to configure:
+#		--with-$1=...
+#
+#	Defines the following vars:
+#		$1_BIN_DIR	Full path to the directory containing
+#				the $1Config.sh file
+#                               Contains a shell comment if nothing was found
+#               HAVE_$1_PACKAGE Boolean 1 = Package found.
+#------------------------------------------------------------------------
+
+AC_DEFUN(TEA_PATH_CONFIG_X, [
+    #
+    # Ok, lets find the $1 configuration
+    # First, look for one uninstalled.
+    # the alternative search directory is invoked by --with-$1
+    #
+
+    if test x"${no_$1}" = x ; then
+	# we reset no_$1 in case something fails here
+	no_$1=true
+	AC_ARG_WITH($1, [  --with-$1              directory containing $1 configuration ($1Config.sh)], with_$1config=${withval})
+	AC_MSG_CHECKING([for $1 configuration])
+	AC_CACHE_VAL(ac_cv_c_$1config,[
+
+	    # First check to see if --with-$1 was specified.
+	    if test x"${with_$1config}" != x ; then
+		if test -f "${with_$1config}/$1Config.sh" ; then
+		    ac_cv_c_$1config=`(cd ${with_$1config}; pwd)`
+		else
+		    AC_MSG_ERROR([${with_$1config} directory doesn't contain $1Config.sh])
+		fi
+	    fi
+
+	    # then check for a private $1 installation
+	    if test x"${ac_cv_c_$1config}" = x ; then
+		for i in \
+			../$1 \
+			`ls -dr ../$1[[8-9]].[[0-9]]* 2>/dev/null` \
+			../../$1 \
+			`ls -dr ../../$1[[8-9]].[[0-9]]* 2>/dev/null` \
+			../../../$1 \
+			`ls -dr ../../../$1[[8-9]].[[0-9]]* 2>/dev/null` \
+			${srcdir}/../$1 \
+			`ls -dr ${srcdir}/../$1[[8-9]].[[0-9]]* 2>/dev/null` \
+			; do
+		    if test -f "$i/$1Config.sh" ; then
+			ac_cv_c_$1config=`(cd $i; pwd)`
+			break
+		    fi
+		    if test -f "$i/unix/$1Config.sh" ; then
+			ac_cv_c_$1config=`(cd $i/unix; pwd)`
+			break
+		    fi
+		done
+	    fi
+
+	    # check in a few common install locations
+	    if test x"${ac_cv_c_$1config}" = x ; then
+		for i in `ls -d ${exec_prefix}/lib 2>/dev/null` \
+			`ls -d ${prefix}/lib 2>/dev/null` \
+			`ls -d /usr/local/lib 2>/dev/null` \
+			`ls -d /usr/contrib/lib 2>/dev/null` \
+			`ls -d /usr/lib 2>/dev/null` \
+			; do
+		    if test -f "$i/$1Config.sh" ; then
+			ac_cv_c_$1config=`(cd $i; pwd)`
+			break
+		    fi
+		done
+	    fi
+	])
+
+	if test x"${ac_cv_c_$1config}" = x ; then
+	    $1_BIN_DIR="# no $1 configs found"
+	    AC_MSG_WARN("Cannot find $1 configuration definitions")
+	    if test "X$2" != "Xoptional" ; then
+		exit 0
+	    fi
+	    HAVE_$1_PACKAGE=0
+	else
+	    no_$1=
+	    $1_BIN_DIR=${ac_cv_c_$1config}
+	    AC_MSG_RESULT([found $$1_BIN_DIR/$1Config.sh])
+	    HAVE_$1_PACKAGE=1
+	    AC_DEFINE([HAVE_$1_PACKAGE])
+	fi
+    fi
+])
+
 
 AC_DEFUN(TRF_FIND_ZLIB_SSL, [
 
@@ -159,7 +266,7 @@ AC_CACHE_CHECK(for libz library,
             break
         fi
 
-        for libsuff in .so ".so.*" .sl .a; do
+        for libsuff in .so ".so.*" .sl .a .dylib; do
 	    if test -n "$trf_cv_lib_ZLIB_LIB_DIR"; then
                     break
             fi
@@ -178,7 +285,7 @@ else
 fi
 
 AC_SUBST(ZLIB_LIB_DIR)
-AC_CACHE_VAL(trf_cv_ZLIB_LIB_DIR, [trf_cv_ZLIB_LIB_DIR="$ZLIB_LIB_DIR"])
+dnl AC_CACHE_VAL(trf_cv_ZLIB_LIB_DIR, [trf_cv_ZLIB_LIB_DIR="$ZLIB_LIB_DIR"])
 
 
 dnl ----------------------------------------------------------------
@@ -277,7 +384,7 @@ AC_CACHE_CHECK(for ssl libcrypto library (for message digests),
             break
         fi
 
-        for libsuff in .so ".so.*" .sl .a; do
+        for libsuff in .so ".so.*" .sl .a .dylib; do
 	    if test -n "$trf_cv_lib_SSL_LIB_DIR"; then
                     break
             fi
@@ -296,7 +403,7 @@ else
 fi
 
 AC_SUBST(SSL_LIB_DIR)
-AC_CACHE_VAL(trf_cv_SSL_LIB_DIR, [trf_cv_SSL_LIB_DIR="$SSL_LIB_DIR"])
+dnl AC_CACHE_VAL(trf_cv_SSL_LIB_DIR, [trf_cv_SSL_LIB_DIR="$SSL_LIB_DIR"])
 
 
 dnl ----------------------------------------------------------------
@@ -327,7 +434,7 @@ AC_CACHE_CHECK(for bz2 compressor library,
             break
         fi
 
-        for libsuff in .so ".so.*" .sl .a; do
+        for libsuff in .so ".so.*" .sl .a .dylib; do
 	    if test -n "$trf_cv_lib_BZ2_LIB_DIR"; then
                     break
             fi
@@ -347,7 +454,7 @@ else
 fi
 
 AC_SUBST(BZ2_LIB_DIR)
-AC_CACHE_VAL(trf_cv_BZ2_LIB_DIR, [trf_cv_BZ2_LIB_DIR="$BZ2_LIB_DIR"])
+dnl AC_CACHE_VAL(trf_cv_BZ2_LIB_DIR, [trf_cv_BZ2_LIB_DIR="$BZ2_LIB_DIR"])
 
 
 if test "x$ZLIB_STATIC" = "xyes"

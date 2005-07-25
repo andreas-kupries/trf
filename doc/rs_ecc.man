@@ -11,7 +11,7 @@ buffering 247 bytes.
 [para]
 [list_begin definitions]
 
-[call [cmd [vset encoding]] [opt [arg options...]] [opt [arg data]]]
+[call [cmd rs_ecc] [opt [arg options...]] [opt [arg data]]]
 
 [list_begin definitions]
 

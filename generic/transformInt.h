@@ -668,14 +668,14 @@ EXTERN void TrfUnlockIt _ANSI_ARGS_ ((void));
  */
 
 #if !(GT81)
-#define PROVIDE(interp,stubs) Tcl_PkgProvide ((interp), "Trf", TRF_VERSION);
+#define PROVIDE(interp,stubs) Tcl_PkgProvide ((interp), PACKAGE_NAME, PACKAGE_VERSION);
 #else
 #ifndef __WIN32__
 #define PROVIDE(interp,stubs) \
-    Tcl_PkgProvideEx ((interp), "Trf", TRF_VERSION, (ClientData) &(stubs)); \
-    Trf_InitStubs    ((interp), TRF_VERSION, 0);
+    Tcl_PkgProvideEx ((interp), PACKAGE_NAME, PACKAGE_VERSION, (ClientData) &(stubs)); \
+    Trf_InitStubs    ((interp), PACKAGE_VERSION, 0);
 #else
-#define PROVIDE(interp,stubs) Tcl_PkgProvideEx ((interp), "Trf", TRF_VERSION, (ClientData) &(stubs));
+#define PROVIDE(interp,stubs) Tcl_PkgProvideEx ((interp), PACKAGE_NAME, PACKAGE_VERSION, (ClientData) &(stubs));
 #endif
 #endif
 
