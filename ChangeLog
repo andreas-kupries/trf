@@ -1,3 +1,11 @@
+2005-10-06  Andreas Kupries <andreask@activestate.com>
+
+	* generic/rmd128.c (MDrmd128_UpdateBuf): Fixed length-dependent
+	* generic/rmd160.c (MDrmd160_UpdateBuf): miscalculation of the
+	  hash value. A bad condition for the loop processing the chunks
+	  in the incoming buffer caused it to ignore the last one if we
+	  got full multiples of 64 bytes. Fixes [SF Trf Bug 1119773].
+
 2004-02-18  Andreas Kupries  <andreask@activestate.com>
 
 	* tests/base64.test: Extended the tests to use not only memchan,

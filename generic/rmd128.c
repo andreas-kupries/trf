@@ -45,7 +45,7 @@
 
 typedef struct ripemd_context {
   dword state [5];		/* state variables of ripemd-128 */
-  byte  buf   [CHUNK_SIZE];	/* buffer of 15-dword's          */
+  byte  buf   [CHUNK_SIZE];	/* buffer of 16-dword's          */
   byte  byteCount;		/* number of bytes in buffer     */
   dword lowc;			/* lower half of a 64bit counter */
   dword highc;			/* upper half of a 64bit counter */
@@ -234,7 +234,7 @@ int   bufLen;
       bufLen -= k;
     } /* k == CHUNK_SIZE => internal buffer was empty, so skip it entirely */
 
-    while (bufLen > CHUNK_SIZE) {
+    while (bufLen >= CHUNK_SIZE) {
       CountLength (ctx, CHUNK_SIZE);
 
 #ifdef WORDS_BIGENDIAN
@@ -250,8 +250,9 @@ int   bufLen;
     }
 
     ctx->byteCount = bufLen;
-    if (bufLen > 0)
+    if (bufLen > 0) {
       memcpy ((VOID*) ctx->buf, (VOID*) buffer, bufLen);
+    }
   }
 }
 
