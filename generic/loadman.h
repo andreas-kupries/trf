@@ -96,10 +96,10 @@ typedef struct Md2Functions {
 
 typedef struct Md5Functions {
   long loaded;
-  void (* init)   _ANSI_ARGS_ ((struct md5_ctx* c));
-  void (* update) _ANSI_ARGS_ ((unsigned char* data, unsigned long length,
+  void (* init)   __P ((struct md5_ctx* c));
+  void (* update) __P ((unsigned char* data, unsigned long length,
 				struct md5_ctx* c));
-  void (* final)  _ANSI_ARGS_ ((struct md5_ctx* c, unsigned char* digest));
+  void* (* final)  __P ((struct md5_ctx* c, unsigned char* digest));
 
   const char* (* crypt) _ANSI_ARGS_ ((const char* key, const char* salt));
 

@@ -73,6 +73,35 @@ extern "C" {
 #endif
 #endif
 
+
+/*
+ * Ensure WORDS_BIGENDIAN is defined correcly:
+ * Needs to happen here in addition to configure to work with fat compiles on
+ * Darwin (where configure runs only once for multiple architectures).
+ */
+
+#ifdef HAVE_SYS_TYPES_H
+#    include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_PARAM_H
+#    include <sys/param.h>
+#endif
+#ifdef BYTE_ORDER
+#    ifdef BIG_ENDIAN
+#        if BYTE_ORDER == BIG_ENDIAN
+#            undef WORDS_BIGENDIAN
+#            define WORDS_BIGENDIAN 1
+#        endif
+#    endif
+#    ifdef LITTLE_ENDIAN
+#        if BYTE_ORDER == LITTLE_ENDIAN
+#            undef WORDS_BIGENDIAN
+#        endif
+#    endif
+#endif
+
+
+
 #ifdef TCL_STORAGE_CLASS
 # undef TCL_STORAGE_CLASS
 #endif

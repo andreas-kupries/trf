@@ -59,7 +59,7 @@ Tcl_Interp* interp;
   int            res;
 
 #ifdef USE_TCL_STUBS
-  char* actualVersion;
+  CONST char* actualVersion;
 
   actualVersion = Tcl_InitStubs(interp, "8.1", 0);
   if (actualVersion == NULL) {

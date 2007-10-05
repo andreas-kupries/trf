@@ -40,6 +40,7 @@
 # endif
 #endif
 
+#include "transformInt.h"
 #include "md5.h"
 
 #ifdef _LIBC

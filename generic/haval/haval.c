@@ -39,6 +39,7 @@
 
 #include <stdio.h>
 #include <memory.h>
+#include "transformInt.h"
 #include "havalapp.h"
 #include "tcl.h"
 #include "haval.h"

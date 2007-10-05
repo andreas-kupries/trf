@@ -19,6 +19,9 @@
 #    ifdef __WIN32__
 #    define SSL_LIB_NAME "crypto32.dll"
 #    endif /* __WIN32__ */
+#    ifdef MAC_OSX_TCL
+#    define SSL_LIB_NAME "libcrypto.dylib"
+#    endif /* MAC_OSX_TCL */
 #    ifndef SSL_LIB_NAME
 #    define SSL_LIB_NAME "libcrypto.so"
 #    endif /* SSL_LIB_NAME */
@@ -29,6 +32,9 @@
 #    ifdef __WIN32__
 #    define CRYPT_LIB_NAME "crypt.dll"
 #    endif /* __WIN32__ */
+#    ifdef MAC_OSX_TCL
+#    define CRYPT_LIB_NAME "libcrypt.dylib"
+#    endif /* MAC_OSX_TCL */
 #    ifndef CRYPT_LIB_NAME
 #    define CRYPT_LIB_NAME "libcrypt.so"
 #    endif /* SSL_LIB_NAME */

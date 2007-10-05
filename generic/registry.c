@@ -51,7 +51,7 @@ int n = 0;
  * Relevant for only Tcl 8.0 and beyond.
  */
 
-#define DELAY (5)
+#define TRF_DELAY (5)
 
 /*
  * Structures used by an attached transformation procedure
@@ -284,7 +284,7 @@ TrfInput _ANSI_ARGS_ ((ClientData instanceData,
 
 static int
 TrfOutput _ANSI_ARGS_ ((ClientData instanceData,
-			char*  buf, int toWrite,
+			CONST84 char* buf, int toWrite,
 			int*        errorCodePtr));
 
 static int
@@ -299,11 +299,11 @@ TrfGetFile _ANSI_ARGS_ ((ClientData instanceData, int direction,
 
 static int
 TrfGetOption _ANSI_ARGS_ ((ClientData instanceData, Tcl_Interp* interp,
-			   char* optionName, Tcl_DString* dsPtr));
+			   CONST84 char* optionName, Tcl_DString* dsPtr));
 
 static int
 TrfSetOption _ANSI_ARGS_((ClientData instanceData, Tcl_Interp* interp,
-			  char* optionName, char* value));
+			  CONST char* optionName, CONST char* value));
 #ifdef USE_TCL_STUBS
 static int
 TrfNotify _ANSI_ARGS_((ClientData instanceData, int interestMask));
@@ -363,11 +363,11 @@ DownWrite _ANSI_ARGS_ ((TrfTransformationInstance* ctrl,
 static int
 DownSOpt _ANSI_ARGS_ ((Tcl_Interp* interp,
 		       TrfTransformationInstance* ctrl,
-		       char* optionName, char* value));
+		       CONST char* optionName, CONST char* value));
 static int
 DownGOpt _ANSI_ARGS_ ((Tcl_Interp* interp,
 		       TrfTransformationInstance* ctrl,
-		       char* optionName, Tcl_DString* dsPtr));
+		       CONST84 char* optionName, Tcl_DString* dsPtr));
 
 #define DOWNC(trans)             (DownChannel (trans))
 #define TELL(trans)              (SEEK (trans, 0, SEEK_CUR))
@@ -1707,7 +1707,7 @@ int*       errorCodePtr;
 static int
 TrfOutput (instanceData, buf, toWrite, errorCodePtr)
 ClientData instanceData;
-char*      buf;
+CONST84 char*      buf;
 int        toWrite;
 int*       errorCodePtr;
 {
@@ -2161,8 +2161,8 @@ static int
 TrfSetOption (instanceData, interp, optionName, value)
      ClientData  instanceData;
      Tcl_Interp* interp;
-     char*       optionName;
-     char*       value;
+     CONST char* optionName;
+     CONST char* value;
 {
   /* Recognized options:
    *
@@ -2312,10 +2312,10 @@ TrfSetOption (instanceData, interp, optionName, value)
 
 static int
 TrfGetOption (instanceData, interp, optionName, dsPtr)
-     ClientData   instanceData;
-     Tcl_Interp*  interp;
-     char*        optionName;
-     Tcl_DString* dsPtr;
+     ClientData    instanceData;
+     Tcl_Interp*   interp;
+     CONST84 char* optionName;
+     Tcl_DString*  dsPtr;
 {
   /* Recognized options:
    *
@@ -3207,8 +3207,8 @@ static int
 DownSOpt (interp, ctrl, optionName, value)
      Tcl_Interp*                interp;
      TrfTransformationInstance* ctrl;
-     char*                      optionName;
-     char*                      value;
+     CONST char*                optionName;
+     CONST char*                value;
 {
   Tcl_Channel parent = DOWNC (ctrl);
 
@@ -3252,7 +3252,7 @@ static int
 DownGOpt (interp, ctrl, optionName, dsPtr)
      Tcl_Interp*                interp;
      TrfTransformationInstance* ctrl;
-     char*                      optionName;
+     CONST84 char*              optionName;
      Tcl_DString*               dsPtr;
 {
   Tcl_Channel parent = DOWNC (ctrl);
@@ -3415,7 +3415,7 @@ DownSeek (ctrl, offset, mode)
    * Just use the standard 'Tcl_Seek'.
    */
 
-    return Tcl_Seek (parent, offset, mode);
+    return (int) Tcl_Seek (parent, offset, mode);
 }
 
 /*
@@ -4736,7 +4736,7 @@ TimerSetup (trans)
      TrfTransformationInstance* trans;
 {
   if (trans->timer == (Tcl_TimerToken) NULL) {
-    trans->timer = Tcl_CreateTimerHandler (DELAY, ChannelHandlerTimer,
+    trans->timer = Tcl_CreateTimerHandler (TRF_DELAY, ChannelHandlerTimer,
 					   (ClientData) trans);
   }
 }

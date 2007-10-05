@@ -28,6 +28,7 @@
 #ifdef  WORDS_BIGENDIAN
 #undef  LITTLE_ENDIAN
 #else
+#undef  LITTLE_ENDIAN
 #define LITTLE_ENDIAN
 #endif
 

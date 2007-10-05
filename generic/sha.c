@@ -28,12 +28,14 @@
  */
 
 #include "transformInt.h"
+#include "sha/sha.h"
 
-#ifndef WORDS_BIGENDIAN
+#ifdef WORDS_BIGENDIAN
+#undef  LITTLE_ENDIAN
+#else
+#undef  LITTLE_ENDIAN
 #define LITTLE_ENDIAN
 #endif
-
-#include "sha/sha.h"
 
 /*
  * Generator description

@@ -1645,6 +1645,8 @@ dnl AC_CHECK_TOOL(AR, ar)
 	    # at present (no 64bit GUI libraries).
 	    test $do64bit_ok = no && test -n "${TK_BIN_DIR}" && \
 	        CFLAGS="`echo "$CFLAGS" | sed -e 's/-arch ppc64/-arch ppc/g'`"
+
+	    AC_DEFINE(MAC_OSX_TCL)
 	    ;;
 	NEXTSTEP-*)
 	    SHLIB_CFLAGS=""

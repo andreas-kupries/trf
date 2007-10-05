@@ -66,7 +66,7 @@ Trf_InitStubs(interp, version, exact)
     CONST char *version;
     int exact;
 {
-    char *actualVersion;
+    CONST char *actualVersion;
 
     actualVersion = Tcl_PkgRequireEx(interp, "Trf", (char *) version, exact,
 		(ClientData *) &trfStubsPtr);
@@ -84,5 +84,5 @@ Trf_InitStubs(interp, version, exact)
     
     trfIntStubsPtr = trfStubsPtr->hooks->trfIntStubs;
     
-    return actualVersion;
+    return (char*) actualVersion;
 }

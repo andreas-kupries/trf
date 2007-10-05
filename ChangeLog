@@ -1,3 +1,32 @@
+2007-10-04  Andreas Kupries  <andreask@activestate.com>
+
+	* configure.in: Version bumped to 2.1.1. Source directory belongs
+	  into the list of include paths. Accept MINGW32_NT as indication
+	  of a Win32 system.
+	* configure: Regenerated.
+	* tclconfig/tcl.m4: Added definition which allows us to recognize
+	  building for OS X.
+	* compat/tclLoadWin.c: Added cast to silence compiler warning.
+	* generic/init.c: Ditto.
+	* generic/loadman.c: Recognize building on OS X and choose
+	  appropriate library names.
+	* generic/loadman.h: Use __P (of trf_features.h) over _ANSI_ARGS_
+	  to silence warnings.
+	* generic/registry.c: Changed name of macro DELAY to avoid clash
+	  with system macro, and constification.
+	* generic/sha.c: Reordered things a bit for proper set up of
+	  endianess definitions.
+	* generic/transformInt.h: Added more checks for proper set up of
+	  endianess on OS X for universal builds.
+	* generic/trfStubLib.c: Constification and cast to silence
+	  warnings.
+	* generic/util.c: Changed name of macro MASK to avoid clash with
+	  system macro.
+	* generic/haval/haval.c: Added inclusion of transformInt.h to get
+	* generic/haval/havalapp.h: proper set up of endianess.
+	* generic/haval.1996/havalapp.h:
+	* md5-crypt/md5.c: Ditto.
+
 2006-01-24  Andreas Kupries <andreask@activestate.com>
 
 	* tclconfig/tcl.m4: Updated to TEA 3.5
@@ -191,7 +220,7 @@
 	  interpretation of -I / -L options by the compiler.
 
 	* configure.in: Readded check for endianess. Moved ltoa,
-	  etc. block just after tea_setup_compiler. Detemrination of flags
+	  etc. block just after tea_setup_compiler. Determination of flags
 	  for shared build messes up these tests.
 
 2002-09-27  Andreas Kupries  <andreas_kupries@users.sourceforge.net>

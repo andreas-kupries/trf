@@ -117,7 +117,7 @@ TrfMerge4to3 (in, out)
 CONST unsigned char* in;
 unsigned char*       out;
 {
-#define	MASK(i,by,mask) ((in [i] by) & mask)
+#define	TRF_MASK(i,by,mask) ((in [i] by) & mask)
 
   /*
    * use temp storage to prevent problems in case of
@@ -126,15 +126,15 @@ unsigned char*       out;
 
   unsigned char o1, o2, o3;
 
-  o1 = MASK (0, << 2, 0374) | MASK (1, >> 4, 003);
-  o2 = MASK (1, << 4, 0360) | MASK (2, >> 2, 017);
-  o3 = MASK (2, << 6, 0300) | MASK (3, >> 0, 077);
+  o1 = TRF_MASK (0, << 2, 0374) | TRF_MASK (1, >> 4, 003);
+  o2 = TRF_MASK (1, << 4, 0360) | TRF_MASK (2, >> 2, 017);
+  o3 = TRF_MASK (2, << 6, 0300) | TRF_MASK (3, >> 0, 077);
 
   out [0] = o1;
   out [1] = o2;
   out [2] = o3;
 
-#undef MASK
+#undef TRF_MASK
 }
 
 /*
