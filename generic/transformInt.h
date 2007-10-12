@@ -119,7 +119,6 @@ extern "C" {
 #define EWOULDBLOCK EAGAIN
 #endif
 
-
 /* Debugging definitions.
  */
 

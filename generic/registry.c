@@ -4503,8 +4503,8 @@ AllocChannelType (sizePtr)
    * Allocation of a new channeltype structure is not easy, because of
    * the various verson of the core and subsequent changes to the
    * structure. The main challenge is to allocate enough memory for
-   * odern versions even if this extyension is compiled against one
-   * of the older variant!
+   * modern versions even if this extension is compiled against one
+   * of the older variants!
    *
    * (1) Versions before stubs (8.0.x) are simple, because they are
    *     supported only if the extension is compiled against exactly
@@ -4526,13 +4526,14 @@ AllocChannelType (sizePtr)
    * 8.1.   First version containing close2proc. Baseline.
    * 8.3.2  Three additional vectors. Moved blockMode, new flush- and
    *        handlerProc's.
+   * 8.4+   wide seek, and thread action.
    *
-   * => Compilation against earlier version has to overallocate three
+   * => Compilation against earlier version has to overallocate five
    *    procedure pointers.
    */
 
 #if !(GT832)
-  size += 3 * procPtrSize;
+  size += 5 * procPtrSize;
 #endif
 #endif
 

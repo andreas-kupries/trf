@@ -356,6 +356,11 @@ ClientData clientData;
   c->state.avail_in  = 1;
 
   for (;;) {
+    if (c->state.avail_in <= 0) {
+      PRINTLN ("Nothing to process");
+      break;
+    }
+
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
@@ -428,12 +433,19 @@ ClientData clientData;
   int res;
 
   START (ZipEncodeBuffer); 
-  PRINT ("Data = {%d, \"%s\"}\n", bufLen, buffer); FL;
+  PRINT ("Data = %d {\n", bufLen);
+  DUMP  (bufLen, buffer);
+  PRINT ("}\n");
 
   c->state.next_in   = (Bytef*) buffer;
   c->state.avail_in  = bufLen;
 
   for (;;) {
+    if (c->state.avail_in <= 0) {
+      PRINTLN ("Nothing to process");
+      break;
+    }
+
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
@@ -747,6 +759,11 @@ ClientData clientData;
   c->state.avail_in  = 1;
 
   for (;;) {
+    if (c->state.avail_in <= 0) {
+      PRINTLN ("Nothing to process");
+      break;
+    }
+
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
@@ -833,8 +850,10 @@ ClientData clientData;
   /* execute conversion specific code here (ZIP) */
   int res;
 
-  START (ZipDecodeBuffer); 
-  PRINT ("Data = {%d, \"%s\"}\n", bufLen, buffer); FL;
+  START (ZipDecodeBuffer);
+  PRINT ("Data = %d {\n", bufLen);
+  DUMP  (bufLen, buffer);
+  PRINT ("}\n");
   /*
   if (c->stop) {
     PRINTLN ("stopped");
@@ -846,6 +865,11 @@ ClientData clientData;
   c->state.avail_in  = bufLen;
 
   for (;;) {
+    if (c->state.avail_in <= 0) {
+      PRINTLN ("Nothing to process");
+      break;
+    }
+
     c->state.next_out  = (Bytef*) c->output_buffer;
     c->state.avail_out = OUT_SIZE;
 
