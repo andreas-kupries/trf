@@ -1,3 +1,8 @@
+2007-11-13  Andreas Kupries  <andreask@activestate.com>
+
+	* teapot.txt: New file, basic meta data of the package for TEApot
+	  compatible repositories.
+
 2007-10-12  Andreas Kupries  <andreask@activestate.com>
 
 	* generic/zip.c: Fixed problem in the zip (de)compressor. Had a
