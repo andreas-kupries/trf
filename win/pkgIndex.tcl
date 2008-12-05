@@ -1,6 +1,6 @@
 # Tcl package index file, version 1.0
 #
-# Window package index for Trf 2.1p2 (as of AUG-26-2002)
+# Window package index for Trf 2.1.3 (as of DEC-06-2008)
 #
 
 proc trfifneeded dir {

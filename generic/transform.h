@@ -4,7 +4,7 @@
  *
  * transform.h - externally visible facilities of data transformers
  *
- * Distributed at AUG-26-2002.
+ * Distributed at DEC-06-2008.
  *
  * Copyright (c) 1995 Andreas Kupries (a.kupries@westend.com)
  * All rights reserved.

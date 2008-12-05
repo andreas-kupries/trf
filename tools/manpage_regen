@@ -4,7 +4,7 @@
 
 # Phase I ... List known manpages ...
 
-rm    ../tools/rules/manpages
+rm -f ../tools/rules/manpages
 touch ../tools/rules/manpages
 
 for i in `ls *.man`

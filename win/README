@@ -1,6 +1,6 @@
 
 		Tcl Data transformations (Tcl-Trf)
-		(Version 2.1p2 / AUG-26-2002)
+		(Version 2.1.3 / DEC-06-2008)
 
 		Andreas Kupries	(andreas_kupries@users.sourceforge.net)
 
@@ -9,8 +9,8 @@ This is the README file for the Windows version of the 'Tcl-Trf' package.
 
 In order to compile Trf for Windows, you need the following items:
 
-	Trf 2.1p2 Source Distribution
-	Tcl 7.6, 8.0* Source distribution
+	Trf 2.1.3 Source Distribution
+	Tcl 7.6, 8.0+ Source distribution
 	A version of 'patch' running under Windows.
 
 	Visual C++ 2.x/4.x/5.x
