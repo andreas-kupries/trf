@@ -40,5 +40,5 @@ proc write_zip {file data} {
 
 # -- and the commands to test --
 
-load ./@Trf_LIB_FILE@
+load ./@PKG_LIB_FILE@
 

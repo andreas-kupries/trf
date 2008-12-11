@@ -19,9 +19,9 @@
 #    ifdef __WIN32__
 #    define SSL_LIB_NAME "crypto32.dll"
 #    endif /* __WIN32__ */
-#    ifdef MAC_OSX_TCL
+#    ifdef __APPLE__
 #    define SSL_LIB_NAME "libcrypto.dylib"
-#    endif /* MAC_OSX_TCL */
+#    endif /* __APPLE__ */
 #    ifndef SSL_LIB_NAME
 #    define SSL_LIB_NAME "libcrypto.so"
 #    endif /* SSL_LIB_NAME */
@@ -32,9 +32,9 @@
 #    ifdef __WIN32__
 #    define CRYPT_LIB_NAME "crypt.dll"
 #    endif /* __WIN32__ */
-#    ifdef MAC_OSX_TCL
-#    define CRYPT_LIB_NAME "libcrypt.dylib"
-#    endif /* MAC_OSX_TCL */
+#    ifdef __APPLE__
+#    define CRYPT_LIB_NAME "libcrypto.dylib"
+#    endif /* __APPLE__ */
 #    ifndef CRYPT_LIB_NAME
 #    define CRYPT_LIB_NAME "libcrypt.so"
 #    endif /* SSL_LIB_NAME */
@@ -67,16 +67,17 @@ static char* ssl_symbols [] = {
   (char *) NULL,
 };
 
+#ifndef MD5_STATIC_BUILD
 static char* crypt_symbols [] = {
   /* md5 */
-  "md5_init_ctx",
-  "md5_process_bytes",
-  "md5_finish_ctx",
+  "MD5_Init",
+  "MD5_Update",
+  "MD5_Final",
   "crypt",
   /* -- */
   (char *) NULL,
 };
-
+#endif
 
 
 
@@ -90,6 +91,14 @@ md5Functions  md5f  = {0}; /* THREADING: serialize initialization */
 
 #ifdef MD5_STATIC_BUILD
 #include "../md5-crypt/md5.h" /* THREADING: import of one constant var, read-only => safe */
+extern char *md5_crypt(const char *key, const char *salt);
+static void md5_update(MD5_CTX *c, unsigned char* data, unsigned long length)
+{
+    md5_process_bytes(data, length, c);
+}
+static void md5_final(unsigned char* digest, MD5_CTX* c) {
+     md5_finish_ctx(c, digest);
+}
 #endif
 
 /*
@@ -182,9 +191,9 @@ TrfLoadMD5 (interp)
 #ifdef MD5_STATIC_BUILD
   md5f.loaded = 1;
   md5f.init   = md5_init_ctx;
-  md5f.update = md5_process_bytes;
-  md5f.final  = md5_finish_ctx;
-  md5f.crypt  = NULL;
+  md5f.update = md5_update;
+  md5f.final  = md5_final;
+  md5f.crypt  = md5_crypt;
   return TCL_OK;
 #else
   int res;

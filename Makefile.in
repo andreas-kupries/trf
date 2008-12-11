@@ -22,6 +22,8 @@
 zlibtcl_STUB_LIB_FILE	= @zlibtcl_STUB_LIB_FILE@
 zlibtcl_SRC_PATH	= @zlibtcl_SRC_PATH@
 zlibtcl_VERSION		= @zlibtcl_VERSION@
+SHLIB_SUFFIX		= @SHLIB_SUFFIX@
+TRF_TESTS		= @TRF_TESTS@
 
 #========================================================================
 # Nothing of the variables below this line should need to be changed.
@@ -207,7 +209,7 @@ install-libraries: libraries
 install-doc: doc
 
 test: binaries libraries
-	$(TCLSH) `@CYGPATH@ $(srcdir)/tests/all` $(TESTFLAGS)
+	$(TCLSH) `@CYGPATH@ $(srcdir)/tea.tests/all.tcl` -constraints "$(TRF_TESTS)" $(TESTFLAGS)
 
 shell: binaries libraries
 	@$(TCLSH) $(SCRIPT)
@@ -349,7 +351,11 @@ SSL_INCLUDE_DIR		=	@SSL_INCLUDE_DIR@
 ZLIB_LIB_DIR		=	@ZLIB_LIB_DIR@
 ZLIB_INCLUDE_DIR	=	@ZLIB_INCLUDE_DIR@
 
+BZ2_LIB_DIR		=	@BZ2_LIB_DIR@
+BZ2_INCLUDE_DIR		=	@BZ2_INCLUDE_DIR@
+
 Trf_INCLUDES		=	-I$(ZLIB_INCLUDE_DIR)	\
+				-I$(BZ2_INCLUDE_DIR)	\
 				-I$(SSL_INCLUDE_DIR)	\
 				-DLIBZ_DEFAULTNAME=\"libz@SHLIB_SUFFIX@\"
 

@@ -11,7 +11,7 @@
 #ifndef _WIN32
 typedef unsigned char BYTE;
 #endif
-#ifdef __alpha
+#if defined(__alpha) || defined(__LP64__)
 typedef unsigned int  UINT32;
 #else
 #ifndef UINT32

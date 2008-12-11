@@ -66,7 +66,20 @@ extern "C" {
 #   include "../compat/sha.h"
 #endif
 
-#include "../md5-crypt/md5.h"
+#if defined(HAVE_MD5_H) && !defined(MD5_STATIC_BUILD)
+#   ifdef OPENSSL_SUB
+#       include <openssl/md5.h>
+#   else
+#       include <md5.h>
+#   endif
+#   ifdef HAVE_UNISTD_H
+#       include <unistd.h>
+#   endif
+#else
+#   include "../md5-crypt/md5.h"
+#   include "../md5-crypt/trf_crypt.h"
+#   define MD5_CTX struct md5_ctx
+#endif
 
 
 #ifdef TCL_STORAGE_CLASS
@@ -96,10 +109,10 @@ typedef struct Md2Functions {
 
 typedef struct Md5Functions {
   long loaded;
-  void (* init)   __P ((struct md5_ctx* c));
-  void (* update) __P ((unsigned char* data, unsigned long length,
-				struct md5_ctx* c));
-  void* (* final)  __P ((struct md5_ctx* c, unsigned char* digest));
+  void (* init)   __P ((MD5_CTX* c));
+  void (* update) __P ((MD5_CTX* c, unsigned char* data,
+				unsigned long length));
+  void* (* final)  __P ((unsigned char* digest, MD5_CTX* c));
 
   const char* (* crypt) _ANSI_ARGS_ ((const char* key, const char* salt));
 

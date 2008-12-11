@@ -31,7 +31,11 @@
 
 VOID *dlopen(path, mode)
     CONST char *path;
+#if defined(__hpux) && defined(__ia64)
+    int mode;
+#else
     unsigned int mode;
+#endif
 {
     int flags, length;
 

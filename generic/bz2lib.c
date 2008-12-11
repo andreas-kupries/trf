@@ -11,22 +11,26 @@
 
 #include "transformInt.h"
 
-#ifdef __WIN32__
-#define BZ2_LIB_NAME "libbz2.dll"
-#endif
-
 #ifndef BZ2_LIB_NAME
-#define BZ2_LIB_NAME "libbz2.so"
-#endif
+#    ifdef __WIN32__
+#    define BZ2_LIB_NAME "libbz2.dll"
+#    endif /* __WIN32__ */
+#    ifdef __APPLE__
+#    define BZ2_LIB_NAME "libbz2.dylib"
+#    endif /* __APPLE__ */
+#    ifndef BZ2_LIB_NAME
+#    define BZ2_LIB_NAME "libbz2.so"
+#    endif /* BZ2_LIB_NAME */
+#endif /* BZ2_LIB_NAME */
 
 
 static char* symbols [] = {
-  "bzCompress",
-  "bzCompressEnd",
-  "bzCompressInit",
-  "bzDecompress",
-  "bzDecompressEnd",
-  "bzDecompressInit",
+  "BZ2_bzCompress",
+  "BZ2_bzCompressEnd",
+  "BZ2_bzCompressInit",
+  "BZ2_bzDecompress",
+  "BZ2_bzDecompressEnd",
+  "BZ2_bzDecompressInit",
   (char *) NULL
 };
 

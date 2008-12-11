@@ -46,7 +46,7 @@
  *      a  product without the  written  permission of the author.
  */
 
-#ifdef __alpha /* aku, Sep 23, 1996 */
+#if defined(__alpha) || defined(__LP64__) /* aku, Sep 23, 1996 */
 typedef unsigned int      haval_word; /* a HAVAL word = 32 bits */
 #else
 typedef unsigned long int haval_word; /* a HAVAL word = 32 bits */

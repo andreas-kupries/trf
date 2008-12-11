@@ -5,7 +5,7 @@ AC_REVISION($Id$)
 
 AC_INIT([Trf],[2.1.3])
 
-TEA_INIT([3.5])
+TEA_INIT([3.7])
 
 AC_CONFIG_AUX_DIR(tclconfig)
 
@@ -95,13 +95,13 @@ TEA_ADD_SOURCES([zip_opt.c zip.c bz2_opt.c bz2.c])
 TEA_ADD_SOURCES([trfStubInit.c])
 TEA_ADD_HEADERS([generic/transform.h generic/trfDecls.h])
 
-TEA_ADD_INCLUDES([-I\"`\${CYGPATH} \${srcdir} | sed -e  's!\\\!/!g'`\"])
-TEA_ADD_INCLUDES([-I\"`\${CYGPATH} \${srcdir}/generic`\"])
-TEA_ADD_INCLUDES([-I\"`\${CYGPATH} \${zlibtcl_SRC_PATH}`\"])
-TEA_ADD_INCLUDES([-I\"`\${CYGPATH} \${zlibtcl_BUILD_PATH}`\"])
+TEA_ADD_INCLUDES([-I\"\${srcdir}\"])
+TEA_ADD_INCLUDES([-I\"\${srcdir}/generic\"])
+TEA_ADD_INCLUDES([-I\"\${zlibtcl_SRC_PATH}\"])
+TEA_ADD_INCLUDES([-I\"\${zlibtcl_BUILD_PATH}\"])
 TEA_ADD_INCLUDES([-I\${ZLIB_INCLUDE_DIR}])
 TEA_ADD_INCLUDES([-I\${SSL_INCLUDE_DIR}])
-TEA_ADD_INCLUDES([-DLIBZ_DEFAULTNAME=\\\"libz${SHLIB_SUFFIX}\\\"])
+TEA_ADD_INCLUDES([-DLIBZ_DEFAULTNAME=\\\"libz\${SHLIB_SUFFIX}\\\"])
 AC_SUBST(SHLIB_SUFFIX)
 
 
@@ -126,10 +126,12 @@ if test "${TEA_PLATFORM}" = "windows" ; then
     AC_MSG_CHECKING([for main in -lcrypt])
     AC_MSG_RESULT([no (Windows)])
     HAS_LIBCRYPT=0
+elif test "`uname -s`" = "Darwin"; then
+    AC_CHECK_LIB(System, crypt, HAS_LIBCRYPT=1, HAS_LIBCRYPT=0)
 else
     AC_CHECK_LIB(crypt, main, HAS_LIBCRYPT=1, HAS_LIBCRYPT=0)
+    AC_CHECK_LIB(crypt, md5_init_ctx, HAS_LIBCRYPT_MD5=1, HAS_LIBCRYPT_MD5=0)
 fi
-AC_CHECK_LIB(crypt, md5_init_ctx, HAS_LIBCRYPT_MD5=1, HAS_LIBCRYPT_MD5=0)
 
 
 
@@ -275,6 +277,8 @@ case "`uname -s`" in
     *win32* | *WIN32* | *CYGWIN_NT* | *CYGWIN_98* | *CYGWIN_95* | MINGW32_NT*)
 	TEA_ADD_SOURCES([compat/tclLoadWin.c])
     ;;
+    *Darwin)
+    ;;
     *)
 	if test "x${DL_OBJS}" != "xtclLoadDl.o"
 	then
@@ -306,7 +310,7 @@ then
 	eval AC_DEFINE_UNQUOTED(MD5_STATIC_BUILD, 1)
 
 	TEA_ADD_SOURCES([md5-crypt/crypt-entry.c md5-crypt/md5-crypt.c md5-crypt/md5.c compat/stpncpy.c])
-else
+elif test "`uname -s`" != "Darwin"; then
 	# (2,3)
 	if test \( $HAS_LIBCRYPT_MD5 -eq 0 \)
 	then

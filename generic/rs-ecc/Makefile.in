@@ -63,8 +63,8 @@ all: ecc
 
 ### targets required by GNU Coding standards ###
 
-Makefile: Makefile.in config.status
-	./config.status
+#Makefile: Makefile.in config.status
+#	./config.status
 
 config.status: configure
 	$(srcdir)/configure --srcdir=$(srcdir) --no-create

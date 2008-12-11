@@ -138,6 +138,16 @@ AC_ARG_WITH(ssl-lib-dir,
 	[SSL_LIB_DIR=$withval],
 	[])
 
+AC_ARG_WITH(bz2,
+	[  --with-bz2=DIR		bzlib.h resides in DIR/include, libbz2 resides in DIR/lib],
+	[BZ2_LIB_DIR=$withval/lib; BZ2_INCLUDE_DIR=$withval/include],
+	[])
+dnl
+AC_ARG_WITH(bz2-include-dir,
+	[  --with-bz2-include-dir=DIR	bzlib.h resides in DIR],
+	[BZ2_INCLUDE_DIR=$withval],
+	[])
+dnl
 AC_ARG_WITH(bz2-lib-dir,
 	[  --with-bz2-lib-dir=DIR	libbz2 resides in DIR],
 	[BZ2_LIB_DIR=$withval],
@@ -178,6 +188,23 @@ fi
 if test "X" = "X$ZLIB_INCLUDE_DIR" -a "X" != "X$ZLIB_LIB_DIR" 
 then
     ZLIB_INCLUDE_DIR="$ZLIB_LIB_DIR/../include"
+fi
+
+
+dnl ----------------------------------------------------------------
+dnl
+dnl Crossover between --with-bz2-include-dir and --with-bz2-lib-dir
+dnl Setting one, but not the other will cause automatic definition
+dnl of the missing part.
+
+if test "X" = "X$BZ2_LIB_DIR" -a "X" != "X$BZ2_INCLUDE_DIR" 
+then
+    BZ2_LIB_DIR="$BZ2_INCLUDE_DIR/../lib"
+fi
+
+if test "X" = "X$BZ2_INCLUDE_DIR" -a "X" != "X$BZ2_LIB_DIR" 
+then
+    BZ2_INCLUDE_DIR="$BZ2_LIB_DIR/../include"
 fi
 
 
@@ -312,13 +339,11 @@ AC_CACHE_CHECK(for directory with ssl.h,
      for dir in $places; do
          if test -r $dir/openssl/md2.h ; then
             trf_cv_path_SSL_INCLUDE_DIR=$dir
-	    eval AC_DEFINE_UNQUOTED(OPENSSL_SUB, 1)
 	    TRF_DEFS="$TRF_DEFS -DOPENSSL_SUB"
             break
          fi
          if test -r $dir/openssl/sha1.h ; then
             trf_cv_path_SSL_INCLUDE_DIR=$dir
-	    eval AC_DEFINE_UNQUOTED(OPENSSL_SUB, 1)
 	    TRF_DEFS="$TRF_DEFS -DOPENSSL_SUB"
             break
          fi
@@ -335,6 +360,10 @@ dnl
 dnl verify success of search
 dnl
 
+if echo "$TRF_DEFS" | grep -q OPENSSL_SUB; then
+    AC_DEFINE_UNQUOTED(OPENSSL_SUB, 1)
+fi
+
 if test -z "$trf_cv_path_SSL_INCLUDE_DIR" ; then
     AC_MSG_WARN(not found; falling back compat/ headers; use --with-ssl=DIR or --with-ssl-include-dir=DIR)
     SSL_INCLUDE_DIR="\".\""
@@ -347,6 +376,7 @@ else
     else
         eval AC_DEFINE_UNQUOTED(HAVE_SSL_H, 1)
         eval AC_DEFINE_UNQUOTED(HAVE_MD2_H, 1)
+        eval AC_DEFINE_UNQUOTED(HAVE_MD5_H, 1)
         eval AC_DEFINE_UNQUOTED(HAVE_SHA_H, 1)
         #DEFS="$DEFS -DHAVE_SSL_H -DHAVE_MD2_H -DHAVE_SHA_H"
         TRF_TESTS="$TRF_TESTS hasSSL"
@@ -405,6 +435,46 @@ fi
 AC_SUBST(SSL_LIB_DIR)
 dnl AC_CACHE_VAL(trf_cv_SSL_LIB_DIR, [trf_cv_SSL_LIB_DIR="$SSL_LIB_DIR"])
 
+
+dnl ----------------------------------------------------------------
+dnl
+dnl Locate bzlib.h
+dnl
+dnl Searches:
+dnl	BZ2_INCLUDE_DIR		(--with-bz2, --with-bz2-include-dir)
+dnl     TCL_INCLUDE_DIR		(--with-tcl, --with-tcl-include-dir)
+dnl	$prefix/include		(--prefix)
+dnl	/usr/local/include
+dnl	/usr/include
+dnl
+AC_CACHE_CHECK(for directory with bzlib.h,
+	trf_cv_path_BZ2_INCLUDE_DIR,
+	[trf_cv_path_BZ2_INCLUDE_DIR=""
+	 places="$BZ2_INCLUDE_DIR \
+		$TCL_INCLUDE_DIR \
+		$prefix/include \
+		/usr/local/include \
+		/usr/include"
+     for dir in $places; do
+         if test -r $dir/bzlib.h ; then
+            trf_cv_path_BZ2_INCLUDE_DIR=$dir
+            break
+         fi
+     done])
+dnl
+dnl verify success of search
+dnl
+
+if test -z "$trf_cv_path_BZ2_INCLUDE_DIR" ; then
+    AC_MSG_WARN(not found; falling back to compat/ headers; use --with-bz2=DIR or --with-bz2-include-dir=DIR)
+    BZ2_INCLUDE_DIR="\".\""
+else
+    BZ2_INCLUDE_DIR="\"`${CYGPATH} $trf_cv_path_BZ2_INCLUDE_DIR`\""
+    eval AC_DEFINE_UNQUOTED(HAVE_BZ2_H, 1)
+fi
+dnl
+
+AC_SUBST(BZ2_INCLUDE_DIR)
 
 dnl ----------------------------------------------------------------
 dnl

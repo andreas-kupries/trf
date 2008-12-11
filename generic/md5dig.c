@@ -37,8 +37,7 @@
  * message digest.
  */
 
-#define MD5_CTX  struct md5_ctx
-#define MD5_CTXP (struct md5_ctx*)
+#define MD5_CTXP (MD5_CTX*)
 
 #ifndef OTP
 #define DIGEST_SIZE               (16)
@@ -169,7 +168,7 @@ unsigned int   character;
 
   /*  MD5Update ((MD5_CTX*) context, &buf, 1); */
 
-  md5f.update (&buf, 1, MD5_CTXP context);
+  md5f.update (MD5_CTXP context, &buf, 1);
 }
 
 /*
@@ -207,7 +206,7 @@ int   bufLen;
   }
 #endif
 
-  md5f.update ((unsigned char*) buffer, bufLen, MD5_CTXP context);
+  md5f.update (MD5_CTXP context, (unsigned char*) buffer, bufLen);
 
 #ifdef TRF_DEBUG
   {
@@ -243,13 +242,13 @@ VOID* digest;
 {
 #ifndef OTP
   /*  MD5Final ((unsigned char*) digest, (MD5_CTX*) context); */
-  md5f.final (MD5_CTXP context, (unsigned char*) digest);
+  md5f.final ((unsigned char*) digest, MD5_CTXP context);
 #else
     int    i;
     unsigned char result[16];
 
     /*    MD5Final ((unsigned char*) result, (MD5_CTX*) context);*/
-    md5f.final (MD5_CTXP context, (unsigned char*) result);
+    md5f.final ((unsigned char*) result, MD5_CTXP context);
 
     for (i = 0; i < 8; i++)
         result[i] ^= result[i + 8];

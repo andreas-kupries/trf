@@ -1,3 +1,23 @@
+2008-12-11  Andreas Kupries  <andreask@activestate.com>
+
+	* Makefile.in: Applied Daniel Steffen's OSX patch, plus an
+	* configure: ActiveState fix for building on HPUX-IA64. The
+	* configure.in: patch updates handling of bz2 compression, md5,
+	* test.setup.in: updates to TEA 3.7, adds some darwin specific
+	* trf.m4: ifdef's in the digests to properly handle 64bit.
+	* compat/tclLoadShl.c:
+	* generic/bz2lib.c:
+	* generic/loadman.c:
+	* generic/loadman.h:
+	* generic/md5dig.c:
+	* generic/transformInt.h:
+	* generic/haval.1996/haval.h:
+	* generic/ripemd/rmd128.h:
+	* generic/ripemd/rmd160.h:
+	* generic/rs-ecc/Makefile.in:
+	* generic/sha/sha.h:
+	* tclconfig/tcl.m4:
+
 2008-12-05  Andreas Kupries  <andreask@activestate.com>
 
 	* Updated everything to 2.1.3 for release.

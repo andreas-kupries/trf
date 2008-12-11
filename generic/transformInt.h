@@ -61,7 +61,7 @@ extern "C" {
 #   endif
 #endif
 #endif
-#ifdef HAVE_BZLIB_H
+#ifdef HAVE_BZ2_H
 #   include <bzlib.h>
 #else
 #   include "../compat/bzlib.h"

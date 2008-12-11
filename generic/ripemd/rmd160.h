@@ -33,7 +33,7 @@
 typedef    unsigned char        byte;   /* unsigned 8-bit integer */
 typedef    unsigned short       word;   /* unsigned 16-bit integer */
 
-#ifdef __alpha
+#if defined(__alpha) || defined(__LP64__)
 typedef    unsigned int         dword;  /* unsigned 32-bit integer (AXP) */ 
 #else
 typedef    unsigned long        dword;  /* unsigned 32-bit integer */ 
