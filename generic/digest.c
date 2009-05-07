@@ -337,6 +337,11 @@ ClientData       clientData;
 {
   EncoderControl* c = (EncoderControl*) ctrlBlock;
 
+  /* [Bug 2788106]. */
+  if (c->destHandle) {
+    ckfree (c->destHandle);
+  }
+
   ckfree ((char*) c->context);
   ckfree ((char*) c);
 }
@@ -622,6 +627,11 @@ Trf_ControlBlock ctrlBlock;
 ClientData clientData;
 {
   DecoderControl* c = (DecoderControl*) ctrlBlock;
+
+  /* [Bug 2788106]. */
+  if (c->destHandle) {
+    ckfree (c->destHandle);
+  }
 
   ckfree ((char*) c->digest_buffer);
   ckfree ((char*) c->context);

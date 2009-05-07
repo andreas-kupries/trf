@@ -1400,6 +1400,12 @@ Tcl_Interp* interp;
 
   ResultClear (&trans->result);
 
+  /*
+   * Complement to NEW_TRANSFORM in AttachChannel.
+   * [Bug 2788106].
+   */
+  ckfree(trans);
+
   DONE (TrfClose);
   return TCL_OK;
 }

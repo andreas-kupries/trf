@@ -1,5 +1,12 @@
 2009-05-06  Andreas Kupries  <andreas_kupries@users.sourceforge.net>
 
+	* generic/digest.c (DeleteEncoder, DeleteDecoder): Fixed the
+	* generic/registry.c (TrfClose): memory leaks reported by
+	  [Bug 2788106].
+
+	* configure.in: Version bumped to 2.1.4.
+	* configure: Regenerated.
+
 	* generic/asc85code.c: Replaced all uses of Tcl_Alloc/Free/Realloc
 	* generic/b64code.c: with ckalloc, ckfree, and ckrealloc. The Tcl_
 	* generic/bincode.c: functions are apparently not respecting a
