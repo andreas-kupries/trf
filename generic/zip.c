@@ -228,7 +228,7 @@ ClientData     clientData;
 
   START (ZipCreateEncoder); 
 
-  c = (EncoderControl*) Tcl_Alloc (sizeof (EncoderControl));
+  c = (EncoderControl*) ckalloc (sizeof (EncoderControl));
   c->write           = fun;
   c->writeClientData = writeClientData;
 
@@ -238,10 +238,10 @@ ClientData     clientData;
   c->state.zfree  = Z_NULL;
   c->state.opaque = Z_NULL;
 
-  c->output_buffer = (char*) Tcl_Alloc (OUT_SIZE);
+  c->output_buffer = (char*) ckalloc (OUT_SIZE);
 
   if (c->output_buffer == (char*) NULL) {
-    Tcl_Free ((VOID*) c);
+    ckfree ((VOID*) c);
     DONE (ZipCreateEncoder); 
     return (ClientData) NULL;
   }
@@ -267,8 +267,8 @@ ClientData     clientData;
       ZlibError (interp, &c->state, res, "compressor/init");
     }
 
-    Tcl_Free ((VOID*) c->output_buffer);
-    Tcl_Free ((VOID*) c);
+    ckfree ((VOID*) c->output_buffer);
+    ckfree ((VOID*) c);
     DONE (ZipCreateEncoder); 
     return (ClientData) NULL;
   }
@@ -309,8 +309,8 @@ ClientData clientData;
 
   zf.zdeflateEnd (&c->state);
 
-  Tcl_Free ((char*) c->output_buffer);
-  Tcl_Free ((char*) c);
+  ckfree ((char*) c->output_buffer);
+  ckfree ((char*) c);
 
   DONE (ZipDeleteEncoder); 
 }
@@ -624,7 +624,7 @@ ClientData     clientData;
 
   START (ZipCreateDecoder); 
 
-  c = (DecoderControl*) Tcl_Alloc (sizeof (DecoderControl));
+  c = (DecoderControl*) ckalloc (sizeof (DecoderControl));
   c->write           = fun;
   c->writeClientData = writeClientData;
   c->nowrap          = o->nowrap;
@@ -636,10 +636,10 @@ ClientData     clientData;
   c->state.zfree  = Z_NULL;
   c->state.opaque = Z_NULL;
 
-  c->output_buffer = (char*) Tcl_Alloc (OUT_SIZE);
+  c->output_buffer = (char*) ckalloc (OUT_SIZE);
 
   if (c->output_buffer == (char*) NULL) {
-    Tcl_Free ((VOID*) c);
+    ckfree ((VOID*) c);
     DONE (ZipCreateDecoder); 
     return (ClientData) NULL;
   }
@@ -664,8 +664,8 @@ ClientData     clientData;
       ZlibError (interp, &c->state, res, "decompressor/init");
     }
 
-    Tcl_Free ((VOID*) c->output_buffer);
-    Tcl_Free ((VOID*) c);
+    ckfree ((VOID*) c->output_buffer);
+    ckfree ((VOID*) c);
     DONE (ZipCreateDecoder); 
     return (ClientData) NULL;
   }
@@ -706,8 +706,8 @@ ClientData clientData;
 
   zf.zinflateEnd (&c->state);
 
-  Tcl_Free ((char*) c->output_buffer);
-  Tcl_Free ((char*) c);
+  ckfree ((char*) c->output_buffer);
+  ckfree ((char*) c);
 
   DONE (ZipDeleteDecoder); 
 

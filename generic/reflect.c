@@ -184,7 +184,7 @@ ClientData     clientData;
   TrfTransformOptionBlock* o = (TrfTransformOptionBlock*) optInfo;
   int                    res;
 
-  c = (ReflectControl*) Tcl_Alloc (sizeof (ReflectControl));
+  c = (ReflectControl*) ckalloc (sizeof (ReflectControl));
   c->write           = fun;
   c->writeClientData = writeClientData;
   c->interp          = interp;
@@ -203,7 +203,7 @@ ClientData     clientData;
 
   if (res != TCL_OK) {
     Tcl_DecrRefCount (c->command);
-    Tcl_Free ((VOID*) c);
+    ckfree ((VOID*) c);
     return (ClientData) NULL;
   }
 
@@ -239,7 +239,7 @@ ClientData clientData;
 		      NULL, 0, TRANSMIT_DONT, 0);
 
   Tcl_DecrRefCount (c->command);
-  Tcl_Free ((VOID*) c);
+  ckfree ((VOID*) c);
 }
 
 /*
@@ -369,7 +369,7 @@ ClientData     clientData;
   TrfTransformOptionBlock* o = (TrfTransformOptionBlock*) optInfo;
   int                      res;
 
-  c = (ReflectControl*) Tcl_Alloc (sizeof (ReflectControl));
+  c = (ReflectControl*) ckalloc (sizeof (ReflectControl));
   c->write           = fun;
   c->writeClientData = writeClientData;
   c->interp          = interp;
@@ -389,7 +389,7 @@ ClientData     clientData;
   if (res != TCL_OK) {
     Tcl_DecrRefCount (c->command);
 
-    Tcl_Free ((VOID*) c);
+    ckfree ((VOID*) c);
     return (ClientData) NULL;
   }
 
@@ -425,7 +425,7 @@ ClientData clientData;
 		      NULL, 0, TRANSMIT_DONT, 0);
 
   Tcl_DecrRefCount (c->command);
-  Tcl_Free ((VOID*) c);
+  ckfree ((VOID*) c);
 }
 
 /*

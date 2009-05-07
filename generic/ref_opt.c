@@ -126,7 +126,7 @@ ClientData clientData;
 {
   TrfTransformOptionBlock* o;
 
-  o = (TrfTransformOptionBlock*) Tcl_Alloc (sizeof (TrfTransformOptionBlock));
+  o = (TrfTransformOptionBlock*) ckalloc (sizeof (TrfTransformOptionBlock));
   o->mode    = TRF_UNKNOWN_MODE;
   o->command = (Tcl_Obj*) NULL;
 
@@ -163,7 +163,7 @@ ClientData  clientData;
     Tcl_DecrRefCount (o->command);
   }
 
-  Tcl_Free ((VOID*) o);
+  ckfree ((VOID*) o);
 }
 
 /*

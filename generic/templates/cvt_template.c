@@ -188,7 +188,7 @@ ClientData clientData;
 {
   EncoderControl* c;
 
-  c = (EncoderControl*) Tcl_Alloc (sizeof (EncoderControl));
+  c = (EncoderControl*) ckalloc (sizeof (EncoderControl));
   c->write           = fun;
   c->writeClientData = writeClientData;
 
@@ -224,7 +224,7 @@ ClientData clientData;
 
   /* release conversion specific items here (XXX) */
 
-  Tcl_Free ((char*) c);
+  ckfree ((char*) c);
 }
 
 /*
@@ -377,7 +377,7 @@ ClientData clientData;
 {
   DecoderControl* c;
 
-  c = (DecoderControl*) Tcl_Alloc (sizeof (DecoderControl));
+  c = (DecoderControl*) ckalloc (sizeof (DecoderControl));
   c->write           = fun;
   c->writeClientData = writeClientData;
 
@@ -413,7 +413,7 @@ ClientData clientData;
 
   /* release conversion specific items here (XXX) */
 
-  Tcl_Free ((char*) c);
+  ckfree ((char*) c);
 }
 
 /*

@@ -125,7 +125,7 @@ ClientData clientData;
 {
   Trf_ConverterOptionBlock* o;
 
-  o = (Trf_ConverterOptionBlock*) Tcl_Alloc (sizeof (Trf_ConverterOptionBlock));
+  o = (Trf_ConverterOptionBlock*) ckalloc (sizeof (Trf_ConverterOptionBlock));
   o->mode = TRF_UNKNOWN_MODE;
 
   return (Trf_Options) o;
@@ -156,7 +156,7 @@ Trf_Options options;
 ClientData  clientData;
 {
   Trf_ConverterOptionBlock* o = (Trf_ConverterOptionBlock*) options;
-  Tcl_Free ((VOID*) o);
+  ckfree ((VOID*) o);
 }
 
 /*

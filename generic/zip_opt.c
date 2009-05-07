@@ -117,7 +117,7 @@ ClientData clientData;
 {
   TrfZipOptionBlock* o;
 
-  o = (TrfZipOptionBlock*) Tcl_Alloc (sizeof (TrfZipOptionBlock));
+  o = (TrfZipOptionBlock*) ckalloc (sizeof (TrfZipOptionBlock));
 
   o->mode   = TRF_UNKNOWN_MODE;
   o->level  = TRF_DEFAULT_LEVEL;
@@ -150,7 +150,7 @@ DeleteOptions (options, clientData)
 Trf_Options options;
 ClientData  clientData;
 {
-  Tcl_Free ((VOID*) options);
+  ckfree ((VOID*) options);
 }
 
 /*

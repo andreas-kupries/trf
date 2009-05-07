@@ -259,7 +259,7 @@ ClientData clientData;
 {
   EncoderControl* c;
 
-  c = (EncoderControl*) Tcl_Alloc (sizeof (EncoderControl));
+  c = (EncoderControl*) ckalloc (sizeof (EncoderControl));
   c->write           = fun;
   c->writeClientData = writeClientData;
 
@@ -291,7 +291,7 @@ ClientData clientData;
 {
   EncoderControl* c = (EncoderControl*) ctrlBlock;
 
-  Tcl_Free ((char*) c);
+  ckfree ((char*) c);
 }
 
 /*
@@ -366,7 +366,7 @@ Tcl_Interp* interp;
 ClientData clientData;
 {
   EncoderControl* c   = (EncoderControl*) ctrlBlock;
-  char*  out = (char*) Tcl_Alloc (3*bufLen+1);
+  char*  out = (char*) ckalloc (3*bufLen+1);
   int    res, i, j;
   CONST char*  ch;
 
@@ -380,7 +380,7 @@ ClientData clientData;
 
   res = c->write (c->writeClientData, (unsigned char*) out, 3*bufLen, interp);
 
-  Tcl_Free ((char*) out);
+  ckfree ((char*) out);
   return res;
 }
 
@@ -468,7 +468,7 @@ ClientData clientData;
 {
   DecoderControl* c;
 
-  c = (DecoderControl*) Tcl_Alloc (sizeof (DecoderControl));
+  c = (DecoderControl*) ckalloc (sizeof (DecoderControl));
   c->write           = fun;
   c->writeClientData = writeClientData;
 
@@ -503,7 +503,7 @@ ClientData clientData;
 {
   DecoderControl* c = (DecoderControl*) ctrlBlock;
 
-  Tcl_Free ((char*) c);
+  ckfree ((char*) c);
 }
 
 /*
@@ -608,7 +608,7 @@ ClientData       clientData;
 #define IN_RANGE(low,x,high) (((low) <= (x)) && ((x) <= (high)))
 
   DecoderControl* c      = (DecoderControl*) ctrlBlock;
-  char*  out             = (char*) Tcl_Alloc (2+bufLen/3);
+  char*  out             = (char*) ckalloc (2+bufLen/3);
   int    res, i, j;
   unsigned char character;
 
